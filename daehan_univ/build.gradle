@@ -1,0 +1,60 @@
+plugins {
+    id 'java' // Java 프로젝트임을 명시
+    id 'org.springframework.boot' version '3.4.5' // Spring Boot 프레임워크의 버전
+    id 'io.spring.dependency-management' version '1.1.4' // 의존성 버전 자동 관리
+}
+
+group = 'kr.ac.dhuniv'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = '17' // 자바 버전 지정 (Java 17)
+
+def lombokVersion = '1.18.30' // Lombok 버전을 변수로 선언
+
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	// ✅ 웹 개발에 필요한 Spring Boot 기본 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // ✅ JPA (ORM) + MySQL 드라이버
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    
+	implementation 'org.postgresql:postgresql:42.7.3' // 2024년 기준 안정 버전
+    // ✅ 요청값 유효성 검사 (@Valid 등)
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // ✅ Lombok (코드 자동 생성용)
+    compileOnly "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+   //Lombok을 테스트 코드에서도 사용한다면 추가
+   testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
+   testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+    //✅ 코드 수정 시 서버 자동 재시작 / 캐시 자동 리프레시 기능 제공
+   developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+
+   //✅ 공통 기능(로깅, 보안 검사 등)을 코드와 분리해서 적용 가능하게 해주는 기법
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '3.4.5'
+
+
+   //thymeleaf
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.4.5'
+    // ✅ MyBatis (직접 SQL 작성 시 사용)
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3'
+    //✅ 이메일로 알림, 보고서 전송, 비밀번호 초기화 등을 처리할 수 있는 도구
+   implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.4.5'
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+repositories {
+	mavenCentral()
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
