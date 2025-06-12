@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학과/부서 관리 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+        }
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1.5rem;
+        }
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .tree-item {
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tree-item:hover {
+            background-color: #f8f9fa;
+        }
+        .tree-item.selected {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 사이드바 -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            관리자
+                        </h4>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                대시보드
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
+                                <i class="fas fa-users me-2"></i>
+                                사용자/조직 관리
+                                <i class="fas fa-chevron-down ms-auto"></i>
+                            </a>
+                            <div class="collapse show" id="userManagement">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-student-management.html">
+                                            <i class="fas fa-user-graduate me-2"></i>
+                                            학생 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-faculty-management.html">
+                                            <i class="fas fa-chalkboard-teacher me-2"></i>
+                                            교직원 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="admin-department-management.html">
+                                            <i class="fas fa-building me-2"></i>
+                                            학과/부서 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-permission-management.html">
+                                            <i class="fas fa-key me-2"></i>
+                                            권한 관리
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                로그아웃
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- 메인 콘텐츠 -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-building me-2"></i>
+                        학과/부서 관리
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addDepartmentModal">
+                                <i class="fas fa-plus me-2"></i>
+                                부서 추가
+                            </button>
+                            <button type="button" class="btn btn-outline-primary">
+                                <i class="fas fa-download me-2"></i>
+                                조직도 다운로드
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 조직도 트리 -->
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-sitemap me-2"></i>
+                                    조직도
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="organizationTree">
+                                    <div class="tree-item" onclick="selectDepartment('university')">
+                                        <i class="fas fa-university me-2"></i>
+                                        <strong>○○대학교</strong>
+                                    </div>
+                                    <div class="ms-3">
+                                        <div class="tree-item" onclick="selectDepartment('engineering')">
+                                            <i class="fas fa-cogs me-2"></i>
+                                            공과대학
+                                        </div>
+                                        <div class="ms-3">
+                                            <div class="tree-item" onclick="selectDepartment('computer')">
+                                                <i class="fas fa-laptop-code me-2"></i>
+                                                컴퓨터공학과
+                                            </div>
+                                            <div class="tree-item" onclick="selectDepartment('mechanical')">
+                                                <i class="fas fa-cog me-2"></i>
+                                                기계공학과
+                                            </div>
+                                            <div class="tree-item" onclick="selectDepartment('electronic')">
+                                                <i class="fas fa-microchip me-2"></i>
+                                                전자공학과
+                                            </div>
+                                        </div>
+                                        <div class="tree-item" onclick="selectDepartment('business')">
+                                            <i class="fas fa-chart-line me-2"></i>
+                                            경영대학
+                                        </div>
+                                        <div class="ms-3">
+                                            <div class="tree-item" onclick="selectDepartment('management')">
+                                                <i class="fas fa-briefcase me-2"></i>
+                                                경영학과
+                                            </div>
+                                            <div class="tree-item" onclick="selectDepartment('accounting')">
+                                                <i class="fas fa-calculator me-2"></i>
+                                                회계학과
+                                            </div>
+                                        </div>
+                                        <div class="tree-item" onclick="selectDepartment('admin')">
+                                            <i class="fas fa-building me-2"></i>
+                                            행정부서
+                                        </div>
+                                        <div class="ms-3">
+                                            <div class="tree-item" onclick="selectDepartment('student-affairs')">
+                                                <i class="fas fa-users me-2"></i>
+                                                학생처
+                                            </div>
+                                            <div class="tree-item" onclick="selectDepartment('academic-affairs')">
+                                                <i class="fas fa-graduation-cap me-2"></i>
+                                                교무처
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 부서 상세 정보 -->
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    부서 상세 정보
+                                </h5>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary me-2" onclick="editDepartment()">
+                                        <i class="fas fa-edit me-1"></i>
+                                        수정
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteDepartment()">
+                                        <i class="fas fa-trash me-1"></i>
+                                        삭제
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <div id="departmentDetails">
+                                    <div class="text-center text-muted py-5">
+                                        <i class="fas fa-building fa-3x mb-3"></i>
+                                        <p>조직도에서 부서를 선택하세요.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 부서 통계 -->
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-primary">전체 부서</h5>
+                                        <h2 class="text-primary">12</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-success">학과</h5>
+                                        <h2 class="text-success">8</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <h5 class="card-title text-info">행정부서</h5>
+                                        <h2 class="text-info">4</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 부서 추가 모달 -->
+    <div class="modal fade" id="addDepartmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus me-2"></i>
+                        부서 추가
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDepartmentForm">
+                        <div class="mb-3">
+                            <label for="departmentCode" class="form-label">부서 코드 *</label>
+                            <input type="text" class="form-control" id="departmentCode" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="departmentName" class="form-label">부서명 *</label>
+                            <input type="text" class="form-control" id="departmentName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="parentDepartment" class="form-label">상위 부서</label>
+                            <select class="form-select" id="parentDepartment">
+                                <option value="">최상위 부서</option>
+                                <option value="university">○○대학교</option>
+                                <option value="engineering">공과대학</option>
+                                <option value="business">경영대학</option>
+                                <option value="admin">행정부서</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="departmentType" class="form-label">부서 유형 *</label>
+                            <select class="form-select" id="departmentType" required>
+                                <option value="">유형 선택</option>
+                                <option value="college">단과대학</option>
+                                <option value="department">학과</option>
+                                <option value="office">행정부서</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="headName" class="form-label">부서장</label>
+                            <input type="text" class="form-control" id="headName">
+                        </div>
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">대표 전화</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+                        <div class="mb-3">
+                            <label for="location" class="form-label">위치</label>
+                            <input type="text" class="form-control" id="location">
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">설명</label>
+                            <textarea class="form-control" id="description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="addDepartment()">
+                        <i class="fas fa-save me-2"></i>
+                        저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedDepartment = null;
+
+        // 부서 선택
+        function selectDepartment(departmentId) {
+            // 이전 선택 해제
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // 현재 선택 표시
+            event.target.classList.add('selected');
+            selectedDepartment = departmentId;
+            
+            // 부서 상세 정보 표시
+            showDepartmentDetails(departmentId);
+        }
+
+        // 부서 상세 정보 표시
+        function showDepartmentDetails(departmentId) {
+            const departments = {
+                'university': {
+                    name: '○○대학교',
+                    code: 'UNIV',
+                    type: '대학교',
+                    head: '총장',
+                    phone: '02-1234-5678',
+                    location: '본관 1층',
+                    description: '○○대학교 본부',
+                    studentCount: 12000,
+                    facultyCount: 450
+                },
+                'computer': {
+                    name: '컴퓨터공학과',
+                    code: 'CSE',
+                    type: '학과',
+                    head: '김교수',
+                    phone: '02-1234-5679',
+                    location: '공학관 3층',
+                    description: '컴퓨터 과학 및 소프트웨어 공학 교육',
+                    studentCount: 320,
+                    facultyCount: 12
+                },
+                'management': {
+                    name: '경영학과',
+                    code: 'BUS',
+                    type: '학과',
+                    head: '이교수',
+                    phone: '02-1234-5680',
+                    location: '경영관 2층',
+                    description: '경영학 및 비즈니스 교육',
+                    studentCount: 280,
+                    facultyCount: 10
+                }
+            };
+
+            const dept = departments[departmentId] || {
+                name: '선택된 부서',
+                code: 'DEPT',
+                type: '부서',
+                head: '-',
+                phone: '-',
+                location: '-',
+                description: '부서 정보',
+                studentCount: 0,
+                facultyCount: 0
+            };
+
+            const detailsHtml = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="30%">부서명:</th>
+                                <td>${dept.name}</td>
+                            </tr>
+                            <tr>
+                                <th>부서 코드:</th>
+                                <td>${dept.code}</td>
+                            </tr>
+                            <tr>
+                                <th>부서 유형:</th>
+                                <td><span class="badge bg-primary">${dept.type}</span></td>
+                            </tr>
+                            <tr>
+                                <th>부서장:</th>
+                                <td>${dept.head}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tr>
+                                <th width="30%">대표 전화:</th>
+                                <td>${dept.phone}</td>
+                            </tr>
+                            <tr>
+                                <th>위치:</th>
+                                <td>${dept.location}</td>
+                            </tr>
+                            <tr>
+                                <th>학생 수:</th>
+                                <td><span class="badge bg-success">${dept.studentCount}명</span></td>
+                            </tr>
+                            <tr>
+                                <th>교직원 수:</th>
+                                <td><span class="badge bg-info">${dept.facultyCount}명</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <h6>설명:</h6>
+                        <p class="text-muted">${dept.description}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('departmentDetails').innerHTML = detailsHtml;
+        }
+
+        // 부서 추가
+        function addDepartment() {
+            const form = document.getElementById('addDepartmentForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            alert('부서가 추가되었습니다.');
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addDepartmentModal'));
+            modal.hide();
+            form.reset();
+        }
+
+        // 부서 수정
+        function editDepartment() {
+            if (!selectedDepartment) {
+                alert('수정할 부서를 선택하세요.');
+                return;
+            }
+            alert(`${selectedDepartment} 부서 수정 기능을 실행합니다.`);
+        }
+
+        // 부서 삭제
+        function deleteDepartment() {
+            if (!selectedDepartment) {
+                alert('삭제할 부서를 선택하세요.');
+                return;
+            }
+            
+            if (confirm('선택한 부서를 정말 삭제하시겠습니까?')) {
+                alert(`${selectedDepartment} 부서가 삭제되었습니다.`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('학과/부서 관리 페이지가 로드되었습니다.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상담 관리 - 교육 관리 시스템</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .logo h2 {
+            color: #667eea;
+            font-size: 1.5rem;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 10px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            text-decoration: none;
+            color: #555;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+        }
+
+        /* 메인 컨텐츠 */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .breadcrumb {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* 탭 네비게이션 */
+        .tab-navigation {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* 상담 예약 섹션 */
+        .booking-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-container, .booking-form {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            color: #667eea;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            background: #f0f0f0;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .calendar-day.header {
+            font-weight: bold;
+            color: #666;
+            cursor: default;
+        }
+
+        .calendar-day.available {
+            background: #e8f5e8;
+            color: #2d5a2d;
+        }
+
+        .calendar-day.available:hover {
+            background: #d4edda;
+            transform: scale(1.1);
+        }
+
+        .calendar-day.selected {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .calendar-day.unavailable {
+            background: #f8f9fa;
+            color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .time-slots {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .time-slot {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .time-slot:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .time-slot.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .time-slot.unavailable {
+            background: #f8f9fa;
+            color: #ccc;
+            cursor: not-allowed;
+            border-color: #e9ecef;
+        }
+
+        /* 예약 폼 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .counselor-select {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .counselor-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .counselor-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .counselor-card.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .counselor-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .counselor-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .counselor-specialty {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        /* 상담 이력 */
+        .history-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            background: white;
+        }
+
+        .history-list {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .history-item {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .history-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-date {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .history-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-scheduled {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .history-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .history-summary {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 상담사 소통 */
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .counselor-info {
+            flex: 1;
+        }
+
+        .counselor-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #28a745;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            margin-bottom: 20px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .message.sent {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .message-content {
+            max-width: 70%;
+        }
+
+        .message-bubble {
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 5px;
+        }
+
+        .message.received .message-bubble {
+            background: #f1f3f4;
+            color: #333;
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message-time {
+            font-size: 0.7rem;
+            color: #999;
+            text-align: right;
+        }
+
+        .message.received .message-time {
+            text-align: left;
+        }
+
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input-field {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            resize: none;
+            max-height: 100px;
+            min-height: 45px;
+        }
+
+        .chat-send-btn {
+            width: 45px;
+            height: 45px;
+            border: none;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 버튼 스타일 */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        /* 알림 및 모달 */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: #28a745;
+        }
+
+        .notification.error {
+            background: #dc3545;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+
+            .main-content {
+                order: 1;
+            }
+
+            .booking-section {
+                grid-template-columns: 1fr;
+            }
+
+            .counselor-select {
+                grid-template-columns: 1fr;
+            }
+
+            .history-details {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-buttons {
+                flex-wrap: wrap;
+            }
+
+            .history-filters {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* 로딩 애니메이션 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 스크롤바 스타일 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5a6fd8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 사이드바 -->
+        <nav class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-graduation-cap"></i> EduSystem</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>대시보드</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="mypage.html" class="nav-link">
+                        <i class="fas fa-user"></i>
+                        <span>마이페이지</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="notice.html" class="nav-link">
+                        <i class="fas fa-bullhorn"></i>
+                        <span>공지사항</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="competency-diagnosis.html" class="nav-link">
+                        <i class="fas fa-chart-line"></i>
+                        <span>핵심역량진단</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="extracurricular-programs.html" class="nav-link">
+                        <i class="fas fa-users"></i>
+                        <span>비교과프로그램</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="counseling.html" class="nav-link active">
+                        <i class="fas fa-comments"></i>
+                        <span>상담 관리</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-star"></i>
+                        <span>마일리지 조회</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-question-circle"></i>
+                        <span>QnA</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="login.html" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>로그아웃</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 메인 컨텐츠 -->
+        <main class="main-content">
+            <!-- 헤더 -->
+            <div class="header">
+                <h1><i class="fas fa-comments"></i> 상담 관리</h1>
+                <div class="breadcrumb">
+                    <i class="fas fa-home"></i> 홈 > 상담 관리
+                </div>
+            </div>
+
+            <!-- 탭 네비게이션 -->
+            <div class="tab-navigation">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="booking">
+                        <i class="fas fa-calendar-plus"></i> 상담 예약
+                    </button>
+                    <button class="tab-btn" data-tab="history">
+                        <i class="fas fa-history"></i> 상담 이력
+                    </button>
+                    <button class="tab-btn" data-tab="chat">
+                        <i class="fas fa-comments"></i> 상담사 소통
+                    </button>
+                </div>
+
+                <!-- 상담 예약 탭 -->
+                <div class="tab-content active" id="booking">
+                    <div class="booking-section">
+                        <!-- 캘린더 -->
+                        <div class="calendar-container">
+                            <h3><i class="fas fa-calendar-alt"></i> 예약 날짜 선택</h3>
+                            <div class="calendar-header">
+                                <button class="calendar-nav" id="prevMonth">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                                <h4 id="currentMonth">2024년 1월</h4>
+                                <button class="calendar-nav" id="nextMonth">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div class="calendar-grid" id="calendarGrid">
+                                <!-- 캘린더 동적 생성 -->
+                            </div>
+                            
+                            <h4 style="margin-top: 20px; margin-bottom: 15px;">
+                                <i class="fas fa-clock"></i> 예약 시간 선택
+                            </h4>
+                            <div class="time-slots" id="timeSlots">
+                                <div class="time-slot" data-time="09:00">09:00</div>
+                                <div class="time-slot" data-time="10:00">10:00</div>
+                                <div class="time-slot" data-time="11:00">11:00</div>
+                                <div class="time-slot" data-time="13:00">13:00</div>
+                                <div class="time-slot" data-time="14:00">14:00</div>
+                                <div class="time-slot" data-time="15:00">15:00</div>
+                                <div class="time-slot" data-time="16:00">16:00</div>
+                                <div class="time-slot" data-time="17:00">17:00</div>
+                                <div class="time-slot unavailable" data-time="18:00">18:00</div>
+                            </div>
+                        </div>
+
+                        <!-- 예약 폼 -->
+                        <div class="booking-form">
+                            <h3><i class="fas fa-user-md"></i> 상담사 선택</h3>
+                            <div class="counselor-select">
+                                <div class="counselor-card" data-counselor="김상담">
+                                    <div class="counselor-avatar">김</div>
+                                    <div class="counselor-name">김상담</div>
+                                    <div class="counselor-specialty">진로 상담 전문</div>
+                                </div>
+                                <div class="counselor-card" data-counselor="이상담">
+                                    <div class="counselor-avatar">이</div>
+                                    <div class="counselor-name">이상담</div>
+                                    <div class="counselor-specialty">학업 상담 전문</div>
+                                </div>
+                                <div class="counselor-card" data-counselor="박상담">
+                                    <div class="counselor-avatar">박</div>
+                                    <div class="counselor-name">박상담</div>
+                                    <div class="counselor-specialty">심리 상담 전문</div>
+                                </div>
+                                <div class="counselor-card" data-counselor="최상담">
+                                    <div class="counselor-avatar">최</div>
+                                    <div class="counselor-name">최상담</div>
+                                    <div class="counselor-specialty">취업 상담 전문</div>
+                                </div>
+                            </div>
+
+                            <form id="bookingForm">
+                                <div class="form-group">
+                                    <label class="form-label">상담 유형</label>
+                                    <select class="form-control" name="counselingType" required>
+                                        <option value="">선택해주세요</option>
+                                        <option value="career">진로 상담</option>
+                                        <option value="academic">학업 상담</option>
+                                        <option value="psychological">심리 상담</option>
+                                        <option value="employment">취업 상담</option>
+                                        <option value="personal">개인 상담</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">상담 방식</label>
+                                    <select class="form-control" name="counselingMethod" required>
+                                        <option value="">선택해주세요</option>
+                                        <option value="face-to-face">대면 상담</option>
+                                        <option value="video">화상 상담</option>
+                                        <option value="phone">전화 상담</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">상담 제목</label>
+                                    <input type="text" class="form-control" name="title" 
+                                           placeholder="상담 제목을 입력해주세요" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">상담 내용</label>
+                                    <textarea class="form-control" name="content" rows="4" 
+                                              placeholder="상담받고 싶은 내용을 자세히 작성해주세요" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">연락처</label>
+                                    <input type="tel" class="form-control" name="phone" 
+                                           placeholder="010-0000-0000" required>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                    <i class="fas fa-calendar-check"></i> 상담 예약하기
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상담 이력 탭 -->
+                <div class="tab-content" id="history">
+                    <div class="history-filters">
+                        <div class="filter-group">
+                            <label>기간:</label>
+                            <select class="filter-select" id="periodFilter">
+                                <option value="all">전체</option>
+                                <option value="week">최근 1주일</option>
+                                <option value="month">최근 1개월</option>
+                                <option value="quarter">최근 3개월</option>
+                                <option value="year">최근 1년</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>상태:</label>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="all">전체</option>
+                                <option value="scheduled">예약됨</option>
+                                <option value="completed">완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>상담 유형:</label>
+                            <select class="filter-select" id="typeFilter">
+                                <option value="all">전체</option>
+                                <option value="career">진로 상담</option>
+                                <option value="academic">학업 상담</option>
+                                <option value="psychological">심리 상담</option>
+                                <option value="employment">취업 상담</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="history-list">
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-date">2024.01.15 (월) 14:00</div>
+                                <div class="history-status status-completed">완료</div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>상담사: 김상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>유형: 진로 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-video"></i>
+                                    <span>방식: 화상 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>소요시간: 50분</span>
+                                </div>
+                            </div>
+                            <div class="history-summary">
+                                <h4>진로 방향성에 대한 고민</h4>
+                                <p>컴퓨터공학과 3학년으로서 졸업 후 진로에 대해 고민이 많습니다. 
+                                   개발자로 취업할지, 대학원 진학을 할지 결정하기 어려워 상담을 요청드립니다.</p>
+                                <p><strong>상담 결과:</strong> 개인의 성향과 목표를 고려하여 단계적 접근 방법을 제시했습니다. 
+                                   먼저 인턴십을 통해 실무 경험을 쌓은 후 최종 결정을 내리는 것을 권장했습니다.</p>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn btn-outline btn-sm" onclick="viewCounselingDetail('1')">
+                                    <i class="fas fa-eye"></i> 상세보기
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="downloadReport('1')">
+                                    <i class="fas fa-download"></i> 보고서 다운로드
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="rateCounseling('1')">
+                                    <i class="fas fa-star"></i> 평가하기
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-date">2024.01.22 (월) 10:00</div>
+                                <div class="history-status status-scheduled">예약됨</div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>상담사: 이상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>유형: 학업 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-handshake"></i>
+                                    <span>방식: 대면 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>장소: 상담실 A</span>
+                                </div>
+                            </div>
+                            <div class="history-summary">
+                                <h4>학업 성취도 향상 방안</h4>
+                                <p>최근 학업 성적이 하락하여 효과적인 학습 방법에 대해 상담받고 싶습니다. 
+                                   특히 전공 과목에서 어려움을 겪고 있어 도움이 필요합니다.</p>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn btn-outline btn-sm" onclick="modifyBooking('2')">
+                                    <i class="fas fa-edit"></i> 예약 변경
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="cancelBooking('2')">
+                                    <i class="fas fa-times"></i> 예약 취소
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="addToCalendar('2')">
+                                    <i class="fas fa-calendar-plus"></i> 캘린더 추가
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="history-item">
+                            <div class="history-header">
+                                <div class="history-date">2023.12.18 (월) 15:00</div>
+                                <div class="history-status status-cancelled">취소</div>
+                            </div>
+                            <div class="history-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-user-md"></i>
+                                    <span>상담사: 박상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-tag"></i>
+                                    <span>유형: 심리 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-phone"></i>
+                                    <span>방식: 전화 상담</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-info-circle"></i>
+                                    <span>취소 사유: 개인 사정</span>
+                                </div>
+                            </div>
+                            <div class="history-summary">
+                                <h4>스트레스 관리 및 심리적 지원</h4>
+                                <p>학업과 취업 준비로 인한 스트레스가 심해져서 심리적 지원이 필요한 상황입니다.</p>
+                            </div>
+                            <div class="history-actions">
+                                <button class="btn btn-outline btn-sm" onclick="rebookCounseling('3')">
+                                    <i class="fas fa-redo"></i> 재예약
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상담사 소통 탭 -->
+                <div class="tab-content" id="chat">
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <div class="counselor-avatar">김</div>
+                            <div class="counselor-info">
+                                <h4>김상담 상담사</h4>
+                                <div class="counselor-status">
+                                    <div class="status-indicator"></div>
+                                    <span>온라인</span>
+                                </div>
+                            </div>
+                            <div class="chat-actions">
+                                <button class="btn btn-outline btn-sm" onclick="startVideoCall()">
+                                    <i class="fas fa-video"></i> 화상통화
+                                </button>
+                                <button class="btn btn-outline btn-sm" onclick="startVoiceCall()">
+                                    <i class="fas fa-phone"></i> 음성통화
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message received">
+                                <div class="message-avatar">김</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        안녕하세요! 김상담 상담사입니다. 오늘 상담 잘 받으셨나요? 
+                                        추가로 궁금한 점이 있으시면 언제든 말씀해 주세요.
+                                    </div>
+                                    <div class="message-time">오후 2:30</div>
+                                </div>
+                            </div>
+
+                            <div class="message sent">
+                                <div class="message-avatar">나</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        네, 상담 정말 도움이 되었습니다. 말씀해주신 인턴십 정보에 대해 
+                                        좀 더 자세히 알고 싶은데, 어떤 회사들이 좋을까요?
+                                    </div>
+                                    <div class="message-time">오후 2:35</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">김</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        좋은 질문이네요! 컴퓨터공학과 학생에게 추천하는 인턴십 프로그램들을 
+                                        정리해서 보내드릴게요. 잠시만 기다려주세요.
+                                    </div>
+                                    <div class="message-time">오후 2:37</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">김</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        📋 추천 인턴십 프로그램<br><br>
+                                        1. 네이버 인턴십 - 웹 개발<br>
+                                        2. 카카오 인턴십 - 모바일 앱 개발<br>
+                                        3. 삼성전자 인턴십 - 소프트웨어 개발<br>
+                                        4. LG전자 인턴십 - AI/ML 개발<br><br>
+                                        각 프로그램의 상세 정보는 별도 파일로 보내드릴게요!
+                                    </div>
+                                    <div class="message-time">오후 2:40</div>
+                                </div>
+                            </div>
+
+                            <div class="message sent">
+                                <div class="message-avatar">나</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        와, 정말 감사합니다! 이렇게 자세히 정리해주시다니... 
+                                        특히 네이버와 카카오 인턴십에 관심이 많은데, 
+                                        지원 시 주의사항이 있을까요?
+                                    </div>
+                                    <div class="message-time">오후 2:42</div>
+                                </div>
+                            </div>
+
+                            <div class="message received">
+                                <div class="message-avatar">김</div>
+                                <div class="message-content">
+                                    <div class="message-bubble">
+                                        네이버와 카카오는 특히 포트폴리오를 중요하게 봅니다. 
+                                        개인 프로젝트나 팀 프로젝트 경험을 잘 정리해서 
+                                        GitHub에 올려두시는 것을 추천드려요. 
+                                        
+                                        다음 상담 때 포트폴리오 검토도 함께 해드릴까요?
+                                    </div>
+                                    <div class="message-time">오후 2:45</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-input">
+                            <textarea class="chat-input-field" placeholder="메시지를 입력하세요..." 
+                                      id="messageInput" rows="1"></textarea>
+                            <button class="chat-send-btn" onclick="sendMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 알림 -->
+    <div class="notification" id="notification"></div>
+
+    <!-- 상담 상세 모달 -->
+    <div class="modal" id="counselingDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>상담 상세 정보</h3>
+                <button class="modal-close" onclick="closeModal('counselingDetailModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="counselingDetailContent">
+                <!-- 상담 상세 내용이 동적으로 로드됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 평가 모달 -->
+    <div class="modal" id="ratingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>상담 평가</h3>
+                <button class="modal-close" onclick="closeModal('ratingModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="rating-content">
+                <div class="form-group">
+                    <label class="form-label">상담 만족도</label>
+                    <div class="rating-stars">
+                        <i class="fas fa-star" data-rating="1"></i>
+                        <i class="fas fa-star" data-rating="2"></i>
+                        <i class="fas fa-star" data-rating="3"></i>
+                        <i class="fas fa-star" data-rating="4"></i>
+                        <i class="fas fa-star" data-rating="5"></i>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">상담 후기</label>
+                    <textarea class="form-control" rows="4" 
+                              placeholder="상담에 대한 후기를 작성해주세요"></textarea>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary" onclick="submitRating()">
+                        <i class="fas fa-check"></i> 평가 제출
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 전역 변수
+        let currentDate = new Date();
+        let selectedDate = null;
+        let selectedTime = null;
+        let selectedCounselor = null;
+
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCalendar();
+            initializeTabs();
+            initializeEventListeners();
+            loadChatMessages();
+        });
+
+        // 캘린더 초기화
+        function initializeCalendar() {
+            updateCalendarDisplay();
+            generateCalendar();
+        }
+
+        // 캘린더 표시 업데이트
+        function updateCalendarDisplay() {
+            const monthNames = [
+                '1월', '2월', '3월', '4월', '5월', '6월',
+                '7월', '8월', '9월', '10월', '11월', '12월'
+            ];
+            document.getElementById('currentMonth').textContent = 
+                `${currentDate.getFullYear()}년 ${monthNames[currentDate.getMonth()]}`;
+        }
+
+        // 캘린더 생성
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+
+            // 요일 헤더
+            const dayHeaders = ['일', '월', '화', '수', '목', '금', '토'];
+            dayHeaders.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day header';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+
+            // 달력 날짜 생성
+            const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+            const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = date.getDate();
+                
+                // 현재 월이 아닌 날짜는 비활성화
+                if (date.getMonth() !== currentDate.getMonth()) {
+                    dayElement.classList.add('unavailable');
+                } else if (date >= new Date()) {
+                    dayElement.classList.add('available');
+                    dayElement.addEventListener('click', () => selectDate(date));
+                } else {
+                    dayElement.classList.add('unavailable');
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+
+        // 날짜 선택
+        function selectDate(date) {
+            // 이전 선택 제거
+            document.querySelectorAll('.calendar-day.selected').forEach(day => {
+                day.classList.remove('selected');
+            });
+            
+            // 새로운 선택 적용
+            event.target.classList.add('selected');
+            selectedDate = date;
+            
+            // 시간 슬롯 업데이트
+            updateTimeSlots();
+        }
+
+        // 시간 슬롯 업데이트
+        function updateTimeSlots() {
+            const timeSlots = document.querySelectorAll('.time-slot');
+            timeSlots.forEach(slot => {
+                slot.classList.remove('selected', 'unavailable');
+                // 실제로는 서버에서 예약 가능한 시간을 확인해야 함
+                if (Math.random() > 0.3) { // 70% 확률로 예약 가능
+                    slot.addEventListener('click', () => selectTime(slot));
+                } else {
+                    slot.classList.add('unavailable');
+                }
+            });
+        }
+
+        // 시간 선택
+        function selectTime(timeSlot) {
+            if (timeSlot.classList.contains('unavailable')) return;
+            
+            // 이전 선택 제거
+            document.querySelectorAll('.time-slot.selected').forEach(slot => {
+                slot.classList.remove('selected');
+            });
+            
+            // 새로운 선택 적용
+            timeSlot.classList.add('selected');
+            selectedTime = timeSlot.dataset.time;
+        }
+
+        // 상담사 선택
+        document.querySelectorAll('.counselor-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // 이전 선택 제거
+                document.querySelectorAll('.counselor-card.selected').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // 새로운 선택 적용
+                this.classList.add('selected');
+                selectedCounselor = this.dataset.counselor;
+            });
+        });
+
+        // 월 변경
+        document.getElementById('prevMonth').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendarDisplay();
+            generateCalendar();
+        });
+
+        document.getElementById('nextMonth').addEventListener('click', function() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendarDisplay();
+            generateCalendar();
+        });
+
+        // 탭 초기화
+        function initializeTabs() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabId = this.dataset.tab;
+                    switchTab(tabId);
+                });
+            });
+        }
+
+        // 탭 전환
+        function switchTab(tabId) {
+            // 모든 탭 버튼과 컨텐츠 비활성화
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 선택된 탭 활성화
+            document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // 이벤트 리스너 초기화
+        function initializeEventListeners() {
+            // 예약 폼 제출
+            document.getElementById('bookingForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitBooking();
+            });
+
+            // 필터 변경
+            document.getElementById('periodFilter').addEventListener('change', filterHistory);
+            document.getElementById('statusFilter').addEventListener('change', filterHistory);
+            document.getElementById('typeFilter').addEventListener('change', filterHistory);
+
+            // 채팅 입력
+            document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // 평가 별점
+            document.querySelectorAll('.rating-stars i').forEach(star => {
+                star.addEventListener('click', function() {
+                    const rating = parseInt(this.dataset.rating);
+                    updateStarRating(rating);
+                });
+            });
+        }
+
+        // 예약 제출
+        function submitBooking() {
+            if (!selectedDate || !selectedTime || !selectedCounselor) {
+                showNotification('날짜, 시간, 상담사를 모두 선택해주세요.', 'error');
+                return;
+            }
+
+            const formData = new FormData(document.getElementById('bookingForm'));
+            const bookingData = {
+                date: selectedDate.toISOString().split('T')[0],
+                time: selectedTime,
+                counselor: selectedCounselor,
+                type: formData.get('counselingType'),
+                method: formData.get('counselingMethod'),
+                title: formData.get('title'),
+                content: formData.get('content'),
+                phone: formData.get('phone')
+            };
+
+            // 실제로는 서버에 데이터를 전송
+            console.log('예약 데이터:', bookingData);
+            
+            // 로딩 표시
+            const submitBtn = document.querySelector('#bookingForm button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<div class="loading"></div> 예약 중...';
+            submitBtn.disabled = true;
+
+            // 시뮬레이션: 2초 후 성공
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                showNotification('상담 예약이 완료되었습니다!', 'success');
+                
+                // 폼 초기화
+                document.getElementById('bookingForm').reset();
+                selectedDate = null;
+                selectedTime = null;
+                selectedCounselor = null;
+                
+                // 선택 상태 초기화
+                document.querySelectorAll('.selected').forEach(el => {
+                    el.classList.remove('selected');
+                });
+            }, 2000);
+        }
+
+        // 상담 이력 필터링
+        function filterHistory() {
+            const period = document.getElementById('periodFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            
+            // 실제로는 서버에서 필터링된 데이터를 가져와야 함
+            console.log('필터 적용:', { period, status, type });
+            
+            // 시뮬레이션: 필터링 로직
+            const historyItems = document.querySelectorAll('.history-item');
+            historyItems.forEach(item => {
+                let show = true;
+                
+                // 상태 필터
+                if (status !== 'all') {
+                    const itemStatus = item.querySelector('.history-status').classList;
+                    if (!itemStatus.contains(`status-${status}`)) {
+                        show = false;
+                    }
+                }
+                
+                item.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        // 채팅 메시지 로드
+        function loadChatMessages() {
+            // 실제로는 서버에서 메시지를 가져와야 함
+            scrollToBottom();
+        }
+
+        // 메시지 전송
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            // 메시지 추가
+            addMessage(message, 'sent');
+            messageInput.value = '';
+            
+            // 자동 응답 시뮬레이션
+            setTimeout(() => {
+                const responses = [
+                    '네, 알겠습니다. 더 자세한 정보를 찾아서 알려드릴게요.',
+                    '좋은 질문이네요! 관련 자료를 준비해서 보내드리겠습니다.',
+                    '언제든지 궁금한 점이 있으시면 말씀해 주세요.',
+                    '추가로 필요한 정보가 있으시면 알려주세요.'
+                ];
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addMessage(randomResponse, 'received');
+            }, 1000 + Math.random() * 2000);
+        }
+
+        // 메시지 추가
+        function addMessage(text, type) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('ko-KR', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${type === 'sent' ? '나' : '김'}</div>
+                <div class="message-content">
+                    <div class="message-bubble">${text}</div>
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // 채팅 하단으로 스크롤
+        function scrollToBottom() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 상담 상세보기
+        function viewCounselingDetail(id) {
+            // 실제로는 서버에서 상세 정보를 가져와야 함
+            const detailContent = `
+                <div class="counseling-detail">
+                    <h4>진로 방향성에 대한 고민</h4>
+                    <div class="detail-info">
+                        <p><strong>상담 일시:</strong> 2024.01.15 (월) 14:00 - 14:50</p>
+                        <p><strong>상담사:</strong> 김상담</p>
+                        <p><strong>상담 방식:</strong> 화상 상담</p>
+                        <p><strong>상담 유형:</strong> 진로 상담</p>
+                    </div>
+                    <div class="detail-content">
+                        <h5>상담 내용</h5>
+                        <p>컴퓨터공학과 3학년으로서 졸업 후 진로에 대해 고민이 많습니다. 
+                           개발자로 취업할지, 대학원 진학을 할지 결정하기 어려워 상담을 요청드립니다.</p>
+                        
+                        <h5>상담 결과 및 조언</h5>
+                        <p>개인의 성향과 목표를 고려하여 단계적 접근 방법을 제시했습니다. 
+                           먼저 인턴십을 통해 실무 경험을 쌓은 후 최종 결정을 내리는 것을 권장했습니다.</p>
+                        
+                        <h5>후속 조치</h5>
+                        <ul>
+                            <li>인턴십 프로그램 정보 제공</li>
+                            <li>포트폴리오 작성 가이드 제공</li>
+                            <li>2주 후 후속 상담 예약</li>
+                        </ul>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('counselingDetailContent').innerHTML = detailContent;
+            showModal('counselingDetailModal');
+        }
+
+        // 보고서 다운로드
+        function downloadReport(id) {
+            showNotification('상담 보고서를 다운로드합니다.', 'success');
+            // 실제로는 PDF 파일을 생성하여 다운로드
+        }
+
+        // 상담 평가
+        function rateCounseling(id) {
+            showModal('ratingModal');
+        }
+
+        // 예약 변경
+        function modifyBooking(id) {
+            showNotification('예약 변경 페이지로 이동합니다.', 'success');
+            // 실제로는 예약 변경 페이지로 이동
+        }
+
+        // 예약 취소
+        function cancelBooking(id) {
+            if (confirm('정말로 예약을 취소하시겠습니까?')) {
+                showNotification('예약이 취소되었습니다.', 'success');
+                // 실제로는 서버에 취소 요청
+            }
+        }
+
+        // 캘린더에 추가
+        function addToCalendar(id) {
+            showNotification('캘린더에 일정이 추가되었습니다.', 'success');
+            // 실제로는 캘린더 앱과 연동
+        }
+
+        // 재예약
+        function rebookCounseling(id) {
+            switchTab('booking');
+            showNotification('예약 페이지로 이동했습니다.', 'success');
+        }
+
+        // 화상통화 시작
+        function startVideoCall() {
+            showNotification('화상통화를 시작합니다.', 'success');
+            // 실제로는 화상통화 앱 실행
+        }
+
+        // 음성통화 시작
+        function startVoiceCall() {
+            showNotification('음성통화를 시작합니다.', 'success');
+            // 실제로는 음성통화 앱 실행
+        }
+
+        // 별점 업데이트
+        function updateStarRating(rating) {
+            document.querySelectorAll('.rating-stars i').forEach((star, index) => {
+                if (index < rating) {
+                    star.style.color = '#ffc107';
+                } else {
+                    star.style.color = '#e9ecef';
+                }
+            });
+        }
+
+        // 평가 제출
+        function submitRating() {
+            showNotification('평가가 제출되었습니다. 감사합니다!', 'success');
+            closeModal('ratingModal');
+        }
+
+        // 모달 표시
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // 모달 닫기
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // 알림 표시
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
