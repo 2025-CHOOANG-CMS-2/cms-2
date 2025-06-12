@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진단 이력 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* History Cards */
+        .history-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .history-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Summary Stats */
+        .summary-stats {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 1rem;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e9ecef;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-left: 1rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2rem;
+            top: 1.5rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--secondary-color);
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #e9ecef;
+        }
+
+        .timeline-item.excellent::before {
+            background: var(--success-color);
+        }
+
+        .timeline-item.good::before {
+            background: var(--secondary-color);
+        }
+
+        .timeline-item.average::before {
+            background: var(--warning-color);
+        }
+
+        .timeline-item.poor::before {
+            background: var(--danger-color);
+        }
+
+        /* Score Display */
+        .score-display {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .score-excellent {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+        }
+
+        .score-good {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+        }
+
+        .score-average {
+            background: linear-gradient(135deg, var(--warning-color), #f7dc6f);
+        }
+
+        .score-poor {
+            background: linear-gradient(135deg, var(--danger-color), #ec7063);
+        }
+
+        /* Competency Bars */
+        .competency-bars {
+            margin-top: 1rem;
+        }
+
+        .competency-bar {
+            margin-bottom: 0.75rem;
+        }
+
+        .competency-label {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .competency-progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        .progress-communication { background: linear-gradient(90deg, #3498db, #5dade2); }
+        .progress-creativity { background: linear-gradient(90deg, #9b59b6, #bb8fce); }
+        .progress-leadership { background: linear-gradient(90deg, #e74c3c, #ec7063); }
+        .progress-problem-solving { background: linear-gradient(90deg, #f39c12, #f7dc6f); }
+        .progress-teamwork { background: linear-gradient(90deg, #27ae60, #58d68d); }
+
+        /* Comparison Chart */
+        .comparison-chart {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-custom {
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Improvement Indicator */
+        .improvement-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .improvement-up {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .improvement-down {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .improvement-same {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .timeline {
+                padding-left: 1rem;
+            }
+
+            .timeline-item {
+                margin-left: 0.5rem;
+            }
+
+            .score-display {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교육 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    메인화면
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mypage.html" class="nav-link">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="notice.html" class="nav-link">
+                    <i class="bi bi-megaphone"></i>
+                    공지사항
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="competency-diagnosis.html" class="nav-link">
+                    <i class="bi bi-clipboard-data"></i>
+                    학생역량진단
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="diagnosis-history.html" class="nav-link active">
+                    <i class="bi bi-clock-history"></i>
+                    진단 이력
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="extracurricular-programs.html" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    비교과 프로그램
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="counseling.html" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    상담관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage.html" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 조회
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-medium">김학생</div>
+                    <small class="text-muted">컴퓨터공학과 3학년</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mypage.html">마이페이지</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="index.html" class="text-white-50">홈</a></li>
+                        <li class="breadcrumb-item"><a href="competency-diagnosis.html" class="text-white-50">학생역량진단</a></li>
+                        <li class="breadcrumb-item active text-white">진단 이력</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-clock-history me-2"></i>진단 이력</h1>
+                <p class="mb-0 mt-2">나의 역량 진단 결과와 성장 과정을 확인하세요</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Summary Statistics -->
+            <div class="summary-stats">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">5</div>
+                            <div class="stat-label">총 진단 횟수</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">85</div>
+                            <div class="stat-label">최근 점수</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">+14</div>
+                            <div class="stat-label">1년간 향상</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-item">
+                            <div class="stat-number">상위 15%</div>
+                            <div class="stat-label">전체 순위</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="filter-controls">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">
+                            <i class="bi bi-funnel me-2"></i>진단 이력 필터
+                        </h5>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex gap-2 justify-content-md-end">
+                            <select class="form-select" style="width: auto;" id="yearFilter">
+                                <option value="all">전체 기간</option>
+                                <option value="2024" selected>2024년</option>
+                                <option value="2023">2023년</option>
+                                <option value="2022">2022년</option>
+                            </select>
+                            <select class="form-select" style="width: auto;" id="semesterFilter">
+                                <option value="all">전체 학기</option>
+                                <option value="1">1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                            <button class="btn btn-outline-primary" onclick="exportHistory()">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progress Comparison Chart -->
+            <div class="comparison-chart">
+                <h5 class="mb-3">
+                    <i class="bi bi-graph-up me-2"></i>성장 추이 분석
+                </h5>
+                <div class="chart-container">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        실제 구현 시 Chart.js를 사용하여 시간별 점수 변화 그래프를 표시합니다.
+                    </div>
+                    <div style="height: 200px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <span class="text-muted">점수 변화 추이 차트 영역</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline of Diagnoses -->
+            <div class="history-card">
+                <h5 class="mb-4">
+                    <i class="bi bi-timeline me-2"></i>진단 이력 타임라인
+                </h5>
+                
+                <div class="timeline" id="diagnosisTimeline">
+                    <!-- 2024년 1학기 진단 -->
+                    <div class="timeline-item excellent" data-date="2024-01-15">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">2024년 1학기 핵심역량진단</h6>
+                                <small class="text-muted">2024년 1월 15일 16:45 완료</small>
+                            </div>
+                            <div class="improvement-indicator improvement-up">
+                                <i class="bi bi-arrow-up"></i>+7점
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-circle score-excellent">85점</div>
+                            <div class="flex-grow-1">
+                                <div class="mb-2">
+                                    <strong>우수 수준</strong>
+                                    <span class="text-muted ms-2">전체 평균 대비 상위 15%</span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    팀워크와 리더십 역량이 크게 향상되었습니다. 창의역량 개선이 필요합니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="competency-bars">
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>의사소통역량</span>
+                                    <span>88점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-communication" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>창의역량</span>
+                                    <span>72점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-creativity" style="width: 72%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>리더십역량</span>
+                                    <span>91점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-leadership" style="width: 91%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>문제해결역량</span>
+                                    <span>79점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-problem-solving" style="width: 79%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>팀워크역량</span>
+                                    <span>95점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-teamwork" style="width: 95%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary btn-custom" onclick="viewDetailResult('2024-01-15')">
+                                <i class="bi bi-eye me-1"></i>상세 보기
+                            </button>
+                            <button class="btn btn-outline-success btn-custom" onclick="downloadResult('2024-01-15')">
+                                <i class="bi bi-download me-1"></i>결과 다운로드
+                            </button>
+                            <button class="btn btn-outline-info btn-custom" onclick="compareResult('2024-01-15')">
+                                <i class="bi bi-arrow-left-right me-1"></i>이전 결과와 비교
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2023년 2학기 진단 -->
+                    <div class="timeline-item good" data-date="2023-08-20">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">2023년 2학기 핵심역량진단</h6>
+                                <small class="text-muted">2023년 8월 20일 14:30 완료</small>
+                            </div>
+                            <div class="improvement-indicator improvement-up">
+                                <i class="bi bi-arrow-up"></i>+5점
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-circle score-good">78점</div>
+                            <div class="flex-grow-1">
+                                <div class="mb-2">
+                                    <strong>양호 수준</strong>
+                                    <span class="text-muted ms-2">전체 평균 대비 상위 25%</span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    의사소통과 문제해결 역량이 향상되었습니다. 리더십 개발이 필요합니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="competency-bars">
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>의사소통역량</span>
+                                    <span>82점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-communication" style="width: 82%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>창의역량</span>
+                                    <span>69점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-creativity" style="width: 69%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>리더십역량</span>
+                                    <span>75점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-leadership" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>문제해결역량</span>
+                                    <span>81점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-problem-solving" style="width: 81%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>팀워크역량</span>
+                                    <span>83점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-teamwork" style="width: 83%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary btn-custom" onclick="viewDetailResult('2023-08-20')">
+                                <i class="bi bi-eye me-1"></i>상세 보기
+                            </button>
+                            <button class="btn btn-outline-success btn-custom" onclick="downloadResult('2023-08-20')">
+                                <i class="bi bi-download me-1"></i>결과 다운로드
+                            </button>
+                            <button class="btn btn-outline-info btn-custom" onclick="compareResult('2023-08-20')">
+                                <i class="bi bi-arrow-left-right me-1"></i>이전 결과와 비교
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2023년 1학기 진단 -->
+                    <div class="timeline-item average" data-date="2023-03-10">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">2023년 1학기 핵심역량진단</h6>
+                                <small class="text-muted">2023년 3월 10일 10:15 완료</small>
+                            </div>
+                            <div class="improvement-indicator improvement-up">
+                                <i class="bi bi-arrow-up"></i>+2점
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-circle score-average">73점</div>
+                            <div class="flex-grow-1">
+                                <div class="mb-2">
+                                    <strong>보통 수준</strong>
+                                    <span class="text-muted ms-2">전체 평균 수준</span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    전반적으로 균형잡힌 역량을 보이나 모든 영역에서 개선이 필요합니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="competency-bars">
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>의사소통역량</span>
+                                    <span>75점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-communication" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>창의역량</span>
+                                    <span>68점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-creativity" style="width: 68%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>리더십역량</span>
+                                    <span>71점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-leadership" style="width: 71%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>문제해결역량</span>
+                                    <span>76점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-problem-solving" style="width: 76%"></div>
+                                </div>
+                            </div>
+                            <div class="competency-bar">
+                                <div class="competency-label">
+                                    <span>팀워크역량</span>
+                                    <span>75점</span>
+                                </div>
+                                <div class="competency-progress">
+                                    <div class="progress-fill progress-teamwork" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary btn-custom" onclick="viewDetailResult('2023-03-10')">
+                                <i class="bi bi-eye me-1"></i>상세 보기
+                            </button>
+                            <button class="btn btn-outline-success btn-custom" onclick="downloadResult('2023-03-10')">
+                                <i class="bi bi-download me-1"></i>결과 다운로드
+                            </button>
+                            <button class="btn btn-outline-info btn-custom" onclick="compareResult('2023-03-10')">
+                                <i class="bi bi-arrow-left-right me-1"></i>이전 결과와 비교
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 2022년 2학기 진단 -->
+                    <div class="timeline-item average" data-date="2022-09-05">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">2022년 2학기 핵심역량진단</h6>
+                                <small class="text-muted">2022년 9월 5일 15:20 완료</small>
+                            </div>
+                            <div class="improvement-indicator improvement-same">
+                                <i class="bi bi-dash"></i>±0점
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-circle score-average">71점</div>
+                            <div class="flex-grow-1">
+                                <div class="mb-2">
+                                    <strong>보통 수준</strong>
+                                    <span class="text-muted ms-2">전체 평균 수준</span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    기본적인 역량은 갖추었으나 전반적인 향상이 필요한 상태입니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary btn-custom" onclick="viewDetailResult('2022-09-05')">
+                                <i class="bi bi-eye me-1"></i>상세 보기
+                            </button>
+                            <button class="btn btn-outline-success btn-custom" onclick="downloadResult('2022-09-05')">
+                                <i class="bi bi-download me-1"></i>결과 다운로드
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 첫 진단 -->
+                    <div class="timeline-item poor" data-date="2022-03-15">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h6 class="mb-1">2022년 1학기 첫 핵심역량진단</h6>
+                                <small class="text-muted">2022년 3월 15일 11:00 완료</small>
+                            </div>
+                            <div class="improvement-indicator improvement-same">
+                                <i class="bi bi-star"></i>첫 진단
+                            </div>
+                        </div>
+                        
+                        <div class="score-display">
+                            <div class="score-circle score-average">71점</div>
+                            <div class="flex-grow-1">
+                                <div class="mb-2">
+                                    <strong>보통 수준</strong>
+                                    <span class="text-muted ms-2">신입생 평균 수준</span>
+                                </div>
+                                <p class="text-muted mb-0 small">
+                                    대학 생활을 시작하며 기본적인 역량 수준을 확인했습니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary btn-custom" onclick="viewDetailResult('2022-03-15')">
+                                <i class="bi bi-eye me-1"></i>상세 보기
+                            </button>
+                            <button class="btn btn-outline-success btn-custom" onclick="downloadResult('2022-03-15')">
+                                <i class="bi bi-download me-1"></i>결과 다운로드
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="history-card text-center">
+                        <i class="bi bi-clipboard-check text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 mb-3">새로운 진단 시작</h5>
+                        <p class="text-muted mb-3">최신 역량 상태를 확인해보세요</p>
+                        <button class="btn btn-primary" onclick="startNewDiagnosis()">
+                            <i class="bi bi-play me-1"></i>진단 시작
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="history-card text-center">
+                        <i class="bi bi-graph-up text-success" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3 mb-3">성장 분석 리포트</h5>
+                        <p class="text-muted mb-3">상세한 성장 분석 보고서를 받아보세요</p>
+                        <button class="btn btn-success" onclick="generateReport()">
+                            <i class="bi bi-file-earmark-text me-1"></i>리포트 생성
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="auth.js"></script>
+    <script>
+        // 현재 시간 표시
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 필터 적용
+        document.getElementById('yearFilter').addEventListener('change', applyFilters);
+        document.getElementById('semesterFilter').addEventListener('change', applyFilters);
+
+        function applyFilters() {
+            const yearFilter = document.getElementById('yearFilter').value;
+            const semesterFilter = document.getElementById('semesterFilter').value;
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            timelineItems.forEach(item => {
+                const date = item.dataset.date;
+                const year = date.split('-')[0];
+                const month = parseInt(date.split('-')[1]);
+                const semester = month <= 6 ? '1' : '2';
+
+                let showItem = true;
+
+                if (yearFilter !== 'all' && year !== yearFilter) {
+                    showItem = false;
+                }
+
+                if (semesterFilter !== 'all' && semester !== semesterFilter) {
+                    showItem = false;
+                }
+
+                item.style.display = showItem ? 'block' : 'none';
+            });
+        }
+
+        // 상세 결과 보기
+        function viewDetailResult(date) {
+            alert(`${date} 진단 결과의 상세 내용을 표시합니다.\n\n실제 구현에서는 모달 창이나 새 페이지에서 상세 분석 결과를 보여줍니다.`);
+        }
+
+        // 결과 다운로드
+        function downloadResult(date) {
+            alert(`${date} 진단 결과를 PDF 파일로 다운로드합니다.`);
+        }
+
+        // 결과 비교
+        function compareResult(date) {
+            alert(`${date} 진단 결과를 이전 결과와 비교 분석합니다.\n\n실제 구현에서는 비교 차트와 상세 분석을 제공합니다.`);
+        }
+
+        // 이력 내보내기
+        function exportHistory() {
+            alert('전체 진단 이력을 Excel 파일로 내보냅니다.');
+        }
+
+        // 새로운 진단 시작
+        function startNewDiagnosis() {
+            if (confirm('새로운 역량 진단을 시작하시겠습니까?')) {
+                window.location.href = 'competency-diagnosis.html';
+            }
+        }
+
+        // 성장 분석 리포트 생성
+        function generateReport() {
+            alert('개인 맞춤형 성장 분석 리포트를 생성합니다.\n\n리포트에는 다음 내용이 포함됩니다:\n- 역량별 성장 추이\n- 강점 및 개선점 분석\n- 맞춤형 개발 계획\n- 추천 프로그램');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 페이지 로드 시 애니메이션
+        window.addEventListener('load', function() {
+            // 프로그레스 바 애니메이션
+            setTimeout(() => {
+                const progressBars = document.querySelectorAll('.progress-fill');
+                progressBars.forEach(bar => {
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }, 500);
+
+            // 타임라인 아이템 순차 표시
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.5s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        });
+
+        // 사이드바 외부 클릭 시 닫기 (모바일)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isToggleButton = event.target.closest('.btn-link');
+            
+            if (!isClickInsideSidebar && !isToggleButton && window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // 스크롤 시 헤더 고정
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            
+            if (scrollTop > lastScrollTop && scrollTop > 100) {
+                header.style.transform = 'translateY(-100%)';
+            } else {
+                header.style.transform = 'translateY(0)';
+            }
+            lastScrollTop = scrollTop;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>메인페이지 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --info-color: #17a2b8;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        /* Greeting Section */
+        .greeting-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .greeting-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            transform: rotate(45deg);
+        }
+
+        .greeting-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .greeting-time {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .greeting-message {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .greeting-submessage {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Status Cards */
+        .status-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .status-card.diagnosis {
+            border-left-color: var(--warning-color);
+            background: linear-gradient(135deg, #fff, #fffbf0);
+        }
+
+        .status-card.diagnosis.not-completed {
+            border-left-color: var(--danger-color);
+            background: linear-gradient(135deg, #fff, #fff5f5);
+        }
+
+        .status-card.counseling {
+            border-left-color: var(--success-color);
+            background: linear-gradient(135deg, #fff, #f0fff4);
+        }
+
+        .status-card.mileage {
+            border-left-color: var(--secondary-color);
+            background: linear-gradient(135deg, #fff, #f0f8ff);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1rem;
+        }
+
+        .status-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .status-icon.diagnosis {
+            background: linear-gradient(135deg, var(--warning-color), #f7dc6f);
+        }
+
+        .status-icon.diagnosis.not-completed {
+            background: linear-gradient(135deg, var(--danger-color), #ec7063);
+        }
+
+        .status-icon.counseling {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+        }
+
+        .status-icon.mileage {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+        }
+
+        .status-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .status-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .status-action {
+            margin-top: 1rem;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .content-header {
+            display: flex;
+            align-items: center;
+            justify-content: between;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .content-title i {
+            margin-right: 0.5rem;
+        }
+
+        /* Program Items - Enhanced Design */
+        .program-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .program-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .program-item.featured {
+            border-left-color: var(--warning-color);
+            background: linear-gradient(135deg, #fff, #fffbf0);
+        }
+
+        .program-item.popular {
+            border-left-color: var(--success-color);
+            background: linear-gradient(135deg, #fff, #f0fff4);
+        }
+
+        .program-item.urgent {
+            border-left-color: var(--danger-color);
+            background: linear-gradient(135deg, #fff, #fff5f5);
+        }
+
+        .program-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .program-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .program-category {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .category-leadership {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .category-creativity {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .category-career {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .category-volunteer {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .category-academic {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .program-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .program-dates {
+            margin-bottom: 0.5rem;
+        }
+
+        .program-dates .date-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.25rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .program-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-recruiting {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-deadline-soon {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .status-closed {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .status-waiting {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .mileage-badge {
+            background: linear-gradient(135deg, var(--warning-color), #f7dc6f);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.8rem;
+        }
+
+        /* Notice Items - Enhanced Design */
+        .notice-item {
+            padding: 1rem;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: white;
+        }
+
+        .notice-item:hover {
+            border-color: var(--secondary-color);
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        .notice-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .notice-header {
+            display: flex;
+            justify-content: between;
+            align-items: start;
+            margin-bottom: 0.25rem;
+        }
+
+        .notice-title {
+            font-weight: 500;
+            color: var(--primary-color);
+            flex: 1;
+            margin-right: 1rem;
+        }
+
+        .notice-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .notice-new {
+            background-color: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .greeting-message {
+                font-size: 1.4rem;
+            }
+
+            .status-score {
+                font-size: 1.5rem;
+            }
+
+            .program-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .program-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Button Enhancements */
+        .btn-custom {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Alert for not completed diagnosis */
+        .alert-not-completed {
+            background: linear-gradient(135deg, #fff5f5, #ffebee);
+            border: 1px solid #ffcdd2;
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교육 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="index.html" class="nav-link active">
+                    <i class="bi bi-house"></i>
+                    메인화면
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mypage.html" class="nav-link">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="notice.html" class="nav-link">
+                    <i class="bi bi-megaphone"></i>
+                    공지사항
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="competency-diagnosis.html" class="nav-link">
+                    <i class="bi bi-clipboard-data"></i>
+                    학생역량진단
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="extracurricular-programs.html" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    비교과 프로그램
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="counseling.html" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    상담관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage.html" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 조회
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-medium" id="headerUserName">김학생</div>
+                    <small class="text-muted" id="headerUserDept">컴퓨터공학과 3학년</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mypage.html">마이페이지</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <div class="container-fluid px-4">
+            <!-- Greeting Section -->
+            <div class="greeting-section fade-in-up">
+                <div class="greeting-content">
+                    <div class="greeting-time" id="greetingTime">2024년 1월 25일 목요일</div>
+                    <div class="greeting-message" id="greetingMessage">안녕하세요, 김학생님!</div>
+                    <div class="greeting-submessage">오늘도 성장하는 하루 되세요 ✨</div>
+                </div>
+            </div>
+
+            <!-- My Status Cards -->
+            <div class="row">
+                <!-- Competency Diagnosis Card - Completed Version -->
+                <div class="col-lg-4 col-md-6" id="diagnosisCompletedCard">
+                    <div class="status-card diagnosis fade-in-up">
+                        <div class="status-header">
+                            <div class="d-flex align-items-center">
+                                <div class="status-icon diagnosis">
+                                    <i class="bi bi-clipboard-data"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">핵심역량진단</h6>
+                                    <small class="status-label">최근 진단: 2024.01.15</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="status-score">85점</div>
+                            <div class="status-label">우수 수준 (상위 15%)</div>
+                        </div>
+                        <div class="status-action">
+                            <button class="btn btn-warning btn-sm w-100 btn-custom" onclick="goToDiagnosis()">
+                                <i class="bi bi-arrow-right me-1"></i>새로운 진단 시작
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competency Diagnosis Card - Not Completed Version (Hidden by default) -->
+                <div class="col-lg-4 col-md-6" id="diagnosisNotCompletedCard" style="display: none;">
+                    <div class="status-card diagnosis not-completed fade-in-up">
+                        <div class="status-header">
+                            <div class="d-flex align-items-center">
+                                <div class="status-icon diagnosis not-completed">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">핵심역량진단</h6>
+                                    <small class="status-label">진단 미실시</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-not-completed mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>핵심역량진단을 아직 실시하지 않았습니다.</strong>
+                            <p class="mb-0 mt-1">자신의 역량을 정확히 파악하고 개선 방향을 찾기 위해 진단을 받아보세요.</p>
+                        </div>
+                        <div class="status-action">
+                            <button class="btn btn-danger btn-sm w-100 btn-custom" onclick="goToDiagnosis()">
+                                <i class="bi bi-clipboard-check me-1"></i>검사하러 가기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Counseling Card -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="status-card counseling fade-in-up">
+                        <div class="status-header">
+                            <div class="d-flex align-items-center">
+                                <div class="status-icon counseling">
+                                    <i class="bi bi-chat-dots"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">최근 상담 예약</h6>
+                                    <small class="status-label">진로 상담</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="mb-2">
+                                <strong>김교수님</strong>
+                                <span class="badge bg-success ms-2">예약 완료</span>
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-calendar me-1"></i>2024.01.30 (화) 14:00
+                            </div>
+                            <div class="text-muted small">
+                                <i class="bi bi-geo-alt me-1"></i>학생상담센터 201호
+                            </div>
+                        </div>
+                        <div class="status-action">
+                            <button class="btn btn-success btn-sm w-100 btn-custom" onclick="goToCounseling()">
+                                <i class="bi bi-arrow-right me-1"></i>상담 상세보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mileage Card -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="status-card mileage fade-in-up">
+                        <div class="status-header">
+                            <div class="d-flex align-items-center">
+                                <div class="status-icon mileage">
+                                    <i class="bi bi-star"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">누적 마일리지</h6>
+                                    <small class="status-label">이번 학기 획득: +380P</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="status-score">1,250P</div>
+                            <div class="status-label">다음 등급까지 250P</div>
+                        </div>
+                        <div class="status-action">
+                            <button class="btn btn-primary btn-sm w-100 btn-custom" onclick="goToMileage()">
+                                <i class="bi bi-arrow-right me-1"></i>마일리지 상세보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Extracurricular Programs -->
+                <div class="col-lg-8">
+                    <div class="content-card fade-in-up">
+                        <div class="content-header">
+                            <div class="content-title">
+                                <i class="bi bi-calendar-event"></i>
+                                최신 비교과 프로그램
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm btn-custom" onclick="goToPrograms()">
+                                더보기 <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+
+                        <div id="programsList">
+                            <!-- Featured Program -->
+                            <div class="program-item featured" onclick="viewProgramDetail(1)">
+                                <div class="program-header">
+                                    <div class="flex-grow-1">
+                                        <div class="program-category category-leadership">리더십</div>
+                                        <div class="program-title">글로벌 리더십 아카데미</div>
+                                        <div class="program-dates">
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-plus"></i>
+                                                <span><strong>신청기간:</strong> 2024.02.01 ~ 2024.02.10</span>
+                                            </div>
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span><strong>운영기간:</strong> 2024.02.15 ~ 2024.03.15</span>
+                                            </div>
+                                        </div>
+                                        <div class="program-meta">
+                                            <span><i class="bi bi-people me-1"></i>20명 모집</span>
+                                            <span><i class="bi bi-geo-alt me-1"></i>국제관 세미나실</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <span class="program-status status-recruiting">모집중</span>
+                                        <div class="mileage-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>200P</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Popular Program -->
+                            <div class="program-item popular" onclick="viewProgramDetail(2)">
+                                <div class="program-header">
+                                    <div class="flex-grow-1">
+                                        <div class="program-category category-creativity">창의성</div>
+                                        <div class="program-title">창의적 사고와 혁신 워크숍</div>
+                                        <div class="program-dates">
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-plus"></i>
+                                                <span><strong>신청기간:</strong> 2024.01.25 ~ 2024.02.15</span>
+                                            </div>
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span><strong>운영기간:</strong> 2024.02.20 ~ 2024.02.22</span>
+                                            </div>
+                                        </div>
+                                        <div class="program-meta">
+                                            <span><i class="bi bi-people me-1"></i>30명 모집</span>
+                                            <span><i class="bi bi-geo-alt me-1"></i>창의관 메이커스페이스</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <span class="program-status status-deadline-soon">마감임박</span>
+                                        <div class="mileage-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>150P</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Career Program -->
+                            <div class="program-item" onclick="viewProgramDetail(3)">
+                                <div class="program-header">
+                                    <div class="flex-grow-1">
+                                        <div class="program-category category-career">진로</div>
+                                        <div class="program-title">IT 기업 멘토링 프로그램</div>
+                                        <div class="program-dates">
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-plus"></i>
+                                                <span><strong>신청기간:</strong> 2024.02.01 ~ 2024.02.25</span>
+                                            </div>
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span><strong>운영기간:</strong> 2024.03.01 ~ 2024.05.31</span>
+                                            </div>
+                                        </div>
+                                        <div class="program-meta">
+                                            <span><i class="bi bi-people me-1"></i>15명 모집</span>
+                                            <span><i class="bi bi-geo-alt me-1"></i>온라인/오프라인 병행</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <span class="program-status status-recruiting">모집중</span>
+                                        <div class="mileage-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>300P</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Volunteer Program -->
+                            <div class="program-item" onclick="viewProgramDetail(4)">
+                                <div class="program-header">
+                                    <div class="flex-grow-1">
+                                        <div class="program-category category-volunteer">봉사</div>
+                                        <div class="program-title">지역 아동센터 학습 지도</div>
+                                        <div class="program-dates">
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-plus"></i>
+                                                <span><strong>신청기간:</strong> 상시 모집</span>
+                                            </div>
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span><strong>운영기간:</strong> 2024.01.15 ~ 2024.06.30</span>
+                                            </div>
+                                        </div>
+                                        <div class="program-meta">
+                                            <span><i class="bi bi-people me-1"></i>상시 모집</span>
+                                            <span><i class="bi bi-geo-alt me-1"></i>인근 지역 아동센터</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <span class="program-status status-recruiting">모집중</span>
+                                        <div class="mileage-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>시간당 20P</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Academic Program -->
+                            <div class="program-item urgent" onclick="viewProgramDetail(5)">
+                                <div class="program-header">
+                                    <div class="flex-grow-1">
+                                        <div class="program-category category-academic">학술</div>
+                                        <div class="program-title">학부생 연구 프로그램</div>
+                                        <div class="program-dates">
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-plus"></i>
+                                                <span><strong>신청기간:</strong> 2024.01.20 ~ 2024.02.28</span>
+                                            </div>
+                                            <div class="date-item">
+                                                <i class="bi bi-calendar-event"></i>
+                                                <span><strong>운영기간:</strong> 2024.03.01 ~ 2024.11.30</span>
+                                            </div>
+                                        </div>
+                                        <div class="program-meta">
+                                            <span><i class="bi bi-people me-1"></i>10명 모집</span>
+                                            <span><i class="bi bi-geo-alt me-1"></i>각 학과 연구실</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <span class="program-status status-deadline-soon">마감임박</span>
+                                        <div class="mileage-badge">
+                                            <i class="bi bi-star-fill"></i>
+                                            <span>500P</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notice Board -->
+                <div class="col-lg-4">
+                    <div class="content-card fade-in-up">
+                        <div class="content-header">
+                            <div class="content-title">
+                                <i class="bi bi-megaphone"></i>
+                                공지사항
+                            </div>
+                            <button class="btn btn-outline-primary btn-sm btn-custom" onclick="goToNotices()">
+                                더보기 <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
+                        </div>
+
+                        <div id="noticesList">
+                            <div class="notice-item" onclick="viewNoticeDetail(1)">
+                                <div class="notice-header">
+                                    <div class="notice-title">
+                                        2024학년도 1학기 장학금 신청 안내
+                                        <span class="notice-new">NEW</span>
+                                    </div>
+                                    <div class="notice-date">01.24</div>
+                                </div>
+                            </div>
+
+                            <div class="notice-item" onclick="viewNoticeDetail(2)">
+                                <div class="notice-header">
+                                    <div class="notice-title">학생역량진단 시스템 업데이트 안내</div>
+                                    <div class="notice-date">01.22</div>
+                                </div>
+                            </div>
+
+                            <div class="notice-item" onclick="viewNoticeDetail(3)">
+                                <div class="notice-header">
+                                    <div class="notice-title">비교과 프로그램 운영 일정 변경</div>
+                                    <div class="notice-date">01.20</div>
+                                </div>
+                            </div>
+
+                            <div class="notice-item" onclick="viewNoticeDetail(4)">
+                                <div class="notice-header">
+                                    <div class="notice-title">상담센터 운영시간 안내</div>
+                                    <div class="notice-date">01.18</div>
+                                </div>
+                            </div>
+
+                            <div class="notice-item" onclick="viewNoticeDetail(5)">
+                                <div class="notice-header">
+                                    <div class="notice-title">마일리지 제도 개편 안내</div>
+                                    <div class="notice-date">01.15</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 현재 시간 표시
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 인사말 업데이트
+        function updateGreeting() {
+            const now = new Date();
+            const hour = now.getHours();
+            const userName = document.getElementById('headerUserName').textContent;
+            
+            let greeting = '';
+            if (hour < 12) {
+                greeting = `좋은 아침입니다, ${userName}님!`;
+            } else if (hour < 18) {
+                greeting = `안녕하세요, ${userName}님!`;
+            } else {
+                greeting = `좋은 저녁입니다, ${userName}님!`;
+            }
+            
+            document.getElementById('greetingMessage').textContent = greeting;
+            
+            // 날짜 업데이트
+            const dateString = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('greetingTime').textContent = dateString;
+        }
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 핵심역량진단 상태 토글 (데모용)
+        function toggleDiagnosisStatus() {
+            const completedCard = document.getElementById('diagnosisCompletedCard');
+            const notCompletedCard = document.getElementById('diagnosisNotCompletedCard');
+            
+            if (completedCard.style.display === 'none') {
+                completedCard.style.display = 'block';
+                notCompletedCard.style.display = 'none';
+            } else {
+                completedCard.style.display = 'none';
+                notCompletedCard.style.display = 'block';
+            }
+        }
+
+        // 페이지 이동 함수들
+        function goToDiagnosis() {
+            window.location.href = 'competency-diagnosis.html';
+        }
+
+        function goToCounseling() {
+            window.location.href = 'counseling.html';
+        }
+
+        function goToMileage() {
+            window.location.href = 'mileage.html';
+        }
+
+        function goToPrograms() {
+            window.location.href = 'extracurricular-programs.html';
+        }
+
+        function goToNotices() {
+            window.location.href = 'notice.html';
+        }
+
+        // 프로그램 상세보기
+        function viewProgramDetail(programId) {
+            const programs = {
+                1: "글로벌 리더십 아카데미",
+                2: "창의적 사고와 혁신 워크숍",
+                3: "IT 기업 멘토링 프로그램",
+                4: "지역 아동센터 학습 지도",
+                5: "학부생 연구 프로그램"
+            };
+            
+            alert(`${programs[programId]} 상세 페이지로 이동합니다.`);
+            // 실제 구현에서는 프로그램 상세 페이지로 이동
+            // window.location.href = `program-detail.html?id=${programId}`;
+        }
+
+        // 공지사항 상세보기
+        function viewNoticeDetail(noticeId) {
+            const notices = {
+                1: "2024학년도 1학기 장학금 신청 안내",
+                2: "학생역량진단 시스템 업데이트 안내",
+                3: "비교과 프로그램 운영 일정 변경",
+                4: "상담센터 운영시간 안내",
+                5: "마일리지 제도 개편 안내"
+            };
+            
+            alert(`${notices[noticeId]} 상세 페이지로 이동합니다.`);
+            // 실제 구현에서는 공지사항 상세 페이지로 이동
+            // window.location.href = `notice-detail.html?id=${noticeId}`;
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 애니메이션 효과
+        function addFadeInAnimation() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            elements.forEach((element, index) => {
+                element.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // 사이드바 외부 클릭 시 닫기 (모바일)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isToggleButton = event.target.closest('.btn-link');
+            
+            if (!isClickInsideSidebar && !isToggleButton && window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            updateTime();
+            updateGreeting();
+            addFadeInAnimation();
+            
+            // 시간 업데이트 (1초마다)
+            setInterval(updateTime, 1000);
+            
+            // 인사말 업데이트 (1분마다)
+            setInterval(updateGreeting, 60000);
+            
+            // 사용자 정보 로드
+            const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            if (user.name) {
+                document.getElementById('headerUserName').textContent = user.name;
+                updateGreeting();
+            }
+
+            // 데모용: 5초 후 진단 상태 토글 (실제 구현에서는 서버에서 상태를 가져와야 함)
+            // setTimeout(toggleDiagnosisStatus, 5000);
+        });
+
+        // 반응형 처리
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Profile Section */
+        .profile-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 3rem;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-upload {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: var(--success-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 3px solid white;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .btn-custom {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-custom:hover {
+            transform: translateY(-2px);
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+
+        .activity-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .password-strength {
+            height: 5px;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .strength-weak { background-color: var(--danger-color); }
+        .strength-medium { background-color: var(--warning-color); }
+        .strength-strong { background-color: var(--success-color); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교육 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="index.html" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    메인화면
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mypage.html" class="nav-link active">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="notice.html" class="nav-link">
+                    <i class="bi bi-megaphone"></i>
+                    공지사항
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="competency-diagnosis.html" class="nav-link">
+                    <i class="bi bi-clipboard-data"></i>
+                    학생역량진단
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="extracurricular-programs.html" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    비교과 프로그램
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="counseling.html" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    상담관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage.html" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 조회
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-medium" id="headerUserName">김학생</div>
+                    <small class="text-muted" id="headerUserDept">컴퓨터공학과 3학년</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mypage.html">마이페이지</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="index.html" class="text-white-50">홈</a></li>
+                        <li class="breadcrumb-item active text-white">마이페이지</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-person me-2"></i>마이페이지</h1>
+                <p class="mb-0 mt-2">개인정보를 관리하고 활동 이력을 확인하세요</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Profile Overview -->
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="profile-card">
+                        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                            <i class="bi bi-person" id="avatarIcon"></i>
+                            <div class="avatar-upload">
+                                <i class="bi bi-camera text-white"></i>
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                        
+                        <h4 id="profileName">김학생</h4>
+                        <p class="text-muted mb-3" id="profileInfo">컴퓨터공학과 3학년 • 2024001234</p>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary btn-custom" onclick="editProfile()">
+                                <i class="bi bi-pencil me-1"></i>프로필 수정
+                            </button>
+                            <button class="btn btn-outline-secondary btn-custom" onclick="downloadData()">
+                                <i class="bi bi-download me-1"></i>내 데이터 다운로드
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="info-card">
+                        <h6 class="mb-3">
+                            <i class="bi bi-graph-up me-2"></i>나의 활동 요약
+                        </h6>
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-primary mb-0">1,250</div>
+                                <small class="text-muted">보유 마일리지</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-success mb-0">3</div>
+                                <small class="text-muted">참여 프로그램</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-warning mb-0">5</div>
+                                <small class="text-muted">상담 횟수</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-info mb-0">85%</div>
+                                <small class="text-muted">역량진단 점수</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs mb-4" id="mypageTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#personalInfoTab">
+                                <i class="bi bi-person-lines-fill me-1"></i>개인정보
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#passwordTab">
+                                <i class="bi bi-shield-lock me-1"></i>비밀번호 변경
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#activityTab">
+                                <i class="bi bi-activity me-1"></i>활동 이력
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#settingsTab">
+                                <i class="bi bi-gear me-1"></i>설정
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Personal Info Tab -->
+                        <div class="tab-pane fade show active" id="personalInfoTab">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-person-lines-fill me-2"></i>개인정보 수정
+                                </h5>
+                                
+                                <form id="personalInfoForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="studentId" value="2024001234" readonly>
+                                                <label for="studentId">학번</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="name" value="김학생" required>
+                                                <label for="name">이름</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="department">
+                                                    <option value="컴퓨터공학과" selected>컴퓨터공학과</option>
+                                                    <option value="경영학과">경영학과</option>
+                                                    <option value="영어영문학과">영어영문학과</option>
+                                                    <option value="기계공학과">기계공학과</option>
+                                                </select>
+                                                <label for="department">학과</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="grade">
+                                                    <option value="1">1학년</option>
+                                                    <option value="2">2학년</option>
+                                                    <option value="3" selected>3학년</option>
+                                                    <option value="4">4학년</option>
+                                                </select>
+                                                <label for="grade">학년</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="email" class="form-control" id="email" value="student@university.ac.kr" required>
+                                                <label for="email">이메일</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="tel" class="form-control" id="phone" value="010-1234-5678" required>
+                                                <label for="phone">휴대폰 번호</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="address" value="서울시 강남구 테헤란로 123">
+                                        <label for="address">주소</label>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="bio" style="height: 100px" placeholder="자기소개를 입력하세요">안녕하세요! 컴퓨터공학과 3학년 김학생입니다. 프로그래밍과 AI에 관심이 많습니다.</textarea>
+                                        <label for="bio">자기소개</label>
+                                    </div>
+
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary btn-custom" onclick="resetPersonalInfo()">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>초기화
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-custom">
+                                            <i class="bi bi-check me-1"></i>저장
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Password Tab -->
+                        <div class="tab-pane fade" id="passwordTab">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-shield-lock me-2"></i>비밀번호 변경
+                                </h5>
+                                
+                                <form id="passwordForm">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="currentPassword" required>
+                                        <label for="currentPassword">현재 비밀번호</label>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="newPassword" required onkeyup="checkPasswordStrength()">
+                                        <label for="newPassword">새 비밀번호</label>
+                                        <div class="password-strength" id="passwordStrength"></div>
+                                        <small class="text-muted" id="passwordHelp">8자 이상, 영문/숫자/특수문자 포함</small>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="confirmPassword" required onkeyup="checkPasswordMatch()">
+                                        <label for="confirmPassword">새 비밀번호 확인</label>
+                                        <small class="text-muted" id="passwordMatch"></small>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>비밀번호 보안 수칙</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>8자 이상의 길이</li>
+                                            <li>영문 대소문자, 숫자, 특수문자 조합</li>
+                                            <li>개인정보와 관련된 정보 사용 금지</li>
+                                            <li>정기적인 비밀번호 변경 권장</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary btn-custom" onclick="clearPasswordForm()">
+                                            <i class="bi bi-x me-1"></i>취소
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-custom" id="passwordSubmitBtn" disabled>
+                                            <i class="bi bi-shield-check me-1"></i>비밀번호 변경
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Activity Tab -->
+                        <div class="tab-pane fade" id="activityTab">
+                            <div class="info-card">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-activity me-2"></i>활동 이력
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select" style="width: auto;" id="activityFilter">
+                                            <option value="all">전체</option>
+                                            <option value="program">비교과 프로그램</option>
+                                            <option value="counseling">상담</option>
+                                            <option value="diagnosis">역량진단</option>
+                                            <option value="mileage">마일리지</option>
+                                        </select>
+                                        <button class="btn btn-outline-primary" onclick="exportActivity()">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="activityList">
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-success">
+                                                <i class="bi bi-calendar-check"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">창업 아이디어 경진대회 참여</h6>
+                                                        <p class="text-muted mb-1 small">비교과 프로그램에 참여하여 150 마일리지를 획득했습니다.</p>
+                                                        <small class="text-muted">2024-01-20 14:30</small>
+                                                    </div>
+                                                    <span class="badge bg-success">+150P</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-primary">
+                                                <i class="bi bi-chat-dots"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">진로 상담 완료</h6>
+                                                        <p class="text-muted mb-1 small">김교수님과 진로 상담을 진행했습니다.</p>
+                                                        <small class="text-muted">2024-01-18 10:00</small>
+                                                    </div>
+                                                    <span class="badge bg-info">상담</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-warning">
+                                                <i class="bi bi-clipboard-data"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">핵심역량진단 완료</h6>
+                                                        <p class="text-muted mb-1 small">2024년 1학기 핵심역량진단을 완료했습니다. (종합점수: 85점)</p>
+                                                        <small class="text-muted">2024-01-15 16:45</small>
+                                                    </div>
+                                                    <span class="badge bg-warning">85점</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-info">
+                                                <i class="bi bi-star"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">봉사활동 마일리지 지급</h6>
+                                                        <p class="text-muted mb-1 small">지역 아동센터 학습 지도 봉사활동 참여로 마일리지를 획득했습니다.</p>
+                                                        <small class="text-muted">2024-01-10 18:00</small>
+                                                    </div>
+                                                    <span class="badge bg-success">+80P</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-secondary">
+                                                <i class="bi bi-person-plus"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">계정 생성</h6>
+                                                        <p class="text-muted mb-1 small">교육 관리 시스템에 가입했습니다.</p>
+                                                        <small class="text-muted">2024-01-05 09:00</small>
+                                                    </div>
+                                                    <span class="badge bg-secondary">가입</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-outline-primary" onclick="loadMoreActivity()">
+                                        <i class="bi bi-arrow-down me-1"></i>더 보기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Settings Tab -->
+                        <div class="tab-pane fade" id="settingsTab">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-gear me-2"></i>계정 설정
+                                </h5>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3">알림 설정</h6>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="emailNotification" checked>
+                                            <label class="form-check-label" for="emailNotification">
+                                                이메일 알림
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="smsNotification">
+                                            <label class="form-check-label" for="smsNotification">
+                                                SMS 알림
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="programNotification" checked>
+                                            <label class="form-check-label" for="programNotification">
+                                                프로그램 알림
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="counselingNotification" checked>
+                                            <label class="form-check-label" for="counselingNotification">
+                                                상담 알림
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3">개인정보 설정</h6>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="profilePublic">
+                                            <label class="form-check-label" for="profilePublic">
+                                                프로필 공개
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="activityPublic">
+                                            <label class="form-check-label" for="activityPublic">
+                                                활동 이력 공개
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-switch mb-3">
+                                            <input class="form-check-input" type="checkbox" id="contactAllow" checked>
+                                            <label class="form-check-label" for="contactAllow">
+                                                연락처 공개
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <hr class="my-4">
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3 text-danger">위험 구역</h6>
+                                        <button class="btn btn-outline-warning btn-custom mb-2 w-100" onclick="deactivateAccount()">
+                                            <i class="bi bi-pause-circle me-1"></i>계정 비활성화
+                                        </button>
+                                        <button class="btn btn-outline-danger btn-custom w-100" onclick="deleteAccount()">
+                                            <i class="bi bi-trash me-1"></i>계정 삭제
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6 class="mb-3">데이터 관리</h6>
+                                        <button class="btn btn-outline-info btn-custom mb-2 w-100" onclick="downloadData()">
+                                            <i class="bi bi-download me-1"></i>내 데이터 다운로드
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-custom w-100" onclick="clearCache()">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>캐시 초기화
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-4">
+                                    <button class="btn btn-primary btn-custom" onclick="saveSettings()">
+                                        <i class="bi bi-check me-1"></i>설정 저장
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 현재 시간 표시
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 프로필 사진 업로드
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatarIcon = document.getElementById('avatarIcon');
+                    avatarIcon.style.backgroundImage = `url(${e.target.result})`;
+                    avatarIcon.style.backgroundSize = 'cover';
+                    avatarIcon.style.backgroundPosition = 'center';
+                    avatarIcon.innerHTML = '';
+                };
+                reader.readAsDataURL(file);
+                alert('프로필 사진이 업로드되었습니다.');
+            }
+        }
+
+        // 개인정보 폼 처리
+        document.getElementById('personalInfoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 폼 데이터 수집
+            const formData = {
+                name: document.getElementById('name').value,
+                department: document.getElementById('department').value,
+                grade: document.getElementById('grade').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('address').value,
+                bio: document.getElementById('bio').value
+            };
+
+            // 실제 구현에서는 서버로 데이터 전송
+            console.log('개인정보 업데이트:', formData);
+            
+            // 프로필 정보 업데이트
+            document.getElementById('profileName').textContent = formData.name;
+            document.getElementById('profileInfo').textContent = `${formData.department} ${formData.grade}학년 • 2024001234`;
+            document.getElementById('headerUserName').textContent = formData.name;
+            document.getElementById('headerUserDept').textContent = `${formData.department} ${formData.grade}학년`;
+
+            alert('개인정보가 성공적으로 업데이트되었습니다.');
+        });
+
+        // 비밀번호 강도 체크
+        function checkPasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const strengthBar = document.getElementById('passwordStrength');
+            const helpText = document.getElementById('passwordHelp');
+
+            let strength = 0;
+            let feedback = [];
+
+            if (password.length >= 8) strength++;
+            else feedback.push('8자 이상');
+
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('소문자');
+
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('대문자');
+
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('숫자');
+
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+            else feedback.push('특수문자');
+
+            // 강도에 따른 색상 변경
+            strengthBar.className = 'password-strength';
+            if (strength < 3) {
+                strengthBar.classList.add('strength-weak');
+                helpText.textContent = '약함: ' + feedback.join(', ') + ' 필요';
+                helpText.className = 'text-danger';
+            } else if (strength < 5) {
+                strengthBar.classList.add('strength-medium');
+                helpText.textContent = '보통: ' + feedback.join(', ') + ' 권장';
+                helpText.className = 'text-warning';
+            } else {
+                strengthBar.classList.add('strength-strong');
+                helpText.textContent = '강함: 안전한 비밀번호입니다';
+                helpText.className = 'text-success';
+            }
+
+            checkPasswordMatch();
+        }
+
+        // 비밀번호 일치 확인
+        function checkPasswordMatch() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const matchText = document.getElementById('passwordMatch');
+            const submitBtn = document.getElementById('passwordSubmitBtn');
+
+            if (confirmPassword === '') {
+                matchText.textContent = '';
+                submitBtn.disabled = true;
+                return;
+            }
+
+            if (newPassword === confirmPassword) {
+                matchText.textContent = '비밀번호가 일치합니다';
+                matchText.className = 'text-success';
+                submitBtn.disabled = false;
+            } else {
+                matchText.textContent = '비밀번호가 일치하지 않습니다';
+                matchText.className = 'text-danger';
+                submitBtn.disabled = true;
+            }
+        }
+
+        // 비밀번호 변경 폼 처리
+        document.getElementById('passwordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+
+            // 실제 구현에서는 서버로 비밀번호 변경 요청
+            if (currentPassword === 'password123') { // 데모용 검증
+                alert('비밀번호가 성공적으로 변경되었습니다.');
+                clearPasswordForm();
+            } else {
+                alert('현재 비밀번호가 올바르지 않습니다.');
+            }
+        });
+
+        // 비밀번호 폼 초기화
+        function clearPasswordForm() {
+            document.getElementById('passwordForm').reset();
+            document.getElementById('passwordStrength').className = 'password-strength';
+            document.getElementById('passwordHelp').textContent = '8자 이상, 영문/숫자/특수문자 포함';
+            document.getElementById('passwordHelp').className = 'text-muted';
+            document.getElementById('passwordMatch').textContent = '';
+            document.getElementById('passwordSubmitBtn').disabled = true;
+        }
+
+        // 개인정보 초기화
+        function resetPersonalInfo() {
+            if (confirm('개인정보를 초기값으로 되돌리시겠습니까?')) {
+                document.getElementById('personalInfoForm').reset();
+                // 초기값 설정
+                document.getElementById('name').value = '김학생';
+                document.getElementById('department').value = '컴퓨터공학과';
+                document.getElementById('grade').value = '3';
+                document.getElementById('email').value = 'student@university.ac.kr';
+                document.getElementById('phone').value = '010-1234-5678';
+                document.getElementById('address').value = '서울시 강남구 테헤란로 123';
+                document.getElementById('bio').value = '안녕하세요! 컴퓨터공학과 3학년 김학생입니다. 프로그래밍과 AI에 관심이 많습니다.';
+            }
+        }
+
+        // 활동 이력 필터링
+        document.getElementById('activityFilter').addEventListener('change', function() {
+            const filter = this.value;
+            const activities = document.querySelectorAll('.activity-item');
+            
+            activities.forEach(activity => {
+                if (filter === 'all') {
+                    activity.style.display = 'block';
+                } else {
+                    // 실제 구현에서는 데이터 속성을 사용하여 필터링
+                    activity.style.display = 'block';
+                }
+            });
+        });
+
+        // 활동 이력 더 보기
+        function loadMoreActivity() {
+            alert('더 많은 활동 이력을 불러옵니다.');
+        }
+
+        // 활동 이력 내보내기
+        function exportActivity() {
+            alert('활동 이력을 Excel 파일로 다운로드합니다.');
+        }
+
+        // 설정 저장
+        function saveSettings() {
+            const settings = {
+                emailNotification: document.getElementById('emailNotification').checked,
+                smsNotification: document.getElementById('smsNotification').checked,
+                programNotification: document.getElementById('programNotification').checked,
+                counselingNotification: document.getElementById('counselingNotification').checked,
+                profilePublic: document.getElementById('profilePublic').checked,
+                activityPublic: document.getElementById('activityPublic').checked,
+                contactAllow: document.getElementById('contactAllow').checked
+            };
+
+            console.log('설정 저장:', settings);
+            alert('설정이 저장되었습니다.');
+        }
+
+        // 프로필 수정
+        function editProfile() {
+            document.querySelector('a[href="#personalInfoTab"]').click();
+        }
+
+        // 데이터 다운로드
+        function downloadData() {
+            alert('개인 데이터를 JSON 형태로 다운로드합니다.');
+        }
+
+        // 캐시 초기화
+        function clearCache() {
+            if (confirm('캐시를 초기화하시겠습니까?')) {
+                alert('캐시가 초기화되었습니다.');
+            }
+        }
+
+        // 계정 비활성화
+        function deactivateAccount() {
+            if (confirm('계정을 비활성화하시겠습니까? 언제든지 다시 활성화할 수 있습니다.')) {
+                alert('계정이 비활성화되었습니다.');
+            }
+        }
+
+        // 계정 삭제
+        function deleteAccount() {
+            const confirmation = prompt('계정을 삭제하려면 "DELETE"를 입력하세요:');
+            if (confirmation === 'DELETE') {
+                alert('계정 삭제 요청이 접수되었습니다. 7일 후 완전히 삭제됩니다.');
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 페이지 로드 시 사용자 정보 로드
+        window.addEventListener('load', function() {
+            // 실제 구현에서는 서버에서 사용자 정보를 가져옴
+            const user = JSON.parse(sessionStorage.getItem('currentUser') || '{}');
+            if (user.name) {
+                document.getElementById('profileName').textContent = user.name;
+                document.getElementById('headerUserName').textContent = user.name;
+                document.getElementById('name').value = user.name;
+            }
+        });
+    </script>
+</body>
+</html>

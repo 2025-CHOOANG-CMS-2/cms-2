@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 관리자</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #5a1e2c;
+        color: white;
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .header-left {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .header-center {
+        flex: 1;
+        text-align: center;
+        font-size: 1.2rem;
+      }
+      .header-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.9rem;
+        gap: 1rem;
+      }
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .user-info {
+        text-align: right;
+        line-height: 1.2;
+      }
+      .user-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+      }
+      .user-btn:hover {
+        color: #ffc107;
+      }
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: 100%;
+        background-color: #5a1e2c;
+        padding: 1rem 0;
+        color: white;
+        z-index: 1030;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar-user-info {
+        display: none;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .sidebar-user-info div {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+      .main-content {
+        margin-top: 60px;
+        margin-left: 240px;
+        padding: 1.5rem;
+      }
+      .nav-link {
+        color: #e0e8f0;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        background-color: #732836;
+        color: #ffffff;
+      }
+      .nav-link.active {
+        background-color: #8a3d4a;
+        font-weight: bold;
+      }
+      .submenu {
+        background-color: #732836;
+      }
+      .submenu a {
+        padding-left: 2.5rem;
+        font-size: 0.95rem;
+      }
+      .has-submenu::after {
+        content: "\25BC";
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+      .hamburger {
+        display: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+      }
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -240px;
+          transition: left 0.3s ease;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: inline-block;
+          margin-right: 1rem;
+        }
+        .header-right {
+          display: none;
+        }
+        .sidebar-user-info {
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header d-flex">
+      <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 관리자 포털
+      </div>
+      <div class="header-center">
+        <img
+          src="../../static/images/logo-white.png"
+          alt="logo"
+          height="30"
+          class="me-2"
+        />
+        대한대학교
+      </div>
+      <div class="header-right">
+        <div class="user-box">
+          <div class="user-info">
+            <div><strong>관리자</strong> (ADMIN001)</div>
+            <div class="small">시스템관리자</div>
+          </div>
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-user-info">
+        <div><strong>관리자</strong> (ADMIN001)</div>
+        <div>시스템관리자</div>
+        <div class="mt-2">
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i> 로그아웃
+          </button>
+        </div>
+      </div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="/admin/student">학생관리</a>
+        <a class="nav-link" href="/admin/staff">교직원관리</a>
+
+        <a class="nav-link" href="/notice">공지사항관리</a>
+
+        <a class="nav-link has-submenu" href="#" data-menu="역량"
+          >핵심역량개발관리</a
+        >
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="/competency/items">역량항목관리</a>
+          <a class="nav-link" href="/competency/questions">진단문항관리</a>
+          <a class="nav-link" href="/competency/diagnosis">진단검사현황</a>
+          <a class="nav-link" href="/competency/recommend">추천비교과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="비교과"
+          >비교과프로그램관리</a
+        >
+        <div class="submenu" id="submenu-비교과" style="display: none">
+          <a class="nav-link" href="/program/manage">프로그램관리</a>
+          <a class="nav-link" href="/program/applications">프로그램신청관리</a>
+          <a class="nav-link" href="/program/activities">프로그램활동관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+          <a class="nav-link" href="/counseling/schedule">상담사일정등록</a>
+          <a class="nav-link" href="/counseling/reservations">상담예약관리</a>
+          <a class="nav-link" href="/counseling/results">상담결과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지"
+          >마일리지관리</a
+        >
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+          <a class="nav-link" href="/mileage/points">마일리지배점</a>
+          <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+          <a class="nav-link" href="/mileage/status">마일리지현황</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <h1>관리자 메인 콘텐츠</h1>
+      <p>해당 영역에 관리자 전용 기능들이 표시됩니다.</p>
+    </main>
+
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const hamburger = document.getElementById("hamburger");
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+      });
+
+      const menuLinks = document.querySelectorAll("[data-menu]");
+      menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+          e.preventDefault();
+          const key = menu.getAttribute("data-menu");
+          const submenu = document.getElementById(`submenu-${key}`);
+
+          document.querySelectorAll(".submenu").forEach((sm) => {
+            if (sm !== submenu) sm.style.display = "none";
+          });
+
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
