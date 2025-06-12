@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공지사항 관리 - 교육 관리 시스템</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .nav-link:hover {
+            color: #fff;
+        }
+        .nav-link.active {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .badge-important {
+            background-color: #dc3545;
+        }
+        .badge-normal {
+            background-color: #6c757d;
+        }
+        .notice-table th, .notice-table td {
+            vertical-align: middle;
+        }
+        .notice-preview {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .category-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 16px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .category-item:last-child {
+            border-bottom: none;
+        }
+        .tab-content {
+            padding: 20px 0;
+        }
+        .filter-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .notice-status-active {
+            color: #28a745;
+        }
+        .notice-status-scheduled {
+            color: #fd7e14;
+        }
+        .notice-status-expired {
+            color: #6c757d;
+        }
+        .notice-status-draft {
+            color: #6c757d;
+            font-style: italic;
+        }
+        .target-badge {
+            margin-right: 5px;
+        }
+        .statistics-card {
+            transition: transform 0.3s;
+        }
+        .statistics-card:hover {
+            transform: translateY(-5px);
+        }
+        .attachment-preview {
+            display: flex;
+            align-items: center;
+            padding: 5px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .attachment-preview i {
+            margin-right: 10px;
+        }
+        .attachment-preview .file-name {
+            flex-grow: 1;
+        }
+        .attachment-preview .file-size {
+            color: #6c757d;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 사이드바 -->
+            <div class="col-md-3 col-lg-2 sidebar p-0">
+                <div class="d-flex flex-column p-3 text-white">
+                    <a href="admin-index.html" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+                        <i class="bi bi-mortarboard-fill me-2"></i>
+                        <span class="fs-4">교육 관리 시스템</span>
+                    </a>
+                    <hr>
+                    <ul class="nav nav-pills flex-column mb-auto">
+                        <li class="nav-item">
+                            <a href="admin-index.html" class="nav-link text-white">
+                                <i class="bi bi-speedometer2 me-2"></i>
+                                대시보드
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-student-management.html" class="nav-link text-white">
+                                <i class="bi bi-person me-2"></i>
+                                학생 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-faculty-management.html" class="nav-link text-white">
+                                <i class="bi bi-person-badge me-2"></i>
+                                교직원 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-department-management.html" class="nav-link text-white">
+                                <i class="bi bi-diagram-3 me-2"></i>
+                                학과/조직 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-permission-management.html" class="nav-link text-white">
+                                <i class="bi bi-shield-lock me-2"></i>
+                                권한 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-diagnosis-management.html" class="nav-link text-white">
+                                <i class="bi bi-clipboard-data me-2"></i>
+                                역량진단 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-programs-management.html" class="nav-link text-white">
+                                <i class="bi bi-calendar-event me-2"></i>
+                                비교과 프로그램 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-counseling-management.html" class="nav-link text-white">
+                                <i class="bi bi-chat-square-text me-2"></i>
+                                상담 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-mileage-management.html" class="nav-link text-white">
+                                <i class="bi bi-coin me-2"></i>
+                                마일리지 관리
+                            </a>
+                        </li>
+                        <li>
+                            <a href="admin-notice-management.html" class="nav-link active">
+                                <i class="bi bi-megaphone me-2"></i>
+                                공지사항 관리
+                            </a>
+                        </li>
+                    </ul>
+                    <hr>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="https://via.placeholder.com/32" alt="관리자" width="32" height="32" class="rounded-circle me-2">
+                            <strong>관리자</strong>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                            <li><a class="dropdown-item" href="#">설정</a></li>
+                            <li><a class="dropdown-item" href="#">프로필</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="login.html">로그아웃</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 메인 콘텐츠 -->
+            <div class="col-md-9 col-lg-10 ms-sm-auto px-md-4 py-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">공지사항 관리</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="exportBtn">
+                                <i class="bi bi-download me-1"></i>내보내기
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary" id="printBtn">
+                                <i class="bi bi-printer me-1"></i>인쇄
+                            </button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#createNoticeModal">
+                            <i class="bi bi-plus-lg me-1"></i>새 공지사항
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 통계 카드 -->
+                <div class="row mb-4">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-primary statistics-card">
+                            <div class="card-body">
+                                <h5 class="card-title">전체 공지사항</h5>
+                                <p class="card-text display-6">124</p>
+                                <p class="card-text"><small>최근 30일: +12</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-success statistics-card">
+                            <div class="card-body">
+                                <h5 class="card-title">활성 공지사항</h5>
+                                <p class="card-text display-6">42</p>
+                                <p class="card-text"><small>전체의 33.9%</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-warning statistics-card">
+                            <div class="card-body">
+                                <h5 class="card-title">중요 공지사항</h5>
+                                <p class="card-text display-6">8</p>
+                                <p class="card-text"><small>활성의 19.0%</small></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-info statistics-card">
+                            <div class="card-body">
+                                <h5 class="card-title">평균 조회수</h5>
+                                <p class="card-text display-6">156</p>
+                                <p class="card-text"><small>최근 30일: +23%</small></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 탭 메뉴 -->
+                <ul class="nav nav-tabs" id="noticeManagementTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="notice-list-tab" data-bs-toggle="tab" data-bs-target="#notice-list" type="button" role="tab" aria-controls="notice-list" aria-selected="true">공지사항 목록</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="category-management-tab" data-bs-toggle="tab" data-bs-target="#category-management" type="button" role="tab" aria-controls="category-management" aria-selected="false">카테고리 관리</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="statistics-tab" data-bs-toggle="tab" data-bs-target="#statistics" type="button" role="tab" aria-controls="statistics" aria-selected="false">통계 및 분석</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">설정</button>
+                    </li>
+                </ul>
+
+                <!-- 탭 콘텐츠 -->
+                <div class="tab-content" id="noticeManagementTabContent">
+                    <!-- 공지사항 목록 탭 -->
+                    <div class="tab-pane fade show active" id="notice-list" role="tabpanel" aria-labelledby="notice-list-tab">
+                        <!-- 필터 섹션 -->
+                        <div class="filter-section mb-4">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label for="categoryFilter" class="form-label">카테고리</label>
+                                    <select class="form-select" id="categoryFilter">
+                                        <option value="">전체</option>
+                                        <option value="1">학사공지</option>
+                                        <option value="2">장학공지</option>
+                                        <option value="3">취업공지</option>
+                                        <option value="4">행사공지</option>
+                                        <option value="5">일반공지</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="statusFilter" class="form-label">상태</label>
+                                    <select class="form-select" id="statusFilter">
+                                        <option value="">전체</option>
+                                        <option value="active">활성</option>
+                                        <option value="scheduled">예약됨</option>
+                                        <option value="expired">만료됨</option>
+                                        <option value="draft">임시저장</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <label for="importanceFilter" class="form-label">중요도</label>
+                                    <select class="form-select" id="importanceFilter">
+                                        <option value="">전체</option>
+                                        <option value="important">중요</option>
+                                        <option value="normal">일반</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="dateRangeFilter" class="form-label">기간</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="dateRangeFilter" placeholder="날짜 범위 선택">
+                                        <button class="btn btn-outline-secondary" type="button" id="clearDateBtn">초기화</button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="searchInput" class="form-label">검색</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="제목, 내용, 작성자 검색">
+                                        <button class="btn btn-outline-primary" type="button" id="searchBtn">검색</button>
+                                        <button class="btn btn-outline-secondary" type="button" id="resetFilterBtn">필터 초기화</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 공지사항 테이블 -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover notice-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAllNotices"></th>
+                                        <th>No.</th>
+                                        <th>제목</th>
+                                        <th>카테고리</th>
+                                        <th>조회수</th>
+                                        <th>작성부서</th>
+                                        <th>작성자</th>
+                                        <th>작성일</th>
+                                        <th>게시여부</th>
+                                        <th>관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" class="notice-checkbox"></td>
+                                        <td>1</td>
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewNoticeModal">2024학년도 1학기 수강신청 안내</a>
+                                        </td>
+                                        <td>학사공지</td>
+                                        <td>1,245</td>
+                                        <td>교무처</td>
+                                        <td>김교무</td>
+                                        <td>2024-01-25</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-success" onclick="togglePublishStatus(1, true)">
+                                                <i class="bi bi-eye"></i> 게시
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">
+                                                <i class="bi bi-pencil"></i> 수정
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="notice-checkbox"></td>
+                                        <td>2</td>
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewNoticeModal">2024학년도 장학금 신청 안내</a>
+                                        </td>
+                                        <td>장학공지</td>
+                                        <td>987</td>
+                                        <td>학생지원처</td>
+                                        <td>이학생</td>
+                                        <td>2024-01-10</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="togglePublishStatus(2, false)">
+                                                <i class="bi bi-eye-slash"></i> 미게시
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">
+                                                <i class="bi bi-pencil"></i> 수정
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="notice-checkbox"></td>
+                                        <td>3</td>
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewNoticeModal">2024 취업박람회 개최 안내</a>
+                                        </td>
+                                        <td>취업공지</td>
+                                        <td>0</td>
+                                        <td>취업지원센터</td>
+                                        <td>박취업</td>
+                                        <td>2024-02-01</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="togglePublishStatus(3, false)">
+                                                <i class="bi bi-eye-slash"></i> 미게시
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">
+                                                <i class="bi bi-pencil"></i> 수정
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="notice-checkbox"></td>
+                                        <td>4</td>
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewNoticeModal">학술제 참가 신청 안내</a>
+                                        </td>
+                                        <td>행사공지</td>
+                                        <td>562</td>
+                                        <td>학생회</td>
+                                        <td>최학생</td>
+                                        <td>2023-10-15</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-success" onclick="togglePublishStatus(4, true)">
+                                                <i class="bi bi-eye"></i> 게시
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">
+                                                <i class="bi bi-pencil"></i> 수정
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="notice-checkbox"></td>
+                                        <td>5</td>
+                                        <td>
+                                            <a href="#" data-bs-toggle="modal" data-bs-target="#viewNoticeModal">시스템 점검 안내</a>
+                                        </td>
+                                        <td>일반공지</td>
+                                        <td>0</td>
+                                        <td>시스템관리팀</td>
+                                        <td>정시스템</td>
+                                        <td>2024-02-05</td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="togglePublishStatus(5, false)">
+                                                <i class="bi bi-eye-slash"></i> 미게시
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">
+                                                <i class="bi bi-pencil"></i> 수정
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 페이지네이션 -->
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">다음</a>
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <!-- 선택된 항목 관리 버튼 -->
+                        <div class="d-flex justify-content-end mt-3">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-secondary" id="activateSelectedBtn">활성화</button>
+                                <button type="button" class="btn btn-outline-secondary" id="deactivateSelectedBtn">비활성화</button>
+                                <button type="button" class="btn btn-outline-danger" id="deleteSelectedBtn">선택 삭제</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 카테고리 관리 탭 -->
+                    <div class="tab-pane fade" id="category-management" role="tabpanel" aria-labelledby="category-management-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">카테고리 목록</h5>
+                                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                            <i class="bi bi-plus-lg me-1"></i>새 카테고리
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="list-group">
+                                            <div class="category-item">
+                                                <div>
+                                                    <span class="fw-bold">학사공지</span>
+                                                    <span class="badge bg-primary ms-2">42</span>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="category-item">
+                                                <div>
+                                                    <span class="fw-bold">장학공지</span>
+                                                    <span class="badge bg-primary ms-2">28</span>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="category-item">
+                                                <div>
+                                                    <span class="fw-bold">취업공지</span>
+                                                    <span class="badge bg-primary ms-2">15</span>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="category-item">
+                                                <div>
+                                                    <span class="fw-bold">행사공지</span>
+                                                    <span class="badge bg-primary ms-2">23</span>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            </div>
+                                            <div class="category-item">
+                                                <div>
+                                                    <span class="fw-bold">일반공지</span>
+                                                    <span class="badge bg-primary ms-2">16</span>
+                                                </div>
+                                                <div>
+                                                    <button class="btn btn-sm btn-outline-primary me-1" data-bs-toggle="modal" data-bs-target="#editCategoryModal"><i class="bi bi-pencil"></i></button>
+                                                    <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal"><i class="bi bi-trash"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">카테고리 통계</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="categoryChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">카테고리별 조회수</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>카테고리</th>
+                                                        <th>공지 수</th>
+                                                        <th>총 조회수</th>
+                                                        <th>평균 조회수</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>학사공지</td>
+                                                        <td>42</td>
+                                                        <td>12,450</td>
+                                                        <td>296.4</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>장학공지</td>
+                                                        <td>28</td>
+                                                        <td>8,760</td>
+                                                        <td>312.9</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>취업공지</td>
+                                                        <td>15</td>
+                                                        <td>3,240</td>
+                                                        <td>216.0</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>행사공지</td>
+                                                        <td>23</td>
+                                                        <td>4,120</td>
+                                                        <td>179.1</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>일반공지</td>
+                                                        <td>16</td>
+                                                        <td>1,890</td>
+                                                        <td>118.1</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 통계 및 분석 탭 -->
+                    <div class="tab-pane fade" id="statistics" role="tabpanel" aria-labelledby="statistics-tab">
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">월별 공지사항 등록 추이</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="monthlyNoticeChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">월별 조회수 추이</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="monthlyViewsChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">대상자별 공지사항 분포</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="targetDistributionChart" height="300"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">상위 조회수 공지사항</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>순위</th>
+                                                        <th>제목</th>
+                                                        <th>카테고리</th>
+                                                        <th>조회수</th>
+                                                        <th>게시일</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>2024학년도 1학기 수강신청 안내</td>
+                                                        <td>학사공지</td>
+                                                        <td>1,245</td>
+                                                        <td>2024-01-25</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>2024학년도 장학금 신청 안내</td>
+                                                        <td>장학공지</td>
+                                                        <td>987</td>
+                                                        <td>2024-01-10</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>2023학년도 2학기 성적 확인 안내</td>
+                                                        <td>학사공지</td>
+                                                        <td>876</td>
+                                                        <td>2023-12-20</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>2024학년도 신입생 오리엔테이션 안내</td>
+                                                        <td>행사공지</td>
+                                                        <td>754</td>
+                                                        <td>2024-02-01</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>5</td>
+                                                        <td>2023학년도 동계 계절학기 안내</td>
+                                                        <td>학사공지</td>
+                                                        <td>723</td>
+                                                        <td>2023-11-15</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 mb-4">
+                                <div class="card">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">상세 분석 보고서</h5>
+                                        <button class="btn btn-sm btn-outline-primary" id="downloadReportBtn">
+                                            <i class="bi bi-download me-1"></i>보고서 다운로드
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">공지사항 활성도</h6>
+                                                        <p class="card-text">최근 30일간 공지사항 활성도는 <strong>85%</strong>로 전월 대비 <span class="text-success">+5%</span> 증가했습니다.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">사용자 참여도</h6>
+                                                        <p class="card-text">공지사항 평균 조회율은 <strong>42%</strong>로 전월 대비 <span class="text-success">+8%</span> 증가했습니다.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 mb-3">
+                                                <div class="card bg-light">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">첨부파일 다운로드</h6>
+                                                        <p class="card-text">첨부파일 다운로드율은 <strong>23%</strong>로 전월 대비 <span class="text-danger">-3%</span> 감소했습니다.</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-info mt-3">
+                                            <h6 class="alert-heading">분석 인사이트</h6>
+                                            <p class="mb-0">학사공지와 장학공지의 조회수가 가장 높으며, 학기 시작 전 공지사항의 조회수가 급증하는 경향이 있습니다. 중요 공지사항은 일반 공지사항보다 평균 2.4배 높은 조회수를 기록하고 있습니다.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 설정 탭 -->
+                    <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">일반 설정</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <label for="defaultCategory" class="form-label">기본 카테고리</label>
+                                                <select class="form-select" id="defaultCategory">
+                                                    <option value="1">학사공지</option>
+                                                    <option value="2">장학공지</option>
+                                                    <option value="3">취업공지</option>
+                                                    <option value="4">행사공지</option>
+                                                    <option value="5" selected>일반공지</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="defaultTarget" class="form-label">기본 대상자</label>
+                                                <select class="form-select" id="defaultTarget">
+                                                    <option value="all" selected>전체 사용자</option>
+                                                    <option value="student">학생</option>
+                                                    <option value="faculty">교직원</option>
+                                                    <option value="admin">관리자</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="defaultDuration" class="form-label">기본 게시 기간(일)</label>
+                                                <input type="number" class="form-control" id="defaultDuration" value="30">
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="autoExpire" checked>
+                                                <label class="form-check-label" for="autoExpire">만료된 공지사항 자동 비활성화</label>
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="enableComments">
+                                                <label class="form-check-label" for="enableComments">댓글 기능 활성화</label>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">설정 저장</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">알림 설정</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="emailNotification" checked>
+                                                <label class="form-check-label" for="emailNotification">이메일 알림</label>
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="smsNotification">
+                                                <label class="form-check-label" for="smsNotification">SMS 알림</label>
+                                            </div>
+                                            <div class="mb-3 form-check">
+                                                <input type="checkbox" class="form-check-input" id="pushNotification" checked>
+                                                <label class="form-check-label" for="pushNotification">푸시 알림</label>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="notificationTemplate" class="form-label">알림 템플릿</label>
+                                                <textarea class="form-control" id="notificationTemplate" rows="3">[교육관리시스템] 새로운 공지사항이 등록되었습니다: {제목}. 자세한 내용은 시스템에서 확인하세요.</textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">설정 저장</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">권한 설정</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form>
+                                            <div class="mb-3">
+                                                <label class="form-label">관리자 권한</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="adminCreate" checked>
+                                                    <label class="form-check-label" for="adminCreate">공지사항 생성</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="adminEdit" checked>
+                                                    <label class="form-check-label" for="adminEdit">공지사항 수정</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="adminDelete" checked>
+                                                    <label class="form-check-label" for="adminDelete">공지사항 삭제</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="adminCategory" checked>
+                                                    <label class="form-check-label" for="adminCategory">카테고리 관리</label>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">교직원 권한</label>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="facultyCreate" checked>
+                                                    <label class="form-check-label" for="facultyCreate">공지사항 생성</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="facultyEdit" checked>
+                                                    <label class="form-check-label" for="facultyEdit">본인 작성 공지사항 수정</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="facultyDelete">
+                                                    <label class="form-check-label" for="facultyDelete">본인 작성 공지사항 삭제</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="facultyCategory">
+                                                    <label class="form-check-label" for="facultyCategory">카테고리 관리</label>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">설정 저장</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">백업 및 복원</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-4">
+                                            <h6>데이터 백업</h6>
+                                            <p>모든 공지사항 데이터를 백업합니다.</p>
+                                            <button class="btn btn-primary" id="backupBtn">
+                                                <i class="bi bi-download me-1"></i>데이터 백업
+                                            </button>
+                                        </div>
+                                        <div class="mb-4">
+                                            <h6>데이터 복원</h6>
+                                            <p>백업 파일에서 데이터를 복원합니다.</p>
+                                            <div class="input-group">
+                                                <input type="file" class="form-control" id="restoreFile">
+                                                <button class="btn btn-outline-secondary" type="button" id="restoreBtn">복원</button>
+                                            </div>
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <i class="bi bi-exclamation-triangle me-2"></i>
+                                            데이터 복원 시 기존 데이터가 모두 삭제되고 백업 데이터로 대체됩니다. 신중하게 진행해주세요.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공지사항 생성 모달 -->
+    <div class="modal fade" id="createNoticeModal" tabindex="-1" aria-labelledby="createNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createNoticeModalLabel">새 공지사항 작성</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createNoticeForm">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="noticeTitle" class="form-label">제목</label>
+                                <input type="text" class="form-control" id="noticeTitle" placeholder="공지사항 제목을 입력하세요" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="noticeCategory" class="form-label">카테고리</label>
+                                <select class="form-select" id="noticeCategory" required>
+                                    <option value="">카테고리 선택</option>
+                                    <option value="1">학사공지</option>
+                                    <option value="2">장학공지</option>
+                                    <option value="3">취업공지</option>
+                                    <option value="4">행사공지</option>
+                                    <option value="5">일반공지</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="noticeAuthor" class="form-label">작성자</label>
+                                <input type="text" class="form-control" id="noticeAuthor" value="김관리자" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="noticeDepartment" class="form-label">작성부서</label>
+                                <input type="text" class="form-control" id="noticeDepartment" value="시스템관리팀" readonly>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="noticePeriod" class="form-label">게시 기간</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="noticePeriod" placeholder="게시 기간 선택">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="noticeImportant">
+                                    <label class="form-check-label" for="noticeImportant">
+                                        중요 공지사항으로 표시
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="noticeContent" class="form-label">내용</label>
+                            <textarea class="form-control" id="noticeContent" rows="10" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="noticeAttachments" class="form-label">첨부파일</label>
+                            <input class="form-control" type="file" id="noticeAttachments" multiple>
+                            <div id="attachmentsList" class="mt-2"></div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="publishImmediately">
+                                    <label class="form-check-label" for="publishImmediately">
+                                        즉시 게시
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="saveAsDraft">
+                                    <label class="form-check-label" for="saveAsDraft">
+                                        임시저장
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveNoticeBtn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공지사항 수정 모달 -->
+    <div class="modal fade" id="editNoticeModal" tabindex="-1" aria-labelledby="editNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editNoticeModalLabel">공지사항 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editNoticeForm">
+                        <div class="row mb-3">
+                            <div class="col-md-8">
+                                <label for="editNoticeTitle" class="form-label">제목</label>
+                                <input type="text" class="form-control" id="editNoticeTitle" value="2024학년도 1학기 수강신청 안내" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="editNoticeCategory" class="form-label">카테고리</label>
+                                <select class="form-select" id="editNoticeCategory" required>
+                                    <option value="">카테고리 선택</option>
+                                    <option value="1" selected>학사공지</option>
+                                    <option value="2">장학공지</option>
+                                    <option value="3">취업공지</option>
+                                    <option value="4">행사공지</option>
+                                    <option value="5">일반공지</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="editNoticePeriod" class="form-label">게시 기간</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="editNoticePeriod" value="2024-02-01 ~ 2024-02-28">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editNoticeTarget" class="form-label">대상자</label>
+                                <select class="form-select" id="editNoticeTarget" multiple required>
+                                    <option value="all">전체 사용자</option>
+                                    <option value="student" selected>학생</option>
+                                    <option value="faculty">교직원</option>
+                                    <option value="admin">관리자</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editNoticeImportant" checked>
+                                    <label class="form-check-label" for="editNoticeImportant">
+                                        중요 공지사항으로 표시
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNoticeContent" class="form-label">내용</label>
+                            <textarea class="form-control" id="editNoticeContent" rows="10" required>2024학년도 1학기 수강신청이 다음과 같이 진행됩니다.
+
+1. 수강신청 기간
+   - 1차: 2024년 2월 5일(월) 09:00 ~ 2월 7일(수) 18:00
+   - 2차: 2024년 2월 12일(월) 09:00 ~ 2월 14일(수) 18:00
+
+2. 수강신청 대상
+   - 재학생 및 복학생
+   - 편입생 및 전과생
+
+3. 주의사항
+   - 수강신청 전 학사일정을 반드시 확인하시기 바랍니다.
+   - 수강신청 시스템 접속이 원활하지 않을 경우 잠시 후 다시 시도해주세요.
+
+문의사항이 있으시면 교무처(02-1234-5678)로 연락주시기 바랍니다.</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editNoticeAttachments" class="form-label">첨부파일</label>
+                            <input class="form-control" type="file" id="editNoticeAttachments" multiple>
+                            <div id="editAttachmentsList" class="mt-2">
+                                <div class="attachment-preview">
+                                    <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                    <span class="file-name">수강신청_안내.pdf</span>
+                                    <span class="file-size">245KB</span>
+                                    <button type="button" class="btn btn-sm btn-outline-danger">삭제</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editSendNotification">
+                                    <label class="form-check-label" for="editSendNotification">
+                                        수정 알림 발송
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editSaveAsDraft">
+                                    <label class="form-check-label" for="editSaveAsDraft">
+                                        임시저장
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="updateNoticeBtn">수정 저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공지사항 상세보기 모달 -->
+    <div class="modal fade" id="viewNoticeModal" tabindex="-1" aria-labelledby="viewNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewNoticeModalLabel">공지사항 상세보기</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="notice-preview">
+                        <div class="mb-3">
+                            <span class="badge badge-important me-2">중요</span>
+                            <span class="badge bg-primary me-2">학사공지</span>
+                            <span class="badge bg-secondary">학생</span>
+                        </div>
+                        <h4 class="mb-3">2024학년도 1학기 수강신청 안내</h4>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <small class="text-muted">작성자: 교무처</small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <small class="text-muted">작성일: 2024-01-25</small>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <small class="text-muted">게시 기간: 2024-02-01 ~ 2024-02-28</small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <small class="text-muted">조회수: 1,245</small>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="notice-content">
+                            <p>2024학년도 1학기 수강신청이 다음과 같이 진행됩니다.</p>
+                            <h6>1. 수강신청 기간</h6>
+                            <ul>
+                                <li>1차: 2024년 2월 5일(월) 09:00 ~ 2월 7일(수) 18:00</li>
+                                <li>2차: 2024년 2월 12일(월) 09:00 ~ 2월 14일(수) 18:00</li>
+                            </ul>
+                            <h6>2. 수강신청 대상</h6>
+                            <ul>
+                                <li>재학생 및 복학생</li>
+                                <li>편입생 및 전과생</li>
+                            </ul>
+                            <h6>3. 주의사항</h6>
+                            <ul>
+                                <li>수강신청 전 학사일정을 반드시 확인하시기 바랍니다.</li>
+                                <li>수강신청 시스템 접속이 원활하지 않을 경우 잠시 후 다시 시도해주세요.</li>
+                            </ul>
+                            <p>문의사항이 있으시면 교무처(02-1234-5678)로 연락주시기 바랍니다.</p>
+                        </div>
+                        <hr>
+                        <div class="attachments">
+                            <h6>첨부파일</h6>
+                            <div class="attachment-preview">
+                                <i class="bi bi-file-earmark-pdf text-danger"></i>
+                                <span class="file-name">수강신청_안내.pdf</span>
+                                <span class="file-size">245KB</span>
+                                <button type="button" class="btn btn-sm btn-outline-primary">다운로드</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editNoticeModal">수정</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 공지사항 삭제 확인 모달 -->
+    <div class="modal fade" id="deleteNoticeModal" tabindex="-1" aria-labelledby="deleteNoticeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteNoticeModalLabel">공지사항 삭제</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>선택한 공지사항을 삭제하시겠습니까?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        삭제된 공지사항은 복구할 수 없습니다.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카테고리 추가 모달 -->
+    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCategoryModalLabel">새 카테고리 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCategoryForm">
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">카테고리명</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="카테고리명을 입력하세요" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDescription" class="form-label">설명</label>
+                            <textarea class="form-control" id="categoryDescription" rows="3" placeholder="카테고리 설명을 입력하세요"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryColor" class="form-label">색상</label>
+                            <input type="color" class="form-control form-control-color" id="categoryColor" value="#0d6efd">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카테고리 수정 모달 -->
+    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCategoryModalLabel">카테고리 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCategoryForm">
+                        <div class="mb-3">
+                            <label for="editCategoryName" class="form-label">카테고리명</label>
+                            <input type="text" class="form-control" id="editCategoryName" value="학사공지" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCategoryDescription" class="form-label">설명</label>
+                            <textarea class="form-control" id="editCategoryDescription" rows="3">학사 관련 공지사항</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editCategoryColor" class="form-label">색상</label>
+                            <input type="color" class="form-control form-control-color" id="editCategoryColor" value="#0d6efd">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="updateCategoryBtn">수정 저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 카테고리 삭제 확인 모달 -->
+    <div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteCategoryModalLabel">카테고리 삭제</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>선택한 카테고리를 삭제하시겠습니까?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        카테고리를 삭제하면 해당 카테고리의 모든 공지사항이 '일반공지' 카테고리로 이동됩니다.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteCategoryBtn">삭제</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+    <script>
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+        });
+
+        function initializePage() {
+            initializeDatePickers();
+            initializeEditor();
+            initializeCharts();
+            initializeEventListeners();
+            initializeFilters();
+        }
+
+        // 날짜 선택기 초기화
+        function initializeDatePickers() {
+            // 게시 기간 선택
+            flatpickr("#noticePeriod", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                locale: "ko"
+            });
+
+            flatpickr("#editNoticePeriod", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                locale: "ko"
+            });
+
+            // 필터 날짜 범위 선택
+            flatpickr("#dateRangeFilter", {
+                mode: "range",
+                dateFormat: "Y-m-d",
+                locale: "ko"
+            });
+        }
+
+        // 에디터 초기화
+        function initializeEditor() {
+            ClassicEditor
+                .create(document.querySelector('#noticeContent'), {
+                    toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', '|',
+                        'link', 'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'imageUpload', 'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ],
+                    language: 'ko'
+                })
+                .then(editor => {
+                    window.noticeEditor = editor;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+
+            ClassicEditor
+                .create(document.querySelector('#editNoticeContent'), {
+                    toolbar: [
+                        'heading', '|',
+                        'bold', 'italic', 'underline', '|',
+                        'link', 'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'imageUpload', 'blockQuote', 'insertTable', '|',
+                        'undo', 'redo'
+                    ],
+                    language: 'ko'
+                })
+                .then(editor => {
+                    window.editNoticeEditor = editor;
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+        }
+
+        // 차트 초기화
+        function initializeCharts() {
+            // 카테고리 분포 차트
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['학사공지', '장학공지', '취업공지', '행사공지', '일반공지'],
+                    datasets: [{
+                        data: [42, 28, 15, 23, 16],
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // 월별 공지사항 등록 추이
+            const monthlyNoticeCtx = document.getElementById('monthlyNoticeChart').getContext('2d');
+            new Chart(monthlyNoticeCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+                    datasets: [{
+                        label: '공지사항 수',
+                        data: [12, 19, 15, 22, 18, 25],
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 월별 조회수 추이
+            const monthlyViewsCtx = document.getElementById('monthlyViewsChart').getContext('2d');
+            new Chart(monthlyViewsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+                    datasets: [{
+                        label: '조회수',
+                        data: [1200, 1900, 1500, 2200, 1800, 2500],
+                        backgroundColor: '#4BC0C0'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // 대상자별 분포
+            const targetDistributionCtx = document.getElementById('targetDistributionChart').getContext('2d');
+            new Chart(targetDistributionCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['전체', '학생', '교직원', '관리자'],
+                    datasets: [{
+                        data: [45, 35, 15, 5],
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // 이벤트 리스너 초기화
+        function initializeEventListeners() {
+            // 전체 선택 체크박스
+            document.getElementById('selectAllNotices').addEventListener('change', function() {
+                const checkboxes = document.querySelectorAll('.notice-checkbox');
+                checkboxes.forEach(checkbox => {
+                    checkbox.checked = this.checked;
+                });
+            });
+
+            // 공지사항 저장
+            document.getElementById('saveNoticeBtn').addEventListener('click', function() {
+                saveNotice();
+            });
+
+            // 공지사항 수정
+            document.getElementById('updateNoticeBtn').addEventListener('click', function() {
+                updateNotice();
+            });
+
+            // 공지사항 삭제 확인
+            document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                deleteNotice();
+            });
+
+            // 카테고리 저장
+            document.getElementById('saveCategoryBtn').addEventListener('click', function() {
+                saveCategory();
+            });
+
+            // 카테고리 수정
+            document.getElementById('updateCategoryBtn').addEventListener('click', function() {
+                updateCategory();
+            });
+
+            // 카테고리 삭제 확인
+            document.getElementById('confirmDeleteCategoryBtn').addEventListener('click', function() {
+                deleteCategory();
+            });
+
+            // 첨부파일 처리
+            document.getElementById('noticeAttachments').addEventListener('change', function() {
+                handleFileAttachment(this, 'attachmentsList');
+            });
+
+            document.getElementById('editNoticeAttachments').addEventListener('change', function() {
+                handleFileAttachment(this, 'editAttachmentsList');
+            });
+
+            // 검색 버튼
+            document.getElementById('searchBtn').addEventListener('click', function() {
+                performSearch();
+            });
+
+            // 필터 초기화
+            document.getElementById('resetFilterBtn').addEventListener('click', function() {
+                resetFilters();
+            });
+
+            // 날짜 필터 초기화
+            document.getElementById('clearDateBtn').addEventListener('click', function() {
+                document.getElementById('dateRangeFilter').value = '';
+            });
+
+            // 선택된 항목 관리
+            document.getElementById('activateSelectedBtn').addEventListener('click', function() {
+                activateSelectedNotices();
+            });
+
+            document.getElementById('deactivateSelectedBtn').addEventListener('click', function() {
+                deactivateSelectedNotices();
+            });
+
+            document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
+                deleteSelectedNotices();
+            });
+
+            // 내보내기 및 인쇄
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                exportData();
+            });
+
+            document.getElementById('printBtn').addEventListener('click', function() {
+                printPage();
+            });
+
+            // 보고서 다운로드
+            document.getElementById('downloadReportBtn').addEventListener('click', function() {
+                downloadReport();
+            });
+
+            // 백업 및 복원
+            document.getElementById('backupBtn').addEventListener('click', function() {
+                backupData();
+            });
+
+            document.getElementById('restoreBtn').addEventListener('click', function() {
+                restoreData();
+            });
+        }
+
+        // 필터 초기화
+        function initializeFilters() {
+            const filters = ['categoryFilter', 'statusFilter', 'importanceFilter'];
+            filters.forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', function() {
+                    applyFilters();
+                });
+            });
+        }
+
+        // 공지사항 저장
+        function saveNotice() {
+            const formData = {
+                title: document.getElementById('noticeTitle').value,
+                category: document.getElementById('noticeCategory').value,
+                author: document.getElementById('noticeAuthor').value,
+                department: document.getElementById('noticeDepartment').value,
+                period: document.getElementById('noticePeriod').value,
+                important: document.getElementById('noticeImportant').checked,
+                content: window.noticeEditor.getData(),
+                publishImmediately: document.getElementById('publishImmediately').checked,
+                saveAsDraft: document.getElementById('saveAsDraft').checked
+            };
+
+            // 유효성 검사
+            if (!formData.title || !formData.category || !formData.content) {
+                alert('필수 항목을 모두 입력해주세요.');
+                return;
+            }
+
+            // 서버로 데이터 전송 (실제 구현 시)
+            console.log('공지사항 저장:', formData);
+            
+            // 성공 메시지
+            alert('공지사항이 저장되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('createNoticeModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 테이블만 업데이트)
+            location.reload();
+        }
+
+        // 공지사항 수정
+        function updateNotice() {
+            const formData = {
+                title: document.getElementById('editNoticeTitle').value,
+                category: document.getElementById('editNoticeCategory').value,
+                period: document.getElementById('editNoticePeriod').value,
+                target: Array.from(document.getElementById('editNoticeTarget').selectedOptions).map(option => option.value),
+                important: document.getElementById('editNoticeImportant').checked,
+                content: window.editNoticeEditor.getData(),
+                sendNotification: document.getElementById('editSendNotification').checked,
+                saveAsDraft: document.getElementById('editSaveAsDraft').checked
+            };
+
+            // 유효성 검사
+            if (!formData.title || !formData.category || !formData.content) {
+                alert('필수 항목을 모두 입력해주세요.');
+                return;
+            }
+
+            // 서버로 데이터 전송 (실제 구현 시)
+            console.log('공지사항 수정:', formData);
+            
+            // 성공 메시지
+            alert('공지사항이 수정되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editNoticeModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 테이블만 업데이트)
+            location.reload();
+        }
+
+        // 공지사항 삭제
+        function deleteNotice() {
+            // 서버로 삭제 요청 (실제 구현 시)
+            console.log('공지사항 삭제');
+            
+            // 성공 메시지
+            alert('공지사항이 삭제되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoticeModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 테이블만 업데이트)
+            location.reload();
+        }
+
+        // 카테고리 저장
+        function saveCategory() {
+            const formData = {
+                name: document.getElementById('categoryName').value,
+                description: document.getElementById('categoryDescription').value,
+                color: document.getElementById('categoryColor').value
+            };
+
+            // 유효성 검사
+            if (!formData.name) {
+                alert('카테고리명을 입력해주세요.');
+                return;
+            }
+
+            // 서버로 데이터 전송 (실제 구현 시)
+            console.log('카테고리 저장:', formData);
+            
+            // 성공 메시지
+            alert('카테고리가 추가되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 카테고리 목록만 업데이트)
+            location.reload();
+        }
+
+        // 카테고리 수정
+        function updateCategory() {
+            const formData = {
+                name: document.getElementById('editCategoryName').value,
+                description: document.getElementById('editCategoryDescription').value,
+                color: document.getElementById('editCategoryColor').value
+            };
+
+            // 유효성 검사
+            if (!formData.name) {
+                alert('카테고리명을 입력해주세요.');
+                return;
+            }
+
+            // 서버로 데이터 전송 (실제 구현 시)
+            console.log('카테고리 수정:', formData);
+            
+            // 성공 메시지
+            alert('카테고리가 수정되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editCategoryModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 카테고리 목록만 업데이트)
+            location.reload();
+        }
+
+        // 카테고리 삭제
+        function deleteCategory() {
+            // 서버로 삭제 요청 (실제 구현 시)
+            console.log('카테고리 삭제');
+            
+            // 성공 메시지
+            alert('카테고리가 삭제되었습니다.');
+            
+            // 모달 닫기
+            const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCategoryModal'));
+            modal.hide();
+            
+            // 페이지 새로고침 (실제로는 카테고리 목록만 업데이트)
+            location.reload();
+        }
+
+        // 첨부파일 처리
+        function handleFileAttachment(input, listId) {
+            const files = input.files;
+            const listContainer = document.getElementById(listId);
+            
+            // 기존 첨부파일 목록 초기화 (새 파일 추가 시)
+            if (listId === 'attachmentsList') {
+                listContainer.innerHTML = '';
+            }
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const filePreview = document.createElement('div');
+                filePreview.className = 'attachment-preview';
+                
+                const fileIcon = getFileIcon(file.type);
+                const fileSize = formatFileSize(file.size);
+                
+                filePreview.innerHTML = `
+                    <i class="bi ${fileIcon}"></i>
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-size">${fileSize}</span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeAttachment(this)">삭제</button>
+                `;
+                
+                listContainer.appendChild(filePreview);
+            }
+        }
+
+        // 파일 아이콘 반환
+        function getFileIcon(fileType) {
+            if (fileType.includes('pdf')) return 'bi-file-earmark-pdf text-danger';
+            if (fileType.includes('word')) return 'bi-file-earmark-word text-primary';
+            if (fileType.includes('excel')) return 'bi-file-earmark-excel text-success';
+            if (fileType.includes('image')) return 'bi-file-earmark-image text-info';
+            return 'bi-file-earmark text-secondary';
+        }
+
+        // 파일 크기 포맷
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // 첨부파일 삭제
+        function removeAttachment(button) {
+            button.parentElement.remove();
+        }
+
+        // 검색 수행
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value;
+            console.log('검색어:', searchTerm);
+            // 실제 구현 시 서버에 검색 요청
+            alert('검색 기능이 실행됩니다: ' + searchTerm);
+        }
+
+        // 필터 적용
+        function applyFilters() {
+            const filters = {
+                category: document.getElementById('categoryFilter').value,
+                status: document.getElementById('statusFilter').value,
+                importance: document.getElementById('importanceFilter').value,
+                dateRange: document.getElementById('dateRangeFilter').value
+            };
+            
+            console.log('필터 적용:', filters);
+            // 실제 구현 시 필터링된 데이터로 테이블 업데이트
+        }
+
+        // 필터 초기화
+        function resetFilters() {
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('importanceFilter').value = '';
+            document.getElementById('dateRangeFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            
+            // 필터 적용
+            applyFilters();
+        }
+
+        // 선택된 공지사항 활성화
+        function activateSelectedNotices() {
+            const selectedNotices = getSelectedNotices();
+            if (selectedNotices.length === 0) {
+                alert('활성화할 공지사항을 선택해주세요.');
+                return;
+            }
+            
+            console.log('활성화할 공지사항:', selectedNotices);
+            alert(`${selectedNotices.length}개의 공지사항이 활성화되었습니다.`);
+            location.reload();
+        }
+
+        // 선택된 공지사항 비활성화
+        function deactivateSelectedNotices() {
+            const selectedNotices = getSelectedNotices();
+            if (selectedNotices.length === 0) {
+                alert('비활성화할 공지사항을 선택해주세요.');
+                return;
+            }
+            
+            console.log('비활성화할 공지사항:', selectedNotices);
+            alert(`${selectedNotices.length}개의 공지사항이 비활성화되었습니다.`);
+            location.reload();
+        }
+
+        // 선택된 공지사항 삭제
+        function deleteSelectedNotices() {
+            const selectedNotices = getSelectedNotices();
+            if (selectedNotices.length === 0) {
+                alert('삭제할 공지사항을 선택해주세요.');
+                return;
+            }
+            
+            if (confirm(`선택한 ${selectedNotices.length}개의 공지사항을 삭제하시겠습니까?`)) {
+                console.log('삭제할 공지사항:', selectedNotices);
+                alert(`${selectedNotices.length}개의 공지사항이 삭제되었습니다.`);
+                location.reload();
+            }
+        }
+
+        // 선택된 공지사항 ID 목록 반환
+        function getSelectedNotices() {
+            const checkboxes = document.querySelectorAll('.notice-checkbox:checked');
+            return Array.from(checkboxes).map((checkbox, index) => index + 1);
+        }
+
+        // 데이터 내보내기
+        function exportData() {
+            console.log('데이터 내보내기');
+            alert('공지사항 데이터를 Excel 파일로 내보냅니다.');
+        }
+
+        // 페이지 인쇄
+        function printPage() {
+            window.print();
+        }
+
+        // 보고서 다운로드
+        function downloadReport() {
+            console.log('보고서 다운로드');
+            alert('상세 분석 보고서를 PDF로 다운로드합니다.');
+        }
+
+        // 데이터 백업
+        function backupData() {
+            console.log('데이터 백업');
+            alert('공지사항 데이터를 백업합니다.');
+        }
+
+        // 데이터 복원
+        function restoreData() {
+            const fileInput = document.getElementById('restoreFile');
+            if (!fileInput.files.length) {
+                alert('복원할 파일을 선택해주세요.');
+                return;
+            }
+            
+            if (confirm('데이터를 복원하시겠습니까? 기존 데이터가 모두 삭제됩니다.')) {
+                console.log('데이터 복원');
+                alert('데이터가 복원되었습니다.');
+                location.reload();
+            }
+        }
+
+        function togglePublishStatus(noticeId, currentStatus) {
+            const newStatus = !currentStatus;
+            const statusText = newStatus ? '게시' : '미게시';
+            const buttonClass = newStatus ? 'btn-success' : 'btn-outline-secondary';
+            const iconClass = newStatus ? 'bi-eye' : 'bi-eye-slash';
+            
+            if (confirm(`이 공지사항을 ${statusText} 상태로 변경하시겠습니까?`)) {
+                // 서버로 상태 변경 요청 (실제 구현 시)
+                console.log(`공지사항 ${noticeId} 상태를 ${statusText}로 변경`);
+                
+                // UI 업데이트
+                const button = event.target.closest('button');
+                button.className = `btn btn-sm ${buttonClass}`;
+                button.innerHTML = `<i class="bi ${iconClass}"></i> ${statusText}`;
+                button.onclick = () => togglePublishStatus(noticeId, newStatus);
+                
+                alert(`공지사항이 ${statusText} 상태로 변경되었습니다.`);
+            }
+        }
+    </script>
+</body>
+</html>
