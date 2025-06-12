@@ -1,7 +1,6 @@
-package kr.ac.dhuniv.core_cpt_eval;
+package kr.ac.dhuniv.core_cpt.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.core_cpt_qst.CoreCptQst;
 import kr.ac.dhuniv.std_info.StdInfo;
 import lombok.*;
 

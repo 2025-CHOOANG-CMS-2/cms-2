@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.std_mileage_total;
+package kr.ac.dhuniv.mileage.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.std_info.StdInfo;

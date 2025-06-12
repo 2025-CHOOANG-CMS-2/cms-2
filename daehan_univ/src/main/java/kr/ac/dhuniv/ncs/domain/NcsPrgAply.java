@@ -1,7 +1,6 @@
-package kr.ac.dhuniv.ncs_prg_aply;
+package kr.ac.dhuniv.ncs.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.ncs_prg_info.NcsPrgInfo;
 import kr.ac.dhuniv.std_info.StdInfo;
 import lombok.*;
 

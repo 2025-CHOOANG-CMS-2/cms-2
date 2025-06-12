@@ -1,7 +1,6 @@
-package kr.ac.dhuniv.ncs_prg_mileage;
+package kr.ac.dhuniv.ncs.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.ncs_prg_info.NcsPrgInfo;
 import lombok.*;
 
 import java.math.BigDecimal;
