@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>권한 관리 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+        }
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .permission-matrix {
+            font-size: 0.9rem;
+        }
+        .permission-matrix th {
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            min-width: 80px;
+            text-align: center;
+        }
+        .permission-check {
+            text-align: center;
+        }
+        .role-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 사이드바 -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            관리자
+                        </h4>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                대시보드
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
+                                <i class="fas fa-users me-2"></i>
+                                사용자/조직 관리
+                                <i class="fas fa-chevron-down ms-auto"></i>
+                            </a>
+                            <div class="collapse show" id="userManagement">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-student-management.html">
+                                            <i class="fas fa-user-graduate me-2"></i>
+                                            학생 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-faculty-management.html">
+                                            <i class="fas fa-chalkboard-teacher me-2"></i>
+                                            교직원 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-department-management.html">
+                                            <i class="fas fa-building me-2"></i>
+                                            학과/부서 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="admin-permission-management.html">
+                                            <i class="fas fa-key me-2"></i>
+                                            권한 관리
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+
+                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                로그아웃
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- 메인 콘텐츠 -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-key me-2"></i>
+                        권한 관리
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                                <i class="fas fa-plus me-2"></i>
+                                역할 추가
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" onclick="savePermissions()">
+                                <i class="fas fa-save me-2"></i>
+                                권한 저장
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 역할 관리 -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-users-cog me-2"></i>
+                                    역할 목록
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <div class="list-group-item list-group-item-action active" onclick="selectRole('admin')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">시스템 관리자</h6>
+                                            <small class="text-muted">5명</small>
+                                        </div>
+                                        <p class="mb-1">모든 시스템 기능에 대한 전체 권한</p>
+                                        <small class="text-muted">최고 권한</small>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action" onclick="selectRole('faculty')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">교직원</h6>
+                                            <small class="text-muted">156명</small>
+                                        </div>
+                                        <p class="mb-1">교육 및 상담 관련 기능 권한</p>
+                                        <small class="text-muted">중간 권한</small>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action" onclick="selectRole('student')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">학생</h6>
+                                            <small class="text-muted">1,247명</small>
+                                        </div>
+                                        <p class="mb-1">개인 정보 조회 및 신청 기능</p>
+                                        <small class="text-muted">기본 권한</small>
+                                    </div>
+                                    <div class="list-group-item list-group-item-action" onclick="selectRole('counselor')">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">상담사</h6>
+                                            <small class="text-muted">12명</small>
+                                        </div>
+                                        <p class="mb-1">상담 관련 전문 기능</p>
+                                        <small class="text-muted">전문 권한</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    권한 매트릭스
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered permission-matrix">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">기능</th>
+                                                <th colspan="4" class="text-center">역할별 권한</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-center">관리자</th>
+                                                <th class="text-center">교직원</th>
+                                                <th class="text-center">상담사</th>
+                                                <th class="text-center">학생</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><strong>사용자 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="faculty_user_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_user_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_user_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>학생 정보 조회</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_student_view">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="counselor_student_view">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_student_view">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>역량진단 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_diagnosis_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_diagnosis_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_diagnosis_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>비교과 프로그램 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_program_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_program_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_program_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>상담 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_counseling_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="counselor_counseling_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_counseling_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>마일리지 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_mileage_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_mileage_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_mileage_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>공지사항 관리</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked id="faculty_notice_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_notice_mgmt">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_notice_mgmt">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>시스템 설정</strong></td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" checked disabled>
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="faculty_system_config">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="counselor_system_config">
+                                                </td>
+                                                <td class="permission-check">
+                                                    <input type="checkbox" id="student_system_config">
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 사용자별 권한 할당 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user-shield me-2"></i>
+                            사용자별 권한 할당
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" placeholder="사용자 검색..." id="userSearch">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="roleFilter">
+                                    <option value="">전체 역할</option>
+                                    <option value="admin">관리자</option>
+                                    <option value="faculty">교직원</option>
+                                    <option value="counselor">상담사</option>
+                                    <option value="student">학생</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary w-100" onclick="searchUsers()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>사용자 ID</th>
+                                        <th>이름</th>
+                                        <th>부서</th>
+                                        <th>현재 역할</th>
+                                        <th>권한 수정</th>
+                                        <th>관리</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>admin001</td>
+                                        <td>시스템관리자</td>
+                                        <td>전산실</td>
+                                        <td><span class="badge role-badge bg-danger">관리자</span></td>
+                                        <td>
+                                            <select class="form-select form-select-sm" onchange="changeUserRole('admin001', this.value)">
+                                                <option value="admin" selected>관리자</option>
+                                                <option value="faculty">교직원</option>
+                                                <option value="counselor">상담사</option>
+                                                <option value="student">학생</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUserPermission('admin001')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>F001</td>
+                                        <td>김교수</td>
+                                        <td>컴퓨터공학과</td>
+                                        <td><span class="badge role-badge bg-primary">교직원</span></td>
+                                        <td>
+                                            <select class="form-select form-select-sm" onchange="changeUserRole('F001', this.value)">
+                                                <option value="admin">관리자</option>
+                                                <option value="faculty" selected>교직원</option>
+                                                <option value="counselor">상담사</option>
+                                                <option value="student">학생</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUserPermission('F001')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>C001</td>
+                                        <td>박상담사</td>
+                                        <td>학생상담센터</td>
+                                        <td><span class="badge role-badge bg-success">상담사</span></td>
+                                        <td>
+                                            <select class="form-select form-select-sm" onchange="changeUserRole('C001', this.value)">
+                                                <option value="admin">관리자</option>
+                                                <option value="faculty">교직원</option>
+                                                <option value="counselor" selected>상담사</option>
+                                                <option value="student">학생</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="editUserPermission('C001')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 역할 추가 모달 -->
+    <div class="modal fade" id="addRoleModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-plus me-2"></i>
+                        새 역할 추가
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addRoleForm">
+                        <div class="mb-3">
+                            <label for="roleName" class="form-label">역할명 *</label>
+                            <input type="text" class="form-control" id="roleName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="roleDescription" class="form-label">설명</label>
+                            <textarea class="form-control" id="roleDescription" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">기본 권한</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="readPermission" checked>
+                                <label class="form-check-label" for="readPermission">
+                                    읽기 권한
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="writePermission">
+                                <label class="form-check-label" for="writePermission">
+                                    쓰기 권한
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="deletePermission">
+                                <label class="form-check-label" for="deletePermission">
+                                    삭제 권한
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="addRole()">
+                        <i class="fas fa-save me-2"></i>
+                        저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedRole = 'admin';
+
+        // 역할 선택
+        function selectRole(roleId) {
+            selectedRole = roleId;
+            
+            // 활성 상태 변경
+            document.querySelectorAll('.list-group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            console.log(`선택된 역할: ${roleId}`);
+        }
+
+        // 권한 저장
+        function savePermissions() {
+            const permissions = {};
+            
+            // 체크박스 상태 수집
+            document.querySelectorAll('input[type="checkbox"]:not([disabled])').forEach(checkbox => {
+                permissions[checkbox.id] = checkbox.checked;
+            });
+            
+            console.log('저장할 권한:', permissions);
+            alert('권한이 저장되었습니다.');
+        }
+
+        // 사용자 검색
+        function searchUsers() {
+            const searchTerm = document.getElementById('userSearch').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+            
+            console.log('검색 조건:', { search: searchTerm, role: roleFilter });
+            alert('사용자 검색이 실행되었습니다.');
+        }
+
+        // 사용자 역할 변경
+        function changeUserRole(userId, newRole) {
+            if (confirm(`사용자 ${userId}의 역할을 ${newRole}로 변경하시겠습니까?`)) {
+                console.log(`사용자 ${userId} 역할을 ${newRole}로 변경`);
+                alert('역할이 변경되었습니다.');
+            }
+        }
+
+        // 사용자 권한 편집
+        function editUserPermission(userId) {
+            alert(`사용자 ${userId}의 개별 권한 설정 화면을 엽니다.`);
+        }
+
+        // 새 역할 추가
+        function addRole() {
+            const form = document.getElementById('addRoleForm');
+            
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const roleName = document.getElementById('roleName').value;
+            alert(`새 역할 '${roleName}'이 추가되었습니다.`);
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addRoleModal'));
+            modal.hide();
+            form.reset();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('권한 관리 페이지가 로드되었습니다.');
+        });
+    </script>
+</body>
+</html>

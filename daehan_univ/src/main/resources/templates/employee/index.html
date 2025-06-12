@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>교직원 메인 페이지</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-color: #2c5aa0;
+        --secondary-color: #f8f9fc;
+      }
+      body {
+        background-color: var(--secondary-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .navbar {
+        background: linear-gradient(135deg, var(--primary-color), #1e3d72);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.4rem;
+      }
+      .main-container {
+        padding: 2rem 0;
+      }
+      .dashboard-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: none;
+        transition: 0.2s;
+        height: 100%;
+      }
+      .dashboard-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      }
+      .card-header {
+        background: linear-gradient(135deg, #fff, #f8f9ff);
+        border-bottom: 2px solid #e9ecef;
+        border-radius: 12px 12px 0 0 !important;
+        padding: 1.25rem 1.5rem;
+      }
+      .card-title {
+        color: var(--primary-color);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 25px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.75rem;
+      }
+      .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+      }
+      .status-active {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #badbcc;
+      }
+      .status-info {
+        background-color: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+      }
+      .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+      .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+      .btn-custom {
+        background: linear-gradient(135deg, var(--primary-color), #1e3d72);
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 500;
+      }
+      .btn-custom:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(44, 90, 160, 0.3);
+      }
+      .program-item,
+      .notice-item,
+      .counseling-item {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+      }
+      .program-info h6 {
+        margin: 0;
+        font-weight: 600;
+        color: #2c3e50;
+      }
+      .program-meta {
+        font-size: 0.8rem;
+        color: #7f8c8d;
+      }
+      .department-rank {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+      }
+      .rank-number {
+        background: var(--primary-color);
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        text-align: center;
+        font-size: 0.8rem;
+        font-weight: 600;
+        line-height: 24px;
+      }
+      .progress {
+        height: 8px;
+        border-radius: 4px;
+        background-color: #e9ecef;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <a class="navbar-brand" href="#"
+          ><i class="fas fa-graduation-cap me-2"></i>교직원 대시보드</a
+        >
+        <div class="navbar-nav ms-auto">
+          <span class="navbar-text text-white"
+            ><i class="fas fa-user-circle me-2"></i>김교수님</span
+          >
+        </div>
+      </div>
+    </nav>
+
+    <div class="container main-container">
+      <div class="row">
+        <!-- 공지사항 -->
+        <div class="col-12 mb-4">
+          <div class="card dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-bullhorn"></i> 전체 공지사항
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="notice-item">
+                <div class="program-info">
+                  <h6>2025년 1학기 비교과 프로그램 운영 안내</h6>
+                  <div class="program-meta">2025.06.10</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </div>
+              <div class="notice-item">
+                <div class="program-info">
+                  <h6>마일리지 지급 기준 변경 안내</h6>
+                  <div class="program-meta">2025.06.08</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </div>
+              <div class="notice-item">
+                <div class="program-info">
+                  <h6>핵심역량진단 시스템 업데이트</h6>
+                  <div class="program-meta">2025.06.05</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </div>
+              <div class="notice-item">
+                <div class="program-info">
+                  <h6>학생 상담 시스템 개선 사항</h6>
+                  <div class="program-meta">2025.06.03</div>
+                </div>
+                <i class="fas fa-chevron-right text-muted"></i>
+              </div>
+              <div class="mt-3">
+                <a href="#" class="btn btn-outline-primary w-100"
+                  ><i class="fas fa-list me-2"></i>공지사항 관리</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 비교과 프로그램 -->
+        <div class="col-lg-6 mb-4">
+          <div class="card dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-calendar-alt"></i> 비교과 프로그램 현황
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="status-badge status-active">
+                <i class="fas fa-users"></i> 모집 중: 15개 프로그램
+              </div>
+              <div class="status-badge status-info">
+                <i class="fas fa-play"></i> 운영 중: 23개 프로그램
+              </div>
+              <div class="status-badge status-pending">
+                <i class="fas fa-user-plus"></i> 최근 1주일 신규 신청: 47명
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-custom w-100">
+                  <i class="fas fa-cog me-2"></i> 프로그램 관리 바로가기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 나의 상담 현황 -->
+        <div class="col-lg-6 mb-4">
+          <div class="card dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-comments"></i> 나의 상담 현황
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row mb-3">
+                <div class="col-6 text-center">
+                  <div class="stat-number text-info">3</div>
+                  <div class="stat-label">오늘의 상담 일정</div>
+                </div>
+                <div class="col-6 text-center">
+                  <div class="stat-number text-warning">5</div>
+                  <div class="stat-label">신규 상담 신청</div>
+                </div>
+              </div>
+              <div class="counseling-item">
+                <div>
+                  <h6>진로 상담 - 김학생</h6>
+                  <div class="program-meta">오늘 14:00 ~ 15:00</div>
+                </div>
+              </div>
+              <div class="counseling-item">
+                <div>
+                  <h6>학업 상담 - 이학생</h6>
+                  <div class="program-meta">오늘 16:00 ~ 17:00</div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-custom w-100">
+                  <i class="fas fa-calendar-check me-2"></i> 상담 관리 바로가기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 마일리지 -->
+        <div class="col-lg-6 mb-4">
+          <div class="card dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-coins"></i> 마일리지 지급 현황
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-3">
+                <div class="stat-number text-success">2,850</div>
+                <div class="stat-label">금학기 총 지급 마일리지</div>
+              </div>
+              <h6 class="mb-3">최근 지급 프로그램</h6>
+              <div class="program-item">
+                <div class="program-info">
+                  <h6>창업 아이디어 경진대회</h6>
+                  <div class="program-meta">50점 × 12명 지급</div>
+                </div>
+                <span class="badge bg-success">완료</span>
+              </div>
+              <div class="program-item">
+                <div class="program-info">
+                  <h6>글로벌 리더십 워크숍</h6>
+                  <div class="program-meta">30점 × 25명 지급</div>
+                </div>
+                <span class="badge bg-success">완료</span>
+              </div>
+              <div class="program-item">
+                <div class="program-info">
+                  <h6>진로 멘토링 프로그램</h6>
+                  <div class="program-meta">20점 × 18명 지급</div>
+                </div>
+                <span class="badge bg-success">완료</span>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-custom w-100">
+                  <i class="fas fa-chart-line me-2"></i> 마일리지 관리 바로가기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 핵심역량진단 (offset 제거됨) -->
+        <div class="col-lg-6 mb-4">
+          <div class="card dashboard-card">
+            <div class="card-header">
+              <h5 class="card-title">
+                <i class="fas fa-chart-bar"></i> 핵심역량진단 통계 요약
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center mb-4">
+                <div class="stat-number text-primary">78%</div>
+                <div class="stat-label">전체 학생 진단 참여율</div>
+                <div class="progress mt-2">
+                  <div class="progress-bar bg-primary" style="width: 78%"></div>
+                </div>
+              </div>
+              <h6 class="mb-3">진단 참여율 낮은 학과 Top 3</h6>
+              <div class="department-rank">
+                <div class="d-flex align-items-center">
+                  <div class="rank-number">1</div>
+                  <div class="ms-2">
+                    <div class="fw-semibold">물리학과</div>
+                    <div class="small text-muted">32%</div>
+                  </div>
+                </div>
+                <div class="progress" style="width: 60px">
+                  <div class="progress-bar bg-danger" style="width: 32%"></div>
+                </div>
+              </div>
+              <div class="department-rank">
+                <div class="d-flex align-items-center">
+                  <div class="rank-number">2</div>
+                  <div class="ms-2">
+                    <div class="fw-semibold">수학과</div>
+                    <div class="small text-muted">45%</div>
+                  </div>
+                </div>
+                <div class="progress" style="width: 60px">
+                  <div class="progress-bar bg-warning" style="width: 45%"></div>
+                </div>
+              </div>
+              <div class="department-rank">
+                <div class="d-flex align-items-center">
+                  <div class="rank-number">3</div>
+                  <div class="ms-2">
+                    <div class="fw-semibold">철학과</div>
+                    <div class="small text-muted">52%</div>
+                  </div>
+                </div>
+                <div class="progress" style="width: 60px">
+                  <div class="progress-bar bg-warning" style="width: 52%"></div>
+                </div>
+              </div>
+              <div class="mt-3">
+                <button class="btn btn-custom w-100">
+                  <i class="fas fa-brain me-2"></i> 핵심역량관리 바로가기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
