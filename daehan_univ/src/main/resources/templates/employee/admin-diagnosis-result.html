@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>진단 결과 열람 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+        }
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+        .search-box {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1.5rem;
+        }
+        .search-box:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .competency-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        .competency-card:hover {
+            transform: translateX(5px);
+        }
+        .competency-communication { border-left-color: #3498db; }
+        .competency-creativity { border-left-color: #9b59b6; }
+        .competency-leadership { border-left-color: #e74c3c; }
+        .competency-problem-solving { border-left-color: #f39c12; }
+        .competency-teamwork { border-left-color: #27ae60; }
+        
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+        
+        .filter-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .student-profile {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .student-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 20px;
+        }
+        
+        .student-info {
+            flex-grow: 1;
+        }
+        
+        .radar-chart {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            height: 350px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .result-summary {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .recommendation-card {
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 사이드바 -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">
+                            <i class="fas fa-graduation-cap me-2"></i>
+                            관리자
+                        </h4>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-index.html">
+                                <i class="fas fa-tachometer-alt me-2"></i>
+                                대시보드
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
+                                <i class="fas fa-users me-2"></i>
+                                사용자/조직 관리
+                                <i class="fas fa-chevron-down ms-auto"></i>
+                            </a>
+                            <div class="collapse" id="userManagement">
+                                <ul class="nav flex-column ms-3">
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-student-management.html">
+                                            <i class="fas fa-user-graduate me-2"></i>
+                                            학생 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-faculty-management.html">
+                                            <i class="fas fa-chalkboard-teacher me-2"></i>
+                                            교직원 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-department-management.html">
+                                            <i class="fas fa-building me-2"></i>
+                                            학과/부서 관리
+                                        </a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="admin-permission-management.html">
+                                            <i class="fas fa-key me-2"></i>
+                                            권한 관리
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="admin-diagnosis-management.html">
+                                <i class="fas fa-chart-line me-2"></i>
+                                역량진단 관리
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-program-management.html">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                비교과 프로그램 관리
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-counseling-management.html">
+                                <i class="fas fa-comments me-2"></i>
+                                상담 관리
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-mileage-management.html">
+                                <i class="fas fa-coins me-2"></i>
+                                마일리지 관리
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="admin-notice-management.html">
+                                <i class="fas fa-bullhorn me-2"></i>
+                                공지사항 관리
+                            </a>
+                        </li>
+                    </ul>
+
+                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="login.html">
+                                <i class="fas fa-sign-out-alt me-2"></i>
+                                로그아웃
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- 메인 콘텐츠 -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        진단 결과 열람
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="btn-group me-2">
+                            <button type="button" class="btn btn-outline-secondary" onclick="exportResults()">
+                                <i class="fas fa-file-export me-2"></i>
+                                결과 내보내기
+                            </button>
+                            <a href="admin-diagnosis-management.html" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                돌아가기
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 필터 및 검색 -->
+                <div class="filter-card">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label for="departmentFilter" class="form-label">학과</label>
+                            <select class="form-select" id="departmentFilter">
+                                <option value="">전체</option>
+                                <option value="computer">컴퓨터공학과</option>
+                                <option value="business">경영학과</option>
+                                <option value="mechanical">기계공학과</option>
+                                <option value="electrical">전기전자공학과</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="gradeFilter" class="form-label">학년</label>
+                            <select class="form-select" id="gradeFilter">
+                                <option value="">전체</option>
+                                <option value="1">1학년</option>
+                                <option value="2">2학년</option>
+                                <option value="3">3학년</option>
+                                <option value="4">4학년</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="periodFilter" class="form-label">진단 기간</label>
+                            <select class="form-select" id="periodFilter">
+                                <option value="">전체</option>
+                                <option value="current">현재 학기</option>
+                                <option value="last">이전 학기</option>
+                                <option value="year">최근 1년</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="scoreFilter" class="form-label">점수 범위</label>
+                            <select class="form-select" id="scoreFilter">
+                                <option value="">전체</option>
+                                <option value="high">상위 25%</option>
+                                <option value="mid">중간 50%</option>
+                                <option value="low">하위 25%</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9 mb-3">
+                            <label for="searchStudent" class="form-label">검색</label>
+                            <input type="text" class="form-control" id="searchStudent" placeholder="학번, 이름으로 검색">
+                        </div>
+                        <div class="col-md-3 mb-3 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" onclick="searchResults()">
+                                <i class="fas fa-search me-2"></i>
+                                검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 학생별 진단 결과 목록 -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>
+                            학생별 진단 결과
+                        </h5>
+                        <span class="badge bg-primary">총 1,247건</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>학번</th>
+                                        <th>이름</th>
+                                        <th>학과</th>
+                                        <th>학년</th>
+                                        <th>진단일시</th>
+                                        <th>종합점수</th>
+                                        <th>상세보기</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>20230001</td>
+                                        <td>김학생</td>
+                                        <td>컴퓨터공학과</td>
+                                        <td>3학년</td>
+                                        <td>2023-06-15 14:23</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                                </div>
+                                                <span>85점</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('20230001')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>20230015</td>
+                                        <td>이학생</td>
+                                        <td>경영학과</td>
+                                        <td>2학년</td>
+                                        <td>2023-06-15 11:45</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-primary" style="width: 72%"></div>
+                                                </div>
+                                                <span>72점</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('20230015')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>20230042</td>
+                                        <td>박학생</td>
+                                        <td>기계공학과</td>
+                                        <td>1학년</td>
+                                        <td>2023-06-14 16:12</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                                </div>
+                                                <span>65점</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('20230042')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>20230078</td>
+                                        <td>최학생</td>
+                                        <td>전기전자공학과</td>
+                                        <td>4학년</td>
+                                        <td>2023-06-14 10:05</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-danger" style="width: 45%"></div>
+                                                </div>
+                                                <span>45점</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('20230078')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>20230103</td>
+                                        <td>정학생</td>
+                                        <td>컴퓨터공학과</td>
+                                        <td>2학년</td>
+                                        <td>2023-06-13 15:30</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" style="width: 88%"></div>
+                                                </div>
+                                                <span>88점</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('20230103')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- 페이지네이션 -->
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1">이전</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">다음</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- 학생 상세 결과 (초기에는 숨김) -->
+                <div id="studentDetailSection" class="mt-4" style="display: none;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-user-graduate me-2"></i>
+                                학생 진단 상세 결과
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- 학생 프로필 -->
+                            <div class="student-profile">
+                                <img src="https://via.placeholder.com/150" alt="학생 프로필" class="student-avatar">
+                                <div class="student-info">
+                                    <h4 id="studentName">김학생</h4>
+                                    <p class="mb-1">
+                                        <span id="studentId">20230001</span> | 
+                                        <span id="studentDepartment">컴퓨터공학과</span> | 
+                                        <span id="studentGrade">3학년</span>
+                                    </p>
+                                    <p class="text-muted mb-0">
+                                        <i class="fas fa-envelope me-2"></i>
+                                        <span id="studentEmail">student@example.com</span>
+                                    </p>
+                                </div>
+                                <div class="text-end">
+                                    <h3 class="text-primary mb-0">85점</h3>
+                                    <p class="text-success mb-0">
+                                        <i class="fas fa-arrow-up me-1"></i>
+                                        전년 대비 +5점
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <!-- 역량 레이더 차트 -->
+                                <div class="col-md-6">
+                                    <div class="radar-chart">
+                                        <div class="text-center">
+                                            <div class="alert alert-info">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                실제 구현 시 Chart.js 등의 라이브러리를 사용하여 레이더 차트를 표시합니다.
+                                            </div>
+                                            <div style="height: 250px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                                <span class="text-muted">역량별 점수 레이더 차트 영역</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 역량별 점수 -->
+                                <div class="col-md-6">
+                                    <div class="result-summary">
+                                        <h5 class="mb-3">역량별 점수</h5>
+                                        
+                                        <div class="competency-card competency-communication p-3 mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>의사소통역량</h6>
+                                                <span class="fw-bold">85점</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-primary" style="width: 85%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="competency-card competency-creativity p-3 mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>창의역량</h6>
+                                                <span class="fw-bold">78점</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-purple" style="width: 78%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="competency-card competency-leadership p-3 mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>리더십역량</h6>
+                                                <span class="fw-bold">92점</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-danger" style="width: 92%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="competency-card competency-problem-solving p-3 mb-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>문제해결역량</h6>
+                                                <span class="fw-bold">88점</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-warning" style="width: 88%"></div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="competency-card competency-teamwork p-3">
+                                            <div class="d-flex justify-content-between">
+                                                <h6>팀워크역량</h6>
+                                                <span class="fw-bold">82점</span>
+                                            </div>
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-success" style="width: 82%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 추천 프로그램 -->
+                            <div class="mt-4">
+                                <h5 class="mb-3">추천 비교과 프로그램</h5>
+                                
+                                <div class="recommendation-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">창의적 문제해결 워크숍</h6>
+                                            <p class="mb-1 text-muted">창의역량 향상을 위한 워크숍 프로그램</p>
+                                            <p class="mb-0 small">
+                                                <span class="badge bg-info me-2">창의역량</span>
+                                                <span class="badge bg-secondary me-2">2023-07-15</span>
+                                                <span class="badge bg-success">마일리지 30점</span>
+                                            </p>
+                                        </div>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
+                                    </div>
+                                </div>
+                                
+                                <div class="recommendation-card">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">효과적인 커뮤니케이션 특강</h6>
+                                            <p class="mb-1 text-muted">의사소통 능력 향상을 위한 특강</p>
+                                            <p class="mb-0 small">
+                                                <span class="badge bg-primary me-2">의사소통역량</span>
+                                                <span class="badge bg-secondary me-2">2023-07-20</span>
+                                                <span class="badge bg-success">마일리지 20점</span>
+                                            </p>
+                                        </div>
+                                        <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 진단 이력 -->
+                            <div class="mt-4">
+                                <h5 class="mb-3">진단 이력</h5>
+                                
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>진단일시</th>
+                                                <th>종합점수</th>
+                                                <th>의사소통</th>
+                                                <th>창의</th>
+                                                <th>리더십</th>
+                                                <th>문제해결</th>
+                                                <th>팀워크</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>2023-06-15</td>
+                                                <td>85점</td>
+                                                <td>85점</td>
+                                                <td>78점</td>
+                                                <td>92점</td>
+                                                <td>88점</td>
+                                                <td>82점</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2022-12-10</td>
+                                                <td>80점</td>
+                                                <td>82점</td>
+                                                <td>75점</td>
+                                                <td>85점</td>
+                                                <td>80점</td>
+                                                <td>78점</td>
+                                            </tr>
+                                            <tr>
+                                                <td>2022-06-05</td>
+                                                <td>75점</td>
+                                                <td>78점</td>
+                                                <td>70점</td>
+                                                <td>80점</td>
+                                                <td>75점</td>
+                                                <td>72점</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- 액션 버튼 -->
+                            <div class="text-center mt-4">
+                                <button class="btn btn-outline-primary me-2" onclick="printStudentReport()">
+                                    <i class="fas fa-print me-2"></i>
+                                    결과 출력
+                                </button>
+                                <button class="btn btn-outline-success me-2" onclick="sendResultEmail()">
+                                    <i class="fas fa-envelope me-2"></i>
+                                    결과 이메일 발송
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="hideStudentDetail()">
+                                    <i class="fas fa-times me-2"></i>
+                                    닫기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 결과 검색
+        function searchResults() {
+            const department = document.getElementById('departmentFilter').value;
+            const grade = document.getElementById('gradeFilter').value;
+            const period = document.getElementById('periodFilter').value;
+            const score = document.getElementById('scoreFilter').value;
+            const keyword = document.getElementById('searchStudent').value;
+            
+            console.log('검색 조건:', { department, grade, period, score, keyword });
+            alert('검색 기능이 실행되었습니다. 실제 구현 시 서버에서 데이터를 가져옵니다.');
+        }
+
+        // 학생 상세 정보 보기
+        function viewStudentDetail(studentId) {
+            console.log(`학생 ID ${studentId}의 상세 정보를 가져옵니다.`);
+            
+            // 실제 구현에서는 서버에서 데이터를 가져옴
+            // 여기서는 예시 데이터로 표시
+            
+            // 학생 정보 업데이트
+            document.getElementById('studentId').textContent = studentId;
+            
+            if (studentId === '20230001') {
+                document.getElementById('studentName').textContent = '김학생';
+                document.getElementById('studentDepartment').textContent = '컴퓨터공학과';
+                document.getElementById('studentGrade').textContent = '3학년';
+                document.getElementById('studentEmail').textContent = 'kim@example.com';
+            } else if (studentId === '20230015') {
+                document.getElementById('studentName').textContent = '이학생';
+                document.getElementById('studentDepartment').textContent = '경영학과';
+                document.getElementById('studentGrade').textContent = '2학년';
+                document.getElementById('studentEmail').textContent = 'lee@example.com';
+            } else {
+                document.getElementById('studentName').textContent = '학생 정보';
+                document.getElementById('studentDepartment').textContent = '학과 정보';
+                document.getElementById('studentGrade').textContent = '학년 정보';
+                document.getElementById('studentEmail').textContent = 'student@example.com';
+            }
+            
+            // 상세 정보 섹션 표시
+            document.getElementById('studentDetailSection').style.display = 'block';
+            
+            // 페이지 스크롤
+            document.getElementById('studentDetailSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 학생 상세 정보 숨기기
+        function hideStudentDetail() {
+            document.getElementById('studentDetailSection').style.display = 'none';
+        }
+
+        // 결과 내보내기
+        function exportResults() {
+            alert('진단 결과를 엑셀 파일로 내보냅니다.');
+            // 실제 구현에서는 서버 API 호출하여 파일 다운로드
+        }
+
+        // 결과 출력
+        function printStudentReport() {
+            alert('학생 진단 결과를 출력합니다.');
+            // 실제 구현에서는 인쇄 기능 실행
+        }
+
+        // 결과 이메일 발송
+        function sendResultEmail() {
+            const studentId = document.getElementById('studentId').textContent;
+            const studentEmail = document.getElementById('studentEmail').textContent;
+            
+            alert(`${studentId} 학생에게 진단 결과를 이메일(${studentEmail})로 발송합니다.`);
+            // 실제 구현에서는 서버 API 호출
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('진단 결과 열람 페이지가 로드되었습니다.');
+            
+            // URL 파라미터에서 학생 ID 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const studentId = urlParams.get('student');
+            
+            // 학생 ID가 있으면 상세 정보 표시
+            if (studentId) {
+                viewStudentDetail(studentId);
+            }
+        });
+    </script>
+</body>
+</html>
