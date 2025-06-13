@@ -2,7 +2,6 @@ package kr.ac.dhuniv.mileage.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
-import kr.ac.dhuniv.ncs.domain.NcsPrgMileage;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -34,15 +33,15 @@ public class StdMileageHist {
     @Column(name = "mlg_add_cd", length = 10)
     private String additionCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)                              //여러건의 마일리지 이력이 한건의 이수정보와 매잉됨(N:1) VS 한건의 마일리지 이력이 한건의 이수정보와 매핑됨(1:1)
     @JoinColumn(name = "cmp_id", referencedColumnName = "cmp_id")
     private NcsCmpInfo completion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)                              //학생 여러명의 마일리지 이력이 한건의 프로그램 마일리지 정보와 매핑됨(N:1)
     @JoinColumn(name = "prg_id", referencedColumnName = "prg_id")
     private NcsPrgMileage programMileage;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)                              //학생기준 여러건의 마일리지 이력이 한건의 마일리지 총합과 매핑됨(N:1)
     @JoinColumn(name = "std_no", referencedColumnName = "std_no")
     private StdMileageTotal studentTotal;
 }
