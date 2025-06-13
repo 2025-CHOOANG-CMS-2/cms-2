@@ -251,6 +251,7 @@
       .program-header {
         display: flex;
         align-items: flex-start;
+        justify-content: space-between;
         gap: 1rem;
         margin-bottom: 1rem;
       }
@@ -307,6 +308,24 @@
         font-weight: 500;
       }
 
+      .d-day-badge {
+        background: #ef4444;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .d-day-badge.today {
+        background: #f59e0b;
+      }
+
+      .d-day-badge.closed {
+        background: #6b7280;
+      }
+
       .program-description {
         color: #6b7280;
         font-size: 0.9rem;
@@ -316,7 +335,7 @@
 
       .program-details {
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: 1fr;
         gap: 0.75rem;
         margin: 1rem 0;
       }
@@ -331,6 +350,7 @@
       .detail-icon {
         color: #9ca3af;
         font-size: 0.9rem;
+        width: 16px;
       }
 
       .detail-text {
@@ -376,22 +396,9 @@
         background: #0f172a;
       }
 
-      .rating {
-        display: flex;
-        align-items: center;
-        gap: 0.25rem;
-        margin-top: 0.5rem;
-      }
-
-      .star {
-        color: #fbbf24;
-        font-size: 0.85rem;
-      }
-
-      .rating-text {
-        color: #6b7280;
-        font-size: 0.8rem;
-        margin-left: 0.25rem;
+      .btn-apply:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
       }
 
       /* 반응형 대응 */
@@ -426,8 +433,13 @@
           align-items: stretch;
         }
 
-        .program-details {
-          grid-template-columns: 1fr;
+        .program-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .d-day-badge {
+          align-self: flex-end;
         }
       }
     </style>
@@ -549,7 +561,7 @@
           <select class="form-select" style="max-width: 150px" id="sortSelect">
             <option value="recent">최신순</option>
             <option value="popular">인기순</option>
-            <option value="rating">평점순</option>
+            <option value="deadline">마감일순</option>
           </select>
           <select
             class="form-select"
@@ -581,10 +593,10 @@
           description:
             "학업성취 향상 아이디어를 공모하는 사업으로 가장 좋은 아이디어를 발굴하는 프로그램",
           participants: "4명",
-          duration: "30일",
-          deadline: "2024.12.20",
+          applicationPeriod: "2024.11.01 ~ 2024.12.20",
+          operationPeriod: "2024.12.25 ~ 2025.01.25",
+          applicationDeadline: "2024.12.20",
           location: "학생회관",
-          rating: 4.5,
           status: "open",
         },
         {
@@ -595,10 +607,10 @@
           description:
             "다양한 문화권 사람들과의 의사소통 능력 향상을 위한 글로벌 리더십 발굴 프로그램",
           participants: "12명",
-          duration: "45일",
-          deadline: "2024.12.15",
+          applicationPeriod: "2024.10.15 ~ 2024.12.15",
+          operationPeriod: "2024.12.20 ~ 2025.02.05",
+          applicationDeadline: "2024.12.15",
           location: "국제관",
-          rating: 4.8,
           status: "open",
         },
         {
@@ -609,10 +621,10 @@
           description:
             "팀프로젝트 활동을 통해 혁신과 창의 협업의 기초 리더십을 함양하는 프로그램",
           participants: "8명",
-          duration: "40일",
-          deadline: "2024.12.22",
-          location: "학생활동",
-          rating: 4.3,
+          applicationPeriod: "2024.11.10 ~ 2024.12.22",
+          operationPeriod: "2025.01.05 ~ 2025.02.15",
+          applicationDeadline: "2024.12.22",
+          location: "학생활동센터",
           status: "open",
         },
         {
@@ -623,11 +635,11 @@
           description:
             "인공지능 기술 이해와 활용 능력을 기르는 미래 지향적 역량 개발 프로그램",
           participants: "10명",
-          duration: "60일",
-          deadline: "2024.12.10",
+          applicationPeriod: "2024.10.01 ~ 2024.12.10",
+          operationPeriod: "2024.12.15 ~ 2025.02.15",
+          applicationDeadline: "2024.12.10",
           location: "IT센터",
-          rating: 4.7,
-          status: "open",
+          status: "closed",
         },
         {
           id: 5,
@@ -637,10 +649,10 @@
           description:
             "국제 문화를 통해 봉사 활동을 하고 글로벌 시민의식을 함양하는 봉사활동 프로그램",
           participants: "15명",
-          duration: "50일",
-          deadline: "2025.01.15",
+          applicationPeriod: "2024.12.01 ~ 2025.01.15",
+          operationPeriod: "2025.01.20 ~ 2025.03.10",
+          applicationDeadline: "2025.01.15",
           location: "국제관",
-          rating: 4.4,
           status: "open",
         },
         {
@@ -651,10 +663,10 @@
           description:
             "사회봉사를 통해 공동체 의식과 상호 지원을 통한 리더십을 배양하는 프로그램",
           participants: "6명",
-          duration: "30일",
-          deadline: "2024.12.30",
+          applicationPeriod: "2024.11.15 ~ 2024.12.30",
+          operationPeriod: "2025.01.10 ~ 2025.02.10",
+          applicationDeadline: "2024.12.30",
           location: "지역사회",
-          rating: 4.4,
           status: "open",
         },
       ];
@@ -670,18 +682,41 @@
       let currentSort = "recent";
       let currentStatus = "all";
 
+      // D-day 계산 함수
+      function calculateDDay(deadline) {
+        const today = new Date();
+        const deadlineDate = new Date(deadline);
+        const diffTime = deadlineDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays < 0) {
+          return { text: "마감", class: "closed" };
+        } else if (diffDays === 0) {
+          return { text: "D-DAY", class: "today" };
+        } else {
+          return { text: `D-${diffDays}`, class: "" };
+        }
+      }
+
       // 프로그램 카드 생성 함수
       function createProgramCard(program) {
+        const dDay = calculateDDay(program.applicationDeadline);
+        const isApplicable =
+          program.status === "open" && dDay.class !== "closed";
+
         return `
           <div class="program-card ${program.category}">
             <div class="program-header">
-              <div class="program-icon ${program.category}">
-                <i class="bi ${getIconByCategory(program.category)}"></i>
+              <div style="display: flex; align-items: flex-start; gap: 1rem; flex: 1;">
+                <div class="program-icon ${program.category}">
+                  <i class="bi ${getIconByCategory(program.category)}"></i>
+                </div>
+                <div class="program-info">
+                  <h3 class="program-title">${program.title}</h3>
+                  <span class="program-category">${program.categoryName}</span>
+                </div>
               </div>
-              <div class="program-info">
-                <h3 class="program-title">${program.title}</h3>
-                <span class="program-category">${program.categoryName}</span>
-              </div>
+              <div class="d-day-badge ${dDay.class}">${dDay.text}</div>
             </div>
             
             <p class="program-description">${program.description}</p>
@@ -689,30 +724,33 @@
             <div class="program-details">
               <div class="detail-item">
                 <i class="bi bi-people detail-icon"></i>
-                <span class="detail-text">${program.participants}</span>
+                <span class="detail-text">모집인원: ${
+                  program.participants
+                }</span>
               </div>
               <div class="detail-item">
-                <i class="bi bi-clock detail-icon"></i>
-                <span class="detail-text">${program.duration}</span>
+                <i class="bi bi-calendar-check detail-icon"></i>
+                <span class="detail-text">신청기간: ${
+                  program.applicationPeriod
+                }</span>
               </div>
               <div class="detail-item">
-                <i class="bi bi-calendar detail-icon"></i>
-                <span class="detail-text">${program.deadline}</span>
+                <i class="bi bi-calendar-event detail-icon"></i>
+                <span class="detail-text">운영기간: ${
+                  program.operationPeriod
+                }</span>
               </div>
               <div class="detail-item">
                 <i class="bi bi-geo-alt detail-icon"></i>
-                <span class="detail-text">${program.location}</span>
+                <span class="detail-text">장소: ${program.location}</span>
               </div>
-            </div>
-
-            <div class="rating">
-              ${generateStars(program.rating)}
-              <span class="rating-text">${program.rating}</span>
             </div>
 
             <div class="program-actions">
               <button class="btn-detail">상세보기</button>
-              <button class="btn-apply">신청하기</button>
+              <button class="btn-apply" ${!isApplicable ? "disabled" : ""}>
+                ${isApplicable ? "신청하기" : "신청마감"}
+              </button>
             </div>
           </div>
         `;
@@ -729,28 +767,6 @@
           counseling: "bi-chat-heart",
         };
         return icons[category] || "bi-star";
-      }
-
-      // 별점 생성
-      function generateStars(rating) {
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 !== 0;
-        let starsHtml = "";
-
-        for (let i = 0; i < fullStars; i++) {
-          starsHtml += '<i class="bi bi-star-fill star"></i>';
-        }
-
-        if (hasHalfStar) {
-          starsHtml += '<i class="bi bi-star-half star"></i>';
-        }
-
-        const emptyStars = 5 - Math.ceil(rating);
-        for (let i = 0; i < emptyStars; i++) {
-          starsHtml += '<i class="bi bi-star star"></i>';
-        }
-
-        return starsHtml;
       }
 
       // 프로그램 필터링 및 정렬
@@ -780,11 +796,17 @@
                 b.participants.replace("명", "") -
                 a.participants.replace("명", "")
               );
-            case "rating":
-              return b.rating - a.rating;
+            case "deadline":
+              return (
+                new Date(a.applicationDeadline) -
+                new Date(b.applicationDeadline)
+              );
             case "recent":
             default:
-              return new Date(b.deadline) - new Date(a.deadline);
+              return (
+                new Date(b.applicationDeadline) -
+                new Date(a.applicationDeadline)
+              );
           }
         });
 
