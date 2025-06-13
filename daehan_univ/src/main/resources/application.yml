@@ -4,9 +4,9 @@ spring:
   application:
     name: daehan_univ
   datasource:
-    url: jdbc:postgresql://210.178.108.186:25432/daehan_univ
-    username: postgres
-    password: 1234
+    url: 
+    username: 
+    password: 
     driver-class-name: org.postgresql.Driver
 
   jpa:
