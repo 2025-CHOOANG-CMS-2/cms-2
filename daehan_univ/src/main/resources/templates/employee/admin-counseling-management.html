@@ -1,0 +1,2080 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상담 관리 - 교육 관리 시스템</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --primary-color-dark: #2e59d9;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f8f9fc;
+            color: #5a5c69;
+        }
+
+        .container-fluid {
+            padding: 1.5rem;
+        }
+
+        .page-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .page-header h1 {
+            font-size: 1.75rem;
+            font-weight: 400;
+            color: #5a5c69;
+        }
+
+        .breadcrumb {
+            background: transparent;
+            padding: 0;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header h6 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #4e73df;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            color: #5a5c69;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: #4e73df;
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #4e73df;
+            background-color: #fff;
+            border-bottom: 3px solid #4e73df;
+        }
+
+        .tab-content {
+            padding: 1.25rem 0;
+        }
+
+        .table {
+            color: #5a5c69;
+        }
+
+        .table thead th {
+            background-color: #f8f9fc;
+            border-bottom: 2px solid #e3e6f0;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(78, 115, 223, 0.05);
+        }
+
+        .badge {
+            font-weight: 600;
+            font-size: 0.75rem;
+            padding: 0.35em 0.65em;
+        }
+
+        .badge-primary {
+            background-color: #4e73df;
+        }
+
+        .badge-success {
+            background-color: #1cc88a;
+        }
+
+        .badge-warning {
+            background-color: #f6c23e;
+            color: #fff;
+        }
+
+        .badge-danger {
+            background-color: #e74a3b;
+        }
+
+        .badge-info {
+            background-color: #36b9cc;
+        }
+
+        .badge-secondary {
+            background-color: #858796;
+        }
+
+        .btn {
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.35rem;
+        }
+
+        .btn-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2653d4;
+        }
+
+        .btn-success {
+            background-color: #1cc88a;
+            border-color: #1cc88a;
+        }
+
+        .btn-success:hover {
+            background-color: #17a673;
+            border-color: #169b6b;
+        }
+
+        .btn-info {
+            background-color: #36b9cc;
+            border-color: #36b9cc;
+            color: #fff;
+        }
+
+        .btn-info:hover {
+            background-color: #2c9faf;
+            border-color: #2a96a5;
+            color: #fff;
+        }
+
+        .btn-warning {
+            background-color: #f6c23e;
+            border-color: #f6c23e;
+            color: #fff;
+        }
+
+        .btn-warning:hover {
+            background-color: #f4b619;
+            border-color: #f4b30d;
+            color: #fff;
+        }
+
+        .btn-danger {
+            background-color: #e74a3b;
+            border-color: #e74a3b;
+        }
+
+        .btn-danger:hover {
+            background-color: #e02d1b;
+            border-color: #d52a1a;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .form-control {
+            font-size: 0.85rem;
+            border: 1px solid #d1d3e2;
+            border-radius: 0.35rem;
+            padding: 0.375rem 0.75rem;
+        }
+
+        .form-control:focus {
+            border-color: #bac8f3;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+
+        .modal-title {
+            color: #4e73df;
+            font-weight: 700;
+        }
+
+        .modal-footer {
+            background-color: #f8f9fc;
+            border-top: 1px solid #e3e6f0;
+        }
+
+        .dropdown-menu {
+            font-size: 0.85rem;
+            border: none;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .dropdown-item {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fc;
+            color: #4e73df;
+        }
+
+        .dropdown-item.active, .dropdown-item:active {
+            background-color: #4e73df;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box .form-control {
+            padding-left: 2.5rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #d1d3e2;
+        }
+
+        .filter-box {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-box .form-select {
+            max-width: 200px;
+        }
+
+        .stats-card {
+            border-left: 0.25rem solid;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-card-primary {
+            border-left-color: #4e73df;
+        }
+
+        .stats-card-success {
+            border-left-color: #1cc88a;
+        }
+
+        .stats-card-info {
+            border-left-color: #36b9cc;
+        }
+
+        .stats-card-warning {
+            border-left-color: #f6c23e;
+        }
+
+        .stats-card .card-body {
+            padding: 1rem;
+        }
+
+        .stats-card .stats-title {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #b7b9cc;
+            margin-bottom: 0.25rem;
+        }
+
+        .stats-card .stats-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #5a5c69;
+            margin-bottom: 0;
+        }
+
+        .stats-card .stats-icon {
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .calendar-container {
+            background: #fff;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            padding: 1rem;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            background: none;
+            border: none;
+            color: #4e73df;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.25rem;
+            font-size: 0.85rem;
+            position: relative;
+        }
+
+        .calendar-day.header {
+            font-weight: 700;
+            color: #5a5c69;
+        }
+
+        .calendar-day.today {
+            background-color: rgba(78, 115, 223, 0.1);
+            font-weight: 700;
+        }
+
+        .calendar-day.has-events::after {
+            content: '';
+            position: absolute;
+            bottom: 0.25rem;
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: #4e73df;
+            border-radius: 50%;
+        }
+
+        .counselor-card {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 0.35rem;
+            background-color: #fff;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            margin-bottom: 1rem;
+            transition: transform 0.2s;
+        }
+
+        .counselor-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .counselor-avatar {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            background-color: #4e73df;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-right: 1rem;
+        }
+
+        .counselor-info {
+            flex: 1;
+        }
+
+        .counselor-name {
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .counselor-specialty {
+            font-size: 0.85rem;
+            color: #858796;
+            margin-bottom: 0.5rem;
+        }
+
+        .counselor-stats {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+        }
+
+        .counselor-stat {
+            display: flex;
+            align-items: center;
+        }
+
+        .counselor-stat i {
+            margin-right: 0.25rem;
+            color: #4e73df;
+        }
+
+        .counselor-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .time-slot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .time-slot {
+            padding: 0.5rem;
+            border: 1px solid #d1d3e2;
+            border-radius: 0.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .time-slot:hover {
+            border-color: #4e73df;
+            background-color: rgba(78, 115, 223, 0.05);
+        }
+
+        .time-slot.selected {
+            background-color: #4e73df;
+            color: #fff;
+            border-color: #4e73df;
+        }
+
+        .time-slot.unavailable {
+            background-color: #f8f9fc;
+            color: #b7b9cc;
+            cursor: not-allowed;
+            border-color: #e3e6f0;
+        }
+
+        .pagination {
+            margin-top: 1rem;
+            margin-bottom: 0;
+        }
+
+        .page-link {
+            color: #4e73df;
+            border: 1px solid #e3e6f0;
+        }
+
+        .page-link:hover {
+            color: #2e59d9;
+            background-color: #f8f9fc;
+            border-color: #e3e6f0;
+        }
+
+        .page-item.active .page-link {
+            background-color: #4e73df;
+            border-color: #4e73df;
+        }
+
+        .page-item.disabled .page-link {
+            color: #b7b9cc;
+        }
+
+        .custom-tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            z-index: 1000;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .custom-tooltip.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .filter-box {
+                flex-direction: column;
+            }
+
+            .filter-box .form-select {
+                max-width: 100%;
+            }
+
+            .counselor-card {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .counselor-avatar {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+
+            .counselor-stats {
+                justify-content: center;
+            }
+
+            .counselor-actions {
+                margin-top: 1rem;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="admin-index.html">홈</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">상담 관리</li>
+                </ol>
+            </nav>
+            <h1><i class="fas fa-comments"></i> 상담 관리</h1>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="row">
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card stats-card-primary mb-4">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stats-title">총 상담 건수</div>
+                                <div class="stats-value">1,285</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-comments stats-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card stats-card-success mb-4">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stats-title">완료된 상담</div>
+                                <div class="stats-value">924</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-check-circle stats-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card stats-card-info mb-4">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stats-title">예약된 상담</div>
+                                <div class="stats-value">156</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar-check stats-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6">
+                <div class="card stats-card stats-card-warning mb-4">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stats-title">평균 만족도</div>
+                                <div class="stats-value">4.7/5.0</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-star stats-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 탭 네비게이션 -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="counselingTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="reservations-tab" data-bs-toggle="tab" data-bs-target="#reservations" type="button" role="tab" aria-controls="reservations" aria-selected="true">
+                            <i class="fas fa-calendar-alt"></i> 예약 관리
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="counselors-tab" data-bs-toggle="tab" data-bs-target="#counselors" type="button" role="tab" aria-controls="counselors" aria-selected="false">
+                            <i class="fas fa-user-tie"></i> 상담사 관리
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="types-tab" data-bs-toggle="tab" data-bs-target="#types" type="button" role="tab" aria-controls="types" aria-selected="false">
+                            <i class="fas fa-tags"></i> 상담 유형 관리
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="history-tab" data-bs-toggle="tab" data-bs-target="#history" type="button" role="tab" aria-controls="history" aria-selected="false">
+                            <i class="fas fa-history"></i> 상담 이력
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reports-tab" data-bs-toggle="tab" data-bs-target="#reports" type="button" role="tab" aria-controls="reports" aria-selected="false">
+                            <i class="fas fa-chart-bar"></i> 통계 및 보고서
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="counselingTabsContent">
+                    <!-- 예약 관리 탭 -->
+                    <div class="tab-pane fade show active" id="reservations" role="tabpanel" aria-labelledby="reservations-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" placeholder="학생명, 학번, 상담사명 검색...">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <div class="filter-box">
+                                    <select class="form-select">
+                                        <option selected>상태 전체</option>
+                                        <option>대기중</option>
+                                        <option>승인됨</option>
+                                        <option>완료됨</option>
+                                        <option>취소됨</option>
+                                    </select>
+                                    <select class="form-select">
+                                        <option selected>상담 유형 전체</option>
+                                        <option>학업 상담</option>
+                                        <option>진로 상담</option>
+                                        <option>취업 상담</option>
+                                        <option>심리 상담</option>
+                                        <option>기타 상담</option>
+                                    </select>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> 필터 적용
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>예약 ID</th>
+                                                <th>학생명</th>
+                                                <th>상담사</th>
+                                                <th>상담 유형</th>
+                                                <th>예약 일시</th>
+                                                <th>상태</th>
+                                                <th>작업</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>R-2024-0125</td>
+                                                <td>김학생</td>
+                                                <td>이상담</td>
+                                                <td>진로 상담</td>
+                                                <td>2024-01-25 14:00</td>
+                                                <td><span class="badge bg-warning">대기중</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-success" onclick="approveReservation('R-2024-0125')">승인</button>
+                                                        <button class="btn btn-sm btn-danger" onclick="rejectReservation('R-2024-0125')">거부</button>
+                                                        <button class="btn btn-sm btn-info" onclick="viewReservationDetail('R-2024-0125')">상세</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R-2024-0124</td>
+                                                <td>박학생</td>
+                                                <td>김상담</td>
+                                                <td>학업 상담</td>
+                                                <td>2024-01-24 10:30</td>
+                                                <td><span class="badge bg-primary">승인됨</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-success" disabled>승인</button>
+                                                        <button class="btn btn-sm btn-danger" onclick="cancelReservation('R-2024-0124')">취소</button>
+                                                        <button class="btn btn-sm btn-info" onclick="viewReservationDetail('R-2024-0124')">상세</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R-2024-0123</td>
+                                                <td>최학생</td>
+                                                <td>박상담</td>
+                                                <td>심리 상담</td>
+                                                <td>2024-01-23 15:00</td>
+                                                <td><span class="badge bg-success">완료됨</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-info" onclick="viewReservationDetail('R-2024-0123')">상세</button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="viewCounselingRecord('R-2024-0123')">기록</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R-2024-0122</td>
+                                                <td>이학생</td>
+                                                <td>최상담</td>
+                                                <td>취업 상담</td>
+                                                <td>2024-01-22 13:00</td>
+                                                <td><span class="badge bg-danger">취소됨</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-info" onclick="viewReservationDetail('R-2024-0122')">상세</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>R-2024-0121</td>
+                                                <td>정학생</td>
+                                                <td>이상담</td>
+                                                <td>진로 상담</td>
+                                                <td>2024-01-21 11:00</td>
+                                                <td><span class="badge bg-success">완료됨</span></td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-sm btn-info" onclick="viewReservationDetail('R-2024-0121')">상세</button>
+                                                        <button class="btn btn-sm btn-secondary" onclick="viewCounselingRecord('R-2024-0121')">기록</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <nav aria-label="Page navigation">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item disabled">
+                                            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                                        </li>
+                                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" href="#">다음</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="calendar-container">
+                                    <div class="calendar-header">
+                                        <button class="calendar-nav" id="prevMonth">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </button>
+                                        <h5 id="currentMonth">2024년 1월</h5>
+                                        <button class="calendar-nav" id="nextMonth">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                    <div class="calendar-grid" id="calendarGrid">
+                                        <!-- 캘린더 동적 생성 -->
+                                    </div>
+                                </div>
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h6 class="m-0">오늘의 상담 일정</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-group">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>10:30</strong> - 박학생 (학업 상담)
+                                                </div>
+                                                <span class="badge bg-primary rounded-pill">승인됨</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>13:00</strong> - 김학생 (진로 상담)
+                                                </div>
+                                                <span class="badge bg-success rounded-pill">완료됨</span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong>15:00</strong> - 이학생 (취업 상담)
+                                                </div>
+                                                <span class="badge bg-warning rounded-pill">대기중</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상담사 관리 탭 -->
+                    <div class="tab-pane fade" id="counselors" role="tabpanel" aria-labelledby="counselors-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" placeholder="상담사명, 전문 분야 검색...">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCounselorModal">
+                                    <i class="fas fa-plus"></i> 상담사 추가
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-4 mb-4">
+                                <div class="counselor-card">
+                                    <div class="counselor-avatar">김</div>
+                                    <div class="counselor-info">
+                                        <h5 class="counselor-name">김상담</h5>
+                                        <p class="counselor-specialty">학업 상담 전문</p>
+                                        <div class="counselor-stats">
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-comments"></i> 상담: 245건
+                                            </div>
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-star"></i> 평점: 4.8
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="counselor-actions">
+                                        <button class="btn btn-sm btn-info" onclick="editCounselor('C001')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteCounselor('C001')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-4">
+                                <div class="counselor-card">
+                                    <div class="counselor-avatar">이</div>
+                                    <div class="counselor-info">
+                                        <h5 class="counselor-name">이상담</h5>
+                                        <p class="counselor-specialty">진로 상담 전문</p>
+                                        <div class="counselor-stats">
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-comments"></i> 상담: 189건
+                                            </div>
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-star"></i> 평점: 4.7
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="counselor-actions">
+                                        <button class="btn btn-sm btn-info" onclick="editCounselor('C002')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteCounselor('C002')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-4">
+                                <div class="counselor-card">
+                                    <div class="counselor-avatar">박</div>
+                                    <div class="counselor-info">
+                                        <h5 class="counselor-name">박상담</h5>
+                                        <p class="counselor-specialty">심리 상담 전문</p>
+                                        <div class="counselor-stats">
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-comments"></i> 상담: 215건
+                                            </div>
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-star"></i> 평점: 4.9
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="counselor-actions">
+                                        <button class="btn btn-sm btn-info" onclick="editCounselor('C003')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteCounselor('C003')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-4">
+                                <div class="counselor-card">
+                                    <div class="counselor-avatar">최</div>
+                                    <div class="counselor-info">
+                                        <h5 class="counselor-name">최상담</h5>
+                                        <p class="counselor-specialty">취업 상담 전문</p>
+                                        <div class="counselor-stats">
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-comments"></i> 상담: 178건
+                                            </div>
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-star"></i> 평점: 4.6
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="counselor-actions">
+                                        <button class="btn btn-sm btn-info" onclick="editCounselor('C004')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteCounselor('C004')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 mb-4">
+                                <div class="counselor-card">
+                                    <div class="counselor-avatar">정</div>
+                                    <div class="counselor-info">
+                                        <h5 class="counselor-name">정상담</h5>
+                                        <p class="counselor-specialty">학업/진로 상담</p>
+                                        <div class="counselor-stats">
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-comments"></i> 상담: 156건
+                                            </div>
+                                            <div class="counselor-stat">
+                                                <i class="fas fa-star"></i> 평점: 4.5
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="counselor-actions">
+                                        <button class="btn btn-sm btn-info" onclick="editCounselor('C005')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteCounselor('C005')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="m-0">상담사 가용 시간 관리</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        <select class="form-select" id="counselorSelect">
+                                            <option selected>상담사 선택</option>
+                                            <option value="C001">김상담</option>
+                                            <option value="C002">이상담</option>
+                                            <option value="C003">박상담</option>
+                                            <option value="C004">최상담</option>
+                                            <option value="C005">정상담</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <input type="date" class="form-control" id="availabilityDate">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-primary w-100" onclick="loadAvailability()">
+                                            <i class="fas fa-search"></i> 조회
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="time-slot-grid" id="timeSlotGrid">
+                                    <div class="time-slot">09:00</div>
+                                    <div class="time-slot">10:00</div>
+                                    <div class="time-slot selected">11:00</div>
+                                    <div class="time-slot selected">12:00</div>
+                                    <div class="time-slot">13:00</div>
+                                    <div class="time-slot selected">14:00</div>
+                                    <div class="time-slot">15:00</div>
+                                    <div class="time-slot selected">16:00</div>
+                                    <div class="time-slot unavailable">17:00</div>
+                                    <div class="time-slot unavailable">18:00</div>
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-success" onclick="saveAvailability()">
+                                        <i class="fas fa-save"></i> 저장
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상담 유형 관리 탭 -->
+                    <div class="tab-pane fade" id="types" role="tabpanel" aria-labelledby="types-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" placeholder="상담 유형 검색...">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCounselingTypeModal">
+                                    <i class="fas fa-plus"></i> 상담 유형 추가
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>유형 ID</th>
+                                        <th>유형명</th>
+                                        <th>설명</th>
+                                        <th>소요 시간</th>
+                                        <th>상담사 수</th>
+                                        <th>상태</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>T001</td>
+                                        <td>학업 상담</td>
+                                        <td>학업 성취도 향상 및 학습 방법 상담</td>
+                                        <td>50분</td>
+                                        <td>3명</td>
+                                        <td><span class="badge bg-success">활성</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="editCounselingType('T001')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCounselingType('T001')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>T002</td>
+                                        <td>진로 상담</td>
+                                        <td>진로 탐색 및 설계 관련 상담</td>
+                                        <td>60분</td>
+                                        <td>4명</td>
+                                        <td><span class="badge bg-success">활성</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="editCounselingType('T002')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCounselingType('T002')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>T003</td>
+                                        <td>취업 상담</td>
+                                        <td>취업 준비 및 전략 수립 상담</td>
+                                        <td>60분</td>
+                                        <td>2명</td>
+                                        <td><span class="badge bg-success">활성</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="editCounselingType('T003')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCounselingType('T003')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>T004</td>
+                                        <td>심리 상담</td>
+                                        <td>심리적 어려움 및 스트레스 관리 상담</td>
+                                        <td>50분</td>
+                                        <td>2명</td>
+                                        <td><span class="badge bg-success">활성</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="editCounselingType('T004')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCounselingType('T004')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>T005</td>
+                                        <td>대인관계 상담</td>
+                                        <td>대인관계 개선 및 갈등 해결 상담</td>
+                                        <td>45분</td>
+                                        <td>1명</td>
+                                        <td><span class="badge bg-secondary">비활성</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="editCounselingType('T005')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-sm btn-danger" onclick="deleteCounselingType('T005')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h6 class="m-0">상담 유형별 상담사 배정</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <select class="form-select" id="counselingTypeSelect">
+                                            <option selected>상담 유형 선택</option>
+                                            <option value="T001">학업 상담</option>
+                                            <option value="T002">진로 상담</option>
+                                            <option value="T003">취업 상담</option>
+                                            <option value="T004">심리 상담</option>
+                                            <option value="T005">대인관계 상담</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <button class="btn btn-primary" onclick="loadCounselorsForType()">
+                                            <i class="fas fa-search"></i> 조회
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>상담사 ID</th>
+                                                <th>상담사명</th>
+                                                <th>전문 분야</th>
+                                                <th>배정 상태</th>
+                                                <th>작업</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="counselorTypeAssignmentTable">
+                                            <tr>
+                                                <td>C001</td>
+                                                <td>김상담</td>
+                                                <td>학업 상담 전문</td>
+                                                <td><span class="badge bg-success">배정됨</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger" onclick="removeCounselorFromType('C001', 'T001')">
+                                                        <i class="fas fa-times"></i> 배정 해제
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>C002</td>
+                                                <td>이상담</td>
+                                                <td>진로 상담 전문</td>
+                                                <td><span class="badge bg-secondary">미배정</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-success" onclick="assignCounselorToType('C002', 'T001')">
+                                                        <i class="fas fa-plus"></i> 배정
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>C005</td>
+                                                <td>정상담</td>
+                                                <td>학업/진로 상담</td>
+                                                <td><span class="badge bg-success">배정됨</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger" onclick="removeCounselorFromType('C005', 'T001')">
+                                                        <i class="fas fa-times"></i> 배정 해제
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 상담 이력 탭 -->
+                    <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="search-box">
+                                    <i class="fas fa-search"></i>
+                                    <input type="text" class="form-control" placeholder="학생명, 학번, 상담사명 검색...">
+                                </div>
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <div class="filter-box">
+                                    <select class="form-select">
+                                        <option selected>기간 전체</option>
+                                        <option>최근 1주일</option>
+                                        <option>최근 1개월</option>
+                                        <option>최근 3개월</option>
+                                        <option>최근 6개월</option>
+                                        <option>최근 1년</option>
+                                    </select>
+                                    <select class="form-select">
+                                        <option selected>상담 유형 전체</option>
+                                        <option>학업 상담</option>
+                                        <option>진로 상담</option>
+                                        <option>취업 상담</option>
+                                        <option>심리 상담</option>
+                                        <option>기타 상담</option>
+                                    </select>
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-filter"></i> 필터 적용
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>상담 ID</th>
+                                        <th>학생명</th>
+                                        <th>상담사</th>
+                                        <th>상담 유형</th>
+                                        <th>상담 일시</th>
+                                        <th>만족도</th>
+                                        <th>작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>C-2024-0120</td>
+                                        <td>김학생</td>
+                                        <td>이상담</td>
+                                        <td>진로 상담</td>
+                                        <td>2024-01-20 14:00</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">4.5</span>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="viewCounselingDetail('C-2024-0120')">
+                                                    <i class="fas fa-eye"></i> 상세
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" onclick="editCounselingRecord('C-2024-0120')">
+                                                    <i class="fas fa-edit"></i> 기록
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>C-2024-0119</td>
+                                        <td>박학생</td>
+                                        <td>김상담</td>
+                                        <td>학업 상담</td>
+                                        <td>2024-01-19 10:30</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">5.0</span>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="viewCounselingDetail('C-2024-0119')">
+                                                    <i class="fas fa-eye"></i> 상세
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" onclick="editCounselingRecord('C-2024-0119')">
+                                                    <i class="fas fa-edit"></i> 기록
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>C-2024-0118</td>
+                                        <td>최학생</td>
+                                        <td>박상담</td>
+                                        <td>심리 상담</td>
+                                        <td>2024-01-18 15:00</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">4.0</span>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="viewCounselingDetail('C-2024-0118')">
+                                                    <i class="fas fa-eye"></i> 상세
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" onclick="editCounselingRecord('C-2024-0118')">
+                                                    <i class="fas fa-edit"></i> 기록
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>C-2024-0117</td>
+                                        <td>이학생</td>
+                                        <td>최상담</td>
+                                        <td>취업 상담</td>
+                                        <td>2024-01-17 13:00</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">4.8</span>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="viewCounselingDetail('C-2024-0117')">
+                                                    <i class="fas fa-eye"></i> 상세
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" onclick="editCounselingRecord('C-2024-0117')">
+                                                    <i class="fas fa-edit"></i> 기록
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>C-2024-0116</td>
+                                        <td>정학생</td>
+                                        <td>이상담</td>
+                                        <td>진로 상담</td>
+                                        <td>2024-01-16 11:00</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <span class="me-2">4.2</span>
+                                                <div class="text-warning">
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="fas fa-star"></i>
+                                                    <i class="far fa-star"></i>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button class="btn btn-sm btn-info" onclick="viewCounselingDetail('C-2024-0116')">
+                                                    <i class="fas fa-eye"></i> 상세
+                                                </button>
+                                                <button class="btn btn-sm btn-secondary" onclick="editCounselingRecord('C-2024-0116')">
+                                                    <i class="fas fa-edit"></i> 기록
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">다음</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- 통계 및 보고서 탭 -->
+                    <div class="tab-pane fade" id="reports" role="tabpanel" aria-labelledby="reports-tab">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0">상담 유형별 분포</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="counselingTypeChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0">월별 상담 건수</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="monthlyCounselingChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0">상담사별 상담 건수</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="counselorPerformanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h6 class="m-0">만족도 분포</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="chart-container">
+                                            <canvas id="satisfactionChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-0">상세 통계 보고서</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-3">
+                                        <select class="form-select">
+                                            <option selected>보고서 유형</option>
+                                            <option>월간 보고서</option>
+                                            <option>분기별 보고서</option>
+                                            <option>연간 보고서</option>
+                                            <option>상담사별 보고서</option>
+                                            <option>상담 유형별 보고서</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" class="form-control" placeholder="시작 날짜">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="date" class="form-control" placeholder="종료 날짜">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button class="btn btn-primary w-100" onclick="generateReport()">
+                                            <i class="fas fa-chart-line"></i> 보고서 생성
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>항목</th>
+                                                <th>값</th>
+                                                <th>전월 대비</th>
+                                                <th>전년 동월 대비</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>총 상담 건수</td>
+                                                <td>1,285</td>
+                                                <td><span class="text-success">+12.5%</span></td>
+                                                <td><span class="text-success">+18.3%</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>완료된 상담</td>
+                                                <td>924</td>
+                                                <td><span class="text-success">+8.7%</span></td>
+                                                <td><span class="text-success">+15.2%</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>평균 만족도</td>
+                                                <td>4.7/5.0</td>
+                                                <td><span class="text-success">+0.2</span></td>
+                                                <td><span class="text-success">+0.3</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>취소율</td>
+                                                <td>8.5%</td>
+                                                <td><span class="text-danger">+1.2%</span></td>
+                                                <td><span class="text-success">-2.1%</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td>재상담율</td>
+                                                <td>32.4%</td>
+                                                <td><span class="text-success">+3.8%</span></td>
+                                                <td><span class="text-success">+5.6%</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-success me-2" onclick="exportReport('excel')">
+                                        <i class="fas fa-file-excel"></i> Excel 다운로드
+                                    </button>
+                                    <button class="btn btn-info" onclick="exportReport('pdf')">
+                                        <i class="fas fa-file-pdf"></i> PDF 다운로드
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상담사 추가 모달 -->
+    <div class="modal fade" id="addCounselorModal" tabindex="-1" aria-labelledby="addCounselorModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCounselorModalLabel">상담사 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCounselorForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="counselorName" class="form-label">상담사명</label>
+                                    <input type="text" class="form-control" id="counselorName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="counselorEmail" class="form-label">이메일</label>
+                                    <input type="email" class="form-control" id="counselorEmail" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="counselorPhone" class="form-label">연락처</label>
+                                    <input type="tel" class="form-control" id="counselorPhone" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="counselorDepartment" class="form-label">소속 부서</label>
+                                    <input type="text" class="form-control" id="counselorDepartment" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="counselorSpecialty" class="form-label">전문 분야</label>
+                            <textarea class="form-control" id="counselorSpecialty" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="counselorTypes" class="form-label">담당 상담 유형</label>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="T001" id="type1">
+                                        <label class="form-check-label" for="type1">학업 상담</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="T002" id="type2">
+                                        <label class="form-check-label" for="type2">진로 상담</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="T003" id="type3">
+                                        <label class="form-check-label" for="type3">취업 상담</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="T004" id="type4">
+                                        <label class="form-check-label" for="type4">심리 상담</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="T005" id="type5">
+                                        <label class="form-check-label" for="type5">대인관계 상담</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCounselor()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상담 유형 추가 모달 -->
+    <div class="modal fade" id="addCounselingTypeModal" tabindex="-1" aria-labelledby="addCounselingTypeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCounselingTypeModalLabel">상담 유형 추가</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCounselingTypeForm">
+                        <div class="form-group">
+                            <label for="typeName" class="form-label">유형명</label>
+                            <input type="text" class="form-control" id="typeName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="typeDescription" class="form-label">설명</label>
+                            <textarea class="form-control" id="typeDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="typeDuration" class="form-label">소요 시간 (분)</label>
+                                    <input type="number" class="form-control" id="typeDuration" min="30" max="120" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="typeStatus" class="form-label">상태</label>
+                                    <select class="form-select" id="typeStatus" required>
+                                        <option value="active">활성</option>
+                                        <option value="inactive">비활성</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCounselingType()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 캘린더 생성
+        function generateCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const currentMonth = document.getElementById('currentMonth');
+            
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            
+            currentMonth.textContent = `${year}년 ${month + 1}월`;
+            
+            // 요일 헤더
+            const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+            calendarGrid.innerHTML = '';
+            
+            weekdays.forEach(day => {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day header';
+                dayElement.textContent = day;
+                calendarGrid.appendChild(dayElement);
+            });
+            
+            // 날짜 생성
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // 빈 칸 추가
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day';
+                calendarGrid.appendChild(emptyDay);
+            }
+            
+            // 날짜 추가
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                if (day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // 상담 일정이 있는 날 표시
+                if ([15, 18, 20, 22, 25].includes(day)) {
+                    dayElement.classList.add('has-events');
+                }
+                
+                calendarGrid.appendChild(dayElement);
+            }
+        }
+        
+        // 차트 생성
+        function createCharts() {
+            // 상담 유형별 분포 차트
+            const typeCtx = document.getElementById('counselingTypeChart').getContext('2d');
+            new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['학업 상담', '진로 상담', '취업 상담', '심리 상담', '기타'],
+                    datasets: [{
+                        data: [35, 28, 20, 12, 5],
+                        backgroundColor: [
+                            '#4e73df',
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#e74a3b'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // 월별 상담 건수 차트
+            const monthlyCtx = document.getElementById('monthlyCounselingChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1월', '2월', '3월', '4월', '5월', '6월'],
+                    datasets: [{
+                        label: '상담 건수',
+                        data: [120, 135, 145, 128, 156, 142],
+                        borderColor: '#4e73df',
+                        backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // 상담사별 상담 건수 차트
+            const counselorCtx = document.getElementById('counselorPerformanceChart').getContext('2d');
+            new Chart(counselorCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['김상담', '이상담', '박상담', '최상담', '정상담'],
+                    datasets: [{
+                        label: '상담 건수',
+                        data: [245, 189, 215, 178, 156],
+                        backgroundColor: '#1cc88a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // 만족도 분포 차트
+            const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
+            new Chart(satisfactionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['5점', '4점', '3점', '2점', '1점'],
+                    datasets: [{
+                        label: '응답 수',
+                        data: [520, 380, 85, 25, 15],
+                        backgroundColor: [
+                            '#1cc88a',
+                            '#36b9cc',
+                            '#f6c23e',
+                            '#fd7e14',
+                            '#e74a3b'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+        // 예약 관리 함수들
+        function approveReservation(reservationId) {
+            if (confirm('이 예약을 승인하시겠습니까?')) {
+                alert(`예약 ${reservationId}이 승인되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function rejectReservation(reservationId) {
+            if (confirm('이 예약을 거부하시겠습니까?')) {
+                alert(`예약 ${reservationId}이 거부되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function cancelReservation(reservationId) {
+            if (confirm('이 예약을 취소하시겠습니까?')) {
+                alert(`예약 ${reservationId}이 취소되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function viewReservationDetail(reservationId) {
+            alert(`예약 ${reservationId}의 상세 정보를 표시합니다.`);
+            // 실제 구현에서는 상세 정보 모달 표시
+        }
+        
+        function viewCounselingRecord(reservationId) {
+            alert(`예약 ${reservationId}의 상담 기록을 표시합니다.`);
+            // 실제 구현에서는 상담 기록 모달 표시
+        }
+        
+        // 상담사 관리 함수들
+        function editCounselor(counselorId) {
+            alert(`상담사 ${counselorId}의 정보를 수정합니다.`);
+            // 실제 구현에서는 수정 모달 표시
+        }
+        
+        function deleteCounselor(counselorId) {
+            if (confirm('이 상담사를 삭제하시겠습니까?')) {
+                alert(`상담사 ${counselorId}이 삭제되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function saveCounselor() {
+            const form = document.getElementById('addCounselorForm');
+            if (form.checkValidity()) {
+                alert('상담사가 추가되었습니다.');
+                bootstrap.Modal.getInstance(document.getElementById('addCounselorModal')).hide();
+                // 실제 구현에서는 서버 API 호출
+            } else {
+                form.reportValidity();
+            }
+        }
+        
+        // 상담 유형 관리 함수들
+        function editCounselingType(typeId) {
+            alert(`상담 유형 ${typeId}을 수정합니다.`);
+            // 실제 구현에서는 수정 모달 표시
+        }
+        
+        function deleteCounselingType(typeId) {
+            if (confirm('이 상담 유형을 삭제하시겠습니까?')) {
+                alert(`상담 유형 ${typeId}이 삭제되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function saveCounselingType() {
+            const form = document.getElementById('addCounselingTypeForm');
+            if (form.checkValidity()) {
+                alert('상담 유형이 추가되었습니다.');
+                bootstrap.Modal.getInstance(document.getElementById('addCounselingTypeModal')).hide();
+                // 실제 구현에서는 서버 API 호출
+            } else {
+                form.reportValidity();
+            }
+        }
+        
+        // 상담 이력 관리 함수들
+        function viewCounselingDetail(counselingId) {
+            alert(`상담 ${counselingId}의 상세 정보를 표시합니다.`);
+            // 실제 구현에서는 상세 정보 모달 표시
+        }
+        
+        function editCounselingRecord(counselingId) {
+            alert(`상담 ${counselingId}의 기록을 수정합니다.`);
+            // 실제 구현에서는 기록 수정 모달 표시
+        }
+        
+        // 시간 슬롯 관리
+        function loadAvailability() {
+            const counselorId = document.getElementById('counselorSelect').value;
+            const date = document.getElementById('availabilityDate').value;
+            
+            if (!counselorId || !date) {
+                alert('상담사와 날짜를 선택해주세요.');
+                return;
+            }
+            
+            alert(`${counselorId} 상담사의 ${date} 가용 시간을 조회합니다.`);
+            // 실제 구현에서는 서버에서 데이터 로드
+        }
+        
+        function saveAvailability() {
+            const selectedSlots = document.querySelectorAll('.time-slot.selected');
+            if (selectedSlots.length === 0) {
+                alert('가용 시간을 선택해주세요.');
+                return;
+            }
+            
+            alert('가용 시간이 저장되었습니다.');
+            // 실제 구현에서는 서버 API 호출
+        }
+        
+        // 상담사-유형 배정 관리
+        function loadCounselorsForType() {
+            const typeId = document.getElementById('counselingTypeSelect').value;
+            if (!typeId) {
+                alert('상담 유형을 선택해주세요.');
+                return;
+            }
+            
+            alert(`${typeId} 유형의 상담사 배정 현황을 조회합니다.`);
+            // 실제 구현에서는 서버에서 데이터 로드
+        }
+        
+        function assignCounselorToType(counselorId, typeId) {
+            if (confirm('이 상담사를 해당 유형에 배정하시겠습니까?')) {
+                alert(`상담사 ${counselorId}이 유형 ${typeId}에 배정되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        function removeCounselorFromType(counselorId, typeId) {
+            if (confirm('이 상담사의 배정을 해제하시겠습니까?')) {
+                alert(`상담사 ${counselorId}의 유형 ${typeId} 배정이 해제되었습니다.`);
+                // 실제 구현에서는 서버 API 호출
+            }
+        }
+        
+        // 보고서 생성
+        function generateReport() {
+            alert('보고서를 생성합니다.');
+            // 실제 구현에서는 서버에서 보고서 생성
+        }
+        
+        function exportReport(format) {
+            alert(`${format.toUpperCase()} 형식으로 보고서를 다운로드합니다.`);
+            // 실제 구현에서는 파일 다운로드
+        }
+        
+        // 시간 슬롯 클릭 이벤트
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('time-slot') && !e.target.classList.contains('unavailable')) {
+                e.target.classList.toggle('selected');
+            }
+        });
+        
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            generateCalendar();
+            
+            // 차트는 해당 탭이 활성화될 때 생성
+            document.getElementById('reports-tab').addEventListener('shown.bs.tab', function() {
+                setTimeout(createCharts, 100);
+            });
+        });
+    </script>
+</body>
+</html>
