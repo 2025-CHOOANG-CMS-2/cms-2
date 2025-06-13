@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>대한대학교 CMS 포털 - 상담 결과 관리</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <link th:href="@{/css/counsel.css}" rel="stylesheet" />
+  <style>
+    body { background-color: #fafafa; margin: 0; padding: 0; font-family: "Segoe UI", sans-serif; }
+    .header { position: fixed; top: 0; width: 100%; height: 60px; background-color: #2d4f3a; color: white; z-index: 1040; display: flex; align-items: center; padding: 0 1rem; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+    .header-left { flex: 1; font-weight: bold; font-size: 1.1rem; }
+    .header-center { flex: 1; text-align: center; font-size: 1.2rem; }
+    .header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; font-size: 0.9rem; gap: 1rem; }
+    .sidebar { position: fixed; top: 60px; left: 0; width: 240px; height: 100%; background-color: #2d4f3a; padding: 1rem 0; color: white; z-index: 1030; overflow-y: auto; box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); }
+    .main-content { margin-top: 60px; margin-left: 240px; padding: 1.5rem; }
+    .nav-link { color: #e0e8f0; padding: 0.75rem 1.5rem; display: flex; align-items: center; transition: background-color 0.2s, color 0.2s; text-decoration: none; }
+    .nav-link i { width: 24px; margin-right: 12px; font-size: 1.1rem; text-align: center; }
+    .nav-link:hover { background-color: #3b624d; color: #ffffff; }
+    .nav-link.active { background-color: #46775c; font-weight: bold; }
+    .hamburger { display: none; cursor: pointer; font-size: 1.25rem; }
+    @media (max-width: 768px) { .sidebar { left: -240px; } .sidebar.show { left: 0; } .main-content { margin-left: 0; } .hamburger { display: inline-block; margin-right: 1rem; } .header-right { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="header d-flex">
+    <div class="header-left"><span class="hamburger" id="hamburger">&#9776;</span> CMS 교직원 포털</div>
+    <div class="header-center"><img th:src="@{/images/logo-white.png}" alt="logo" height="30" class="me-2"/>대한대학교</div>
+    <div class="header-right"><div class="user-box"><div class="user-info"><div><strong>김상담</strong> (COUNSEL01)</div><div class="small">상담사</div></div><button class="user-btn" title="로그아웃"><i class="bi bi-box-arrow-right"></i></button></div></div>
+  </header>
+  <aside class="sidebar" id="sidebar">
+    <nav class="nav flex-column">
+      <a class="nav-link" href="counselor-dashboard.html"><i class="fas fa-tachometer-alt"></i><span>대시보드</span></a>
+      <a class="nav-link active" href="counselor-results.html"><i class="fas fa-file-medical-alt"></i><span>상담 결과 관리</span></a>
+      <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i><span>로그아웃</span></a>
+    </nav>
+  </aside>
+  <main class="main-content">
+    <div class="header"><h1><i class="fas fa-file-medical-alt"></i> 상담 결과 관리</h1><div class="breadcrumb"><i class="fas fa-home"></i> 홈 &gt; 상담 결과 관리</div></div>
+    <div class="results-filters">
+        <div class="filter-group"><label>기간:</label><select class="filter-select" id="resultsDateFilter"><option value="week">최근 1주일</option><option value="month">최근 1개월</option></select></div>
+        <div class="filter-group"><label>상담 유형:</label><select class="filter-select" id="resultsTypeFilter"><option value="all">전체</option><option value="career">진로 상담</option></select></div>
+    </div>
+    <div class="results-list">
+        <div class="result-item"><div class="result-header"><div class="result-date">2025.06.08 (일) 15:00</div><div class="result-rating"><span>평점: 4.8</span><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div></div></div><div class="result-details"><div class="student-info"><h4>이학생 (20241236)</h4><p>심리학과 4학년 | 취업 상담</p></div><div class="result-summary"><h5>상담 요약</h5><p>취업 준비 전략 수립 및 이력서 작성 방법에 대해 상담을 진행했습니다...</p></div></div><div class="result-actions"><button class="btn btn-primary btn-sm" onclick="editResult('3')"><i class="fas fa-edit"></i> 결과 수정</button><button class="btn btn-outline btn-sm" onclick="downloadResult('3')"><i class="fas fa-download"></i> PDF 다운로드</button></div></div>
+        <div class="result-item"><div class="result-header"><div class="result-date">2025.06.07 (토) 11:00</div><div class="result-rating"><span>평점: 4.5</span><div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i></div></div></div><div class="result-details"><div class="student-info"><h4>최학생 (20241237)</h4><p>컴퓨터공학과 2학년 | 학업 상담</p></div><div class="result-summary"><h5>상담 요약</h5><p>프로그래밍 학습에 어려움을 겪는 학생에게 단계별 학습 방법과 실습 위주의 학습 계획을 제안했습니다.</p></div></div><div class="result-actions"><button class="btn btn-primary btn-sm" onclick="editResult('4')"><i class="fas fa-edit"></i> 결과 수정</button><button class="btn btn-outline btn-sm" onclick="downloadResult('4')"><i class="fas fa-download"></i> PDF 다운로드</button></div></div>
+    </div>
+  </main>
+  <div class="modal" id="resultModal"></div>
+  <script th:src="@{/js/employee/counsel-default-schedule.js}"></script>
+</body>
+</html>

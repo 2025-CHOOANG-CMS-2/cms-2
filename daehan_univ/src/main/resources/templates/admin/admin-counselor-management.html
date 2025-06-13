@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 상담사 관리</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link th:href="@{/css/counsel.css}" rel="stylesheet" /> 
+
+    <style>
+      body {
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .admin-header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #5a1e2c;
+        color: white;
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .admin-header .header-left { flex: 1; font-weight: bold; font-size: 1.1rem; }
+      .admin-header .header-center { flex: 1; text-align: center; font-size: 1.2rem; }
+      .admin-header .header-right { flex: 1; display: flex; justify-content: flex-end; align-items: center; font-size: 0.9rem; gap: 1rem; }
+      .admin-header .user-box { display: flex; align-items: center; gap: 0.5rem; }
+      .admin-header .user-info { text-align: right; line-height: 1.2; }
+      .admin-header .user-btn { background: none; border: none; color: white; font-size: 1.2rem; padding: 0.25rem 0.5rem; cursor: pointer; }
+      .admin-header .hamburger { display: none; cursor: pointer; font-size: 1.25rem; }
+
+      .admin-sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: calc(100% - 60px);
+        background-color: #5a1e2c;
+        padding: 1rem 0;
+        color: white;
+        z-index: 1030;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .admin-sidebar .nav-link { color: #e0e8f0; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s, color 0.2s; text-decoration: none; }
+      .admin-sidebar .nav-link:hover { background-color: #732836; color: #ffffff; }
+      .admin-sidebar .nav-link.active { background-color: #8a3d4a; font-weight: bold; }
+      .admin-sidebar .submenu { background-color: #732836; }
+      .admin-sidebar .submenu a { padding-left: 2.5rem; font-size: 0.95rem; }
+      .admin-sidebar .has-submenu::after { content: "▼"; font-size: 0.6rem; opacity: 0.7; }
+      
+      body .main-content {
+        margin-top: 60px;
+        margin-left: 240px;
+        padding: 1.5rem;
+      }
+      
+      @media (max-width: 768px) {
+        .admin-sidebar { left: -240px; transition: left 0.3s ease; }
+        .admin-sidebar.show { left: 0; }
+        body .main-content { margin-left: 0; }
+        .admin-header .hamburger { display: inline-block; margin-right: 1rem; }
+        .admin-header .header-right { display: none; }
+      }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+      <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 관리자 포털
+      </div>
+      <div class="header-center">
+        <img th:src="@{/images/logo-white.png}" alt="logo" height="30" class="me-2"/>
+        대한대학교
+      </div>
+      <div class="header-right">
+        <div class="user-box">
+          <div class="user-info">
+            <div><strong>관리자</strong> (ADMIN001)</div>
+            <div class="small">시스템관리자</div>
+          </div>
+          <button class="user-btn" title="로그아웃"><i class="bi bi-box-arrow-right"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <aside class="admin-sidebar" id="sidebar">
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#">학생관리</a>
+        <a class="nav-link" href="#">교직원관리</a>
+        <a class="nav-link" href="#">공지사항관리</a>
+        <a class="nav-link has-submenu" href="#" data-menu="역량">핵심역량개발관리</a>
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="#">역량항목관리</a>
+          <a class="nav-link" href="#">진단문항관리</a>
+        </div>
+        <a class="nav-link has-submenu" href="#" data-menu="비교과">비교과프로그램관리</a>
+        <div class="submenu" id="submenu-비교과" style="display: none">
+          <a class="nav-link" href="#">프로그램관리</a>
+          <a class="nav-link" href="#">프로그램신청관리</a>
+        </div>
+        <a class="nav-link has-submenu active" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: block">
+          <a class="nav-link" href="#">상담사일정등록</a>
+          <a class="nav-link active" href="#">상담사/예약관리</a>
+          <a class="nav-link" href="#">상담결과관리</a>
+        </div>
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지">마일리지관리</a>
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+          <a class="nav-link" href="#">마일리지배점</a>
+          <a class="nav-link" href="#">마일리지지급관리</a>
+        </div>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-user-tie"></i> 상담사 관리</h1>
+            <div class="breadcrumb">
+                <i class="fas fa-home"></i> 홈 &gt; 상담관리 &gt; 상담사 관리
+            </div>
+        </div>
+
+        <div class="stats-overview">
+            <div class="stats-card"><div class="stats-icon"><i class="fas fa-users"></i></div><div class="stats-info"><h3>총 상담사</h3><p class="stats-number">12명</p></div></div>
+            <div class="stats-card"><div class="stats-icon"><i class="fas fa-user-check"></i></div><div class="stats-info"><h3>활성 상담사</h3><p class="stats-number">10명</p></div></div>
+            <div class="stats-card"><div class="stats-icon"><i class="fas fa-calendar-check"></i></div><div class="stats-info"><h3>이번 달 상담</h3><p class="stats-number">245건</p></div></div>
+            <div class="stats-card"><div class="stats-icon"><i class="fas fa-star"></i></div><div class="stats-info"><h3>평균 만족도</h3><p class="stats-number">4.7</p></div></div>
+        </div>
+
+        <div class="counselor-management-section">
+            <div class="section-header">
+                <h2>상담사 목록</h2>
+                <div class="section-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="상담사명, 전문분야 검색..." id="searchInput">
+                    </div>
+                    <button class="btn btn-primary" onclick="showAddCounselorModal()"><i class="fas fa-plus"></i> 상담사 추가</button>
+                </div>
+            </div>
+            <div class="counselor-filters">
+                <div class="filter-group"><label>상태:</label><select class="filter-select" id="statusFilter"><option value="all">전체</option><option value="active">활성</option><option value="inactive">비활성</option></select></div>
+                <div class="filter-group"><label>전문분야:</label><select class="filter-select" id="specialtyFilter"><option value="all">전체</option><option value="career">진로 상담</option><option value="academic">학업 상담</option><option value="psychological">심리 상담</option><option value="employment">취업 상담</option></select></div>
+            </div>
+            <div class="counselor-grid">
+                <div class="counselor-card-admin" data-status="active" data-specialty="academic"><div class="counselor-header"><div class="counselor-avatar">김</div><div class="counselor-basic-info"><h3>김상담</h3><p class="counselor-id">ID: C001</p><span class="status-badge active">활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">학업 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">10년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">kim.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-1234-5678</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 245건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.8</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.03</span></div></div></div>
+                <div class="counselor-card-admin" data-status="active" data-specialty="career"><div class="counselor-header"><div class="counselor-avatar">이</div><div class="counselor-basic-info"><h3>이상담</h3><p class="counselor-id">ID: C002</p><span class="status-badge active">활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">진로 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">8년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">lee.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-2345-6789</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 189건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.7</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.05</span></div></div></div>
+                <div class="counselor-card-admin" data-status="inactive" data-specialty="employment"><div class="counselor-header"><div class="counselor-avatar">최</div><div class="counselor-basic-info"><h3>최상담</h3><p class="counselor-id">ID: C004</p><span class="status-badge inactive">비활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">취업 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">15년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">choi.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-4567-8901</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 178건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.6</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.01</span></div></div></div>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal" id="counselorModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">상담사 추가</h3>
+                <button class="modal-close" onclick="closeModal('counselorModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="counselorForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">이름</label>
+                            <input type="text" class="form-control" id="counselorName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">이메일</label>
+                            <input type="email" class="form-control" id="counselorEmail" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">연락처</label>
+                            <input type="tel" class="form-control" id="counselorPhone" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">경력 (년)</label>
+                            <input type="number" class="form-control" id="counselorExperience" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">전문분야</label>
+                        <select class="form-control" id="counselorSpecialty" required>
+                            <option value="">선택해주세요</option>
+                            <option value="career">진로 상담</option>
+                            <option value="academic">학업 상담</option>
+                            <option value="psychological">심리 상담</option>
+                            <option value="employment">취업 상담</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">소개</label>
+                        <textarea class="form-control" id="counselorBio" rows="4" placeholder="상담사 소개를 입력해주세요"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">상태</label>
+                        <select class="form-control" id="counselorStatus">
+                            <option value="active">활성</option>
+                            <option value="inactive">비활성</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('counselorModal')">취소</button>
+                <button class="btn btn-primary" onclick="saveCounselor()">저장</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification"></div>
+
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const hamburger = document.getElementById("hamburger");
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+      });
+
+      const menuLinks = document.querySelectorAll(".admin-sidebar [data-menu]");
+      menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+          e.preventDefault();
+          const key = menu.getAttribute("data-menu");
+          const submenu = document.getElementById(`submenu-${key}`);
+          const allSubmenus = document.querySelectorAll(".admin-sidebar .submenu");
+
+          allSubmenus.forEach((sm) => {
+            if (sm !== submenu) {
+              sm.style.display = "none";
+              const parentLink = sm.previousElementSibling;
+              if (parentLink.classList.contains('has-submenu')) {
+                parentLink.classList.remove('active');
+              }
+            }
+          });
+
+          if (submenu) {
+            const isVisible = submenu.style.display === "block";
+            submenu.style.display = isVisible ? "none" : "block";
+            menu.classList.toggle('active', !isVisible);
+          }
+        });
+      });
+    </script>
+    <script th:src="@{/js/admin/admin-counselor-management.js}"></script>
+</body>
+</html>
