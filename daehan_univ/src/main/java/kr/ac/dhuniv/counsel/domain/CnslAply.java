@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.cnsl_aply;
+package kr.ac.dhuniv.counsel.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.empl_info.EmplInfo;

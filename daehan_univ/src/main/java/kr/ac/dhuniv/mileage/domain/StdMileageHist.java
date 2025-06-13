@@ -1,9 +1,8 @@
-package kr.ac.dhuniv.std_mileage_hist;
+package kr.ac.dhuniv.mileage.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.ncs_cmp_info.NcsCmpInfo;
-import kr.ac.dhuniv.ncs_prg_mileage.NcsPrgMileage;
-import kr.ac.dhuniv.std_mileage_total.StdMileageTotal;
+import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
+import kr.ac.dhuniv.ncs.domain.NcsPrgMileage;
 import lombok.*;
 
 import java.math.BigDecimal;

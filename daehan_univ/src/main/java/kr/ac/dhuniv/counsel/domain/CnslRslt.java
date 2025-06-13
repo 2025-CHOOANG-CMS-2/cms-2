@@ -1,8 +1,7 @@
-package kr.ac.dhuniv.cnsl_rslt;
+package kr.ac.dhuniv.counsel.domain;
 
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.cnsl_aply.CnslAply;
 import lombok.*;
 
 import java.math.BigDecimal;
