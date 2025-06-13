@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 교직원 관리</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+      }
+      .detail-label {
+        font-weight: bold;
+        color: #5a1e2c;
+      }
+      .detail-row {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+      }
+      .modal-body {
+        background-color: #fcfcfc;
+      }
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #5a1e2c;
+        color: white;
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .header-left {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .header-center {
+        flex: 1;
+        text-align: center;
+        font-size: 1.2rem;
+      }
+      .header-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.9rem;
+        gap: 1rem;
+      }
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .user-info {
+        text-align: right;
+        line-height: 1.2;
+      }
+      .user-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+      }
+      .user-btn:hover {
+        color: #ffc107;
+      }
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: 100%;
+        background-color: #5a1e2c;
+        padding: 1rem 0;
+        color: white;
+        z-index: 1030;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar-user-info {
+        display: none;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .sidebar-user-info div {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+      .main-content {
+        margin-top: 60px;
+        margin-left: 240px;
+        padding: 1.5rem;
+      }
+      .nav-link {
+        color: #e0e8f0;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        background-color: #732836;
+        color: #ffffff;
+      }
+      .nav-link.active {
+        background-color: #8a3d4a;
+        font-weight: bold;
+      }
+      .submenu {
+        background-color: #732836;
+      }
+      .submenu a {
+        padding-left: 2.5rem;
+        font-size: 0.95rem;
+      }
+      .has-submenu::after {
+        content: "\25BC";
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+      .hamburger {
+        display: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+      }
+
+      /* Enhanced Modal Styles */
+      .modal-dialog {
+        max-width: 600px;
+      }
+
+      .modal-content {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #5a1e2c 0%, #732836 100%);
+        color: white;
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+      }
+
+      .modal-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin: 0;
+      }
+
+      .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        opacity: 0.8;
+      }
+
+      .btn-close:hover {
+        opacity: 1;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+        background: #fafafa;
+      }
+
+      .staff-detail-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+      }
+
+      .detail-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .detail-section:last-child {
+        margin-bottom: 0;
+      }
+
+      .section-title {
+        color: #5a1e2c;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .detail-row {
+        display: flex;
+        margin-bottom: 0.75rem;
+        gap: 0.75rem;
+      }
+
+      .detail-item {
+        flex: 1;
+        padding: 0.6rem;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border-left: 3px solid #5a1e2c;
+        min-width: 0;
+      }
+
+      .detail-item.full-width {
+        flex: 1 1 100%;
+      }
+
+      .detail-row.two-items {
+        gap: 1rem;
+      }
+
+      .detail-row.two-items .detail-item {
+        flex: 1;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        color: #495057;
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .detail-value {
+        color: #212529;
+        font-size: 0.95rem;
+        font-weight: 500;
+        word-break: break-word;
+        overflow-wrap: break-word;
+      }
+
+      .status-badge {
+        padding: 0.3rem 0.8rem;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-block;
+      }
+
+      .status-active {
+        background: #28a745;
+        color: white;
+      }
+
+      .status-inactive {
+        background: #dc3545;
+        color: white;
+      }
+
+      .status-leave {
+        background: #ffc107;
+        color: #212529;
+      }
+
+      .modal-footer {
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+        background: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -240px;
+          transition: left 0.3s ease;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: inline-block;
+          margin-right: 1rem;
+        }
+        .header-right {
+          display: none;
+        }
+        .sidebar-user-info {
+          display: block;
+        }
+
+        .modal-dialog {
+          margin: 1rem;
+          max-width: calc(100% - 2rem);
+        }
+
+        .modal-body {
+          padding: 1rem;
+        }
+
+        .staff-detail-card {
+          padding: 1rem;
+        }
+
+        .detail-row {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+
+        .detail-item {
+          margin-bottom: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header d-flex">
+      <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 관리자 포털
+      </div>
+      <div class="header-center">
+        <img
+          src="../../static/images/logo-white.png"
+          alt="logo"
+          height="30"
+          class="me-2"
+        />
+        대한대학교
+      </div>
+      <div class="header-right">
+        <div class="user-box">
+          <div class="user-info">
+            <div><strong>관리자</strong> (ADMIN001)</div>
+            <div class="small">시스템관리자</div>
+          </div>
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-user-info">
+        <div><strong>관리자</strong> (ADMIN001)</div>
+        <div>시스템관리자</div>
+        <div class="mt-2">
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i> 로그아웃
+          </button>
+        </div>
+      </div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="/admin/student">학생관리</a>
+        <a class="nav-link active" href="/admin/staff">교직원관리</a>
+        <a class="nav-link" href="/notice">공지사항관리</a>
+        <a class="nav-link has-submenu" href="#" data-menu="역량"
+          >핵심역량개발관리</a
+        >
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="/competency/items">역량항목관리</a>
+          <a class="nav-link" href="/competency/questions">진단문항관리</a>
+          <a class="nav-link" href="/competency/diagnosis">진단검사현황</a>
+          <a class="nav-link" href="/competency/recommend">추천비교과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="비교과"
+          >비교과프로그램관리</a
+        >
+        <div class="submenu" id="submenu-비교과" style="display: none">
+          <a class="nav-link" href="/program/manage">프로그램관리</a>
+          <a class="nav-link" href="/program/applications">프로그램신청관리</a>
+          <a class="nav-link" href="/program/activities">프로그램활동관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+          <a class="nav-link" href="/counseling/schedule">상담사일정등록</a>
+          <a class="nav-link" href="/counseling/reservations">상담예약관리</a>
+          <a class="nav-link" href="/counseling/results">상담결과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지"
+          >마일리지관리</a
+        >
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+          <a class="nav-link" href="/mileage/points">마일리지배점</a>
+          <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+          <a class="nav-link" href="/mileage/status">마일리지현황</a>
+        </div>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <h1>교직원 목록 관리</h1>
+      <form class="row gy-2 gx-3 align-items-center mb-3">
+        <div class="col-auto">
+          <input
+            type="text"
+            class="form-control"
+            id="searchName"
+            placeholder="이름 검색"
+          />
+        </div>
+        <div class="col-auto">
+          <select class="form-select" id="searchDept">
+            <option value="">부서 전체</option>
+            <option value="ADMIN">행정팀</option>
+            <option value="ACADEMIC">교무팀</option>
+            <option value="STUDENT">학생팀</option>
+            <option value="IT">정보팀</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <select class="form-select" id="searchStatus">
+            <option value="">상태 전체</option>
+            <option value="Y">재직</option>
+            <option value="N">퇴직</option>
+            <option value="L">휴직</option>
+          </select>
+        </div>
+        <div class="col-auto">
+          <button type="button" class="btn btn-primary" onclick="filterStaff()">
+            검색
+          </button>
+        </div>
+      </form>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover text-center">
+          <thead class="table-light">
+            <tr>
+              <th>사번</th>
+              <th>이름</th>
+              <th>부서</th>
+              <th>직급</th>
+              <th>상태</th>
+              <th>연락처</th>
+              <th>이메일</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+          <tbody id="staffTableBody"></tbody>
+        </table>
+      </div>
+      <nav class="d-flex justify-content-between align-items-center">
+        <div></div>
+        <ul class="pagination justify-content-center m-0" id="pagination"></ul>
+        <button type="button" class="btn btn-success" onclick="openAddModal()">
+          <i class="bi bi-plus-circle me-1"></i>교직원 등록
+        </button>
+      </nav>
+    </main>
+
+    <!-- 상세보기 모달 -->
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">교직원 상세정보</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="detailContent"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-1"></i>닫기
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              id="editFromDetailBtn"
+            >
+              <i class="bi bi-pencil me-1"></i>수정
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 등록 모달 -->
+    <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">교직원 등록</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="addForm">
+              <div class="staff-detail-card">
+                <div class="detail-section">
+                  <div class="section-title">기본 정보</div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <div class="detail-label">사번</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="add_id"
+                        placeholder="사번을 입력하세요"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">이름</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="add_name"
+                        placeholder="이름을 입력하세요"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">부서</div>
+                      <select class="form-select form-select-sm" id="add_dept">
+                        <option value="">부서를 선택하세요</option>
+                        <option value="ADMIN">행정팀</option>
+                        <option value="ACADEMIC">교무팀</option>
+                        <option value="STUDENT">학생팀</option>
+                        <option value="IT">정보팀</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <div class="detail-label">직급</div>
+                      <select
+                        class="form-select form-select-sm"
+                        id="add_position"
+                      >
+                        <option value="">직급을 선택하세요</option>
+                        <option value="사원">사원</option>
+                        <option value="주임">주임</option>
+                        <option value="대리">대리</option>
+                        <option value="과장">과장</option>
+                        <option value="차장">차장</option>
+                        <option value="부장">부장</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">재직상태</div>
+                      <select
+                        class="form-select form-select-sm"
+                        id="add_status"
+                      >
+                        <option value="">상태를 선택하세요</option>
+                        <option value="Y">재직</option>
+                        <option value="N">퇴직</option>
+                        <option value="L">휴직</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">입사일자</div>
+                      <input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="add_hire_date"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="section-title">주소 정보</div>
+
+                  <div class="detail-row two-items">
+                    <div class="detail-item">
+                      <div class="detail-label">우편번호</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="add_zipcode"
+                        placeholder="우편번호"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">주소</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="add_address"
+                        placeholder="주소를 입력하세요"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item full-width">
+                      <div class="detail-label">상세주소</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="add_address_detail"
+                        placeholder="상세주소를 입력하세요"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="section-title">연락처</div>
+
+                  <div class="detail-row two-items">
+                    <div class="detail-item">
+                      <div class="detail-label">이메일</div>
+                      <input
+                        type="email"
+                        class="form-control form-control-sm"
+                        id="add_email"
+                        placeholder="이메일을 입력하세요"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">연락처</div>
+                      <input
+                        type="tel"
+                        class="form-control form-control-sm"
+                        id="add_phone"
+                        placeholder="연락처를 입력하세요"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-1"></i>취소
+            </button>
+            <button type="button" class="btn btn-success" onclick="addStaff()">
+              <i class="bi bi-check-circle me-1"></i>등록
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 수정 모달 -->
+    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">교직원 정보 수정</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="editForm">
+              <div class="staff-detail-card">
+                <div class="detail-section">
+                  <div class="section-title">기본 정보</div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <div class="detail-label">사번</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="edit_id"
+                        readonly
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">이름</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="edit_name"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">부서</div>
+                      <select class="form-select form-select-sm" id="edit_dept">
+                        <option value="ADMIN">행정팀</option>
+                        <option value="ACADEMIC">교무팀</option>
+                        <option value="STUDENT">학생팀</option>
+                        <option value="IT">정보팀</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item">
+                      <div class="detail-label">직급</div>
+                      <select
+                        class="form-select form-select-sm"
+                        id="edit_position"
+                      >
+                        <option value="사원">사원</option>
+                        <option value="주임">주임</option>
+                        <option value="대리">대리</option>
+                        <option value="과장">과장</option>
+                        <option value="차장">차장</option>
+                        <option value="부장">부장</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">재직상태</div>
+                      <select
+                        class="form-select form-select-sm"
+                        id="edit_status"
+                      >
+                        <option value="Y">재직</option>
+                        <option value="N">퇴직</option>
+                        <option value="L">휴직</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">입사일자</div>
+                      <input
+                        type="date"
+                        class="form-control form-control-sm"
+                        id="edit_hire_date"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="section-title">주소 정보</div>
+
+                  <div class="detail-row two-items">
+                    <div class="detail-item">
+                      <div class="detail-label">우편번호</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="edit_zipcode"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">주소</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="edit_address"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="detail-row">
+                    <div class="detail-item full-width">
+                      <div class="detail-label">상세주소</div>
+                      <input
+                        type="text"
+                        class="form-control form-control-sm"
+                        id="edit_address_detail"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="detail-section">
+                  <div class="section-title">연락처</div>
+
+                  <div class="detail-row two-items">
+                    <div class="detail-item">
+                      <div class="detail-label">이메일</div>
+                      <input
+                        type="email"
+                        class="form-control form-control-sm"
+                        id="edit_email"
+                      />
+                    </div>
+                    <div class="detail-item">
+                      <div class="detail-label">연락처</div>
+                      <input
+                        type="tel"
+                        class="form-control form-control-sm"
+                        id="edit_phone"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              <i class="bi bi-x-circle me-1"></i>취소
+            </button>
+            <button type="button" class="btn btn-primary" onclick="saveStaff()">
+              <i class="bi bi-check-circle me-1"></i>저장
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const sidebar = document.getElementById("sidebar");
+      const hamburger = document.getElementById("hamburger");
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+      });
+      const menuLinks = document.querySelectorAll("[data-menu]");
+      menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+          e.preventDefault();
+          const key = menu.getAttribute("data-menu");
+          const submenu = document.getElementById(`submenu-${key}`);
+
+          document.querySelectorAll(".submenu").forEach((sm) => {
+            if (sm !== submenu) sm.style.display = "none";
+          });
+
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+      const staff = [
+        {
+          id: "EMP001",
+          name: "김철수",
+          dept: "ADMIN",
+          deptName: "행정팀",
+          position: "과장",
+          status: "Y",
+          statusLabel: "재직",
+          phone: "010-1111-2222",
+          email: "kim@univ.ac.kr",
+          hireDate: "2020-03-01",
+        },
+        {
+          id: "EMP002",
+          name: "이영희",
+          dept: "ACADEMIC",
+          deptName: "교무팀",
+          position: "대리",
+          status: "Y",
+          statusLabel: "재직",
+          phone: "010-2222-3333",
+          email: "lee@univ.ac.kr",
+          hireDate: "2021-05-15",
+        },
+        {
+          id: "EMP003",
+          name: "박민수",
+          dept: "STUDENT",
+          deptName: "학생팀",
+          position: "주임",
+          status: "L",
+          statusLabel: "휴직",
+          phone: "010-3333-4444",
+          email: "park@univ.ac.kr",
+          hireDate: "2019-08-20",
+        },
+        {
+          id: "EMP004",
+          name: "정하늘",
+          dept: "IT",
+          deptName: "정보팀",
+          position: "사원",
+          status: "Y",
+          statusLabel: "재직",
+          phone: "010-4444-5555",
+          email: "jung@univ.ac.kr",
+          hireDate: "2022-01-10",
+        },
+        {
+          id: "EMP005",
+          name: "최준호",
+          dept: "ADMIN",
+          deptName: "행정팀",
+          position: "부장",
+          status: "Y",
+          statusLabel: "재직",
+          phone: "010-5555-6666",
+          email: "choi@univ.ac.kr",
+          hireDate: "2018-02-28",
+        },
+        {
+          id: "EMP006",
+          name: "한수정",
+          dept: "ACADEMIC",
+          deptName: "교무팀",
+          position: "차장",
+          status: "N",
+          statusLabel: "퇴직",
+          phone: "010-6666-7777",
+          email: "han@univ.ac.kr",
+          hireDate: "2017-11-05",
+        },
+      ];
+
+      let currentPage = 1;
+      const pageSize = 10;
+      let currentEditingStaff = null;
+
+      // 등록 모달 열기 함수 (먼저 정의)
+      function openAddModal() {
+        // 폼 초기화
+        document.getElementById("addForm").reset();
+
+        // 등록 모달 열기
+        new bootstrap.Modal(document.getElementById("addModal")).show();
+      }
+
+      function renderTable(data) {
+        const tbody = document.getElementById("staffTableBody");
+        const start = (currentPage - 1) * pageSize;
+        const pageData = data.slice(start, start + pageSize);
+
+        tbody.innerHTML = pageData
+          .map(
+            (s) => `
+      <tr onclick="showDetail(${JSON.stringify(s).replace(/"/g, "&quot;")})">
+        <td>${s.id}</td>
+        <td>${s.name}</td>
+        <td>${s.deptName}</td>
+        <td>${s.position}</td>
+        <td>${s.statusLabel}</td>
+        <td>${s.phone}</td>
+        <td>${s.email}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-secondary" onclick="event.stopPropagation(); openEditModal(${JSON.stringify(
+            s
+          ).replace(/"/g, "&quot;")})">
+            <i class="bi bi-pencil"></i>
+          </button>
+        </td>
+      </tr>`
+          )
+          .join("");
+      }
+
+      function getStatusBadgeClass(status) {
+        switch (status) {
+          case "Y":
+            return "status-active";
+          case "N":
+            return "status-inactive";
+          case "L":
+            return "status-leave";
+          default:
+            return "status-active";
+        }
+      }
+
+      function showDetail(staff) {
+        currentEditingStaff = staff;
+        const modalBody = document.getElementById("detailContent");
+        modalBody.innerHTML = `
+          <div class="staff-detail-card">
+            <div class="detail-section">
+              <div class="section-title">기본 정보</div>
+              
+              <div class="detail-row">
+                <div class="detail-item">
+                  <div class="detail-label">사번</div>
+                  <div class="detail-value">${staff.id}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">이름</div>
+                  <div class="detail-value">${staff.name}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">부서</div>
+                  <div class="detail-value">${staff.deptName}</div>
+                </div>
+              </div>
+              
+              <div class="detail-row">
+                <div class="detail-item">
+                  <div class="detail-label">직급</div>
+                  <div class="detail-value">${staff.position}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">재직상태</div>
+                  <div class="detail-value">
+                    <span class="status-badge ${getStatusBadgeClass(
+                      staff.status
+                    )}">${staff.statusLabel}</span>
+                  </div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">입사일자</div>
+                  <div class="detail-value">${staff.hireDate}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="section-title">주소 정보</div>
+              
+              <div class="detail-row two-items">
+                <div class="detail-item">
+                  <div class="detail-label">우편번호</div>
+                  <div class="detail-value">12345</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">주소</div>
+                  <div class="detail-value">서울특별시 종로구 대학로</div>
+                </div>
+              </div>
+              
+              <div class="detail-row">
+                <div class="detail-item full-width">
+                  <div class="detail-label">상세주소</div>
+                  <div class="detail-value">대한대학교 교직원 숙소 A동 102호</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-section">
+              <div class="section-title">연락처</div>
+              
+              <div class="detail-row two-items">
+                <div class="detail-item">
+                  <div class="detail-label">이메일</div>
+                  <div class="detail-value">${staff.email}</div>
+                </div>
+                <div class="detail-item">
+                  <div class="detail-label">연락처</div>
+                  <div class="detail-value">${staff.phone}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        // 수정 버튼 이벤트 설정
+        document.getElementById("editFromDetailBtn").onclick = function () {
+          openEditModal(currentEditingStaff);
+        };
+
+        new bootstrap.Modal(document.getElementById("detailModal")).show();
+      }
+
+      // 수정 모달 열기
+      function openEditModal(staffMember) {
+        currentEditingStaff = staffMember;
+
+        // 폼에 기존 데이터 채우기
+        document.getElementById("edit_id").value = staffMember.id;
+        document.getElementById("edit_name").value = staffMember.name;
+        document.getElementById("edit_dept").value = staffMember.dept;
+        document.getElementById("edit_position").value = staffMember.position;
+        document.getElementById("edit_status").value = staffMember.status;
+        document.getElementById("edit_email").value = staffMember.email;
+        document.getElementById("edit_phone").value = staffMember.phone;
+        document.getElementById("edit_hire_date").value = staffMember.hireDate;
+
+        // 상세보기 모달이 열려있다면 닫기
+        const detailModal = bootstrap.Modal.getInstance(
+          document.getElementById("detailModal")
+        );
+        if (detailModal) {
+          detailModal.hide();
+        }
+
+        // 수정 모달 열기
+        new bootstrap.Modal(document.getElementById("editModal")).show();
+      }
+
+      // 교직원 정보 저장
+      function saveStaff() {
+        const staffId = document.getElementById("edit_id").value;
+        const updatedStaff = {
+          id: staffId,
+          name: document.getElementById("edit_name").value,
+          dept: document.getElementById("edit_dept").value,
+          deptName: getDeptName(document.getElementById("edit_dept").value),
+          position: document.getElementById("edit_position").value,
+          status: document.getElementById("edit_status").value,
+          statusLabel: getStatusLabel(
+            document.getElementById("edit_status").value
+          ),
+          email: document.getElementById("edit_email").value,
+          phone: document.getElementById("edit_phone").value,
+          hireDate: document.getElementById("edit_hire_date").value,
+        };
+
+        // 배열에서 해당 교직원 찾아서 업데이트
+        const staffIndex = staff.findIndex((s) => s.id === staffId);
+        if (staffIndex !== -1) {
+          staff[staffIndex] = updatedStaff;
+
+          // 테이블 다시 렌더링
+          filterStaff();
+
+          // 모달 닫기
+          bootstrap.Modal.getInstance(
+            document.getElementById("editModal")
+          ).hide();
+
+          alert("교직원 정보가 성공적으로 수정되었습니다.");
+        }
+      }
+
+      // 부서 코드를 이름으로 변환
+      function getDeptName(deptCode) {
+        const deptMap = {
+          ADMIN: "행정팀",
+          ACADEMIC: "교무팀",
+          STUDENT: "학생팀",
+          IT: "정보팀",
+        };
+        return deptMap[deptCode] || deptCode;
+      }
+
+      // 상태 코드를 라벨로 변환
+      function getStatusLabel(statusCode) {
+        const statusMap = {
+          Y: "재직",
+          N: "퇴직",
+          L: "휴직",
+        };
+        return statusMap[statusCode] || statusCode;
+      }
+
+      // 교직원 등록
+      function addStaff() {
+        // 폼 데이터 가져오기
+        const newStaff = {
+          id: document.getElementById("add_id").value.trim(),
+          name: document.getElementById("add_name").value.trim(),
+          dept: document.getElementById("add_dept").value,
+          deptName: getDeptName(document.getElementById("add_dept").value),
+          position: document.getElementById("add_position").value,
+          status: document.getElementById("add_status").value,
+          statusLabel: getStatusLabel(
+            document.getElementById("add_status").value
+          ),
+          email: document.getElementById("add_email").value.trim(),
+          phone: document.getElementById("add_phone").value.trim(),
+          hireDate: document.getElementById("add_hire_date").value,
+        };
+
+        // 유효성 검사
+        if (
+          !newStaff.id ||
+          !newStaff.name ||
+          !newStaff.dept ||
+          !newStaff.position ||
+          !newStaff.status ||
+          !newStaff.email ||
+          !newStaff.phone ||
+          !newStaff.hireDate
+        ) {
+          alert("모든 필수 정보를 입력해주세요.");
+          return;
+        }
+
+        // 사번 중복 체크
+        if (staff.find((s) => s.id === newStaff.id)) {
+          alert("이미 존재하는 사번입니다.");
+          return;
+        }
+
+        // 교직원 배열에 추가
+        staff.push(newStaff);
+
+        // 테이블 다시 렌더링
+        filterStaff();
+
+        // 모달 닫기
+        bootstrap.Modal.getInstance(document.getElementById("addModal")).hide();
+
+        alert("교직원이 성공적으로 등록되었습니다.");
+      }
+
+      function renderPagination(data) {
+        const totalPages = Math.ceil(data.length / pageSize);
+        const pagination = document.getElementById("pagination");
+        pagination.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+          const li = document.createElement("li");
+          li.className = "page-item" + (i === currentPage ? " active" : "");
+          li.innerHTML = `<button class="page-link">${i}</button>`;
+          li.addEventListener("click", () => {
+            currentPage = i;
+            renderTable(filteredData);
+            renderPagination(filteredData);
+          });
+          pagination.appendChild(li);
+        }
+      }
+
+      let filteredData = [...staff];
+
+      function filterStaff() {
+        const name = document.getElementById("searchName").value.toLowerCase();
+        const dept = document.getElementById("searchDept").value;
+        const status = document.getElementById("searchStatus").value;
+
+        filteredData = staff.filter(
+          (s) =>
+            (!name || s.name.toLowerCase().includes(name)) &&
+            (!dept || s.dept === dept) &&
+            (!status || s.status === status)
+        );
+        currentPage = 1;
+        renderTable(filteredData);
+        renderPagination(filteredData);
+      }
+
+      renderTable(filteredData);
+      renderPagination(filteredData);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"></script>
+  </body>
+</html>

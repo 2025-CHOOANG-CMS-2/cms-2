@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마일리지 관리 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --admin-color: #c0392b;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--admin-color), #e74c3c);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .header-time {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--admin-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--admin-color), #e74c3c);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Content Cards */
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* Mileage Cards */
+        .mileage-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .mileage-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .mileage-card.high-earner {
+            border-left-color: var(--success-color);
+            background: linear-gradient(135deg, #fff, #f0fff4);
+        }
+
+        .mileage-card.low-earner {
+            border-left-color: var(--warning-color);
+            background: linear-gradient(135deg, #fff, #fffbf0);
+        }
+
+        .mileage-card.inactive {
+            border-left-color: var(--danger-color);
+            background: linear-gradient(135deg, #fff, #fff5f5);
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .student-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .mileage-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mileage-footer {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .activity-summary {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        /* Store Item Cards */
+        .store-item-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .store-item-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .item-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .item-category {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .category-food {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .category-goods {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .category-service {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .category-event {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .item-price {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--warning-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .item-stock {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .item-footer {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-inactive {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .status-out-of-stock {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .status-low-stock {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .filter-btn {
+            border: 2px solid #e9ecef;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .filter-btn.active {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Search Box */
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem 0.75rem 3rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+
+        /* Tabs */
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: #6c757d;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: transparent;
+            color: var(--admin-color);
+        }
+
+        .nav-tabs .nav-link.active {
+            border-color: var(--admin-color);
+            color: var(--admin-color);
+            background-color: transparent;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--admin-color);
+            border-color: var(--admin-color);
+        }
+
+        .btn-primary:hover {
+            background: #b03a2e;
+            border-color: #b03a2e;
+        }
+
+        .btn-outline-primary {
+            color: var(--admin-color);
+            border-color: var(--admin-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--admin-color);
+            border-color: var(--admin-color);
+            color: white;
+        }
+
+        /* Table */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            min-width: 800px;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .table td {
+            vertical-align: middle;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 300px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        /* Progress Bars */
+        .progress {
+            height: 8px;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .student-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .mileage-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-shield-check me-2"></i>
+                교육 관리 시스템
+            </a>
+            <small class="text-white-50">최고관리자 모드</small>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="admin-index.html" class="nav-link">
+                    <i class="bi bi-speedometer2"></i>
+                    대시보드
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mypage.html" class="nav-link">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <!-- 관리자 전용 메뉴 -->
+            <div class="nav-item mt-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <small class="text-white-50 px-3">시스템 관리</small>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-users.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    사용자/조직 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-diagnosis-management.html" class="nav-link">
+                    <i class="bi bi-graph-up"></i>
+                    학생역량진단 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-programs-management.html" class="nav-link">
+                    <i class="bi bi-calendar-check"></i>
+                    비교과 프로그램 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-counseling-management.html" class="nav-link">
+                    <i class="bi bi-chat-square-dots"></i>
+                    상담 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-mileage-management.html" class="nav-link active">
+                    <i class="bi bi-award"></i>
+                    마일리지 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-notice.html" class="nav-link">
+                    <i class="bi bi-clipboard-plus"></i>
+                    공지사항 관리
+                </a>
+            </div>
+            
+            <div class="nav-item mt-3" style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem;">
+                <small class="text-white-50 px-3">시스템 설정</small>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-settings.html" class="nav-link">
+                    <i class="bi bi-gear"></i>
+                    시스템 설정
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-logs.html" class="nav-link">
+                    <i class="bi bi-file-text"></i>
+                    시스템 로그
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="admin-backup.html" class="nav-link">
+                    <i class="bi bi-cloud-download"></i>
+                    백업/복원
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div class="header-time">
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="header-user">
+                <div class="user-avatar">
+                    <i class="bi bi-shield-check"></i>
+                </div>
+                
+                <div>
+                    <div class="fw-medium">관리자</div>
+                    <small class="text-muted">시스템 관리자</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mypage.html">마이페이지</a></li>
+                        <li><a class="dropdown-item" href="admin-settings.html">시스템 설정</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="admin-index.html" class="text-white-50">홈</a></li>
+                        <li class="breadcrumb-item active text-white">마일리지 관리</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-award me-2"></i>마일리지 관리</h1>
+                <p class="mb-0 mt-2">학생 마일리지 현황을 관리하고 마일리지 스토어를 운영합니다</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Statistics Overview -->
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card">
+                        <div class="stat-number">1,245,680</div>
+                        <div class="stat-label">총 발행 마일리지</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card" style="border-left-color: var(--success-color);">
+                        <div class="stat-number text-success">892,340</div>
+                        <div class="stat-label">사용된 마일리지</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card" style="border-left-color: var(--warning-color);">
+                        <div class="stat-number text-warning">353,340</div>
+                        <div class="stat-label">보유 마일리지</div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="stats-card" style="border-left-color: var(--danger-color);">
+                        <div class="stat-number text-danger">1,234</div>
+                        <div class="stat-label">활성 사용자</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="mileageTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#studentMileageTab">
+                        <i class="bi bi-people me-1"></i>학생 마일리지 현황
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#storeTab">
+                        <i class="bi bi-shop me-1"></i>마일리지 스토어
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#policyTab">
+                        <i class="bi bi-gear me-1"></i>정책 관리
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#transactionTab">
+                        <i class="bi bi-receipt me-1"></i>거래 내역
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#statsTab">
+                        <i class="bi bi-graph-up me-1"></i>통계 및 보고서
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Student Mileage Tab -->
+                <div class="tab-pane fade show active" id="studentMileageTab">
+                    <!-- Filter and Search Section -->
+                    <div class="filter-section">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">검색</label>
+                                <div class="search-box">
+                                    <i class="bi bi-search search-icon"></i>
+                                    <input type="text" class="form-control search-input" id="searchInput" 
+                                           placeholder="학생명, 학번으로 검색하세요..." onkeyup="searchStudents()">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">정렬</label>
+                                <select class="form-select" id="sortSelect" onchange="sortStudents()">
+                                    <option value="mileage-desc">마일리지 높은순</option>
+                                    <option value="mileage-asc">마일리지 낮은순</option>
+                                    <option value="name">이름순</option>
+                                    <option value="recent">최근 활동순</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">학과</label>
+                                <select class="form-select" id="departmentFilter" onchange="filterByDepartment()">
+                                    <option value="all">전체</option>
+                                    <option value="computer">컴퓨터공학과</option>
+                                    <option value="business">경영학과</option>
+                                    <option value="design">디자인학과</option>
+                                    <option value="education">교육학과</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">마일리지 범위</label>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" data-range="all" onclick="filterByMileageRange('all')">
+                                    <i class="bi bi-grid me-1"></i>전체
+                                </button>
+                                <button class="filter-btn" data-range="high" onclick="filterByMileageRange('high')">
+                                    <i class="bi bi-star-fill me-1"></i>1000P 이상
+                                </button>
+                                <button class="filter-btn" data-range="medium" onclick="filterByMileageRange('medium')">
+                                    <i class="bi bi-star-half me-1"></i>500-999P
+                                </button>
+                                <button class="filter-btn" data-range="low" onclick="filterByMileageRange('low')">
+                                    <i class="bi bi-star me-1"></i>100-499P
+                                </button>
+                                <button class="filter-btn" data-range="zero" onclick="filterByMileageRange('zero')">
+                                    <i class="bi bi-dash-circle me-1"></i>100P 미만
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-outline-primary me-2" onclick="exportMileageData()">
+                                <i class="bi bi-download me-1"></i>데이터 다운로드
+                            </button>
+                            <button class="btn btn-primary" onclick="bulkMileageAdjustment()">
+                                <i class="bi bi-plus-circle me-1"></i>일괄 마일리지 조정
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Student Mileage List -->
+                    <div id="studentMileageList">
+                        <!-- High Earner Student -->
+                        <div class="mileage-card high-earner" data-department="computer" data-mileage="1850" data-id="1">
+                            <div class="student-header">
+                                <div class="flex-grow-1">
+                                    <div class="student-name">김우수 (2021001)</div>
+                                    <div class="student-info">
+                                        <span><i class="bi bi-mortarboard me-1"></i>컴퓨터공학과 3학년</span>
+                                        <span><i class="bi bi-calendar me-1"></i>최근 활동: 2024.01.20</span>
+                                        <span><i class="bi bi-trophy me-1"></i>상위 5%</span>
+                                    </div>
+                                </div>
+                                <div class="mileage-amount">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>1,850P</span>
+                                </div>
+                            </div>
+                            <div class="activity-summary">
+                                이번 달 획득: 320P | 이번 달 사용: 150P | 참여 프로그램: 8개
+                            </div>
+                            <div class="mileage-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-success">활발한 참여자</span>
+                                    <span class="badge bg-info">리더십 우수</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewMileageHistory(1)">
+                                        <i class="bi bi-clock-history me-1"></i>이력 조회
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="adjustMileage(1)">
+                                        <i class="bi bi-pencil me-1"></i>조정
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="sendMileageNotification(1)">
+                                        <i class="bi bi-envelope me-1"></i>알림
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Medium Earner Student -->
+                        <div class="mileage-card" data-department="business" data-mileage="750" data-id="2">
+                            <div class="student-header">
+                                <div class="flex-grow-1">
+                                    <div class="student-name">이보통 (2021002)</div>
+                                    <div class="student-info">
+                                        <span><i class="bi bi-mortarboard me-1"></i>경영학과 2학년</span>
+                                        <span><i class="bi bi-calendar me-1"></i>최근 활동: 2024.01.18</span>
+                                        <span><i class="bi bi-graph-up me-1"></i>상위 30%</span>
+                                    </div>
+                                </div>
+                                <div class="mileage-amount">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>750P</span>
+                                </div>
+                            </div>
+                            <div class="activity-summary">
+                                이번 달 획득: 180P | 이번 달 사용: 200P | 참여 프로그램: 4개
+                            </div>
+                            <div class="mileage-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-primary">꾸준한 참여자</span>
+                                    <span class="badge bg-warning">창의성 우수</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewMileageHistory(2)">
+                                        <i class="bi bi-clock-history me-1"></i>이력 조회
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="adjustMileage(2)">
+                                        <i class="bi bi-pencil me-1"></i>조정
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="sendMileageNotification(2)">
+                                        <i class="bi bi-envelope me-1"></i>알림
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Low Earner Student -->
+                        <div class="mileage-card low-earner" data-department="design" data-mileage="280" data-id="3">
+                            <div class="student-header">
+                                <div class="flex-grow-1">
+                                    <div class="student-name">박신입 (2023001)</div>
+                                    <div class="student-info">
+                                        <span><i class="bi bi-mortarboard me-1"></i>디자인학과 1학년</span>
+                                        <span><i class="bi bi-calendar me-1"></i>최근 활동: 2024.01.15</span>
+                                        <span><i class="bi bi-graph-down me-1"></i>하위 50%</span>
+                                    </div>
+                                </div>
+                                <div class="mileage-amount">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>280P</span>
+                                </div>
+                            </div>
+                            <div class="activity-summary">
+                                이번 달 획득: 120P | 이번 달 사용: 50P | 참여 프로그램: 2개
+                            </div>
+                            <div class="mileage-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-secondary">신규 사용자</span>
+                                    <span class="badge bg-info">잠재력 있음</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewMileageHistory(3)">
+                                        <i class="bi bi-clock-history me-1"></i>이력 조회
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="adjustMileage(3)">
+                                        <i class="bi bi-pencil me-1"></i>조정
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="sendMileageNotification(3)">
+                                        <i class="bi bi-envelope me-1"></i>알림
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inactive Student -->
+                        <div class="mileage-card inactive" data-department="education" data-mileage="50" data-id="4">
+                            <div class="student-header">
+                                <div class="flex-grow-1">
+                                    <div class="student-name">최비활성 (2022001)</div>
+                                    <div class="student-info">
+                                        <span><i class="bi bi-mortarboard me-1"></i>교육학과 2학년</span>
+                                        <span><i class="bi bi-calendar me-1"></i>최근 활동: 2023.12.10</span>
+                                        <span><i class="bi bi-exclamation-triangle me-1"></i>비활성</span>
+                                    </div>
+                                </div>
+                                <div class="mileage-amount">
+                                    <i class="bi bi-star"></i>
+                                    <span>50P</span>
+                                </div>
+                            </div>
+                            <div class="activity-summary">
+                                이번 달 획득: 0P | 이번 달 사용: 0P | 참여 프로그램: 0개
+                            </div>
+                            <div class="mileage-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-danger">비활성 사용자</span>
+                                    <span class="badge bg-warning">관심 필요</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewMileageHistory(4)">
+                                        <i class="bi bi-clock-history me-1"></i>이력 조회
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="adjustMileage(4)">
+                                        <i class="bi bi-pencil me-1"></i>조정
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="sendMileageNotification(4)">
+                                        <i class="bi bi-envelope me-1"></i>알림
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav aria-label="Page navigation" class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">다음</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Store Management Tab -->
+                <div class="tab-pane fade" id="storeTab">
+                    <!-- Store Filter Section -->
+                    <div class="filter-section">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">검색</label>
+                                <div class="search-box">
+                                    <i class="bi bi-search search-icon"></i>
+                                    <input type="text" class="form-control search-input" id="storeSearchInput" 
+                                           placeholder="상품명으로 검색하세요..." onkeyup="searchStoreItems()">
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">정렬</label>
+                                <select class="form-select" id="storeSortSelect" onchange="sortStoreItems()">
+                                    <option value="popular">인기순</option>
+                                    <option value="price-asc">가격 낮은순</option>
+                                    <option value="price-desc">가격 높은순</option>
+                                    <option value="stock">재고순</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">상태</label>
+                                <select class="form-select" id="storeStatusFilter" onchange="filterByStoreStatus()">
+                                    <option value="all">전체</option>
+                                    <option value="active">판매중</option>
+                                    <option value="inactive">판매중지</option>
+                                    <option value="out-of-stock">품절</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <label class="form-label fw-bold">카테고리</label>
+                            <div class="filter-buttons">
+                                <button class="filter-btn active" data-category="all" onclick="filterByStoreCategory('all')">
+                                    <i class="bi bi-grid me-1"></i>전체
+                                </button>
+                                <button class="filter-btn" data-category="food" onclick="filterByStoreCategory('food')">
+                                    <i class="bi bi-cup-straw me-1"></i>식음료
+                                </button>
+                                <button class="filter-btn" data-category="goods" onclick="filterByStoreCategory('goods')">
+                                    <i class="bi bi-gift me-1"></i>굿즈
+                                </button>
+                                <button class="filter-btn" data-category="service" onclick="filterByStoreCategory('service')">
+                                    <i class="bi bi-tools me-1"></i>서비스
+                                </button>
+                                <button class="filter-btn" data-category="event" onclick="filterByStoreCategory('event')">
+                                    <i class="bi bi-calendar-event me-1"></i>이벤트
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-3">
+                            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStoreItemModal">
+                                <i class="bi bi-plus-circle me-1"></i>상품 등록
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Store Items List -->
+                    <div id="storeItemsList">
+                        <!-- Food Item -->
+                        <div class="store-item-card" data-category="food" data-status="active" data-id="1">
+                            <div class="item-header">
+                                <div class="flex-grow-1">
+                                    <div class="item-category category-food">식음료</div>
+                                    <div class="item-name">카페 아메리카노</div>
+                                    <div class="item-stock">재고: 무제한</div>
+                                </div>
+                                <div class="item-price">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>300P</span>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="status-badge status-active">판매중</span>
+                                    <span class="badge bg-success">인기상품</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewStoreItemDetail(1)">
+                                        <i class="bi bi-eye me-1"></i>상세보기
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="editStoreItem(1)">
+                                        <i class="bi bi-pencil me-1"></i>수정
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteStoreItem(1)">
+                                        <i class="bi bi-trash me-1"></i>삭제
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Goods Item -->
+                        <div class="store-item-card" data-category="goods" data-status="active" data-id="2">
+                            <div class="item-header">
+                                <div class="flex-grow-1">
+                                    <div class="item-category category-goods">굿즈</div>
+                                    <div class="item-name">대학교 로고 텀블러</div>
+                                    <div class="item-stock">재고: 25개</div>
+                                </div>
+                                <div class="item-price">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>1,500P</span>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="status-badge status-active">판매중</span>
+                                    <span class="badge bg-info">신상품</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewStoreItemDetail(2)">
+                                        <i class="bi bi-eye me-1"></i>상세보기
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="editStoreItem(2)">
+                                        <i class="bi bi-pencil me-1"></i>수정
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteStoreItem(2)">
+                                        <i class="bi bi-trash me-1"></i>삭제
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Service Item -->
+                        <div class="store-item-card" data-category="service" data-status="active" data-id="3">
+                            <div class="item-header">
+                                <div class="flex-grow-1">
+                                    <div class="item-category category-service">서비스</div>
+                                    <div class="item-name">도서관 스터디룸 1시간</div>
+                                    <div class="item-stock">재고: 무제한</div>
+                                </div>
+                                <div class="item-price">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>200P</span>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="status-badge status-active">판매중</span>
+                                    <span class="badge bg-primary">추천상품</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewStoreItemDetail(3)">
+                                        <i class="bi bi-eye me-1"></i>상세보기
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="editStoreItem(3)">
+                                        <i class="bi bi-pencil me-1"></i>수정
+                                    </button>
+                                    <button class="btn btn-outline-danger btn-sm" onclick="deleteStoreItem(3)">
+                                        <i class="bi bi-trash me-1"></i>삭제
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Event Item -->
+                        <div class="store-item-card" data-category="event" data-status="out-of-stock" data-id="4">
+                            <div class="item-header">
+                                <div class="flex-grow-1">
+                                    <div class="item-category category-event">이벤트</div>
+                                    <div class="item-name">학과 MT 참가권</div>
+                                    <div class="item-stock">재고: 0개</div>
+                                </div>
+                                <div class="item-price">
+                                    <i class="bi bi-star-fill"></i>
+                                    <span>5,000P</span>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <div class="d-flex gap-2">
+                                    <span class="status-badge status-out-of-stock">품절</span>
+                                    <span class="badge bg-warning">한정상품</span>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-primary btn-sm" onclick="viewStoreItemDetail(4)">
+                                        <i class="bi bi-eye me-1"></i>상세보기
+                                    </button>
+                                    <button class="btn btn-outline-warning btn-sm" onclick="editStoreItem(4)">
+                                        <i class="bi bi-pencil me-1"></i>수정
+                                    </button>
+                                    <button class="btn btn-outline-success btn-sm" onclick="restockItem(4)">
+                                        <i class="bi bi-plus-circle me-1"></i>재입고
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Policy Management Tab -->
+                <div class="tab-pane fade" id="policyTab">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="content-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-award me-2"></i>마일리지 획득 정책
+                                </h5>
+
+                                <div class="table-container">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>활동 유형</th>
+                                                <th>기본 마일리지</th>
+                                                <th>관리</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>비교과 프로그램 참여</td>
+                                                <td>100-500P</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editEarnPolicy('program')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>봉사활동 (시간당)</td>
+                                                <td>20P</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editEarnPolicy('volunteer')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>학술 활동</td>
+                                                <td>300-1000P</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editEarnPolicy('academic')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>상담 참여</td>
+                                                <td>50P</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editEarnPolicy('counseling')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>역량진단 참여</td>
+                                                <td>100P</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary" onclick="editEarnPolicy('diagnosis')">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="d-flex justify-content-end mt-3">
+                                    <button class="btn btn-primary" onclick="addEarnPolicy()">
+                                        <i class="bi bi-plus-circle me-1"></i>정책 추가
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="content-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-gear me-2"></i>시스템 설정
+                                </h5>
+
+                                <form>
+                                    <div class="mb-3">
+                                        <label class="form-label">마일리지 유효기간</label>
+                                        <select class="form-select">
+                                            <option value="1">1년</option>
+                                            <option value="2" selected>2년</option>
+                                            <option value="3">3년</option>
+                                            <option value="0">무제한</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">최대 보유 마일리지</label>
+                                        <input type="number" class="form-control" value="10000" min="0">
+                                        <small class="form-text text-muted">0 입력 시 제한 없음</small>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">일일 최대 획득 마일리지</label>
+                                        <input type="number" class="form-control" value="1000" min="0">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="autoExpire" checked>
+                                            <label class="form-check-label" for="autoExpire">
+                                                자동 만료 알림 발송
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="earnNotification" checked>
+                                            <label class="form-check-label" for="earnNotification">
+                                                마일리지 획득 알림 발송
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="useNotification" checked>
+                                            <label class="form-check-label" for="useNotification">
+                                                마일리지 사용 알림 발송
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-primary" onclick="savePolicySettings()">
+                                            <i class="bi bi-check-circle me-1"></i>설정 저장
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <div class="content-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>마일리지 만료 관리
+                                </h5>
+
+                                <div class="alert alert-warning">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    30일 이내 만료 예정 마일리지: <strong>15,680P</strong> (234명)
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-warning" onclick="viewExpiringMileage()">
+                                        <i class="bi bi-clock me-1"></i>만료 예정 조회
+                                    </button>
+                                    <button class="btn btn-outline-primary" onclick="sendExpiryNotification()">
+                                        <i class="bi bi-envelope me-1"></i>만료 알림 발송
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transaction History Tab -->
+                <div class="tab-pane fade" id="transactionTab">
+                    <div class="content-card">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="mb-0">
+                                <i class="bi bi-receipt me-2"></i>마일리지 거래 내역
+                            </h5>
+                            <div class="d-flex gap-2">
+                                <select class="form-select" style="width: auto;">
+                                    <option value="all">전체 거래</option>
+                                    <option value="earn">획득</option>
+                                    <option value="use">사용</option>
+                                    <option value="adjust">조정</option>
+                                    <option value="expire">만료</option>
+                                </select>
+                                <input type="date" class="form-control" style="width: auto;">
+                                <button class="btn btn-outline-primary" onclick="exportTransactions()">
+                                    <i class="bi bi-download me-1"></i>다운로드
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="table-container">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10%">일시</th>
+                                        <th style="width: 15%">학생</th>
+                                        <th style="width: 10%">유형</th>
+                                        <th style="width: 15%">내용</th>
+                                        <th style="width: 10%">마일리지</th>
+                                        <th style="width: 10%">잔액</th>
+                                        <th style="width: 15%">관리자</th>
+                                        <th style="width: 15%">비고</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>2024.01.20<br><small>14:30</small></td>
+                                        <td>김우수<br><small>2021001</small></td>
+                                        <td><span class="badge bg-success">획득</span></td>
+                                        <td>리더십 프로그램 참여</td>
+                                        <td class="text-success">+200P</td>
+                                        <td>1,850P</td>
+                                        <td>시스템</td>
+                                        <td>자동 부여</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024.01.20<br><small>10:15</small></td>
+                                        <td>이보통<br><small>2021002</small></td>
+                                        <td><span class="badge bg-danger">사용</span></td>
+                                        <td>카페 아메리카노</td>
+                                        <td class="text-danger">-300P</td>
+                                        <td>750P</td>
+                                        <td>-</td>
+                                        <td>스토어 구매</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024.01.19<br><small>16:45</small></td>
+                                        <td>박신입<br><small>2023001</small></td>
+                                        <td><span class="badge bg-success">획득</span></td>
+                                        <td>역량진단 참여</td>
+                                        <td class="text-success">+100P</td>
+                                        <td>280P</td>
+                                        <td>시스템</td>
+                                        <td>자동 부여</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024.01.19<br><small>09:30</small></td>
+                                        <td>최비활성<br><small>2022001</small></td>
+                                        <td><span class="badge bg-warning">조정</span></td>
+                                        <td>관리자 조정</td>
+                                        <td class="text-warning">+50P</td>
+                                        <td>50P</td>
+                                        <td>관리자</td>
+                                        <td>보상 지급</td>
+                                    </tr>
+                                    <tr>
+                                        <td>2024.01.18<br><small>23:59</small></td>
+                                        <td>김만료<br><small>2020001</small></td>
+                                        <td><span class="badge bg-secondary">만료</span></td>
+                                        <td>마일리지 만료</td>
+                                        <td class="text-muted">-500P</td>
+                                        <td>0P</td>
+                                        <td>시스템</td>
+                                        <td>2년 경과</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <nav aria-label="Page navigation" class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" tabindex="-1" aria-disabled="true">이전</a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <li class="page-item">
+                                    <a class="page-link" href="#">다음</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Statistics Tab -->
+                <div class="tab-pane fade" id="statsTab">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="content-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-graph-up me-2"></i>마일리지 획득/사용 추이
+                                </h5>
+                                <div class="chart-container">
+                                    <div class="text-center">
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            실제 구현 시 Chart.js 등의 라이브러리를 사용하여 차트를 표시합니다.
+                                        </div>
+                                        <span class="text-muted">월별 마일리지 획득/사용 추이 차트 영역</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="content-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-pie-chart me-2"></i>마일리지 사용 분포
+                                </h5>
+                                <div class="chart-container">
+                                    <div class="text-center">
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            실제 구현 시 Chart.js 등의 라이브러리를 사용하여 차트를 표시합니다.
+                                        </div>
+                                        <span class="text-muted">카테고리별 마일리지 사용 분포 파이 차트 영역</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="content-card">
+                        <h5 class="mb-4">
+                            <i class="bi bi-table me-2"></i>학과별 마일리지 통계
+                        </h5>
+                        <div class="table-container">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>학과</th>
+                                        <th>학생 수</th>
+                                        <th>총 획득 마일리지</th>
+                                        <th>총 사용 마일리지</th>
+                                        <th>평균 보유 마일리지</th>
+                                        <th>활성 사용자 비율</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>컴퓨터공학과</td>
+                                        <td>320명</td>
+                                        <td>456,780P</td>
+                                        <td>298,450P</td>
+                                        <td>495P</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                                </div>
+                                                <span>85%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>경영학과</td>
+                                        <td>280명</td>
+                                        <td>398,560P</td>
+                                        <td>245,320P</td>
+                                        <td>547P</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-success" style="width: 78%"></div>
+                                                </div>
+                                                <span>78%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>디자인학과</td>
+                                        <td>150명</td>
+                                        <td>189,340P</td>
+                                        <td>156,780P</td>
+                                        <td>217P</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-warning" style="width: 65%"></div>
+                                                </div>
+                                                <span>65%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>교육학과</td>
+                                        <td>200명</td>
+                                        <td>201,000P</td>
+                                        <td>191,790P</td>
+                                        <td>46P</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                                    <div class="progress-bar bg-danger" style="width: 45%"></div>
+                                                </div>
+                                                <span>45%</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-end mt-4">
+                            <button class="btn btn-outline-primary me-2" onclick="exportDepartmentStats()">
+                                <i class="bi bi-download me-1"></i>통계 다운로드
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="generateMileageReport()">
+                                <i class="bi bi-file-earmark-text me-1"></i>보고서 생성
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-lg-4">
+                            <div class="content-card">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-trophy me-2"></i>상위 마일리지 보유자
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>김우수</strong><br>
+                                            <small class="text-muted">컴퓨터공학과</small>
+                                        </div>
+                                        <span class="badge bg-warning rounded-pill">1,850P</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>이열심</strong><br>
+                                            <small class="text-muted">경영학과</small>
+                                        </div>
+                                        <span class="badge bg-warning rounded-pill">1,720P</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>박성실</strong><br>
+                                            <small class="text-muted">디자인학과</small>
+                                        </div>
+                                        <span class="badge bg-warning rounded-pill">1,650P</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="content-card">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-fire me-2"></i>인기 스토어 상품
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>카페 아메리카노</strong><br>
+                                            <small class="text-muted">300P</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">156회</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>스터디룸 1시간</strong><br>
+                                            <small class="text-muted">200P</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">89회</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>대학교 텀블러</strong><br>
+                                            <small class="text-muted">1,500P</small>
+                                        </div>
+                                        <span class="badge bg-success rounded-pill">23회</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="content-card">
+                                <h6 class="mb-3">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>주의 필요 학생
+                                </h6>
+                                <div class="list-group list-group-flush">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>최비활성</strong><br>
+                                            <small class="text-muted">30일 미활동</small>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">50P</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>김무관심</strong><br>
+                                            <small class="text-muted">60일 미활동</small>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">25P</span>
+                                    </div>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>이소극적</strong><br>
+                                            <small class="text-muted">90일 미활동</small>
+                                        </div>
+                                        <span class="badge bg-danger rounded-pill">10P</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Store Item Modal -->
+    <div class="modal fade" id="addStoreItemModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-plus-circle me-2"></i>스토어 상품 등록
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addStoreItemForm">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="mb-3">
+                                    <label class="form-label">상품명 <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="itemName" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">카테고리 <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="itemCategory" required>
+                                        <option value="">선택하세요</option>
+                                        <option value="food">식음료</option>
+                                        <option value="goods">굿즈</option>
+                                        <option value="service">서비스</option>
+                                        <option value="event">이벤트</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">가격 (마일리지) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="itemPrice" min="1" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">재고 수량</label>
+                                    <input type="number" class="form-control" id="itemStock" min="0" placeholder="무제한인 경우 비워두세요">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">상품 설명</label>
+                            <textarea class="form-control" id="itemDescription" rows="3"></textarea>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">판매 시작일</label>
+                                    <input type="date" class="form-control" id="itemStartDate">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">판매 종료일</label>
+                                    <input type="date" class="form-control" id="itemEndDate">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="itemFeatured">
+                                <label class="form-check-label" for="itemFeatured">
+                                    추천 상품으로 설정
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="itemActive" checked>
+                                <label class="form-check-label" for="itemActive">
+                                    즉시 판매 시작
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="addStoreItem()">등록</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 현재 시간 표시
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // 페이지 로드 시 시간 업데이트 시작
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 학생 검색
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const students = document.querySelectorAll('.mileage-card');
+            
+            students.forEach(student => {
+                const name = student.querySelector('.student-name').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm)) {
+                    student.style.display = 'block';
+                } else {
+                    student.style.display = 'none';
+                }
+            });
+        }
+
+        // 학과별 필터링
+        function filterByDepartment() {
+            const department = document.getElementById('departmentFilter').value;
+            const students = document.querySelectorAll('.mileage-card');
+            
+            students.forEach(student => {
+                if (department === 'all' || student.dataset.department === department) {
+                    student.style.display = 'block';
+                } else {
+                    student.style.display = 'none';
+                }
+            });
+        }
+
+        // 마일리지 범위별 필터링
+        function filterByMileageRange(range) {
+            const students = document.querySelectorAll('.mileage-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // 버튼 활성화 상태 변경
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-range="${range}"]`).classList.add('active');
+            
+            students.forEach(student => {
+                const mileage = parseInt(student.dataset.mileage);
+                let show = false;
+                
+                switch (range) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'high':
+                        show = mileage >= 1000;
+                        break;
+                    case 'medium':
+                        show = mileage >= 500 && mileage < 1000;
+                        break;
+                    case 'low':
+                        show = mileage >= 100 && mileage < 500;
+                        break;
+                    case 'zero':
+                        show = mileage < 100;
+                        break;
+                }
+                
+                student.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        // 학생 정렬
+        function sortStudents() {
+            const sortBy = document.getElementById('sortSelect').value;
+            const studentList = document.getElementById('studentMileageList');
+            const students = Array.from(studentList.querySelectorAll('.mileage-card'));
+            
+            students.sort((a, b) => {
+                switch (sortBy) {
+                    case 'mileage-desc':
+                        return parseInt(b.dataset.mileage) - parseInt(a.dataset.mileage);
+                    case 'mileage-asc':
+                        return parseInt(a.dataset.mileage) - parseInt(b.dataset.mileage);
+                    case 'name':
+                        const nameA = a.querySelector('.student-name').textContent;
+                        const nameB = b.querySelector('.student-name').textContent;
+                        return nameA.localeCompare(nameB);
+                    case 'recent':
+                        // 실제 구현 시 최근 활동 데이터를 기준으로 정렬
+                        return 0;
+                    default:
+                        return 0;
+                }
+            });
+            
+            students.forEach(student => studentList.appendChild(student));
+        }
+
+        // 마일리지 이력 조회
+        function viewMileageHistory(id) {
+            alert(`학생 ${id}의 마일리지 이력을 조회합니다.`);
+        }
+
+        // 마일리지 조정
+        function adjustMileage(id) {
+            const adjustment = prompt('조정할 마일리지를 입력하세요 (+ 또는 - 포함):');
+            if (adjustment) {
+                alert(`학생 ${id}의 마일리지가 ${adjustment}P 조정되었습니다.`);
+                location.reload();
+            }
+        }
+
+        // 마일리지 알림 발송
+        function sendMileageNotification(id) {
+            alert(`학생 ${id}에게 마일리지 관련 알림을 발송합니다.`);
+        }
+
+        // 일괄 마일리지 조정
+        function bulkMileageAdjustment() {
+            alert('일괄 마일리지 조정 기능을 실행합니다.');
+        }
+
+        // 마일리지 데이터 다운로드
+        function exportMileageData() {
+            alert('마일리지 데이터를 Excel 파일로 다운로드합니다.');
+        }
+
+        // 스토어 상품 검색
+        function searchStoreItems() {
+            const searchTerm = document.getElementById('storeSearchInput').value.toLowerCase();
+            const items = document.querySelectorAll('.store-item-card');
+            
+            items.forEach(item => {
+                const name = item.querySelector('.item-name').textContent.toLowerCase();
+                
+                if (name.includes(searchTerm)) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 스토어 카테고리별 필터링
+        function filterByStoreCategory(category) {
+            const items = document.querySelectorAll('.store-item-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            
+            // 버튼 활성화 상태 변경
+            buttons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`[data-category="${category}"]`).classList.add('active');
+            
+            items.forEach(item => {
+                if (category === 'all' || item.dataset.category === category) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 스토어 상태별 필터링
+        function filterByStoreStatus() {
+            const status = document.getElementById('storeStatusFilter').value;
+            const items = document.querySelectorAll('.store-item-card');
+            
+            items.forEach(item => {
+                if (status === 'all' || item.dataset.status === status) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 스토어 상품 정렬
+        function sortStoreItems() {
+            const sortBy = document.getElementById('storeSortSelect').value;
+            const itemList = document.getElementById('storeItemsList');
+            const items = Array.from(itemList.querySelectorAll('.store-item-card'));
+            
+            items.sort((a, b) => {
+                switch (sortBy) {
+                    case 'popular':
+                        // 실제 구현 시 인기도 데이터를 기준으로 정렬
+                        return 0;
+                    case 'price-asc':
+                        // 실제 구현 시 가격 데이터를 기준으로 정렬
+                        return 0;
+                    case 'price-desc':
+                        // 실제 구현 시 가격 데이터를 기준으로 정렬
+                        return 0;
+                    case 'stock':
+                        // 실제 구현 시 재고 데이터를 기준으로 정렬
+                        return 0;
+                    default:
+                        return 0;
+                }
+            });
+            
+            items.forEach(item => itemList.appendChild(item));
+        }
+
+        // 스토어 상품 상세보기
+        function viewStoreItemDetail(id) {
+            alert(`상품 ${id}의 상세 정보를 표시합니다.`);
+        }
+
+        // 스토어 상품 수정
+        function editStoreItem(id) {
+            alert(`상품 ${id} 수정 페이지로 이동합니다.`);
+        }
+
+        // 스토어 상품 삭제
+        function deleteStoreItem(id) {
+            if (confirm('이 상품을 삭제하시겠습니까?')) {
+                alert(`상품 ${id}이 삭제되었습니다.`);
+                location.reload();
+            }
+        }
+
+        // 상품 재입고
+        function restockItem(id) {
+            const quantity = prompt('재입고할 수량을 입력하세요:');
+            if (quantity && !isNaN(quantity)) {
+                alert(`상품 ${id}이 ${quantity}개 재입고되었습니다.`);
+                location.reload();
+            }
+        }
+
+        // 스토어 상품 등록
+        function addStoreItem() {
+            const form = document.getElementById('addStoreItemForm');
+            if (form.checkValidity()) {
+                alert('상품이 등록되었습니다.');
+                bootstrap.Modal.getInstance(document.getElementById('addStoreItemModal')).hide();
+                form.reset();
+                location.reload();
+            } else {
+                form.reportValidity();
+            }
+        }
+
+        // 정책 관련 함수들
+        function editEarnPolicy(type) {
+            alert(`${type} 마일리지 획득 정책을 수정합니다.`);
+        }
+
+        function addEarnPolicy() {
+            alert('새로운 마일리지 획득 정책을 추가합니다.');
+        }
+
+        function savePolicySettings() {
+            alert('마일리지 정책 설정이 저장되었습니다.');
+        }
+
+        function viewExpiringMileage() {
+            alert('만료 예정 마일리지 목록을 조회합니다.');
+        }
+
+        function sendExpiryNotification() {
+            alert('만료 예정 마일리지 알림을 발송합니다.');
+        }
+
+        // 거래 내역 관련 함수들
+        function exportTransactions() {
+            alert('거래 내역을 Excel 파일로 다운로드합니다.');
+        }
+
+        // 통계 관련 함수들
+        function exportDepartmentStats() {
+            alert('학과별 통계를 Excel 파일로 다운로드합니다.');
+        }
+
+        function generateMileageReport() {
+            alert('마일리지 운영 보고서를 생성합니다.');
+        }
+    </script>
+</body>
+</html>
