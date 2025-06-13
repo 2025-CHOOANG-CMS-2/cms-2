@@ -23,23 +23,23 @@ public class CoreCptQst {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cci_id")
-    private CoreCptInfo coreCptInfo;
+    private CoreCptInfo coreCptInfo; //연관된 핵심역량
 
     @Column(name = "qst_cont", length = 500)
-    private String qstCont;
+    private String qstCont; //문항 내용
 
     @Column(name = "qst_ord")
-    private Integer qstOrd;
+    private Integer qstOrd; //문항 순서
 
     @Column(name = "reg_user_id", length = 20)
-    private String regUserId;
+    private String regUserId; //등록자 ID
 
     @Column(name = "reg_dt")
-    private LocalDateTime regDt;
+    private LocalDateTime regDt; //등록일
 
     @Column(name = "upd_user_id", length = 20)
-    private String updUserId;
+    private String updUserId; //수정자 ID
 
     @Column(name = "upd_dt")
-    private LocalDateTime updDt;
+    private LocalDateTime updDt; //수정일
 }

@@ -22,27 +22,27 @@ public class CoreCptInfo {
     private Long id; // 자동 증가 PK
 
     @Column(name = "cci_id", length = 20, nullable = false, unique = true)
-    private String cciId; // 비즈니스 키
+    private String cciId; // 핵심역량 ID (비즈니스 키
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "up_cci_id", referencedColumnName = "cci_id")
-    private CoreCptInfo parent; // 자기참조 관계
-
+    private CoreCptInfo parent; // 상위 역량 (자기참조 관계)
+    
     @Column(name = "cci_nm", length = 100)
-    private String cciNm;
+    private String cciNm; //역량명
 
     @Column(name = "cci_desc", length = 500)
-    private String cciDesc;
+    private String cciDesc; //역량 설명
 
     @Column(name = "reg_user_id", length = 20)
-    private String regUserId;
+    private String regUserId; // 등록자 ID
 
     @Column(name = "reg_dt")
-    private LocalDateTime regDt;
+    private LocalDateTime regDt; //등록일
 
     @Column(name = "upd_user_id", length = 20)
-    private String updUserId;
+    private String updUserId; //수정자 ID
 
     @Column(name = "upd_dt")
-    private LocalDateTime updDt;
+    private LocalDateTime updDt; //수정일
 }
