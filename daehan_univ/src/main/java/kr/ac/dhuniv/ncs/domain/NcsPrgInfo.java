@@ -1,8 +1,8 @@
-package kr.ac.dhuniv.ncs_prg_info;
+package kr.ac.dhuniv.ncs.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.com_info.ComInfo;
-import kr.ac.dhuniv.core_cpt_info.CoreCptInfo;
+import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import lombok.*;
 
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.cnlr_schd;
+package kr.ac.dhuniv.counsel.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
