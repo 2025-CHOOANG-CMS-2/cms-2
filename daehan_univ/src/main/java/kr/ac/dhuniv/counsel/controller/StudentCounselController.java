@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.counsel.controller.student;
+package kr.ac.dhuniv.counsel.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
