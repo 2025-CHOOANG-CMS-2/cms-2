@@ -245,6 +245,16 @@
         color: #374151;
       }
 
+      /* 카테고리 배지 */
+      .category-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        background: #e0f2fe;
+        color: #0369a1;
+      }
+
       /* 액션 버튼 */
       .btn-action {
         padding: 0.25rem 0.5rem;
@@ -263,6 +273,16 @@
         background: #f9fafb;
         color: #374151;
         text-decoration: none;
+      }
+
+      .btn-view {
+        color: #059669;
+        border-color: #059669;
+      }
+
+      .btn-view:hover {
+        background: #ecfdf5;
+        color: #047857;
       }
 
       .btn-edit {
@@ -308,7 +328,7 @@
       .modal-content {
         background: white;
         border-radius: 12px;
-        max-width: 600px;
+        max-width: 800px;
         width: 100%;
         max-height: calc(100vh - 2rem);
         display: flex;
@@ -404,6 +424,12 @@
         gap: 1rem;
       }
 
+      .form-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+      }
+
       .modal-actions {
         display: flex;
         gap: 1rem;
@@ -441,6 +467,46 @@
 
       .btn-modal-primary:hover {
         background: #0f172a;
+      }
+
+      /* 상세 정보 스타일 */
+      .detail-section {
+        margin-bottom: 2rem;
+      }
+
+      .detail-section h3 {
+        color: #1a2a45;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .detail-item {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 6px;
+      }
+
+      .detail-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+      }
+
+      .detail-value {
+        color: #6b7280;
+      }
+
+      .detail-full {
+        grid-column: 1 / -1;
       }
 
       /* 페이지네이션 */
@@ -509,7 +575,12 @@
           overflow-x: auto;
         }
 
-        .form-row {
+        .form-row,
+        .form-row-3 {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-grid {
           grid-template-columns: 1fr;
         }
 
@@ -634,12 +705,12 @@
             id="categoryFilter"
           >
             <option value="">전체 카테고리</option>
-            <option value="leadership">리더십</option>
-            <option value="global">글로벌</option>
-            <option value="specialty">전문성</option>
-            <option value="ai">AI역량</option>
-            <option value="startup">창업</option>
-            <option value="counseling">상담</option>
+            <option value="1">리더십</option>
+            <option value="2">글로벌</option>
+            <option value="3">전문성</option>
+            <option value="4">AI역량</option>
+            <option value="5">창업</option>
+            <option value="6">상담</option>
           </select>
         </div>
       </div>
@@ -653,6 +724,7 @@
               <th>프로그램명</th>
               <th style="width: 100px">카테고리</th>
               <th style="width: 80px">정원</th>
+              <th style="width: 80px">마일리지</th>
               <th style="width: 120px">신청기간</th>
               <th style="width: 120px">운영기간</th>
               <th style="width: 100px">상태</th>
@@ -676,6 +748,35 @@
         </div>
       </div>
     </main>
+
+    <!-- 프로그램 상세 보기 모달 -->
+    <div class="modal-overlay" id="detailModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">프로그램 상세 정보</h2>
+          <button class="modal-close" onclick="closeDetailModal()">×</button>
+        </div>
+
+        <div class="modal-body" id="detailModalBody">
+          <!-- 상세 정보가 여기에 동적으로 생성됩니다 -->
+        </div>
+
+        <div class="modal-actions">
+          <button
+            class="btn-modal btn-modal-secondary"
+            onclick="closeDetailModal()"
+          >
+            닫기
+          </button>
+          <button
+            class="btn-modal btn-modal-primary"
+            onclick="editFromDetail()"
+          >
+            수정하기
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- 프로그램 등록/수정 모달 -->
     <div class="modal-overlay" id="programModal">
@@ -722,7 +823,7 @@
               ></textarea>
             </div>
 
-            <div class="form-row">
+            <div class="form-row-3">
               <div class="form-group">
                 <label class="form-label required">카테고리</label>
                 <select class="form-control" id="cciId" required>
@@ -745,6 +846,19 @@
                   placeholder="20"
                   min="1"
                   max="999"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required">마일리지</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="mileageScore"
+                  placeholder="10"
+                  min="0"
+                  max="100"
                   required
                 />
               </div>
@@ -793,6 +907,30 @@
                 />
               </div>
             </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">진행 장소</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="location"
+                  placeholder="예: 학술관 101호"
+                  maxlength="100"
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">담당자</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="manager"
+                  placeholder="예: 김교수"
+                  maxlength="50"
+                />
+              </div>
+            </div>
           </form>
         </div>
 
@@ -817,6 +955,9 @@
           prg_desc:
             "학업성취 향상 아이디어를 공모하는 사업으로 가장 좋은 아이디어를 발굴하는 프로그램",
           max_cnt: 20,
+          mileage_score: 15,
+          location: "학술관 대강당",
+          manager: "김교수",
           aply_bgng_ymd: "2024-11-01T09:00",
           aply_end_ymd: "2024-12-20T23:59",
           prg_st_dt: "2024-12-25T10:00",
@@ -836,6 +977,9 @@
           prg_desc:
             "다양한 문화권 사람들과의 의사소통 능력 향상을 위한 글로벌 리더십 발굴 프로그램",
           max_cnt: 15,
+          mileage_score: 20,
+          location: "국제교육원",
+          manager: "이교수",
           aply_bgng_ymd: "2024-10-15T09:00",
           aply_end_ymd: "2024-12-15T23:59",
           prg_st_dt: "2024-12-20T10:00",
@@ -855,6 +999,9 @@
           prg_desc:
             "인공지능 기술 이해와 활용 능력을 기르는 미래 지향적 역량 개발 프로그램",
           max_cnt: 12,
+          mileage_score: 25,
+          location: "AI연구센터",
+          manager: "박교수",
           aply_bgng_ymd: "2024-10-01T09:00",
           aply_end_ymd: "2024-12-10T23:59",
           prg_st_dt: "2024-12-15T10:00",
@@ -874,6 +1021,9 @@
           prg_desc:
             "팀프로젝트 활동을 통해 혁신과 창의 협업의 기초 리더십을 함양하는 프로그램",
           max_cnt: 25,
+          mileage_score: 12,
+          location: "창업보육센터",
+          manager: "최교수",
           aply_bgng_ymd: "2025-01-10T09:00",
           aply_end_ymd: "2025-02-10T23:59",
           prg_st_dt: "2025-02-15T10:00",
@@ -891,6 +1041,7 @@
       // DOM 요소들
       const programTableBody = document.getElementById("programTableBody");
       const programModal = document.getElementById("programModal");
+      const detailModal = document.getElementById("detailModal");
       const modalTitle = document.getElementById("modalTitle");
       const searchInput = document.getElementById("searchInput");
       const statusFilter = document.getElementById("statusFilter");
@@ -925,6 +1076,15 @@
           .replace(/\.$/, "");
       }
 
+      // 날짜와 시간 포맷팅
+      function formatDateTime(dateString) {
+        const date = new Date(dateString);
+        return date
+          .toLocaleString("ko-KR")
+          .replace(/\. /g, ".")
+          .replace(/\.$/, "");
+      }
+
       // 테이블 행 생성
       function createTableRow(program, index) {
         const status = getProgramStatus(program);
@@ -939,11 +1099,14 @@
               }</div>
             </td>
             <td>
-              <span class="status-badge status-${program.categoryName.toLowerCase()}">${
-          program.categoryName
-        }</span>
+              <span class="category-badge">${program.categoryName}</span>
             </td>
             <td>${program.max_cnt}명</td>
+            <td>
+              <span style="font-weight: 600; color: #1a2a45;">${
+                program.mileage_score
+              }점</span>
+            </td>
             <td>
               <div style="font-size: 0.85rem;">
                 ${formatDate(program.aply_bgng_ymd)}<br>
@@ -962,6 +1125,9 @@
         }</span>
             </td>
             <td>
+              <button class="btn-action btn-view" onclick="viewProgram(${
+                program.id
+              })">상세</button>
               <button class="btn-action btn-edit" onclick="editProgram(${
                 program.id
               })">수정</button>
@@ -1002,6 +1168,138 @@
         });
       }
 
+      // 프로그램 상세 보기
+      function viewProgram(id) {
+        const program = programs.find((p) => p.id === id);
+        if (!program) return;
+
+        const status = getProgramStatus(program);
+
+        const detailContent = `
+          <div class="detail-section">
+            <h3>기본 정보</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <div class="detail-label">프로그램 ID</div>
+                <div class="detail-value">${program.prg_id}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">카테고리</div>
+                <div class="detail-value">${program.categoryName}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">정원</div>
+                <div class="detail-value">${program.max_cnt}명</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">마일리지</div>
+                <div class="detail-value">${program.mileage_score}점</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">진행 장소</div>
+                <div class="detail-value">${program.location || "-"}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">담당자</div>
+                <div class="detail-value">${program.manager || "-"}</div>
+              </div>
+              <div class="detail-item detail-full">
+                <div class="detail-label">프로그램명</div>
+                <div class="detail-value" style="font-weight: 600; font-size: 1.1rem;">${
+                  program.prg_nm
+                }</div>
+              </div>
+              <div class="detail-item detail-full">
+                <div class="detail-label">프로그램 설명</div>
+                <div class="detail-value">${program.prg_desc || "-"}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>일정 정보</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <div class="detail-label">신청 시작일</div>
+                <div class="detail-value">${formatDateTime(
+                  program.aply_bgng_ymd
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">신청 종료일</div>
+                <div class="detail-value">${formatDateTime(
+                  program.aply_end_ymd
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">프로그램 시작일</div>
+                <div class="detail-value">${formatDateTime(
+                  program.prg_st_dt
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">프로그램 종료일</div>
+                <div class="detail-value">${formatDateTime(
+                  program.prg_end_dt
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">현재 상태</div>
+                <div class="detail-value">
+                  <span class="status-badge status-${status.status}">${
+          status.text
+        }</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>등록 정보</h3>
+            <div class="detail-grid">
+              <div class="detail-item">
+                <div class="detail-label">등록일시</div>
+                <div class="detail-value">${formatDateTime(
+                  program.reg_dt
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">등록자</div>
+                <div class="detail-value">${program.reg_user_id}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">수정일시</div>
+                <div class="detail-value">${formatDateTime(
+                  program.upd_dt
+                )}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">수정자</div>
+                <div class="detail-value">${program.upd_user_id}</div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.getElementById("detailModalBody").innerHTML = detailContent;
+        editingProgram = program;
+        detailModal.classList.add("show");
+        document.body.style.overflow = "hidden";
+      }
+
+      // 상세 모달에서 수정하기
+      function editFromDetail() {
+        closeDetailModal();
+        editProgram(editingProgram.id);
+      }
+
+      // 상세 모달 닫기
+      function closeDetailModal() {
+        detailModal.classList.remove("show");
+        document.body.style.overflow = "auto";
+        editingProgram = null;
+      }
+
       // 모달 열기 (새 프로그램)
       function openAddModal() {
         editingProgram = null;
@@ -1023,6 +1321,11 @@
           editingProgram.prg_desc || "";
         document.getElementById("cciId").value = editingProgram.cci_id;
         document.getElementById("maxCnt").value = editingProgram.max_cnt;
+        document.getElementById("mileageScore").value =
+          editingProgram.mileage_score;
+        document.getElementById("location").value =
+          editingProgram.location || "";
+        document.getElementById("manager").value = editingProgram.manager || "";
         document.getElementById("aplyBgngYmd").value =
           editingProgram.aply_bgng_ymd;
         document.getElementById("aplyEndYmd").value =
@@ -1049,6 +1352,11 @@
           prg_desc: document.getElementById("prgDesc").value,
           cci_id: parseInt(document.getElementById("cciId").value),
           max_cnt: parseInt(document.getElementById("maxCnt").value),
+          mileage_score: parseInt(
+            document.getElementById("mileageScore").value
+          ),
+          location: document.getElementById("location").value,
+          manager: document.getElementById("manager").value,
           aply_bgng_ymd: document.getElementById("aplyBgngYmd").value,
           aply_end_ymd: document.getElementById("aplyEndYmd").value,
           prg_st_dt: document.getElementById("prgStDt").value,
@@ -1061,6 +1369,7 @@
           !formData.prg_nm ||
           !formData.cci_id ||
           !formData.max_cnt ||
+          !formData.mileage_score ||
           !formData.aply_bgng_ymd ||
           !formData.aply_end_ymd ||
           !formData.prg_st_dt ||
@@ -1123,6 +1432,7 @@
             upd_user_id: "admin001",
           };
           programs.push(newProgram);
+
           alert("프로그램이 등록되었습니다.");
         }
 
@@ -1142,10 +1452,20 @@
         }
       });
 
+      detailModal.addEventListener("click", (e) => {
+        if (e.target === detailModal) {
+          closeDetailModal();
+        }
+      });
+
       // ESC 키로 모달 닫기
       document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && programModal.classList.contains("show")) {
-          closeModal();
+        if (e.key === "Escape") {
+          if (detailModal.classList.contains("show")) {
+            closeDetailModal();
+          } else if (programModal.classList.contains("show")) {
+            closeModal();
+          }
         }
       });
 
@@ -1153,31 +1473,28 @@
       const hamburger = document.getElementById("hamburger");
       const sidebar = document.getElementById("sidebar");
 
-      if (window.innerWidth <= 768) {
-        hamburger.style.display = "inline-block";
-        sidebar.style.left = "-240px";
-        document.querySelector(".main-content").style.marginLeft = "0";
-      }
-
-      hamburger.addEventListener("click", () => {
-        sidebar.classList.toggle("show");
-      });
-
-      // 윈도우 리사이즈 이벤트
-      window.addEventListener("resize", () => {
+      function updateSidebarVisibility() {
         if (window.innerWidth <= 768) {
           hamburger.style.display = "inline-block";
-          if (!sidebar.classList.contains("show")) {
-            sidebar.style.left = "-240px";
-            document.querySelector(".main-content").style.marginLeft = "0";
-          }
+          sidebar.style.left = "-240px";
+          document.querySelector(".main-content").style.marginLeft = "0";
         } else {
           hamburger.style.display = "none";
           sidebar.style.left = "0";
           sidebar.classList.remove("show");
           document.querySelector(".main-content").style.marginLeft = "240px";
         }
+      }
+
+      // 초기 사이드바 설정
+      updateSidebarVisibility();
+
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
       });
+
+      // 윈도우 리사이즈 이벤트
+      window.addEventListener("resize", updateSidebarVisibility);
 
       // 초기 렌더링
       renderTable();
