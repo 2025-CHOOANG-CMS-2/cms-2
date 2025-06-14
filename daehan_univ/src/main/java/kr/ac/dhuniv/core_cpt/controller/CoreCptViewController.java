@@ -8,25 +8,25 @@ public class CoreCptViewController {
 
 	@GetMapping("/employees/core-empl-cpt")
 	public String getEmpCorePage() {
-		return "employee/admin-competency-management"; 
+		return "employee/competency/admin-competency-management";
 			
 	}
 	@GetMapping("/employees/core-diagnosis-cpt")
 	public String getEmpDiagnosisPage() {
-		return "employee/admin-diagnosis-management"; 
+		return "employee/competency/admin-diagnosis-management";
 			
 	}
 	@GetMapping("/employees/core-diagnosis-result")
 	public String getEmpCoreResultPage() {
-		return "employee/admin-diagnosis-result";
+		return "employee/competency/admin-diagnosis-result";
 	}
 	
 	@GetMapping("/students/competency-diagnosis")
 	public String getStudentCompetencyPage() {
-		return "student/competency-diagnosis";
+		return "student/competency/competency-diagnosis";
 	}
 	@GetMapping("/students/history")
 	public String getStudentCompetencyHistoryPage() {
-		return "student/diagnosis-history";
+		return "student/competency/diagnosis-history";
 	}
 }

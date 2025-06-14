@@ -6,24 +6,19 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "core_cpt_qst")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class CoreCptQst {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id; // 자동 증가 PK
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "qst_id", length = 20, nullable = false, unique = true)
-    private String qstId; // 비즈니스 키
+    private String qstId;
 
+    // core_cpt_qst.cci_id → core_cpt_info.id
+    // CoreCptQst.java
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cci_id")
-    private CoreCptInfo coreCptInfo; //연관된 핵심역량
+    @JoinColumn(name = "core_cpt_info_id")    // 기존 cci_id → core_cpt_info_id
+    private CoreCptInfo coreCptInfo;
 
     @Column(name = "qst_cont", length = 500)
     private String qstCont; //문항 내용
