@@ -13,6 +13,8 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
       /* 공통 스타일 */
       body {
@@ -503,6 +505,47 @@
           justify-content: flex-end;
         }
       }
+
+      .detail-section-title {
+        color: #1a2a45;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .program-status-banner {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .program-status-banner.pending {
+        background-color: #fff7ed;
+        border: 1px solid #fdba74;
+      }
+
+      .program-status-banner.ongoing {
+        background-color: #f0fdf4;
+        border: 1px solid #86efac;
+      }
+
+      .program-status-banner.completed {
+        background-color: #eff6ff;
+        border: 1px solid #93c5fd;
+      }
+
+      .program-status-banner.rejected {
+        background-color: #fef2f2;
+        border: 1px solid #fca5a5;
+      }
+
+      .modal-lg {
+        max-width: 800px;
+      }
     </style>
   </head>
   <body>
@@ -659,6 +702,69 @@
 
       <!-- 페이지네이션 추가 -->
       <div id="pagination" class="d-flex justify-content-center mt-4"></div>
+
+      <!-- 상세보기 모달 -->
+      <div
+        class="modal fade"
+        id="programDetailModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"></h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="program-detail-content">
+                <div class="program-status-banner mb-4"></div>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <h6 class="detail-section-title">프로그램 정보</h6>
+                    <table class="table table-sm">
+                      <tr>
+                        <th width="100">카테고리</th>
+                        <td class="program-category"></td>
+                      </tr>
+                      <tr>
+                        <th>신청일</th>
+                        <td class="program-application-date"></td>
+                      </tr>
+                      <tr>
+                        <th>진행기간</th>
+                        <td class="program-period"></td>
+                      </tr>
+                      <tr>
+                        <th>장소</th>
+                        <td class="program-location"></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="detail-section-title">진행 현황</h6>
+                    <div class="program-description"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
 
     <script>
@@ -775,8 +881,6 @@
 
       // 프로그램 항목 생성
       function createProgramItem(program) {
-        const actions = `<a href="#" class="btn-action">상세정보</a>`;
-
         return `
           <div class="program-item">
             <div class="program-icon-wrapper ${program.category}">
@@ -801,7 +905,11 @@
               }</div>
             </div>
             <div class="program-actions">
-              ${actions}
+              <button class="btn-action" onclick="showProgramDetail(${
+                program.id
+              })">
+                <i class="bi bi-info-circle me-1"></i>상세정보
+              </button>
             </div>
           </div>
         `;
@@ -844,7 +952,68 @@
         `;
       }
 
-      // 프로그램 목록 렌더링
+      // 모달 초기화 및 관련 함수들
+      let programDetailModal;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // 모달 인스턴스 초기화
+        programDetailModal = new bootstrap.Modal(
+          document.getElementById("programDetailModal")
+        );
+      });
+
+      // 프로그램 상세정보 표시
+      function showProgramDetail(programId) {
+        const program = myPrograms.find((p) => p.id === programId);
+        if (!program) return;
+
+        // 모달 내용 업데이트
+        const modal = document.getElementById("programDetailModal");
+        modal.querySelector(".modal-title").textContent = program.title;
+
+        // 상태 배너 업데이트
+        const statusBanner = modal.querySelector(".program-status-banner");
+        statusBanner.className = `program-status-banner ${program.status}`;
+
+        // 상태별 아이콘과 메시지
+        const statusIcons = {
+          pending: "bi-clock",
+          ongoing: "bi-play-circle",
+          completed: "bi-check-circle",
+          rejected: "bi-x-circle",
+        };
+
+        const statusMessages = {
+          pending: "관리자의 승인을 기다리고 있습니다.",
+          ongoing: "프로그램이 진행 중입니다.",
+          completed: "프로그램을 성공적으로 이수했습니다.",
+          rejected: "신청이 반려되었습니다.",
+        };
+
+        // 상태 배너 내용 업데이트
+        statusBanner.innerHTML = `
+          <i class="bi ${statusIcons[program.status]} fs-4"></i>
+          <div>
+            <div class="fw-bold">${program.statusText}</div>
+            <div class="small">${statusMessages[program.status]}</div>
+          </div>
+        `;
+
+        // 프로그램 정보 업데이트
+        modal.querySelector(".program-category").textContent =
+          program.categoryName;
+        modal.querySelector(".program-application-date").textContent =
+          program.applicationDate;
+        modal.querySelector(".program-period").textContent = program.period;
+        modal.querySelector(".program-location").textContent = program.location;
+        modal.querySelector(".program-description").textContent =
+          program.description;
+
+        // 모달 표시
+        programDetailModal.show();
+      }
+
+      // 페이지 목록 렌더링
       function renderPrograms(tab = "all", page = 1) {
         let filteredPrograms = myPrograms;
 
@@ -856,7 +1025,7 @@
 
         if (filteredPrograms.length === 0) {
           programList.innerHTML = createEmptyState(tab);
-          pagination.innerHTML = '';
+          pagination.innerHTML = "";
           return;
         }
 
@@ -867,7 +1036,9 @@
         const paginatedPrograms = filteredPrograms.slice(startIndex, endIndex);
 
         // 프로그램 목록 렌더링
-        programList.innerHTML = paginatedPrograms.map(createProgramItem).join("");
+        programList.innerHTML = paginatedPrograms
+          .map(createProgramItem)
+          .join("");
 
         // 페이지네이션 렌더링
         renderPagination(totalPages, page);
@@ -876,14 +1047,14 @@
       // 페이지네이션 버튼 렌더링 함수
       function renderPagination(totalPages, currentPage) {
         if (totalPages <= 1) {
-          pagination.innerHTML = '';
+          pagination.innerHTML = "";
           return;
         }
 
         let html = `
           <nav aria-label="프로그램 목록 페이지">
             <ul class="pagination">
-              <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+              <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
                 <a class="page-link" href="#" data-page="${currentPage - 1}">
                   <span aria-hidden="true">&laquo;</span>
                 </a>
@@ -892,14 +1063,16 @@
 
         for (let i = 1; i <= totalPages; i++) {
           html += `
-            <li class="page-item ${currentPage === i ? 'active' : ''}">
+            <li class="page-item ${currentPage === i ? "active" : ""}">
               <a class="page-link" href="#" data-page="${i}">${i}</a>
             </li>
           `;
         }
 
         html += `
-              <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+              <li class="page-item ${
+                currentPage === totalPages ? "disabled" : ""
+              }">
                 <a class="page-link" href="#" data-page="${currentPage + 1}">
                   <span aria-hidden="true">&raquo;</span>
                 </a>
@@ -911,10 +1084,12 @@
         pagination.innerHTML = html;
 
         // 페이지네이션 클릭 이벤트
-        pagination.querySelectorAll('.page-link').forEach(link => {
-          link.addEventListener('click', (e) => {
+        pagination.querySelectorAll(".page-link").forEach((link) => {
+          link.addEventListener("click", (e) => {
             e.preventDefault();
-            const newPage = parseInt(e.target.closest('.page-link').dataset.page);
+            const newPage = parseInt(
+              e.target.closest(".page-link").dataset.page
+            );
             if (!isNaN(newPage) && newPage > 0 && newPage <= totalPages) {
               currentPage = newPage;
               renderPrograms(currentTab, currentPage);
