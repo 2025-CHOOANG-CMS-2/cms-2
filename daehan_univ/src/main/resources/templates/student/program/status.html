@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 내 프로그램 현황</title>
+    <!-- Bootstrap & Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+      /* 공통 스타일 */
+      body {
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      /* 헤더 영역 */
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #1a2a45;
+        color: white;
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .header-left {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .header-center {
+        flex: 1;
+        text-align: center;
+        font-size: 1.2rem;
+      }
+      .header-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.9rem;
+        gap: 1rem;
+      }
+
+      /* 사용자 정보 및 버튼 */
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .user-info {
+        text-align: right;
+        line-height: 1.2;
+      }
+      .user-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+      }
+      .user-btn:hover {
+        color: #ffc107;
+      }
+
+      /* 사이드바 */
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: 100%;
+        background-color: #1a2a45;
+        padding: 1rem 0;
+        color: white;
+        z-index: 1030;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar-user-info {
+        display: none;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .sidebar-user-info div {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+
+      /* 본문 */
+      .main-content {
+        margin-top: 60px;
+        margin-left: 240px;
+        padding: 1.5rem;
+      }
+
+      /* 메뉴 스타일 */
+      .nav-link {
+        color: #e0e8f0;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        background-color: #223a5e;
+        color: #ffffff;
+      }
+      .nav-link.active {
+        background-color: #2b4d77;
+        font-weight: bold;
+      }
+      .submenu {
+        background-color: #223a5e;
+      }
+      .submenu a {
+        padding-left: 2.5rem;
+        font-size: 0.95rem;
+      }
+      .has-submenu::after {
+        content: "\25BC";
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+
+      /* 햄버거 메뉴 (모바일) */
+      .hamburger {
+        display: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+      }
+
+      /* 페이지 헤더 */
+      .page-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .page-title {
+        color: #1a2a45;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .page-subtitle {
+        color: #666;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+      }
+
+      /* 통계 카드 */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 1rem; /* 1.5rem에서 1rem으로 줄임 */
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid transparent;
+        transition: transform 0.2s;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
+
+      .stat-card.pending {
+        border-left-color: #f59e0b;
+      }
+
+      .stat-card.ongoing {
+        border-left-color: #10b981;
+      }
+
+      .stat-card.completed {
+        border-left-color: #3b82f6;
+      }
+
+      .stat-card.rejected {
+        border-left-color: #ef4444;
+      }
+
+      .stat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.5rem; /* 1rem에서 0.5rem으로 줄임 */
+      }
+
+      .stat-icon {
+        width: 32px; /* 40px에서 32px로 줄임 */
+        height: 32px; /* 40px에서 32px로 줄임 */
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1rem; /* 1.2rem에서 1rem으로 줄임 */
+      }
+
+      .stat-icon.pending {
+        background: #f59e0b;
+      }
+
+      .stat-icon.ongoing {
+        background: #10b981;
+      }
+
+      .stat-icon.completed {
+        background: #3b82f6;
+      }
+
+      .stat-icon.rejected {
+        background: #ef4444;
+      }
+
+      .stat-number {
+        font-size: 1.5rem; /* 2rem에서 1.5rem으로 줄임 */
+        font-weight: bold;
+        color: #1a2a45;
+      }
+
+      .stat-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* 탭 네비게이션 */
+      .tab-navigation {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+        overflow: hidden;
+      }
+
+      .tab-list {
+        display: flex;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .tab-button {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        background: none;
+        border: none;
+        color: #6b7280;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-bottom: 2px solid transparent;
+      }
+
+      .tab-button.active {
+        color: #1a2a45;
+        border-bottom-color: #1a2a45;
+        background: #f9fafb;
+      }
+
+      .tab-button:hover:not(.active) {
+        background: #f9fafb;
+      }
+
+      /* 프로그램 리스트 */
+      .program-list {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .program-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: background-color 0.2s;
+      }
+
+      .program-item:last-child {
+        border-bottom: none;
+      }
+
+      .program-item:hover {
+        background: #f9fafb;
+      }
+
+      .program-icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+
+      .program-icon-wrapper.leadership {
+        background: #8b5cf6;
+      }
+
+      .program-icon-wrapper.global {
+        background: #3b82f6;
+      }
+
+      .program-icon-wrapper.specialty {
+        background: #10b981;
+      }
+
+      .program-icon-wrapper.ai {
+        background: #f59e0b;
+      }
+
+      .program-icon-wrapper.startup {
+        background: #ef4444;
+      }
+
+      .program-icon-wrapper.counseling {
+        background: #ec4899;
+      }
+
+      .program-details {
+        flex: 1;
+      }
+
+      .program-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a2a45;
+        margin: 0 0 0.25rem 0;
+      }
+
+      .program-meta {
+        display: flex;
+        gap: 1rem;
+        color: #6b7280;
+        font-size: 0.85rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .program-status {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .status-pending {
+        background: #fef3c7;
+        color: #92400e;
+      }
+
+      .status-ongoing {
+        background: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-completed {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+
+      .status-rejected {
+        background: #fee2e2;
+        color: #991b1b;
+      }
+
+      .program-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+
+      .btn-action {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+
+      .btn-action:hover {
+        background: #f9fafb;
+        color: #374151;
+        text-decoration: none;
+      }
+
+      .btn-primary {
+        background: #1a2a45;
+        color: white;
+        border-color: #1a2a45;
+      }
+
+      .btn-primary:hover {
+        background: #0f172a;
+        color: white;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1.5rem;
+        color: #6b7280;
+      }
+
+      .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+      }
+
+      .empty-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #374151;
+      }
+
+      .empty-description {
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -240px;
+          transition: left 0.3s ease;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: inline-block;
+          margin-right: 1rem;
+        }
+        .header-right {
+          display: none;
+        }
+        .sidebar-user-info {
+          display: block;
+        }
+
+        .stats-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .tab-list {
+          flex-wrap: wrap;
+        }
+
+        .tab-button {
+          flex: 1 1 50%;
+        }
+
+        .program-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .program-details {
+          width: 100%;
+        }
+
+        .program-actions {
+          width: 100%;
+          justify-content: flex-end;
+        }
+      }
+
+      .detail-section-title {
+        color: #1a2a45;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      .program-status-banner {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .program-status-banner.pending {
+        background-color: #fff7ed;
+        border: 1px solid #fdba74;
+      }
+
+      .program-status-banner.ongoing {
+        background-color: #f0fdf4;
+        border: 1px solid #86efac;
+      }
+
+      .program-status-banner.completed {
+        background-color: #eff6ff;
+        border: 1px solid #93c5fd;
+      }
+
+      .program-status-banner.rejected {
+        background-color: #fef2f2;
+        border: 1px solid #fca5a5;
+      }
+
+      .modal-lg {
+        max-width: 800px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 상단 헤더 -->
+    <header class="header d-flex">
+      <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 학생포털
+      </div>
+      <div class="header-center">
+        <img
+          src="../../static/images/logo-white.png"
+          alt="logo"
+          height="30"
+          class="me-2"
+        />
+        대한대학교
+      </div>
+      <div class="header-right" id="user-info">
+        <!-- 로그인 상태 -->
+        <div id="user-logged-in" class="user-box">
+          <div class="user-info">
+            <div><strong>홍길동</strong> (20231234)</div>
+            <div class="small">컴퓨터공학과 3학년</div>
+          </div>
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- 좌측 사이드바 -->
+    <aside class="sidebar" id="sidebar">
+      <!-- 모바일에서 사용자 정보 표시 -->
+      <div class="sidebar-user-info">
+        <div><strong>홍길동</strong> (20231234)</div>
+        <div>컴퓨터공학과 3학년</div>
+        <div class="mt-2">
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i> 로그아웃
+          </button>
+        </div>
+      </div>
+      <!-- 메뉴 항목 -->
+      <nav class="nav flex-column">
+        <a class="nav-link" href="/notice">공지사항</a>
+        <a class="nav-link has-submenu" href="/competency" data-menu="역량"
+          >핵심역량개발</a
+        >
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="/competency/test">진단검사</a>
+          <a class="nav-link" href="/competency/history">진단결과이력</a>
+        </div>
+        <a
+          class="nav-link has-submenu active"
+          href="/program"
+          data-menu="비교과"
+          >비교과프로그램</a
+        >
+        <div class="submenu" id="submenu-비교과" style="display: block">
+          <a class="nav-link" href="/program/list">프로그램 목록</a>
+          <a class="nav-link active" href="/program/status"
+            >프로그램 참여 현황</a
+          >
+        </div>
+        <a class="nav-link has-submenu" href="/counseling" data-menu="상담"
+          >상담센터</a
+        >
+        <div class="submenu" id="submenu-상담" style="display: none">
+          <a class="nav-link" href="/counseling/reservation">상담 예약</a>
+          <a class="nav-link" href="/counseling/applications">상담 신청 내역</a>
+          <a class="nav-link" href="/counseling/results">상담결과</a>
+        </div>
+        <a class="nav-link" href="/mileage">마일리지</a>
+        <a class="nav-link" href="/mypage">마이페이지</a>
+      </nav>
+    </aside>
+
+    <!-- 본문 영역 -->
+    <main class="main-content">
+      <!-- 페이지 헤더 -->
+      <div class="page-header">
+        <h1 class="page-title">내 프로그램 현황</h1>
+        <p class="page-subtitle">
+          신청하고 참여 중인 프로그램의 현황을 확인할 수 있습니다.
+        </p>
+      </div>
+
+      <!-- 통계 카드 -->
+      <div class="stats-grid">
+        <div class="stat-card pending">
+          <div class="stat-header">
+            <div class="stat-icon pending">
+              <i class="bi bi-clock"></i>
+            </div>
+            <div>
+              <div class="stat-number" id="pendingCount">2</div>
+              <div class="stat-label">대기중</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card ongoing">
+          <div class="stat-header">
+            <div class="stat-icon ongoing">
+              <i class="bi bi-play-circle"></i>
+            </div>
+            <div>
+              <div class="stat-number" id="ongoingCount">1</div>
+              <div class="stat-label">진행중</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card completed">
+          <div class="stat-header">
+            <div class="stat-icon completed">
+              <i class="bi bi-check-circle"></i>
+            </div>
+            <div>
+              <div class="stat-number" id="completedCount">3</div>
+              <div class="stat-label">이수</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card rejected">
+          <div class="stat-header">
+            <div class="stat-icon rejected">
+              <i class="bi bi-x-circle"></i>
+            </div>
+            <div>
+              <div class="stat-number" id="rejectedCount">0</div>
+              <div class="stat-label">반려</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 탭 네비게이션 -->
+      <div class="tab-navigation">
+        <div class="tab-list">
+          <button class="tab-button active" data-tab="all">전체</button>
+          <button class="tab-button" data-tab="pending">대기중</button>
+          <button class="tab-button" data-tab="ongoing">진행중</button>
+          <button class="tab-button" data-tab="completed">이수</button>
+        </div>
+      </div>
+
+      <!-- 프로그램 리스트 -->
+      <div class="program-list" id="programList">
+        <!-- 프로그램 항목들이 여기에 동적으로 생성됩니다 -->
+      </div>
+
+      <!-- 페이지네이션 추가 -->
+      <div id="pagination" class="d-flex justify-content-center mt-4"></div>
+
+      <!-- 상세보기 모달 -->
+      <div
+        class="modal fade"
+        id="programDetailModal"
+        tabindex="-1"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title"></h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="program-detail-content">
+                <div class="program-status-banner mb-4"></div>
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <h6 class="detail-section-title">프로그램 정보</h6>
+                    <table class="table table-sm">
+                      <tr>
+                        <th width="100">카테고리</th>
+                        <td class="program-category"></td>
+                      </tr>
+                      <tr>
+                        <th>신청일</th>
+                        <td class="program-application-date"></td>
+                      </tr>
+                      <tr>
+                        <th>진행기간</th>
+                        <td class="program-period"></td>
+                      </tr>
+                      <tr>
+                        <th>장소</th>
+                        <td class="program-location"></td>
+                      </tr>
+                    </table>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="detail-section-title">진행 현황</h6>
+                    <div class="program-description"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // 내 프로그램 데이터
+      const myPrograms = [
+        {
+          id: 1,
+          title: "창의 아이디어 경진대회",
+          category: "leadership",
+          categoryName: "리더십",
+          status: "pending",
+          statusText: "신청 승인 대기",
+          applicationDate: "2024.12.10",
+          period: "2024.12.25 ~ 2025.01.25",
+          location: "학생회관",
+          description: "신청서 제출 완료, 승인 결과 대기 중",
+        },
+        {
+          id: 2,
+          title: "글로벌 리더십 탐구",
+          category: "global",
+          categoryName: "글로벌",
+          status: "ongoing",
+          statusText: "참여중",
+          applicationDate: "2024.11.20",
+          period: "2024.12.20 ~ 2025.02.05",
+          location: "국제관",
+          description: "현재 2단계 문화 프로젝트 진행 중",
+        },
+        {
+          id: 3,
+          title: "소통과 협업 프로젝트",
+          category: "specialty",
+          categoryName: "전문성",
+          status: "pending",
+          statusText: "신청 승인 대기",
+          applicationDate: "2024.12.12",
+          period: "2025.01.05 ~ 2025.02.15",
+          location: "학생활동센터",
+          description: "신청서 제출 완료, 승인 결과 대기 중",
+        },
+        {
+          id: 4,
+          title: "AI 기초 워크샵",
+          category: "ai",
+          categoryName: "AI역량",
+          status: "completed",
+          statusText: "이수 완료",
+          applicationDate: "2024.09.15",
+          period: "2024.10.01 ~ 2024.11.15",
+          location: "IT센터",
+          description: "프로그램 이수 완료, 평가점수 4.8/5.0",
+        },
+        {
+          id: 5,
+          title: "창업 아이디어 발굴",
+          category: "startup",
+          categoryName: "창업",
+          status: "completed",
+          statusText: "이수 완료",
+          applicationDate: "2024.08.01",
+          period: "2024.08.15 ~ 2024.09.30",
+          location: "창업지원센터",
+          description: "우수 아이디어 선정, 이수 완료",
+        },
+        {
+          id: 6,
+          title: "리더십 기초과정",
+          category: "leadership",
+          categoryName: "리더십",
+          status: "completed",
+          statusText: "이수 완료",
+          applicationDate: "2024.06.10",
+          period: "2024.07.01 ~ 2024.08.15",
+          location: "학생회관",
+          description: "리더십 기초과정 이수, 심화과정 추천",
+        },
+      ];
+
+      // DOM 요소들
+      const programList = document.getElementById("programList");
+      const tabButtons = document.querySelectorAll(".tab-button");
+      const sidebar = document.getElementById("sidebar");
+      const hamburger = document.getElementById("hamburger");
+      const pagination = document.getElementById("pagination");
+
+      let currentTab = "all";
+      let currentPage = 1;
+      const itemsPerPage = 5; // 페이지당 5개 항목으로 변경
+
+      // 카테고리별 아이콘 반환
+      function getIconByCategory(category) {
+        const icons = {
+          leadership: "bi-trophy",
+          global: "bi-globe",
+          specialty: "bi-gear",
+          ai: "bi-cpu",
+          startup: "bi-lightbulb",
+          counseling: "bi-chat-heart",
+        };
+        return icons[category] || "bi-star";
+      }
+
+      // 상태별 한국어 텍스트
+      function getStatusText(status) {
+        const statusTexts = {
+          pending: "대기중",
+          ongoing: "진행중",
+          completed: "완료",
+          rejected: "반려",
+        };
+        return statusTexts[status] || status;
+      }
+
+      // 프로그램 항목 생성
+      function createProgramItem(program) {
+        return `
+          <div class="program-item">
+            <div class="program-icon-wrapper ${program.category}">
+              <i class="bi ${getIconByCategory(program.category)}"></i>
+            </div>
+            <div class="program-details">
+              <h3 class="program-name">${program.title}</h3>
+              <div class="program-meta">
+                <span><i class="bi bi-calendar3"></i> 신청일: ${
+                  program.applicationDate
+                }</span>
+                <span><i class="bi bi-clock"></i> 기간: ${program.period}</span>
+                <span><i class="bi bi-geo-alt"></i> ${program.location}</span>
+              </div>
+              <div style="margin-bottom: 0.5rem;">
+                <span class="program-status status-${program.status}">${
+          program.statusText
+        }</span>
+              </div>
+              <div style="color: #6b7280; font-size: 0.9rem;">${
+                program.description
+              }</div>
+            </div>
+            <div class="program-actions">
+              <button class="btn-action" onclick="showProgramDetail(${
+                program.id
+              })">
+                <i class="bi bi-info-circle me-1"></i>상세정보
+              </button>
+            </div>
+          </div>
+        `;
+      }
+
+      // 빈 상태 메시지 생성
+      function createEmptyState(tab) {
+        const messages = {
+          all: {
+            icon: "bi-inbox",
+            title: "참여한 프로그램이 없습니다",
+            description: "새로운 프로그램에 신청해보세요!",
+          },
+          pending: {
+            icon: "bi-clock",
+            title: "대기 중인 프로그램이 없습니다",
+            description: "새로운 프로그램에 신청하거나 승인을 기다려주세요.",
+          },
+          ongoing: {
+            icon: "bi-play-circle",
+            title: "진행 중인 프로그램이 없습니다",
+            description: "승인된 프로그램이 시작되면 여기에 표시됩니다.",
+          },
+          completed: {
+            icon: "bi-check-circle",
+            title: "이수한 프로그램이 없습니다",
+            description: "프로그램을 완주하면 여기에 표시됩니다.",
+          },
+        };
+
+        const message = messages[tab];
+        return `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <i class="bi ${message.icon}"></i>
+            </div>
+            <div class="empty-title">${message.title}</div>
+            <div class="empty-description">${message.description}</div>
+          </div>
+        `;
+      }
+
+      // 모달 초기화 및 관련 함수들
+      let programDetailModal;
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // 모달 인스턴스 초기화
+        programDetailModal = new bootstrap.Modal(
+          document.getElementById("programDetailModal")
+        );
+      });
+
+      // 프로그램 상세정보 표시
+      function showProgramDetail(programId) {
+        const program = myPrograms.find((p) => p.id === programId);
+        if (!program) return;
+
+        // 모달 내용 업데이트
+        const modal = document.getElementById("programDetailModal");
+        modal.querySelector(".modal-title").textContent = program.title;
+
+        // 상태 배너 업데이트
+        const statusBanner = modal.querySelector(".program-status-banner");
+        statusBanner.className = `program-status-banner ${program.status}`;
+
+        // 상태별 아이콘과 메시지
+        const statusIcons = {
+          pending: "bi-clock",
+          ongoing: "bi-play-circle",
+          completed: "bi-check-circle",
+          rejected: "bi-x-circle",
+        };
+
+        const statusMessages = {
+          pending: "관리자의 승인을 기다리고 있습니다.",
+          ongoing: "프로그램이 진행 중입니다.",
+          completed: "프로그램을 성공적으로 이수했습니다.",
+          rejected: "신청이 반려되었습니다.",
+        };
+
+        // 상태 배너 내용 업데이트
+        statusBanner.innerHTML = `
+          <i class="bi ${statusIcons[program.status]} fs-4"></i>
+          <div>
+            <div class="fw-bold">${program.statusText}</div>
+            <div class="small">${statusMessages[program.status]}</div>
+          </div>
+        `;
+
+        // 프로그램 정보 업데이트
+        modal.querySelector(".program-category").textContent =
+          program.categoryName;
+        modal.querySelector(".program-application-date").textContent =
+          program.applicationDate;
+        modal.querySelector(".program-period").textContent = program.period;
+        modal.querySelector(".program-location").textContent = program.location;
+        modal.querySelector(".program-description").textContent =
+          program.description;
+
+        // 모달 표시
+        programDetailModal.show();
+      }
+
+      // 페이지 목록 렌더링
+      function renderPrograms(tab = "all", page = 1) {
+        let filteredPrograms = myPrograms;
+
+        if (tab !== "all") {
+          filteredPrograms = myPrograms.filter(
+            (program) => program.status === tab
+          );
+        }
+
+        if (filteredPrograms.length === 0) {
+          programList.innerHTML = createEmptyState(tab);
+          pagination.innerHTML = "";
+          return;
+        }
+
+        // 페이지네이션 계산
+        const totalPages = Math.ceil(filteredPrograms.length / itemsPerPage);
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedPrograms = filteredPrograms.slice(startIndex, endIndex);
+
+        // 프로그램 목록 렌더링
+        programList.innerHTML = paginatedPrograms
+          .map(createProgramItem)
+          .join("");
+
+        // 페이지네이션 렌더링
+        renderPagination(totalPages, page);
+      }
+
+      // 페이지네이션 버튼 렌더링 함수
+      function renderPagination(totalPages, currentPage) {
+        if (totalPages <= 1) {
+          pagination.innerHTML = "";
+          return;
+        }
+
+        let html = `
+          <nav aria-label="프로그램 목록 페이지">
+            <ul class="pagination">
+              <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+              </li>
+        `;
+
+        for (let i = 1; i <= totalPages; i++) {
+          html += `
+            <li class="page-item ${currentPage === i ? "active" : ""}">
+              <a class="page-link" href="#" data-page="${i}">${i}</a>
+            </li>
+          `;
+        }
+
+        html += `
+              <li class="page-item ${
+                currentPage === totalPages ? "disabled" : ""
+              }">
+                <a class="page-link" href="#" data-page="${currentPage + 1}">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        `;
+
+        pagination.innerHTML = html;
+
+        // 페이지네이션 클릭 이벤트
+        pagination.querySelectorAll(".page-link").forEach((link) => {
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const newPage = parseInt(
+              e.target.closest(".page-link").dataset.page
+            );
+            if (!isNaN(newPage) && newPage > 0 && newPage <= totalPages) {
+              currentPage = newPage;
+              renderPrograms(currentTab, currentPage);
+            }
+          });
+        });
+      }
+
+      // 통계 업데이트
+      function updateStats() {
+        const stats = {
+          pending: myPrograms.filter((p) => p.status === "pending").length,
+          ongoing: myPrograms.filter((p) => p.status === "ongoing").length,
+          completed: myPrograms.filter((p) => p.status === "completed").length,
+          rejected: myPrograms.filter((p) => p.status === "rejected").length,
+        };
+
+        document.getElementById("pendingCount").textContent = stats.pending;
+        document.getElementById("ongoingCount").textContent = stats.ongoing;
+        document.getElementById("completedCount").textContent = stats.completed;
+        document.getElementById("rejectedCount").textContent = stats.rejected;
+      }
+
+      // 탭 이벤트 리스너
+      tabButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          tabButtons.forEach((btn) => btn.classList.remove("active"));
+          button.classList.add("active");
+          currentTab = button.dataset.tab;
+          currentPage = 1; // 탭 변경시 첫 페이지로 리셋
+          renderPrograms(currentTab, currentPage);
+        });
+      });
+
+      // 사이드바 토글
+      hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+      });
+
+      // 서브메뉴 토글
+      const menuLinks = document.querySelectorAll("[data-menu]");
+      menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+          e.preventDefault();
+          const key = menu.getAttribute("data-menu");
+          const submenu = document.getElementById(`submenu-${key}`);
+
+          document.querySelectorAll(".submenu").forEach((sm) => {
+            if (sm !== submenu) sm.style.display = "none";
+          });
+
+          if (submenu) {
+            submenu.style.display =
+              submenu.style.display === "block" ? "none" : "block";
+          }
+        });
+      });
+
+      // 초기화
+      updateStats();
+      renderPrograms(currentTab, currentPage);
+    </script>
+  </body>
+</html>

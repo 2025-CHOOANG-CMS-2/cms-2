@@ -1,10 +1,10 @@
-package kr.ac.dhuniv.std_info;
+package kr.ac.dhuniv.std_info.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.user.User;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "std_info")
@@ -33,7 +33,7 @@ public class StdInfo {
     private Integer schoolYear;
 
     @Column(name = "entr_dt")
-    private LocalDateTime entranceDate;
+    private LocalDate entranceDate;
 
     @Column(name = "std_stat_cd", length = 10)
     private String statusCode;

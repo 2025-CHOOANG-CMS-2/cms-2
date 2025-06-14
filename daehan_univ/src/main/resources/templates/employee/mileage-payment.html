@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마일리지 지급 관리 - 교직원 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Tab Navigation Styles */
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: 2px solid transparent;
+            border-radius: 10px 10px 0 0;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            margin-right: 0.25rem;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+            border-color: var(--secondary-color);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Management Cards */
+        .management-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .management-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Program Selection */
+        .program-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .program-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .program-item:hover {
+            background-color: #f8f9fa;
+            border-color: var(--secondary-color);
+        }
+
+        .program-item.selected {
+            background-color: rgba(52, 152, 219, 0.1);
+            border-color: var(--secondary-color);
+        }
+
+        .program-info {
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .program-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .program-details {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .program-points {
+            font-weight: bold;
+            color: var(--success-color);
+            font-size: 1.1rem;
+        }
+
+        /* Student List */
+        .student-list-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .student-table {
+            margin-bottom: 0;
+        }
+
+        .student-table th {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .student-table th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .student-table th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .student-table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .student-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Search and Filter */
+        .search-filter-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Payment History Table */
+        .payment-history-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .payment-table {
+            margin-bottom: 0;
+        }
+
+        .payment-table th {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .payment-table th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .payment-table th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .payment-table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .payment-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-pending {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        /* Category Badges */
+        .category-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .badge-leadership {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .badge-creativity {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .badge-volunteer {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .badge-academic {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .badge-career {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-action {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 15px;
+        }
+
+        /* Pagination */
+        .pagination-custom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 2rem;
+        }
+
+        .page-btn {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #e9ecef;
+            border-radius: 50%;
+            background: white;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+
+        .page-btn.active {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .student-table th,
+            .student-table td,
+            .payment-table th,
+            .payment-table td {
+                padding: 0.5rem 0.25rem;
+                font-size: 0.9rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교직원 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="staff-dashboard.html" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    대시보드
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="student-management.html" class="nav-link">
+                    <i class="bi bi-people"></i>
+                    학생 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="program-management.html" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    프로그램 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage-dashboard.html" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage-payment.html" class="nav-link active">
+                    <i class="bi bi-credit-card"></i>
+                    지급 관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="reports.html" class="nav-link">
+                    <i class="bi bi-graph-up"></i>
+                    통계 및 보고서
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="settings.html" class="nav-link">
+                    <i class="bi bi-gear"></i>
+                    시스템 설정
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-medium">김교수</div>
+                    <small class="text-muted">학생지원팀</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="profile.html">프로필</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="staff-dashboard.html" class="text-white-50">대시보드</a></li>
+                        <li class="breadcrumb-item active text-white">마일리지 지급 관리</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-credit-card me-2"></i>마일리지 지급 관리</h1>
+                <p class="mb-0 mt-2">프로그램별 마일리지 지급 및 내역 관리</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="paymentTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#programPaymentTab">
+                        <i class="bi bi-calendar-event me-1"></i>프로그램 연동 지급
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#paymentHistoryTab">
+                        <i class="bi bi-clock-history me-1"></i>지급 내역 조회
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Program Payment Tab -->
+                <div class="tab-pane fade show active" id="programPaymentTab">
+                    <!-- Program Selection -->
+                    <div class="management-card">
+                        <h5 class="mb-4">
+                            <i class="bi bi-list-check me-2"></i>이수 완료 프로그램 목록
+                        </h5>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="categoryFilter" onchange="filterPrograms()">
+                                    <option value="all">전체 카테고리</option>
+                                    <option value="leadership">리더십</option>
+                                    <option value="creativity">창의성</option>
+                                    <option value="volunteer">봉사활동</option>
+                                    <option value="academic">학술활동</option>
+                                    <option value="career">진로개발</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="statusFilter" onchange="filterPrograms()">
+                                    <option value="completed">이수 완료</option>
+                                    <option value="pending">지급 대기</option>
+                                    <option value="paid">지급 완료</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" placeholder="프로그램명 검색" id="programSearch" onkeyup="searchPrograms()">
+                            </div>
+                        </div>
+
+                        <div class="program-list" id="programList">
+                            <div class="program-item" data-program-id="1" data-category="leadership" onclick="selectProgram(1)">
+                                <input type="radio" name="selectedProgram" value="1" class="form-check-input">
+                                <div class="program-info">
+                                    <div class="program-title">글로벌 리더십 아카데미</div>
+                                    <div class="program-details">
+                                        <span class="category-badge badge-leadership">리더십</span>
+                                        <span class="ms-2">이수 완료: 23명</span>
+                                        <span class="ms-2">기간: 2024.01.15 ~ 2024.01.19</span>
+                                    </div>
+                                </div>
+                                <div class="program-points">200P</div>
+                            </div>
+
+                            <div class="program-item" data-program-id="2" data-category="creativity" onclick="selectProgram(2)">
+                                <input type="radio" name="selectedProgram" value="2" class="form-check-input">
+                                <div class="program-info">
+                                    <div class="program-title">창의적 사고 워크숍</div>
+                                    <div class="program-details">
+                                        <span class="category-badge badge-creativity">창의성</span>
+                                        <span class="ms-2">이수 완료: 18명</span>
+                                        <span class="ms-2">기간: 2024.01.10 ~ 2024.01.12</span>
+                                    </div>
+                                </div>
+                                <div class="program-points">150P</div>
+                            </div>
+
+                            <div class="program-item" data-program-id="3" data-category="volunteer" onclick="selectProgram(3)">
+                                <input type="radio" name="selectedProgram" value="3" class="form-check-input">
+                                <div class="program-info">
+                                    <div class="program-title">지역사회 봉사활동</div>
+                                    <div class="program-details">
+                                        <span class="category-badge badge-volunteer">봉사활동</span>
+                                        <span class="ms-2">이수 완료: 15명</span>
+                                        <span class="ms-2">기간: 2024.01.08 ~ 2024.01.14</span>
+                                    </div>
+                                </div>
+                                <div class="program-points">160P</div>
+                            </div>
+
+                            <div class="program-item" data-program-id="4" data-category="academic" onclick="selectProgram(4)">
+                                <input type="radio" name="selectedProgram" value="4" class="form-check-input">
+                                <div class="program-info">
+                                    <div class="program-title">학술논문 발표대회</div>
+                                    <div class="program-details">
+                                        <span class="category-badge badge-academic">학술활동</span>
+                                        <span class="ms-2">이수 완료: 12명</span>
+                                        <span class="ms-2">기간: 2024.01.05 ~ 2024.01.07</span>
+                                    </div>
+                                </div>
+                                <div class="program-points">300P</div>
+                            </div>
+
+                            <div class="program-item" data-program-id="5" data-category="career" onclick="selectProgram(5)">
+                                <input type="radio" name="selectedProgram" value="5" class="form-check-input">
+                                <div class="program-info">
+                                    <div class="program-title">기업 인턴십 프로그램</div>
+                                    <div class="program-details">
+                                        <span class="category-badge badge-career">진로개발</span>
+                                        <span class="ms-2">이수 완료: 8명</span>
+                                        <span class="ms-2">기간: 2023.12.01 ~ 2024.01.31</span>
+                                    </div>
+                                </div>
+                                <div class="program-points">400P</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Student List -->
+                    <div class="student-list-section" id="studentListSection" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-people me-2"></i>이수 학생 명단
+                                <span class="badge bg-primary ms-2" id="studentCount">0명</span>
+                            </h5>
+                            <div>
+                                <button class="btn btn-success" onclick="bulkPayment()" id="bulkPaymentBtn" disabled>
+                                    <i class="bi bi-credit-card me-1"></i>일괄 지급
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            선택된 프로그램: <strong id="selectedProgramName">-</strong> | 
+                            지급 예정 포인트: <strong id="selectedProgramPoints">0P</strong> | 
+                            총 지급 예정: <strong id="totalPaymentPoints">0P</strong>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover student-table">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">
+                                            <input type="checkbox" class="form-check-input" id="selectAll" onchange="toggleSelectAll()">
+                                        </th>
+                                        <th width="15%">학번</th>
+                                        <th width="15%">이름</th>
+                                        <th width="20%">학과</th>
+                                        <th width="15%">이수일</th>
+                                        <th width="15%">지급 포인트</th>
+                                        <th width="15%">상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="studentTableBody">
+                                    <!-- 동적으로 생성됨 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment History Tab -->
+                <div class="tab-pane fade" id="paymentHistoryTab">
+                    <!-- Search and Filter -->
+                    <div class="search-filter-section">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">기간 검색</label>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <input type="date" class="form-control" id="startDate" value="2024-01-01">
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="date" class="form-control" id="endDate" value="2024-01-31">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <label class="form-label fw-bold">프로그램명</label>
+                                <input type="text" class="form-control" placeholder="프로그램명 검색" id="programNameSearch">
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">카테고리</label>
+                                <select class="form-select" id="historyCategory">
+                                    <option value="all">전체</option>
+                                    <option value="leadership">리더십</option>
+                                    <option value="creativity">창의성</option>
+                                    <option value="volunteer">봉사활동</option>
+                                    <option value="academic">학술활동</option>
+                                    <option value="career">진로개발</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">상태</label>
+                                <select class="form-select" id="paymentStatus">
+                                    <option value="all">전체</option>
+                                    <option value="completed">지급완료</option>
+                                    <option value="cancelled">취소됨</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2">
+                                <label class="form-label fw-bold">&nbsp;</label>
+                                <button class="btn btn-primary w-100" onclick="searchPaymentHistory()">
+                                    <i class="bi bi-search me-1"></i>검색
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment History Table -->
+                    <div class="payment-history-section">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">
+                                <i class="bi bi-clock-history me-2"></i>마일리지 지급 내역
+                            </h5>
+                            <div>
+                                <button class="btn btn-outline-success me-2" onclick="exportPaymentHistory()">
+                                    <i class="bi bi-download me-1"></i>내역 다운로드
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="bulkCancel()">
+                                    <i class="bi bi-x-circle me-1"></i>선택 취소
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="table table-hover payment-table">
+                                <thead>
+                                    <tr>
+                                        <th width="5%">
+                                            <input type="checkbox" class="form-check-input" id="selectAllHistory" onchange="toggleSelectAllHistory()">
+                                        </th>
+                                        <th width="12%">지급일</th>
+                                        <th width="15%">학번</th>
+                                        <th width="10%">이름</th>
+                                        <th width="25%">프로그램명</th>
+                                        <th width="10%">카테고리</th>
+                                        <th width="8%">포인트</th>
+                                        <th width="8%">상태</th>
+                                        <th width="7%">작업</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentHistoryList">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="1">
+                                        </td>
+                                        <td>2024-01-20</td>
+                                        <td>2021001234</td>
+                                        <td>김학생</td>
+                                        <td class="text-start">글로벌 리더십 아카데미</td>
+                                        <td>
+                                            <span class="category-badge badge-leadership">리더십</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+200P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(1)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="2">
+                                        </td>
+                                        <td>2024-01-20</td>
+                                        <td>2021001235</td>
+                                        <td>이학생</td>
+                                        <td class="text-start">글로벌 리더십 아카데미</td>
+                                        <td>
+                                            <span class="category-badge badge-leadership">리더십</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+200P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(2)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="3">
+                                        </td>
+                                        <td>2024-01-19</td>
+                                        <td>2021001236</td>
+                                        <td>박학생</td>
+                                        <td class="text-start">창의적 사고 워크숍</td>
+                                        <td>
+                                            <span class="category-badge badge-creativity">창의성</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+150P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(3)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="4">
+                                        </td>
+                                        <td>2024-01-18</td>
+                                        <td>2021001237</td>
+                                        <td>최학생</td>
+                                        <td class="text-start">지역사회 봉사활동</td>
+                                        <td>
+                                            <span class="category-badge badge-volunteer">봉사활동</span>
+                                        </td>
+                                        <td class="fw-bold text-danger">-160P</td>
+                                        <td>
+                                            <span class="status-badge status-cancelled">취소됨</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-secondary btn-action" disabled>
+                                                    <i class="bi bi-check"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="5">
+                                        </td>
+                                        <td>2024-01-17</td>
+                                        <td>2021001238</td>
+                                        <td>정학생</td>
+                                        <td class="text-start">학술논문 발표대회</td>
+                                        <td>
+                                            <span class="category-badge badge-academic">학술활동</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+300P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(5)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="6">
+                                        </td>
+                                        <td>2024-01-16</td>
+                                        <td>2021001239</td>
+                                        <td>강학생</td>
+                                        <td class="text-start">기업 인턴십 프로그램</td>
+                                        <td>
+                                            <span class="category-badge badge-career">진로개발</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+400P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(6)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="7">
+                                        </td>
+                                        <td>2024-01-15</td>
+                                        <td>2021001240</td>
+                                        <td>윤학생</td>
+                                        <td class="text-start">창의적 사고 워크숍</td>
+                                        <td>
+                                            <span class="category-badge badge-creativity">창의성</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+150P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(7)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="8">
+                                        </td>
+                                        <td>2024-01-14</td>
+                                        <td>2021001241</td>
+                                        <td>조학생</td>
+                                        <td class="text-start">지역사회 봉사활동</td>
+                                        <td>
+                                            <span class="category-badge badge-volunteer">봉사활동</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+160P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(8)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="9">
+                                        </td>
+                                        <td>2024-01-13</td>
+                                        <td>2021001242</td>
+                                        <td>한학생</td>
+                                        <td class="text-start">글로벌 리더십 아카데미</td>
+                                        <td>
+                                            <span class="category-badge badge-leadership">리더십</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+200P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(9)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="form-check-input history-checkbox" value="10">
+                                        </td>
+                                        <td>2024-01-12</td>
+                                        <td>2021001243</td>
+                                        <td>임학생</td>
+                                        <td class="text-start">학술논문 발표대회</td>
+                                        <td>
+                                            <span class="category-badge badge-academic">학술활동</span>
+                                        </td>
+                                        <td class="fw-bold text-success">+300P</td>
+                                        <td>
+                                            <span class="status-badge status-completed">지급완료</span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <button class="btn btn-outline-danger btn-action" onclick="cancelPayment(10)">
+                                                    <i class="bi bi-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="pagination-custom">
+                            <button class="page-btn" onclick="changePage('prev')">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="page-btn active" onclick="changePage(1)">1</button>
+                            <button class="page-btn" onclick="changePage(2)">2</button>
+                            <button class="page-btn" onclick="changePage(3)">3</button>
+                            <button class="page-btn" onclick="changePage(4)">4</button>
+                            <button class="page-btn" onclick="changePage(5)">5</button>
+                            <button class="page-btn" onclick="changePage('next')">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // 현재 시간 표시
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // 사이드바 토글
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // 프로그램 데이터
+        const programData = {
+            1: {
+                name: '글로벌 리더십 아카데미',
+                points: 200,
+                students: [
+                    { id: '2021001234', name: '김학생', department: '컴퓨터공학과', completionDate: '2024-01-19' },
+                    { id: '2021001235', name: '이학생', department: '경영학과', completionDate: '2024-01-19' },
+                    { id: '2021001236', name: '박학생', department: '전자공학과', completionDate: '2024-01-19' },
+                    { id: '2021001237', name: '최학생', department: '기계공학과', completionDate: '2024-01-19' },
+                    { id: '2021001238', name: '정학생', department: '화학공학과', completionDate: '2024-01-19' }
+                ]
+            },
+            2: {
+                name: '창의적 사고 워크숍',
+                points: 150,
+                students: [
+                    { id: '2021001239', name: '강학생', department: '산업디자인학과', completionDate: '2024-01-12' },
+                    { id: '2021001240', name: '윤학생', department: '미술학과', completionDate: '2024-01-12' },
+                    { id: '2021001241', name: '조학생', department: '음악학과', completionDate: '2024-01-12' }
+                ]
+            },
+            3: {
+                name: '지역사회 봉사활동',
+                points: 160,
+                students: [
+                    { id: '2021001242', name: '한학생', department: '사회복지학과', completionDate: '2024-01-14' },
+                    { id: '2021001243', name: '임학생', department: '교육학과', completionDate: '2024-01-14' },
+                    { id: '2021001244', name: '신학생', department: '심리학과', completionDate: '2024-01-14' }
+                ]
+            },
+            4: {
+                name: '학술논문 발표대회',
+                points: 300,
+                students: [
+                    { id: '2021001245', name: '오학생', department: '물리학과', completionDate: '2024-01-07' },
+                    { id: '2021001246', name: '서학생', department: '수학과', completionDate: '2024-01-07' }
+                ]
+            },
+            5: {
+                name: '기업 인턴십 프로그램',
+                points: 400,
+                students: [
+                    { id: '2021001247', name: '남학생', department: '경제학과', completionDate: '2024-01-31' },
+                    { id: '2021001248', name: '문학생', department: '국제통상학과', completionDate: '2024-01-31' }
+                ]
+            }
+        };
+
+        // 프로그램 선택
+        function selectProgram(programId) {
+            // 모든 프로그램 아이템에서 선택 상태 제거
+            document.querySelectorAll('.program-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // 선택된 프로그램 아이템에 선택 상태 추가
+            const selectedItem = document.querySelector(`[data-program-id="${programId}"]`);
+            selectedItem.classList.add('selected');
+
+            // 라디오 버튼 체크
+            const radioButton = selectedItem.querySelector('input[type="radio"]');
+            radioButton.checked = true;
+
+            // 학생 목록 표시
+            displayStudentList(programId);
+        }
+
+        // 학생 목록 표시
+        function displayStudentList(programId) {
+            const program = programData[programId];
+            const studentListSection = document.getElementById('studentListSection');
+            const studentTableBody = document.getElementById('studentTableBody');
+            const studentCount = document.getElementById('studentCount');
+            const selectedProgramName = document.getElementById('selectedProgramName');
+            const selectedProgramPoints = document.getElementById('selectedProgramPoints');
+            const totalPaymentPoints = document.getElementById('totalPaymentPoints');
+            const bulkPaymentBtn = document.getElementById('bulkPaymentBtn');
+
+            // 프로그램 정보 업데이트
+            selectedProgramName.textContent = program.name;
+            selectedProgramPoints.textContent = program.points + 'P';
+            studentCount.textContent = program.students.length + '명';
+            totalPaymentPoints.textContent = (program.points * program.students.length).toLocaleString() + 'P';
+
+            // 학생 테이블 생성
+            studentTableBody.innerHTML = '';
+            program.students.forEach((student, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <input type="checkbox" class="form-check-input student-checkbox" value="${student.id}" onchange="updateBulkPaymentButton()">
+                    </td>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.department}</td>
+                    <td>${student.completionDate}</td>
+                    <td class="fw-bold text-success">${program.points}P</td>
+                    <td>
+                        <span class="status-badge status-pending">지급대기</span>
+                    </td>
+                `;
+                studentTableBody.appendChild(row);
+            });
+
+            // 학생 목록 섹션 표시
+            studentListSection.style.display = 'block';
+            bulkPaymentBtn.disabled = false;
+        }
+
+        // 전체 선택/해제
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+            
+            updateBulkPaymentButton();
+        }
+
+        // 일괄 지급 버튼 상태 업데이트
+        function updateBulkPaymentButton() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+            const bulkPaymentBtn = document.getElementById('bulkPaymentBtn');
+            const totalPaymentPoints = document.getElementById('totalPaymentPoints');
+            
+            if (checkboxes.length > 0) {
+                const selectedProgram = document.querySelector('input[name="selectedProgram"]:checked');
+                if (selectedProgram) {
+                    const programId = selectedProgram.value;
+                    const program = programData[programId];
+                    const totalPoints = program.points * checkboxes.length;
+                    totalPaymentPoints.textContent = totalPoints.toLocaleString() + 'P';
+                }
+                bulkPaymentBtn.disabled = false;
+            } else {
+                bulkPaymentBtn.disabled = true;
+            }
+        }
+
+        // 일괄 지급
+        function bulkPayment() {
+            const selectedStudents = document.querySelectorAll('.student-checkbox:checked');
+            const selectedProgram = document.querySelector('input[name="selectedProgram"]:checked');
+            
+            if (!selectedProgram) {
+                alert('프로그램을 선택해주세요.');
+                return;
+            }
+            
+            if (selectedStudents.length === 0) {
+                alert('지급할 학생을 선택해주세요.');
+                return;
+            }
+            
+            const programId = selectedProgram.value;
+            const program = programData[programId];
+            const totalPoints = program.points * selectedStudents.length;
+            
+            if (confirm(`${selectedStudents.length}명의 학생에게 총 ${totalPoints.toLocaleString()}P를 지급하시겠습니까?`)) {
+                // 실제로는 서버에 요청을 보내야 함
+                alert(`마일리지 지급이 완료되었습니다.\n지급 대상: ${selectedStudents.length}명\n총 지급 포인트: ${totalPoints.toLocaleString()}P`);
+                
+                // 상태 업데이트
+                selectedStudents.forEach(checkbox => {
+                    const row = checkbox.closest('tr');
+                    const statusCell = row.cells[6];
+                    statusCell.innerHTML = '<span class="status-badge status-completed">지급완료</span>';
+                    checkbox.disabled = true;
+                });
+                
+                // 선택 해제
+                document.getElementById('selectAll').checked = false;
+                updateBulkPaymentButton();
+            }
+        }
+
+        // 프로그램 필터링
+        function filterPrograms() {
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const programItems = document.querySelectorAll('.program-item');
+            
+            programItems.forEach(item => {
+                const category = item.dataset.category;
+                let show = true;
+                
+                if (categoryFilter !== 'all' && category !== categoryFilter) {
+                    show = false;
+                }
+                
+                // 상태 필터는 실제 구현에서는 서버 데이터를 기반으로 해야 함
+                
+                item.style.display = show ? 'flex' : 'none';
+            });
+        }
+
+        // 프로그램 검색
+        function searchPrograms() {
+            const searchTerm = document.getElementById('programSearch').value.toLowerCase();
+            const programItems = document.querySelectorAll('.program-item');
+            
+            programItems.forEach(item => {
+                const programTitle = item.querySelector('.program-title').textContent.toLowerCase();
+                if (programTitle.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // 지급 내역 검색
+        function searchPaymentHistory() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const programName = document.getElementById('programNameSearch').value.toLowerCase();
+            const category = document.getElementById('historyCategory').value;
+            const status = document.getElementById('paymentStatus').value;
+            
+            alert(`검색 조건:\n기간: ${startDate} ~ ${endDate}\n프로그램: ${programName || '전체'}\n카테고리: ${category}\n상태: ${status}`);
+        }
+
+        // 지급 내역 전체 선택/해제
+        function toggleSelectAllHistory() {
+            const selectAll = document.getElementById('selectAllHistory');
+            const checkboxes = document.querySelectorAll('.history-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                if (!checkbox.disabled) {
+                    checkbox.checked = selectAll.checked;
+                }
+            });
+        }
+
+        // 개별 지급 취소
+        function cancelPayment(paymentId) {
+            if (confirm('선택한 마일리지 지급을 취소하시겠습니까?\n취소된 마일리지는 학생 계정에서 차감됩니다.')) {
+                alert(`지급 ID ${paymentId}의 마일리지가 취소되었습니다.`);
+                
+                // 상태 업데이트
+                const row = document.querySelector(`input[value="${paymentId}"]`).closest('tr');
+                const statusCell = row.cells[7];
+                const pointsCell = row.cells[6];
+                const actionCell = row.cells[8];
+                
+                statusCell.innerHTML = '<span class="status-badge status-cancelled">취소됨</span>';
+                pointsCell.innerHTML = pointsCell.innerHTML.replace('+', '-').replace('text-success', 'text-danger');
+                actionCell.innerHTML = '<div class="action-buttons"><button class="btn btn-outline-secondary btn-action" disabled><i class="bi bi-check"></i></button></div>';
+            }
+        }
+
+        // 일괄 취소
+        function bulkCancel() {
+            const selectedItems = document.querySelectorAll('.history-checkbox:checked');
+            
+            if (selectedItems.length === 0) {
+                alert('취소할 항목을 선택해주세요.');
+                return;
+            }
+            
+            if (confirm(`선택한 ${selectedItems.length}개 항목의 마일리지 지급을 취소하시겠습니까?`)) {
+                selectedItems.forEach(checkbox => {
+                    const paymentId = checkbox.value;
+                    const row = checkbox.closest('tr');
+                    const statusCell = row.cells[7];
+                    const pointsCell = row.cells[6];
+                    const actionCell = row.cells[8];
+                    
+                    statusCell.innerHTML = '<span class="status-badge status-cancelled">취소됨</span>';
+                    pointsCell.innerHTML = pointsCell.innerHTML.replace('+', '-').replace('text-success', 'text-danger');
+                    actionCell.innerHTML = '<div class="action-buttons"><button class="btn btn-outline-secondary btn-action" disabled><i class="bi bi-check"></i></button></div>';
+                    checkbox.disabled = true;
+                    checkbox.checked = false;
+                });
+                
+                document.getElementById('selectAllHistory').checked = false;
+                alert(`${selectedItems.length}개 항목의 마일리지 지급이 취소되었습니다.`);
+            }
+        }
+
+        // 지급 내역 내보내기
+        function exportPaymentHistory() {
+            alert('지급 내역을 Excel 파일로 다운로드합니다.');
+        }
+
+        // 페이지 변경
+        function changePage(page) {
+            // 현재 활성 페이지 제거
+            document.querySelectorAll('.page-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            if (page === 'prev' || page === 'next') {
+                alert(`${page === 'prev' ? '이전' : '다음'} 페이지로 이동합니다.`);
+            } else {
+                document.querySelector(`[onclick="changePage(${page})"]`).classList.add('active');
+                alert(`${page}페이지로 이동합니다.`);
+            }
+        }
+
+        // 로그아웃
+        function logout() {
+            if (confirm('로그아웃 하시겠습니까?')) {
+                window.location.href = 'login.html';
+            }
+        }
+
+        // 페이지 로드 시 초기화
+        window.addEventListener('load', function() {
+            // 현재 날짜로 종료일 설정
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('endDate').value = today;
+            
+            // 한 달 전 날짜로 시작일 설정
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
+        });
+
+        // 사이드바 외부 클릭 시 닫기 (모바일)
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const isClickInsideSidebar = sidebar.contains(event.target);
+            const isToggleButton = event.target.closest('.btn-link');
+            
+            if (!isClickInsideSidebar && !isToggleButton && window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+            }
+        });
+    </script>
+</body>
+</html>
