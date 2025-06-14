@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마일리지 지급 관리</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-4">
+    <h2 class="mb-4">마일리지 지급 관리</h2>
+
+    <!-- 필터 영역 -->
+    <form th:action="@{/mileage/payment}" method="get" class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">운영 시작일</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" th:value="${startDate}">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">운영 종료일</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" th:value="${endDate}">
+        </div>
+        <div class="col-md-3">
+            <label for="coreCompetency" class="form-label">핵심역량</label>
+            <select class="form-select" id="coreCompetency" name="coreCompetency">
+                <option value="">전체</option>
+                <option th:each="cmp : ${coreCompetencyList}" 
+                        th:value="${cmp.code}" 
+                        th:text="${cmp.name}" 
+                        th:selected="${cmp.code == selectedCompetency}">핵심역량</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="programId" class="form-label">비교과 프로그램</label>
+            <select class="form-select" id="programId" name="programId">
+                <option value="">전체</option>
+                <option th:each="prg : ${programList}" 
+                        th:value="${prg.id}" 
+                        th:text="${prg.name}" 
+                        th:selected="${prg.id == selectedProgram}">프로그램</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary">검색</button>
+        </div>
+    </form>
+
+    <!-- 결과 테이블 -->
+    <form th:action="@{/mileage/pay}" method="post" class="mt-4">
+        <table class="table table-bordered table-hover align-middle text-center">
+            <thead class="table-light">
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>학번</th>
+                    <th>이름</th>
+                    <th>프로그램명</th>
+                    <th>핵심역량</th>
+                    <th>이수일</th>
+                    <th>지급 여부</th>
+                    <th>마일리지</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item : ${completedList}">
+                    <td><input type="checkbox" name="selectedIds" th:value="${item.cmpId}"></td>
+                    <td th:text="${item.student.stdNo}">20230001</td>
+                    <td th:text="${item.student.name}">홍길동</td>
+                    <td th:text="${item.program.name}">리더십캠프</td>
+                    <td th:text="${item.program.coreCompetency.name}">리더십</td>
+                    <td th:text="${#temporals.format(item.completeDate, 'yyyy-MM-dd')}">2025-06-01</td>
+                    <td>
+                        <span th:text="${item.paid ? '지급완료' : '미지급'}"
+                              th:classappend="${item.paid ? 'text-success' : 'text-danger'}"></span>
+                    </td>
+                    <td><input type="number" name="mileageMap[__${item.cmpId}__]" class="form-control" th:value="${item.mileage}" min="0"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-between mt-3">
+            <button type="submit" class="btn btn-success">선택 지급</button>
+            <a th:href="@{/mileage/export}" class="btn btn-secondary">엑셀 다운로드</a>
+        </div>
+    </form>
+</div>
+
+<!-- 선택 전체 스크립트 -->
+<script>
+    document.getElementById('selectAll').addEventListener('change', function () {
+        const checkboxes = document.querySelectorAll('input[name="selectedIds"]');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+    });
+</script>
+</body>
+</html>
