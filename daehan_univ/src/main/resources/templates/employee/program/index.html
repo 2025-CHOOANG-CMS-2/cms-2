@@ -965,9 +965,6 @@
               <button class="btn-action btn-edit" onclick="editProgram(${
                 program.id
               })">수정</button>
-              <button class="btn-action btn-delete" onclick="deleteProgram(${
-                program.id
-              })">삭제</button>
             </td>
           </tr>
         `;
@@ -1131,16 +1128,6 @@
 
         closeModal();
         renderTable();
-      }
-
-      // 프로그램 삭제
-      function deleteProgram(id) {
-        if (confirm("정말로 이 프로그램을 삭제하시겠습니까?")) {
-          const index = programs.findIndex((p) => p.id === id);
-          programs.splice(index, 1);
-          alert("프로그램이 삭제되었습니다.");
-          renderTable();
-        }
       }
 
       // 이벤트 리스너
