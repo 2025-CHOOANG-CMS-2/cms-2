@@ -10,12 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.ac.dhuniv.mileage.domain.NcsPrgMileage;
 import kr.ac.dhuniv.mileage.domain.StdMileageHist;
 import kr.ac.dhuniv.mileage.domain.StdMileageTotal;
+import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
 import kr.ac.dhuniv.mileage.repository.NcsCmpInfoRepository2;
 import kr.ac.dhuniv.mileage.repository.NcsPrgMileageRepository2;
 import kr.ac.dhuniv.mileage.repository.StdMileageHistRepository;
 import kr.ac.dhuniv.mileage.repository.StdMileageTotalRepository;
 import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
-import kr.ac.dhuniv.std_info.StdInfo;
+import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -64,4 +65,12 @@ public class MileageService {
         int nextId = (maxId != null) ? maxId + 1 : 1;
         return String.format("MLG%03d", nextId);   // 예: MLG001, MLG002 ...
     }
+    
+    public List<CompletedStudentDto> getAllCompletedStudents() {
+        return cmpInfoRepository.findAllCompletedStudents();
+    }
+
+//    public List<CompletedStudentDto> searchCompletedStudents(String programName, String studentName) {
+//        return cmpInfoRepository.findCompletedStudentsByCondition(programName, studentName);
+//    }
 }
