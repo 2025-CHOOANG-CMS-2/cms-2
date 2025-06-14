@@ -4,9 +4,9 @@ spring:
   application:
     name: daehan_univ
   datasource:
-    url: 
-    username: 
-    password: 
+    url: jdbc:postgresql://210.178.108.186:25432/daehan_univ
+    username: postgres
+    password: 1234
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -16,7 +16,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
-        show_sql : true		
+        show_sql : true
   thymeleaf:
     cache: false
     prefix: classpath:/templates/

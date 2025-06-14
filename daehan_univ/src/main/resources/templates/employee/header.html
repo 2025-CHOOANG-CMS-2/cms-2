@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
+ <head th:fragment="common-head">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>대한대학교 CMS 포털 - 교직원</title>
@@ -171,7 +171,7 @@
       }
     </style>
   </head>
-  <body>
+  <body th:fragment="staff-header">
     <!-- 헤더 -->
     <header class="header d-flex">
       <div class="header-left">
@@ -255,11 +255,6 @@
       </nav>
     </aside>
 
-    <!-- 본문 -->
-    <main class="main-content">
-      <h1>교직원 메인 콘텐츠</h1>
-      <p>해당 영역에 교직원용 기능들이 표시됩니다.</p>
-    </main>
 
     <!-- 스크립트 -->
     <script>

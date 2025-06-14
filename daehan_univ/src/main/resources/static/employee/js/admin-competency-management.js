@@ -1,0 +1,224 @@
+// ✅ DOM 로드 후 역량 목록 로드
+// 페이지가 완전히 로드되면 목록만 불러오도록 변경
+// 하위 역량별 코멘트/프로그램 추천 로직 제거
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('역량 항목 관리 페이지 로드됨');
+    loadCompetencyList(); // 목록 로딩
+});
+
+// 전역 변수 선언
+let selectedCompetency = null;    // 선택된 상위 역량 코드
+let subModalParentId = null;      // 하위 역량 추가 모달용 상위 코드 저장
+
+/**
+ * 상위 역량 목록 가져오기
+ */
+function loadCompetencyList() {
+    fetch('/api/competencies/list')
+        .then(res => res.json())
+        .then(data => {
+            const listGroup = document.querySelector('.list-group');
+            listGroup.innerHTML = '';
+
+            data.forEach((comp, index) => {
+                const item = document.createElement('a');
+                item.href = '#';
+                item.className = 'list-group-item list-group-item-action';
+                if (index === 0) item.classList.add('active');
+
+                item.onclick = e => {
+                    e.preventDefault();
+                    selectCompetency(comp.cciId);
+                    document.querySelectorAll('.list-group-item')
+                        .forEach(el => el.classList.remove('active'));
+                    item.classList.add('active');
+                };
+
+                item.innerHTML = `
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">${comp.cciNm}</h6>
+                        <small>${comp.questionCount ?? 0}문항</small>
+                    </div>
+                    <p class="mb-1">${comp.cciDesc}</p>
+                `;
+                listGroup.appendChild(item);
+            });
+
+            if (data.length > 0) {
+                selectedCompetency = data[0].cciId;
+                selectCompetency(data[0].cciId);
+            }
+        })
+        .catch(err => {
+            console.error('역량 목록 로딩 실패', err);
+            alert('역량 목록을 불러오지 못했습니다.');
+        });
+}
+
+/**
+ * 선택된 상위 역량 상세 조회
+ */
+function selectCompetency(cciId) {
+    selectedCompetency = cciId;
+    fetch(`/api/competencies/${cciId}`)
+        .then(res => res.json())
+        .then(data => updateCompetencyDetails(data))
+        .catch(err => console.error('상세 조회 에러', err));
+}
+
+/**
+ * 상세 정보 렌더링 (하위 역량 목록 포함)
+ */
+function updateCompetencyDetails(comp) {
+    let html = `
+      <h5 class="text-primary mb-3">${comp.cciNm}</h5>
+      <div class="competency-detail mb-4">
+        <div class="row mb-2">
+          <div class="col-md-3 fw-bold">역량 코드</div>
+          <div class="col-md-9">${comp.cciId}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-3 fw-bold">역량 설명</div>
+          <div class="col-md-9">${comp.cciDesc}</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-3 fw-bold">가중치</div>
+          <div class="col-md-9">${comp.weight ?? 0}%</div>
+        </div>
+        <div class="row mb-2">
+          <div class="col-md-3 fw-bold">문항 수</div>
+          <div class="col-md-9">${comp.questionCount ?? 0}문항</div>
+        </div>
+        <div class="row">
+          <div class="col-md-3 fw-bold">표시 색상</div>
+          <div class="col-md-9">
+            <div style="width:50px;height:25px;background-color:${comp.colorHex ?? '#ccc'};border-radius:5px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="mt-4 mb-3">하위 역량 항목</h6>
+    `;
+
+    if (Array.isArray(comp.children) && comp.children.length) {
+        comp.children.forEach(child => {
+            html += `
+          <div class="sub-competency-item mb-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <h6 class="mb-1">${child.cciNm} <small>(${child.weight}%)</small></h6>
+              <div>
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editSubCompetency('${child.cciId}')">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteSubCompetency('${child.cciId}')">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+            <p class="small text-muted mb-0">${child.cciDesc}</p>
+          </div>
+        `;
+        });
+    } else {
+        html += `<div class="text-center text-muted py-3">하위 역량이 없습니다.</div>`;
+    }
+
+    html += `
+      <div class="text-center mt-4">
+        <button class="btn btn-outline-primary" onclick="openSubCompetencyModal('${comp.cciId}')">
+          <i class="fas fa-plus me-2"></i> 하위 역량 추가
+        </button>
+      </div>
+    `;
+
+    document.getElementById('competencyDetails').innerHTML = html;
+}
+
+/**
+ * 최상위 역량 추가
+ */
+function addCompetency() {
+    const form = document.getElementById('addCompetencyForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    const dto = {
+        cciNm: document.getElementById('competencyName').value,
+        cciDesc: document.getElementById('competencyDescription').value,
+        weight: parseInt(document.getElementById('competencyWeight').value, 10),
+        colorHex: document.getElementById('competencyColor').value,
+        regUserId: 'admin01'
+    };
+
+    fetch('/api/competencies/root', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(dto)
+    })
+        .then(res => res.json())
+        .then(data => {
+            alert(`역량 '${data.cciNm}' 등록 (ID: ${data.cciId})`);
+            form.reset();
+            bootstrap.Modal.getInstance(document.getElementById('addCompetencyModal')).hide();
+            loadCompetencyList();
+        })
+        .catch(err => { console.error(err); alert('등록 오류'); });
+}
+
+/**
+ * 하위 역량 추가 모달 열기
+ */
+function openSubCompetencyModal(parentCciId) {
+    subModalParentId = parentCciId;
+    new bootstrap.Modal(document.getElementById('addSubCompetencyModal')).show();
+}
+
+/**
+ * 하위 역량 등록
+ */
+function addSubCompetency() {
+    const form = document.getElementById('addSubCompetencyForm');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (!subModalParentId) { return alert('상위 역량 지정 필요'); }
+
+    const dto = {
+        cciNm: document.getElementById('subCompetencyName').value,
+        cciDesc: document.getElementById('subCompetencyDescription').value,
+        weight: parseInt(document.getElementById('subCompetencyWeight').value, 10),
+        regUserId: 'admin01'
+    };
+
+    fetch(`/api/competencies/child/${subModalParentId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("등록 실패");
+            return res.json(); // ❗ 서버 응답이 JSON이 아닐 경우 여기서 에러 발생
+        })
+        .then(added => {
+            alert(`하위 역량 '${added.cciNm}' 등록 완료 (ID:${added.cciId})`);
+            bootstrap.Modal.getInstance(document.getElementById('addSubCompetencyModal')).hide();
+            form.reset();
+            selectCompetency(subModalParentId);
+        })
+        .catch(err => {
+            console.error("등록 실패:", err); // 여기서 에러 이유 확인
+            alert("하위 역량 등록 중 오류가 발생했습니다.");
+        });
+}
+
+/**
+ * 하위 역량 수정(플레이스홀더)
+ */
+function editSubCompetency(subId) {
+    alert(`하위 역량 ${subId} 수정 실행`);
+}
+
+/**
+ * 하위 역량 삭제(플레이스홀더)
+ */
+function deleteSubCompetency(subId) {
+    if (confirm('정말 삭제하시겠습니까?')) {
+        alert(`하위 역량 ${subId} 삭제됨`);
+    }
+}

@@ -6,94 +6,8 @@
     <title>역량진단 관리 - 교육 관리 시스템</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background-color: #f8f9fa;
-            min-height: 100vh;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            margin-bottom: 20px;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 25px;
-            padding: 0.5rem 1.5rem;
-        }
-        .table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-        }
-        .badge-status {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
-        .search-box {
-            border-radius: 25px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem 1.5rem;
-        }
-        .search-box:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-        }
-        .competency-card {
-            border-left: 4px solid;
-            transition: all 0.3s ease;
-        }
-        .competency-card:hover {
-            transform: translateX(5px);
-        }
-        .competency-communication { border-left-color: #3498db; }
-        .competency-creativity { border-left-color: #9b59b6; }
-        .competency-leadership { border-left-color: #e74c3c; }
-        .competency-problem-solving { border-left-color: #f39c12; }
-        .competency-teamwork { border-left-color: #27ae60; }
-        
-        .question-card {
-            border-left: 4px solid #3498db;
-            margin-bottom: 15px;
-        }
-        .question-options {
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-        .option-item {
-            padding: 5px 10px;
-            margin-bottom: 5px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        .chart-container {
-            height: 300px;
-            position: relative;
-        }
-    </style>
+    <link href="/employee/css/admin-diagnosis-management.css" rel="stylesheet">
+       
 </head>
 <body>
     <div class="container-fluid">
@@ -136,7 +50,7 @@
                                         </a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" href="admin-department-management.html">
+                                        <a class="nav-link" href="../admin-department-management.html">
                                             <i class="fas fa-building me-2"></i>
                                             학과/부서 관리
                                         </a>
@@ -163,19 +77,19 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="admin-counseling-management.html">
+                            <a class="nav-link" href="../admin-counseling-management.html">
                                 <i class="fas fa-comments me-2"></i>
                                 상담 관리
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="admin-mileage-management.html">
+                            <a class="nav-link" href="../admin-mileage-management.html">
                                 <i class="fas fa-coins me-2"></i>
                                 마일리지 관리
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="admin-notice-management.html">
+                            <a class="nav-link" href="../admin-notice-management.html">
                                 <i class="fas fa-bullhorn me-2"></i>
                                 공지사항 관리
                             </a>
@@ -208,7 +122,7 @@
                                 <i class="fas fa-cogs me-2"></i>
                                 역량 항목 관리
                             </a>
-                            <a href="admin-question-management.html" class="btn btn-outline-primary">
+                            <a href="../admin-question-management.html" class="btn btn-outline-primary">
                                 <i class="fas fa-question-circle me-2"></i>
                                 진단 문항 관리
                             </a>
@@ -450,7 +364,7 @@
                                 <i class="fas fa-question-circle text-success" style="font-size: 3rem;"></i>
                                 <h5 class="mt-3 mb-3">진단 문항 관리</h5>
                                 <p class="text-muted mb-3">진단 문항을 추가, 수정, 삭제합니다</p>
-                                <a href="admin-question-management.html" class="btn btn-success">
+                                <a href="../admin-question-management.html" class="btn btn-success">
                                     <i class="fas fa-arrow-right me-1"></i>
                                     바로가기
                                 </a>
