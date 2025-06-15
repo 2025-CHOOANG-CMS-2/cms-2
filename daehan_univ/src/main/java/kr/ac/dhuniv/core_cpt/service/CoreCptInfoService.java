@@ -1,6 +1,7 @@
 package kr.ac.dhuniv.core_cpt.service;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
+import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
 import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoDetailDTO;
 import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoListDTO;
 import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoRequestDTO;
@@ -132,43 +133,68 @@ public class CoreCptInfoService {
     }
 
     /**
-     * 상위 역량 + 하위역량을 포함한 상세 DTO 반환
-     * 스트림이 아닌 for-loop로 변환 처리
-     */
-    /**
-     * 상세 조회 (상위 + 하위 역량 포함)
+     * 상위 cciId 로 상세 정보 조회 (하위 역량 포함)
      */
     public CoreCptInfoDetailDTO getDetailByCciId(String cciId) {
-        // 상위 역량 조회 (없으면 예외)
+        // (1) repository 를 통해 해당 cciId 의 CoreCptInfo 엔티티를 조회
         CoreCptInfo entity = repository.findByCciId(cciId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 cciId를 찾을 수 없습니다: " + cciId));
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "해당 cciId를 찾을 수 없습니다: " + cciId));
 
-        // 하위 역량 DTO 리스트 생성
+        // (2) 하위 역량 DTO 를 담을 빈 리스트 생성
         List<SubCompetencyDTO> subs = new ArrayList<>();
 
-        // 하위 엔티티 -> DTO 변환 (for-loop)
+        // (3) 엔티티의 children(하위 역량) 엔티티들을 순회
         for (CoreCptInfo child : entity.getChildren()) {
-            SubCompetencyDTO subDto = SubCompetencyDTO.builder()
-                    .cciId(child.getCciId())         // 코드
-                    .cciNm(child.getCciNm())         // 이름
-                    .cciDesc(child.getCciDesc())     // 설명
-                    .weight(child.getWeight())       // 가중치
-                    .build();
+            // (3-1) 각 하위 역량 엔티티를 DTO 로 변환
+            SubCompetencyDTO subDto = new SubCompetencyDTO();
+            subDto.setCciId(child.getCciId());     // 하위 역량 코드
+            subDto.setCciNm(child.getCciNm());     // 하위 역량명
+            subDto.setCciDesc(child.getCciDesc()); // 하위 역량 설명
+            subDto.setWeight(child.getWeight());   // 하위 역량 가중치
 
-            subs.add(subDto); // 리스트에 추가
+            // (3-2) 변환한 DTO 를 리스트에 추가
+            subs.add(subDto);
         }
 
-        // 최종 DTO 조립
-        CoreCptInfoDetailDTO detail = CoreCptInfoDetailDTO.builder()
-                .cciId(entity.getCciId())               // 코드
-                .cciNm(entity.getCciNm())               // 이름
-                .cciDesc(entity.getCciDesc())           // 설명
-                .weight(entity.getWeight())             // 가중치
-                .colorHex(entity.getColorHex())         // 색상
-                .questionCount(entity.getQuestions().size()) // 질문 수
-                .children(subs)                         // 하위 목록
-                .build();
+        // (4) CoreCptInfoDetailDTO 인스턴스 생성 및 상위 정보 설정
+        CoreCptInfoDetailDTO detailDto = new CoreCptInfoDetailDTO();
+        detailDto.setCciId(entity.getCciId());               // 상위 역량 코드
+        detailDto.setCciNm(entity.getCciNm());               // 상위 역량명
+        detailDto.setCciDesc(entity.getCciDesc());           // 상위 역량 설명
+        detailDto.setWeight(entity.getWeight());             // 상위 역량 가중치
+        detailDto.setColorHex(entity.getColorHex());         // 상위 역량 표시 색상
+        detailDto.setQuestionCount(entity.getQuestions().size()); // 상위 역량 문항 수
+        detailDto.setChildren(subs);                         // (3)에서 만든 하위 역량 리스트
 
-        return detail; // 반환
+        // (5) 최종 DTO 반환
+        return detailDto;
+    }
+    public CoreCptInfoDetailDTO toDetailDTO(CoreCptInfo entity) {
+        // (이미 작성하신 for-loop 기반 SubCompetencyDTO 변환 로직과 동일)
+        CoreCptInfoDetailDTO dto = new CoreCptInfoDetailDTO();
+        dto.setCciId(entity.getCciId());
+        dto.setCciNm(entity.getCciNm());
+        dto.setCciDesc(entity.getCciDesc());
+        dto.setWeight(entity.getWeight());
+        dto.setColorHex(entity.getColorHex());
+        // 질문 수 계산 시 null 체크
+        List<CoreCptQst> questions = entity.getQuestions();
+        int qCount = (questions != null) ? questions.size() : 0;
+        dto.setQuestionCount(qCount);
+
+
+        List<SubCompetencyDTO> subs = new ArrayList<>();
+        for (CoreCptInfo child : entity.getChildren()) {
+            SubCompetencyDTO sub = new SubCompetencyDTO();
+            sub.setCciId(child.getCciId());
+            sub.setCciNm(child.getCciNm());
+            sub.setCciDesc(child.getCciDesc());
+            sub.setWeight(child.getWeight());
+            subs.add(sub);
+        }
+        dto.setChildren(subs);
+
+        return dto;
     }
 }

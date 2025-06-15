@@ -1,10 +1,12 @@
 package kr.ac.dhuniv.std_info.domain;
 
 import jakarta.persistence.*;
+
 import kr.ac.dhuniv.user.User;
 import lombok.*;
 
 import java.time.LocalDate;
+
 
 @Entity
 @Table(name = "std_info")
@@ -55,6 +57,7 @@ public class StdInfo {
 
     @Column(name = "use_yn", length = 1)
     private String useYn;
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id2", referencedColumnName = "user_id")

@@ -1,28 +1,40 @@
 package kr.ac.dhuniv.std_info.dto;
 
-import java.time.LocalDate; // LocalDateTime 대신 LocalDate 사용
-
+import java.time.LocalDate;
+import com.fasterxml.jackson.annotation.JsonProperty; // 이 import 추가
 import lombok.Data;
-import lombok.NoArgsConstructor; // 기본 생성자 추가 (Lombok)
-import lombok.AllArgsConstructor; // 모든 필드 생성자 추가 (Lombok)
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
-@Data 
-@NoArgsConstructor // 기본 생성자
-@AllArgsConstructor // 모든 필드 포함 생성자
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class StdInfoDto {
 
-
+    @JsonProperty("STD_NO")
     private String STD_NO;
+    @JsonProperty("STD_NM")
     private String STD_NM;
+    @JsonProperty("SCSBJT_CD")
     private String SCSBJT_CD;
+    @JsonProperty("SCH_YR")
     private Integer SCH_YR;
-    private LocalDate ENTR_DT; // LocalDate로 변경
+    @JsonProperty("ENTR_DT")
+    private LocalDate ENTR_DT;
+    @JsonProperty("STD_STAT_CD")
     private String STD_STAT_CD;
+    @JsonProperty("STD_ZIP")
     private String STD_ZIP;
+    @JsonProperty("STD_ADDR")
     private String STD_ADDR;
+    @JsonProperty("STD_DADDR")
     private String STD_DADDR;
+    @JsonProperty("STD_TELNO")
     private String STD_TELNO;
+    @JsonProperty("STD_EML_ADDR")
     private String STD_EML_ADDR;
-    private Long USER_ID2; 
+    @JsonProperty("USER_ID2")
+    private String USER_ID2;
+    @JsonProperty("USE_YN")
     private String USE_YN;
 }

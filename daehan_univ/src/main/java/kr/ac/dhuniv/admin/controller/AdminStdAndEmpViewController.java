@@ -1,10 +1,10 @@
-package kr.ac.dhuniv.std_info.controller;
+package kr.ac.dhuniv.admin.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class StudentViewController {
+public class AdminStdAndEmpViewController {
 	
 	@GetMapping("/admin_index.do")
 	public String AdminIndexController() {
@@ -13,11 +13,11 @@ public class StudentViewController {
 	
 	@GetMapping("/employee_management.do")
 	public String EmployeeManagementController() {
-		return "/admin/employee-management.html";
+		return "/admin/management/employee-management.html";
 	}
 	
 	@GetMapping("/student_management.do")
 	public String StudentManagementController() {
-		return "/admin/student-management.html";
+		return "/admin/management/student-management.html";
 	}
 }
