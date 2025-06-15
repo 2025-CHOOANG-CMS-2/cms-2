@@ -1,6 +1,7 @@
 package kr.ac.dhuniv.std_info.domain;
 
 import jakarta.persistence.*;
+
 import kr.ac.dhuniv.user.User;
 import lombok.*;
 
