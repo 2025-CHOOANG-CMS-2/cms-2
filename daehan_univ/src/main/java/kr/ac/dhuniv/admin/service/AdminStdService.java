@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.admin.service;
 
+import kr.ac.dhuniv.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import kr.ac.dhuniv.admin.repository.AdminStdRepository; // AdminStdRepository 임포트 유지
 import kr.ac.dhuniv.std_info.domain.StdInfo;
 import kr.ac.dhuniv.std_info.dto.StdInfoDto;
-import kr.ac.dhuniv.user.User; // User 관련 import 유지
 import kr.ac.dhuniv.user.repository.UserRepository; // UserRepository import 유지 (User 객체 조회를 위해 필요)
 
 @Service
