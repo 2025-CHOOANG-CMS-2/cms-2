@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserInfo {
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // BIGSERIAL, AUTO_INCREMENT
