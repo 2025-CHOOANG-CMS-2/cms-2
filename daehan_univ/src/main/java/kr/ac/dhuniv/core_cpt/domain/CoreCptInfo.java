@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
@@ -27,7 +28,9 @@ public class CoreCptInfo {
     private CoreCptInfo parent;
 
     // (2) 자식(하위) 역량 리스트
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference            // ← children 필드는 직렬화하되, child.parent는 무시
     private List<CoreCptInfo> children = new ArrayList<>();
 
     @Column(name = "cci_nm", length = 100)

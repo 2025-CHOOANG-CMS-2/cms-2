@@ -27,13 +27,15 @@ public class CoreCptInfoController {
     }
 
     // ✅ 하위 역량 등록 API (POST /api/competencies/child/{parentId})
-    @PostMapping("/child/{parentId}")
-    public ResponseEntity<CoreCptInfo> registerChild(
-            @PathVariable("parentId") String parentId,
+    /** 하위 역량 등록 → DTO 반환 */
+    @PostMapping("/child/{parentCciId}")
+    public ResponseEntity<CoreCptInfoDetailDTO> registerChild(
+            @PathVariable("parentCciId") String parentCciId,
             @RequestBody CoreCptInfoRequestDTO dto) {
 
-        CoreCptInfo saved = service.registerAsChild(parentId, dto); // 상위 ID 기준 등록
-        return ResponseEntity.ok(saved);
+        CoreCptInfo saved = service.registerAsChild(parentCciId, dto);
+        CoreCptInfoDetailDTO response = service.toDetailDTO(saved);
+        return ResponseEntity.ok(response);
     }
     // ✅ [3] 전체 역량 목록 조회 (상위만)
     @GetMapping("/list")
@@ -52,10 +54,11 @@ public class CoreCptInfoController {
      * 상위역량 상세 조회: 이제 CoreCptInfoDetailDTO 반환
      */
     @GetMapping("/{cciId}")
-    public ResponseEntity<CoreCptInfoDetailDTO> getCompetencyByCciId(
+    public ResponseEntity<CoreCptInfoDetailDTO> getCompetencyDetail(
             @PathVariable("cciId") String cciId) {
-        // 서비스에서 DTO로 변환된 결과 받아오기
-        CoreCptInfoDetailDTO dto = service.getDetailByCciId(cciId);
-        return ResponseEntity.ok(dto);
+
+        // service 에서 CoreCptInfoDetailDTO 를 만들어 리턴하도록 변경
+        CoreCptInfoDetailDTO detail = service.getDetailByCciId(cciId);
+        return ResponseEntity.ok(detail);
     }
 }
