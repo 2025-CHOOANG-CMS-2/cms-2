@@ -60,7 +60,7 @@ public class JwtTokenProvider {
         // JWT 생성
         return Jwts.builder()
                 .setSubject(userId) // subject에 사용자 ID 저장
-                .addClaims(claims) // 커스텀 클레임 추가 (roles)
+                .claim("roles", roles)  // roles를 클레임에 추가
                 .setIssuedAt(new Date()) // 발급 시간
                 .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 만료 시간
                 .signWith(secretKey, SignatureAlgorithm.HS256) // 서명 및 알고리즘
@@ -105,7 +105,7 @@ public class JwtTokenProvider {
 
         // SimpleGrantedAuthority 리스트로 변환
         List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(SimpleGrantedAuthority::new)
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
 
         // 인증 객체 생성 (비밀번호는 null)
@@ -128,5 +128,12 @@ public class JwtTokenProvider {
             return bearer.substring(7);
         }
         return null;
+    }
+    // ✅ JWT 토큰을 파싱하고 Claims 반환
+    public Jws<Claims> parseToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(secretKey)    // ✅ 서명 검증용 비밀키 지정
+                .build()
+                .parseClaimsJws(token);      // ✅ 토큰 파싱 및 서명 검증
     }
 }

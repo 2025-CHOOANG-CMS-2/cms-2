@@ -1,8 +1,8 @@
 package kr.ac.dhuniv.user;
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "user_info")
@@ -22,8 +22,9 @@ public class User {
     @Column(name = "user_pw", length = 500, nullable = false)
     private String userPw;
 
-    @Column(name = "user_type", columnDefinition = "CHAR(1)", nullable = false)
-    private String userType;
+    // ✅ 기존 userType 제거 (ManyToMany 구조로 대체)
+    // @Column(name = "user_type", length = 20, nullable = false)
+    // private String userType;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
@@ -36,4 +37,13 @@ public class User {
 
     @Column(name = "failed_login_cnt", nullable = false)
     private Integer failedLoginCnt;
+
+    // ✅ 다중 권한 관계 추가
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_roles", // 연결 테이블 이름
+            joinColumns = @JoinColumn(name = "user_id"), // 현재 엔티티(User)의 FK
+            inverseJoinColumns = @JoinColumn(name = "role_id") // Role 엔티티 FK
+    )
+    private List<Role> roles;
 }
