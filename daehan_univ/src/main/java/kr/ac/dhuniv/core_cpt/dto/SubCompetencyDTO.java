@@ -4,9 +4,6 @@ import lombok.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class SubCompetencyDTO {
     private String cciId;    // 하위 역량 코드
     private String cciNm;    // 하위 역량명

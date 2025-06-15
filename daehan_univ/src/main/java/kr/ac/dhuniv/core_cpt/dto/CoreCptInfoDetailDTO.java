@@ -6,9 +6,6 @@ import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class CoreCptInfoDetailDTO {
     private String cciId;                   // 상위 역량 코드
     private String cciNm;                   // 역량명

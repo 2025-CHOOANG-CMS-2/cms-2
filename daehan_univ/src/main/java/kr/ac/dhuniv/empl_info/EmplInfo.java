@@ -2,7 +2,7 @@ package kr.ac.dhuniv.empl_info;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.com_info.ComInfo;
-import kr.ac.dhuniv.user.User;
+import kr.ac.dhuniv.user.UserInfo;
 import lombok.*;
 
 @Entity
@@ -52,5 +52,5 @@ public class EmplInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id2", referencedColumnName = "user_id")
-    private User user;
+    private UserInfo user;
 }
