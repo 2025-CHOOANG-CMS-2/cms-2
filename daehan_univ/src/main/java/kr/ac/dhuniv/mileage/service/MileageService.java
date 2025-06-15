@@ -15,7 +15,7 @@ import kr.ac.dhuniv.mileage.repository.NcsPrgMileageRepository2;
 import kr.ac.dhuniv.mileage.repository.StdMileageHistRepository;
 import kr.ac.dhuniv.mileage.repository.StdMileageTotalRepository;
 import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
-import kr.ac.dhuniv.std_info.StdInfo;
+import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.RequiredArgsConstructor;
 
 @Service

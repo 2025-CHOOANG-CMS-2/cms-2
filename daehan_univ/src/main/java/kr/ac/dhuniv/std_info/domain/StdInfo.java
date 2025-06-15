@@ -1,7 +1,8 @@
 package kr.ac.dhuniv.std_info.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.user.User;
+
+import kr.ac.dhuniv.user.UserInfo;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -58,5 +59,5 @@ public class StdInfo {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id2", referencedColumnName = "user_id")
-    private User user;
+    private UserInfo user;
 }
