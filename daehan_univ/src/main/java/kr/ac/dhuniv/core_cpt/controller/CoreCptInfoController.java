@@ -30,7 +30,7 @@ public class CoreCptInfoController {
     /** 하위 역량 등록 → DTO 반환 */
     @PostMapping("/child/{parentCciId}")
     public ResponseEntity<CoreCptInfoDetailDTO> registerChild(
-            @PathVariable("parentCciId") String parentCciId,
+            @PathVariable("parentCciId") Long parentCciId,
             @RequestBody CoreCptInfoRequestDTO dto) {
 
         CoreCptInfo saved = service.registerAsChild(parentCciId, dto);
@@ -55,7 +55,7 @@ public class CoreCptInfoController {
      */
     @GetMapping("/{cciId}")
     public ResponseEntity<CoreCptInfoDetailDTO> getCompetencyDetail(
-            @PathVariable("cciId") String cciId) {
+            @PathVariable("cciId") Long cciId) {
 
         // service 에서 CoreCptInfoDetailDTO 를 만들어 리턴하도록 변경
         CoreCptInfoDetailDTO detail = service.getDetailByCciId(cciId);

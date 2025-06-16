@@ -106,10 +106,7 @@
         <div class="col-auto">
           <select class="form-select" id="searchDept">
             <option value="">학과 전체</option>
-            <option value="CSE">컴퓨터공학과</option>
-            <option value="ME">기계공학과</option>
-            <option value="LAW">법학과</option>
-          </select>
+            </select>
         </div>
         <div class="col-auto">
           <select class="form-select" id="searchStatus">
@@ -123,17 +120,17 @@
           <button
             type="button"
             class="btn btn-primary"
-            onclick="filterStudents()"
+            id="filterButton" onclick="filterStudents()"
           >
             검색
           </button>
         </div>
       </form>
       <div class="table-responsive">
-        <table class="table table-bordered table-hover text-center" id="studentTable"> <thead class="table-light">
+        <table class="table table-bordered table-hover text-center" id="studentTable">
+          <thead class="table-light">
             <tr>
-              <th>학번</th>
-              <th>이름</th>
+              <th>학번 (User ID)</th> <th>이름</th>
               <th>학과</th>
               <th>학년</th>
               <th>상태</th>
@@ -212,13 +209,11 @@
 
                   <div class="detail-row">
                     <div class="detail-item">
-                      <div class="detail-label">학번</div>
-                      <input
+                      <div class="detail-label">학번 (User ID)</div> <input
                         type="text"
                         class="form-control form-control-sm"
                         id="add_id"
-                        placeholder="학번은 자동 생성됩니다."
-                        readonly />
+                        placeholder="User ID는 자동으로 생성됩니다." readonly />
                     </div>
                     <div class="detail-item">
                       <div class="detail-label">학생명</div>
@@ -231,18 +226,17 @@
                     </div>
                     <div class="detail-item">
                       <div class="detail-label">학과명</div>
-                      <select class="form-select form-select-sm" id="add_dept" required> <option value="">학과를 선택하세요</option>
-                        <option value="CSE">컴퓨터공학과</option>
-                        <option value="ME">기계공학과</option>
-                        <option value="LAW">법학과</option>
-                      </select>
+                      <select class="form-select form-select-sm" id="add_dept" required>
+                        <option value="">학과를 선택하세요</option>
+                        </select>
                     </div>
                   </div>
 
                   <div class="detail-row">
                     <div class="detail-item">
                       <div class="detail-label">학년</div>
-                      <select class="form-select form-select-sm" id="add_year" required> <option value="">학년을 선택하세요</option>
+                      <select class="form-select form-select-sm" id="add_year" required>
+                        <option value="">학년을 선택하세요</option>
                         <option value="1">1학년</option>
                         <option value="2">2학년</option>
                         <option value="3">3학년</option>
@@ -376,8 +370,7 @@
 
                   <div class="detail-row">
                     <div class="detail-item">
-                      <div class="detail-label">학번</div>
-                      <input
+                      <div class="detail-label">학번 (User ID)</div> <input
                         type="text"
                         class="form-control form-control-sm"
                         id="edit_id"
@@ -396,10 +389,7 @@
                     <div class="detail-item">
                       <div class="detail-label">학과명</div>
                       <select class="form-select form-select-sm" id="edit_dept" required>
-                        <option value="CSE">컴퓨터공학과</option>
-                        <option value="ME">기계공학과</option>
-                        <option value="LAW">법학과</option>
-                      </select>
+                        </select>
                     </div>
                   </div>
 

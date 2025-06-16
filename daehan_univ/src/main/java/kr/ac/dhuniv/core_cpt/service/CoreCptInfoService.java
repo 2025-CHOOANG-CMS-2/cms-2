@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -29,10 +28,10 @@ public class CoreCptInfoService {
      */
     public String generateNextRootCciId() {
         // CPT로 시작하는 항목 중 cciId가 가장 큰 것 조회
-        Optional<CoreCptInfo> latest = repository.findTopByCciIdStartingWithOrderByCciIdDesc("CPT");
+        Optional<CoreCptInfo> latest = repository.findTopByCciCodeStartingWithOrderByCciCodeDesc("CPT");
 
         // 가장 큰 cciId 가져오기, 없으면 "CPT000" 사용
-        String latestId = latest.map(CoreCptInfo::getCciId).orElse("CPT000");
+        String latestId = latest.map(CoreCptInfo::getCciCode).orElse("CPT000");
 
         // 숫자 부분 추출 (CPT003 -> 3)
         int number = Integer.parseInt(latestId.substring(3));
@@ -46,10 +45,10 @@ public class CoreCptInfoService {
      */
     public String generateNextSubCciId() {
         // SCPT로 시작하는 항목 중 cciId가 가장 큰 것 조회
-        Optional<CoreCptInfo> latest = repository.findTopByCciIdStartingWithOrderByCciIdDesc("SCPT");
+        Optional<CoreCptInfo> latest = repository.findTopByCciCodeStartingWithOrderByCciCodeDesc("SCPT");
 
         // 가장 큰 cciId 가져오기, 없으면 "SCPT000" 사용
-        String latestId = latest.map(CoreCptInfo::getCciId).orElse("SCPT000");
+        String latestId = latest.map(CoreCptInfo::getCciCode).orElse("SCPT000");
 
         // 숫자 부분 추출 (SCPT003 -> 3)
         int number = Integer.parseInt(latestId.substring(4));
@@ -66,7 +65,7 @@ public class CoreCptInfoService {
 
         // 엔티티 빌드
         CoreCptInfo entity = CoreCptInfo.builder()
-                .cciId(nextId)                  // 생성된 CPT 코드
+                .cciCode(nextId)                  // 생성된 CPT 코드
                 .parent(null)                   // 최상위 역량은 parent 없음
                 .cciNm(dto.getCciNm())          // 사용자 입력명
                 .cciDesc(dto.getCciDesc())      // 사용자 입력설명
@@ -83,7 +82,7 @@ public class CoreCptInfoService {
     /**
      * 하위 역량 등록
      */
-    public CoreCptInfo registerAsChild(String parentCciId, CoreCptInfoRequestDTO dto) {
+    public CoreCptInfo registerAsChild(Long parentCciId, CoreCptInfoRequestDTO dto) {
         // 새로운 SCPT 코드 생성
         String nextId = generateNextSubCciId();
 
@@ -93,7 +92,7 @@ public class CoreCptInfoService {
 
         // 엔티티 빌드
         CoreCptInfo entity = CoreCptInfo.builder()
-                .cciId(nextId)                  // 생성된 SCPT 코드
+                .cciCode(nextId)                  // 생성된 SCPT 코드
                 .parent(parent)                 // 상위 역량 연결
                 .cciNm(dto.getCciNm())          // 사용자 입력명
                 .cciDesc(dto.getCciDesc())      // 사용자 입력설명
@@ -120,7 +119,7 @@ public class CoreCptInfoService {
         // 엔티티 -> DTO 수동 변환
         for (CoreCptInfo entity : topList) {
             CoreCptInfoListDTO dto = CoreCptInfoListDTO.builder()
-                    .cciId(entity.getCciId())       // 코드
+                    .cciCode(entity.getCciCode())       // 코드
                     .cciNm(entity.getCciNm())       // 이름
                     .cciDesc(entity.getCciDesc())   // 설명
                     .questionCount(0)               // 질문 수 (나중에 로직 연결)
@@ -135,7 +134,7 @@ public class CoreCptInfoService {
     /**
      * 상위 cciId 로 상세 정보 조회 (하위 역량 포함)
      */
-    public CoreCptInfoDetailDTO getDetailByCciId(String cciId) {
+    public CoreCptInfoDetailDTO getDetailByCciId(Long cciId) {
         // (1) repository 를 통해 해당 cciId 의 CoreCptInfo 엔티티를 조회
         CoreCptInfo entity = repository.findByCciId(cciId)
                 .orElseThrow(() -> new IllegalArgumentException(
@@ -148,7 +147,7 @@ public class CoreCptInfoService {
         for (CoreCptInfo child : entity.getChildren()) {
             // (3-1) 각 하위 역량 엔티티를 DTO 로 변환
             SubCompetencyDTO subDto = new SubCompetencyDTO();
-            subDto.setCciId(child.getCciId());     // 하위 역량 코드
+            subDto.setCciCode(child.getCciCode());     // 하위 역량 코드
             subDto.setCciNm(child.getCciNm());     // 하위 역량명
             subDto.setCciDesc(child.getCciDesc()); // 하위 역량 설명
             subDto.setWeight(child.getWeight());   // 하위 역량 가중치
@@ -159,7 +158,7 @@ public class CoreCptInfoService {
 
         // (4) CoreCptInfoDetailDTO 인스턴스 생성 및 상위 정보 설정
         CoreCptInfoDetailDTO detailDto = new CoreCptInfoDetailDTO();
-        detailDto.setCciId(entity.getCciId());               // 상위 역량 코드
+        detailDto.setCciCode(entity.getCciCode());               // 상위 역량 코드
         detailDto.setCciNm(entity.getCciNm());               // 상위 역량명
         detailDto.setCciDesc(entity.getCciDesc());           // 상위 역량 설명
         detailDto.setWeight(entity.getWeight());             // 상위 역량 가중치
@@ -173,7 +172,7 @@ public class CoreCptInfoService {
     public CoreCptInfoDetailDTO toDetailDTO(CoreCptInfo entity) {
         // (이미 작성하신 for-loop 기반 SubCompetencyDTO 변환 로직과 동일)
         CoreCptInfoDetailDTO dto = new CoreCptInfoDetailDTO();
-        dto.setCciId(entity.getCciId());
+        dto.setCciCode(entity.getCciCode());
         dto.setCciNm(entity.getCciNm());
         dto.setCciDesc(entity.getCciDesc());
         dto.setWeight(entity.getWeight());
@@ -187,7 +186,7 @@ public class CoreCptInfoService {
         List<SubCompetencyDTO> subs = new ArrayList<>();
         for (CoreCptInfo child : entity.getChildren()) {
             SubCompetencyDTO sub = new SubCompetencyDTO();
-            sub.setCciId(child.getCciId());
+            sub.setCciCode(child.getCciCode());
             sub.setCciNm(child.getCciNm());
             sub.setCciDesc(child.getCciDesc());
             sub.setWeight(child.getWeight());

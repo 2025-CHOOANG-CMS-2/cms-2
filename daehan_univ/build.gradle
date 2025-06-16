@@ -38,8 +38,16 @@ dependencies {
 
    //✅ 공통 기능(로깅, 보안 검사 등)을 코드와 분리해서 적용 가능하게 해주는 기법
    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop', version: '3.4.5'
+    // ✅ Spring Security 의존성 추가
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
+    // ✅ JWT 라이브러리 추가 (가장 많이 쓰이는 jjwt)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5' // JSON 파싱용 (jackson 사용)
 
+    // ✅ (선택) 패스워드 암호화용 BCrypt
+    implementation 'org.springframework.security:spring-security-crypto'
    //thymeleaf
    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: '3.4.5'
     // ✅ MyBatis (직접 SQL 작성 시 사용)

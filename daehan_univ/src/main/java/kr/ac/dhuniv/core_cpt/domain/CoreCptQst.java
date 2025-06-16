@@ -9,10 +9,11 @@ import java.time.LocalDateTime;
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class CoreCptQst {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name="qst_id")
+    private Long qstId;
 
-    @Column(name = "qst_id", length = 20, nullable = false, unique = true)
-    private String qstId;
+    @Column(name = "qst_code", length = 20, nullable = false, unique = true)
+    private String qstCode;
 
     // core_cpt_qst.cci_id → core_cpt_info.id
     // CoreCptQst.java
