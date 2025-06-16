@@ -19,22 +19,22 @@ public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
     List<NcsCmpInfo> findByStudent_StdId(Long stdId);
     
     // 전체 이수자 목록 조회
-    @Query("""
-    	    SELECT new kr.ac.dhuniv.mileage.dto.CompletedStudentDto(
-    	    s.stdNo,
-    	    s.stdNm,
-    	    p.prgNm,
-    	    c.cciNm,
-            a.completeDate,
-            m.mileageScore
-        )
-        FROM NcsCmpInfo a 
-        JOIN a.student s
-        JOIN a.program p
-        JOIN p.coreCpt c
-        JOIN NcsPrgMileage m ON m.program = p
-    """)
-    List<CompletedStudentDto> findAllCompletedStudents();
+//    @Query("""
+//    	    SELECT new kr.ac.dhuniv.mileage.dto.CompletedStudentDto(
+//    	    s.stdNo,
+//    	    s.stdNm,
+//    	    p.prgNm,
+//    	    c.cciNm,
+//            a.completeDate,
+//            m.mileageScore
+//        )
+//        FROM NcsCmpInfo a 
+//        JOIN a.student s
+//        JOIN a.program p
+//        JOIN p.coreCpt c
+//        JOIN NcsPrgMileage m ON m.program = p
+//    """)
+//    List<CompletedStudentDto> findAllCompletedStudents();
 }
 
 

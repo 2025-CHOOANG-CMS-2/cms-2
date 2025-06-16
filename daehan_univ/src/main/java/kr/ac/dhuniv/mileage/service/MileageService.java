@@ -66,9 +66,9 @@ public class MileageService {
         return String.format("MLG%03d", nextCode);   // 예: MLG001, MLG002 ...
     }
     
-    public List<CompletedStudentDto> getAllCompletedStudents() {
-        return cmpInfoRepository.findAllCompletedStudents();
-    }
+//    public List<CompletedStudentDto> getAllCompletedStudents() {
+//        return cmpInfoRepository.findAllCompletedStudents();
+//    }
 
 //    public List<CompletedStudentDto> searchCompletedStudents(String programName, String studentName) {
 //        return cmpInfoRepository.findCompletedStudentsByCondition(programName, studentName);
