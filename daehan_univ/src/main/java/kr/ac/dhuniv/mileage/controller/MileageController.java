@@ -78,11 +78,11 @@ public class MileageController {
     	return "/employee/mileage/mileage-payment.html";
     }
     
-    @GetMapping("/completed-students")
-    public String getCompletedStudents() {
-    	System.out.println(mileageService.getAllCompletedStudents());
-        return "/employee/mileage/mileage-payment.html";
-    }
+//    @GetMapping("/completed-students")
+//    public String getCompletedStudents() {
+//    	System.out.println(mileageService.getAllCompletedStudents());
+//        return "/employee/mileage/mileage-payment.html";
+//    }
     
 //    @GetMapping("/completed-students")
 //    public List<CompletedStudentDto> getCompletedStudents(
