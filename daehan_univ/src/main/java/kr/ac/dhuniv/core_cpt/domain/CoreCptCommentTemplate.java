@@ -7,7 +7,7 @@ import lombok.*;
 @Getter @Setter @Builder @NoArgsConstructor @AllArgsConstructor
 public class CoreCptCommentTemplate {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long cmt_id;
 
     // core_cpt_comment_template.cci_id → core_cpt_info.id
     @ManyToOne(fetch = FetchType.LAZY)

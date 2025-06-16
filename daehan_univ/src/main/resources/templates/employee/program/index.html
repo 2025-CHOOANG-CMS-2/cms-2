@@ -216,7 +216,6 @@
       .table tbody tr:hover {
         background: #f9fafb;
       }
-
       /* 상태 배지 */
       .status-badge {
         padding: 0.25rem 0.75rem;
@@ -591,6 +590,43 @@
           height: 100vh;
         }
       }
+
+      .image-upload-wrapper {
+        margin-bottom: 20px;
+      }
+
+      .image-preview-container {
+        width: 200px;
+        height: 200px;
+        border: 2px dashed #ddd;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+      }
+
+      .image-preview-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .detail-image-container {
+        width: 100%;
+        max-height: 300px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .detail-image-container img {
+        max-width: 100%;
+        height: auto;
+        object-fit: contain;
+      }
     </style>
   </head>
   <body>
@@ -720,11 +756,13 @@
         <table class="table">
           <thead>
             <tr>
-              <th style="width: 60px">번호</th>
+              <th>번호</th>
+              <th>대표이미지</th>
+              <!-- 추가된 컬럼 -->
               <th>프로그램명</th>
               <th style="width: 100px">카테고리</th>
               <th style="width: 80px">정원</th>
-              <th style="width: 80px">마일리지</th>
+              <th style="width: 100px">마일리지</th>
               <th style="width: 120px">신청기간</th>
               <th style="width: 120px">운영기간</th>
               <th style="width: 100px">상태</th>
@@ -753,14 +791,85 @@
     <div class="modal-overlay" id="detailModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title">프로그램 상세 정보</h2>
-          <button class="modal-close" onclick="closeDetailModal()">×</button>
+          <h3 class="modal-title">프로그램 상세정보</h3>
+          <button class="modal-close" onclick="closeDetailModal()">
+            &times;
+          </button>
         </div>
-
-        <div class="modal-body" id="detailModalBody">
-          <!-- 상세 정보가 여기에 동적으로 생성됩니다 -->
+        <div class="modal-body">
+          <div class="detail-section">
+            <div class="detail-image-container">
+              <img id="detailProgramImage" src="" alt="프로그램 이미지" />
+            </div>
+            <div class="form-section">
+              <h4>기본 정보</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="detail-label">프로그램 ID</span>
+                  <span class="detail-value" id="detailId"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">프로그램명</span>
+                  <span class="detail-value" id="detailName"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">카테고리</span>
+                  <span class="detail-value" id="detailCategory"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">마일리지</span>
+                  <span class="detail-value" id="detailMileage"></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-section">
+              <h4>기간 및 장소</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="detail-label">신청기간</span>
+                  <span class="detail-value" id="detailApplyPeriod"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">프로그램 기간</span>
+                  <span class="detail-value" id="detailProgramPeriod"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">진행장소</span>
+                  <span class="detail-value" id="detailLocation"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">수강정원</span>
+                  <span class="detail-value" id="detailCapacity"></span>
+                </div>
+              </div>
+            </div>
+            <div class="form-section">
+              <h4>담당자 정보</h4>
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="detail-label">담당자명</span>
+                  <span class="detail-value" id="detailManager"></span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">연락처</span>
+                  <span class="detail-value" id="detailContact">-</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">이메일</span>
+                  <span class="detail-value" id="detailEmail">-</span>
+                </div>
+                <div class="detail-item">
+                  <span class="detail-label">소속부서</span>
+                  <span class="detail-value" id="detailDepartment">-</span>
+                </div>
+              </div>
+            </div>
+            <div class="detail-full">
+              <span class="detail-label">프로그램 설명</span>
+              <div class="detail-value" id="detailDescription"></div>
+            </div>
+          </div>
         </div>
-
         <div class="modal-actions">
           <button
             class="btn-modal btn-modal-secondary"
@@ -770,7 +879,7 @@
           </button>
           <button
             class="btn-modal btn-modal-primary"
-            onclick="editFromDetail()"
+            onclick="editProgramFromDetail()"
           >
             수정하기
           </button>
@@ -782,11 +891,32 @@
     <div class="modal-overlay" id="programModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h2 class="modal-title" id="modalTitle">프로그램 등록</h2>
-          <button class="modal-close" onclick="closeModal()">×</button>
+          <h3 class="modal-title" id="modalTitle">프로그램 등록</h3>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
-
         <div class="modal-body">
+          <!-- 이미지 업로드 영역 추가 -->
+          <div class="form-group">
+            <label for="programImage" class="form-label">프로그램 이미지</label>
+            <div class="image-upload-wrapper">
+              <div class="image-preview-container">
+                <img
+                  id="uploadPreview"
+                  src="/images/no-image.png"
+                  alt="이미지 미리보기"
+                />
+              </div>
+              <input
+                type="file"
+                id="programImage"
+                name="programImage"
+                class="form-control"
+                accept="image/*"
+                onchange="previewUploadImage(this)"
+              />
+            </div>
+          </div>
+          <!-- 기존 폼 요소들 -->
           <form id="programForm">
             <div class="form-group">
               <label class="form-label required">프로그램 ID</label>
@@ -1093,6 +1223,16 @@
           <tr>
             <td>${index + 1}</td>
             <td>
+              <!-- 대표이미지 영역 -->
+              <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 8px;">
+                <img
+                  src="https://via.placeholder.com/60"
+                  alt="대표이미지"
+                  style="width: 100%; height: 100%; object-fit: cover;"
+                />
+              </div>
+            </td>
+            <td>
               <div style="font-weight: 600;">${program.prg_nm}</div>
               <div style="font-size: 0.85rem; color: #6b7280;">${
                 program.prg_id
@@ -1171,133 +1311,115 @@
       // 프로그램 상세 보기
       function viewProgram(id) {
         const program = programs.find((p) => p.id === id);
-        if (!program) return;
+        if (program) {
+          document.getElementById("detailId").textContent = program.id;
+          document.getElementById("detailName").textContent = program.prg_nm;
+          document.getElementById("detailCategory").textContent =
+            program.categoryName;
+          document.getElementById(
+            "detailMileage"
+          ).textContent = `${program.mileage_score} 점`;
+          document.getElementById(
+            "detailCapacity"
+          ).textContent = `${program.max_cnt}명`;
+          document.getElementById(
+            "detailApplyPeriod"
+          ).textContent = `${formatDate(program.aply_bgng_ymd)} ~ ${formatDate(
+            program.aply_end_ymd
+          )}`;
+          document.getElementById(
+            "detailProgramPeriod"
+          ).textContent = `${formatDate(program.prg_st_dt)} ~ ${formatDate(
+            program.prg_end_dt
+          )}`;
+          document.getElementById("detailLocation").textContent =
+            program.location || "-";
+          document.getElementById("detailManager").textContent =
+            program.manager || "-";
+          document.getElementById("detailContact").textContent = "-";
+          document.getElementById("detailEmail").textContent = "-";
+          document.getElementById("detailDepartment").textContent = "-";
+          document.getElementById("detailDescription").textContent =
+            program.prg_desc || "-";
+          document.getElementById("detailProgramImage").src =
+            program.image_url || "/images/no-image.png";
 
-        const status = getProgramStatus(program);
-
-        const detailContent = `
-          <div class="detail-section">
-            <h3>기본 정보</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <div class="detail-label">프로그램 ID</div>
-                <div class="detail-value">${program.prg_id}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">카테고리</div>
-                <div class="detail-value">${program.categoryName}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">정원</div>
-                <div class="detail-value">${program.max_cnt}명</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">마일리지</div>
-                <div class="detail-value">${program.mileage_score}점</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">진행 장소</div>
-                <div class="detail-value">${program.location || "-"}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">담당자</div>
-                <div class="detail-value">${program.manager || "-"}</div>
-              </div>
-              <div class="detail-item detail-full">
-                <div class="detail-label">프로그램명</div>
-                <div class="detail-value" style="font-weight: 600; font-size: 1.1rem;">${
-                  program.prg_nm
-                }</div>
-              </div>
-              <div class="detail-item detail-full">
-                <div class="detail-label">프로그램 설명</div>
-                <div class="detail-value">${program.prg_desc || "-"}</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h3>일정 정보</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <div class="detail-label">신청 시작일</div>
-                <div class="detail-value">${formatDateTime(
-                  program.aply_bgng_ymd
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">신청 종료일</div>
-                <div class="detail-value">${formatDateTime(
-                  program.aply_end_ymd
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">프로그램 시작일</div>
-                <div class="detail-value">${formatDateTime(
-                  program.prg_st_dt
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">프로그램 종료일</div>
-                <div class="detail-value">${formatDateTime(
-                  program.prg_end_dt
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">현재 상태</div>
-                <div class="detail-value">
-                  <span class="status-badge status-${status.status}">${
-          status.text
-        }</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="detail-section">
-            <h3>등록 정보</h3>
-            <div class="detail-grid">
-              <div class="detail-item">
-                <div class="detail-label">등록일시</div>
-                <div class="detail-value">${formatDateTime(
-                  program.reg_dt
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">등록자</div>
-                <div class="detail-value">${program.reg_user_id}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">수정일시</div>
-                <div class="detail-value">${formatDateTime(
-                  program.upd_dt
-                )}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-label">수정자</div>
-                <div class="detail-value">${program.upd_user_id}</div>
-              </div>
-            </div>
-          </div>
-        `;
-
-        document.getElementById("detailModalBody").innerHTML = detailContent;
-        editingProgram = program;
-        detailModal.classList.add("show");
-        document.body.style.overflow = "hidden";
+          detailModal.classList.add("show");
+        }
       }
 
-      // 상세 모달에서 수정하기
+      // 상세보기에서 수정하기로 전환하는 함수
       function editFromDetail() {
-        closeDetailModal();
-        editProgram(editingProgram.id);
+        const programId = document.getElementById("detailId").textContent;
+        const program = programs.find((p) => p.id === programId);
+
+        if (program) {
+          // 상세보기 모달 닫기
+          closeDetailModal();
+
+          // 수정 모달의 title 변경
+          document.getElementById("modalTitle").textContent = "프로그램 수정";
+
+          // 수정 모달의 form 필드들에 데이터 채우기
+          document.getElementById("programName").value = program.prg_nm;
+          document.getElementById("category").value = program.category;
+          document.getElementById("mileage").value = program.mileage;
+          document.getElementById("capacity").value = program.capacity;
+          document.getElementById("startDate").value = program.aply_bgng_ymd;
+          document.getElementById("endDate").value = program.aply_end_ymd;
+          document.getElementById("prgStartDate").value = program.prg_bgng_ymd;
+          document.getElementById("prgEndDate").value = program.prg_end_ymd;
+          document.getElementById("location").value = program.location;
+          document.getElementById("description").value = program.description;
+          document.getElementById("managerName").value = program.manager_nm;
+          document.getElementById("managerContact").value = program.manager_tel;
+          document.getElementById("managerEmail").value = program.manager_email;
+          document.getElementById("department").value = program.dept_nm;
+
+          // 이미지 미리보기 설정
+          if (program.image_url) {
+            document.getElementById("uploadPreview").src = program.image_url;
+          }
+
+          // 수정 중인 프로그램 ID 저장
+          editingProgramId = program.id;
+
+          // 수정 모달 표시
+          const programModal = document.getElementById("programModal");
+          programModal.classList.add("show");
+        }
+      }
+
+      // 프로그램 수정 함수
+      function editProgram(id) {
+        const program = programs.find((p) => p.id === id);
+        if (program) {
+          // 수정 모달 폼에 데이터 설정
+          document.getElementById("programName").value = program.prg_nm;
+          document.getElementById("category").value = program.category_id;
+          document.getElementById("mileage").value = program.mileage;
+          document.getElementById("capacity").value = program.capacity;
+          document.getElementById("location").value = program.location;
+          // ... 나머지 필드들도 설정
+
+          // 이미지 미리보기 설정
+          document.getElementById("uploadPreview").src =
+            program.image_url || "/images/no-image.png";
+
+          // 수정 모달 제목 변경
+          document.getElementById("modalTitle").textContent = "프로그램 수정";
+
+          // 현재 수정중인 프로그램 ID 저장
+          editingProgramId = program.id;
+
+          // 수정 모달 표시
+          programModal.classList.add("show");
+        }
       }
 
       // 상세 모달 닫기
       function closeDetailModal() {
         detailModal.classList.remove("show");
-        document.body.style.overflow = "auto";
-        editingProgram = null;
       }
 
       // 모달 열기 (새 프로그램)
@@ -1335,6 +1457,14 @@
 
         programModal.classList.add("show");
         document.body.style.overflow = "hidden";
+      }
+
+      function editProgramFromDetail() {
+        const id = parseInt(document.getElementById("detailId").textContent);
+        if (!isNaN(id)) {
+          closeDetailModal();
+          editProgram(id);
+        }
       }
 
       // 모달 닫기
@@ -1438,6 +1568,22 @@
 
         closeModal();
         renderTable();
+      }
+
+      // 이미지 미리보기
+      function previewUploadImage(input) {
+        const file = input.files[0];
+        const previewContainer = document.getElementById("uploadPreview");
+
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewContainer.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          previewContainer.src = "/images/no-image.png";
+        }
       }
 
       // 이벤트 리스너

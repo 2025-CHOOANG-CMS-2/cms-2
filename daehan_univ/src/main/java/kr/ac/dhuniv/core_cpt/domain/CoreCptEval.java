@@ -19,11 +19,11 @@ public class CoreCptEval {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id; // 자동 증가 PK
+    @Column(name = "eval_id")
+    private Long evalId; // 자동 증가 PK
 
-    @Column(name = "eval_id", length = 20, nullable = false, unique = true)
-    private String evalId; // 비즈니스 키
+    @Column(name = "eval_code", length = 20, nullable = false, unique = true)
+    private String evalCode; // 비즈니스 키
 
     @Column(name = "ans_score", precision = 10, scale = 3)
     private BigDecimal answerScore;
