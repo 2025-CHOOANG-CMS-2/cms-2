@@ -15,11 +15,12 @@ import java.util.List;
 @Table(name = "core_cpt_info")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class CoreCptInfo {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                    // PK
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long cciId;                    // PK
 
-    @Column(name = "cci_id", length = 20, nullable = false, unique = true)
-    private String cciId;               // 비즈니스키
+    @Column(name = "cci_code", length = 20, nullable = false, unique = true)
+    private String cciCode;               // 비즈니스키
 
     // (1) 부모 역량: up_cci_id → core_cpt_info.id (bigint FK)
 // CoreCptInfo.java (자기참조)

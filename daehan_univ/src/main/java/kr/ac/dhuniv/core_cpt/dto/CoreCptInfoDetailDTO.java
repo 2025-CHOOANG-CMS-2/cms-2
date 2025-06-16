@@ -7,7 +7,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CoreCptInfoDetailDTO {
-    private String cciId;                   // 상위 역량 코드
+    private String cciCode;                   // 상위 역량 코드
     private String cciNm;                   // 역량명
     private String cciDesc;                 // 설명
     private Integer weight;                 // 가중치 (%)

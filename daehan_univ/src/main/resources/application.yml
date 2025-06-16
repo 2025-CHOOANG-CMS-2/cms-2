@@ -23,3 +23,6 @@ spring:
     suffix: .html
     mode: HTML
     encoding: UTF-8
+jwt:
+  secret: "your-secure-jwt-secret-key-please-change-this" # JWT 서명 키 (안전하게 환경변수로 변경 권장)
+  expiration: 3600000 # 1시간 (밀리초 단위, 1000ms = 1초)
