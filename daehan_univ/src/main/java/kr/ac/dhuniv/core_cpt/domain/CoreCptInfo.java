@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
 
 import jakarta.persistence.*;
@@ -14,11 +15,12 @@ import java.util.List;
 @Table(name = "core_cpt_info")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class CoreCptInfo {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;                    // PK
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long cciId;                    // PK
 
-    @Column(name = "cci_id", length = 20, nullable = false, unique = true)
-    private String cciId;               // 비즈니스키
+    @Column(name = "cci_code", length = 20, nullable = false, unique = true)
+    private String cciCode;               // 비즈니스키
 
     // (1) 부모 역량: up_cci_id → core_cpt_info.id (bigint FK)
 // CoreCptInfo.java (자기참조)
@@ -27,7 +29,9 @@ public class CoreCptInfo {
     private CoreCptInfo parent;
 
     // (2) 자식(하위) 역량 리스트
+    @Builder.Default
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference            // ← children 필드는 직렬화하되, child.parent는 무시
     private List<CoreCptInfo> children = new ArrayList<>();
 
     @Column(name = "cci_nm", length = 100)
