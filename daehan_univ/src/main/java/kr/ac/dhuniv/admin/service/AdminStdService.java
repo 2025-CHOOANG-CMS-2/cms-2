@@ -3,20 +3,63 @@ package kr.ac.dhuniv.admin.service;
 import kr.ac.dhuniv.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
-import kr.ac.dhuniv.admin.repository.AdminStdRepository; // AdminStdRepository 임포트 유지
+import kr.ac.dhuniv.admin.repository.AdminStdRepository;
 import kr.ac.dhuniv.std_info.domain.StdInfo;
 import kr.ac.dhuniv.std_info.dto.StdInfoDto;
-import kr.ac.dhuniv.user.repository.UserRepository; // UserRepository import 유지 (User 객체 조회를 위해 필요)
+import kr.ac.dhuniv.user.repository.UserRepository;
+
+import jakarta.persistence.criteria.Predicate;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class AdminStdService {
 
     private final AdminStdRepository stdInfoRepository;
-    private final UserRepository userRepository; // User 엔티티를 조회하기 위해 필요
+    private final UserRepository userRepository;
+
+    // 학과 코드와 이름 매핑 (백엔드에서 유효성 검증 및 학번 생성에 사용)
+    private static final Map<String, String> DEPT_MAP = new HashMap<>();
+    static {
+        DEPT_MAP.put("001", "국어국문학과");
+        DEPT_MAP.put("002", "영어영문학과");
+        DEPT_MAP.put("003", "철학과");
+        DEPT_MAP.put("004", "정치외교학과");
+        DEPT_MAP.put("005", "심리학과");
+        DEPT_MAP.put("006", "사회복지학과");
+        DEPT_MAP.put("007", "통계학과");
+        DEPT_MAP.put("008", "천문학과");
+        DEPT_MAP.put("009", "화학과");
+        DEPT_MAP.put("010", "기계공학과");
+        DEPT_MAP.put("011", "컴퓨터공학과");
+        DEPT_MAP.put("012", "건축학과");
+        DEPT_MAP.put("013", "스마트시스템과학과");
+        DEPT_MAP.put("014", "동양화과");
+        DEPT_MAP.put("015", "조소과");
+        DEPT_MAP.put("016", "공예과");
+        DEPT_MAP.put("017", "교육학과");
+        DEPT_MAP.put("018", "식품영양학과");
+        DEPT_MAP.put("019", "의류학과");
+        DEPT_MAP.put("020", "성악과");
+        DEPT_MAP.put("021", "의예과");
+    }
+
+    // 상태 코드와 이름 매핑
+    private static final Map<String, String> STATUS_MAP = new HashMap<>();
+    static {
+        STATUS_MAP.put("ENROLL", "재학");
+        STATUS_MAP.put("LEAVE", "휴학");
+        STATUS_MAP.put("GRAD", "졸업");
+    }
 
     @Transactional
     public StdInfoDto insertStudent(StdInfoDto dto) {
@@ -26,14 +69,31 @@ public class AdminStdService {
                 throw new IllegalArgumentException("입력하신 이메일(" + dto.getSTD_EML_ADDR() + ")은 이미 등록된 학생의 이메일입니다.");
             }
 
-            String newStdNo = generateStudentNo();
+            // 2. 전화번호 중복 체크 추가
+            if (dto.getSTD_TELNO() != null && !dto.getSTD_TELNO().trim().isEmpty()) {
+                if (stdInfoRepository.findByTel(dto.getSTD_TELNO()).isPresent()) {
+                    throw new IllegalArgumentException("입력하신 전화번호(" + dto.getSTD_TELNO() + ")는 이미 등록된 학생의 전화번호입니다.");
+                }
+            }
 
-            String userReferenceId = dto.getUSER_ID2(); // 프론트에서 받은 "user01" 같은 문자열
+            // 3. 학과 코드 유효성 검사
+            if (!DEPT_MAP.containsKey(dto.getSCSBJT_CD())) {
+                throw new IllegalArgumentException("유효하지 않은 학과 코드입니다: " + dto.getSCSBJT_CD());
+            }
 
-            // User 엔티티의 userId (DB 컬럼명 user_id) 필드로 User를 찾습니다.
-            User associatedUser = userRepository.findByUserId(userReferenceId)
-                    .orElseThrow(() -> new IllegalArgumentException("해당 관리자 사용자 (ID: " + userReferenceId + ")를 찾을 수 없습니다. User 테이블의 user_id 필드를 확인하세요."));
+            // 4. 관리자 ID (USER_ID2)로 User 엔티티 조회
+            User associatedUser = userRepository.findByUserId(dto.getUSER_ID2())
+                    .orElseThrow(() -> new IllegalArgumentException("해당 관리자 사용자 (ID: " + dto.getUSER_ID2() + ")를 찾을 수 없습니다. User 테이블의 user_id 필드를 확인하세요."));
 
+            // 5. 새로운 학번 생성 (YYYY + NNN + MMM 체계)
+            String newStdNo = generateStudentNo(dto.getENTR_DT(), dto.getSCSBJT_CD());
+            
+            // 6. 생성된 학번의 중복 체크
+            if (stdInfoRepository.findByStdNo(newStdNo).isPresent()) {
+                throw new IllegalStateException("생성된 학번(" + newStdNo + ")이 이미 존재합니다. 다시 시도해주세요.");
+            }
+
+            // StdInfo 엔티티 빌드 및 저장
             StdInfo entity = StdInfo.builder()
                     .stdNo(newStdNo)
                     .stdNm(dto.getSTD_NM())
@@ -47,90 +107,89 @@ public class AdminStdService {
                     .tel(dto.getSTD_TELNO())
                     .email(dto.getSTD_EML_ADDR())
                     .useYn(dto.getUSE_YN() != null ? dto.getUSE_YN() : "Y")
-                    .user(associatedUser) // <<<<<< 조회된 User 엔티티 객체를 설정 >>>>>>
+                    .user(associatedUser) // `user` 필드에 관리자 User 엔티티 설정
                     .build();
 
             StdInfo savedEntity = stdInfoRepository.save(entity);
 
-            // 응답 DTO 구성
-            StdInfoDto responseDto = new StdInfoDto();
-            responseDto.setSTD_NO(savedEntity.getStdNo());
-            responseDto.setSTD_NM(savedEntity.getStdNm());
-            responseDto.setSCSBJT_CD(savedEntity.getScsbjtCd());
-            responseDto.setSCH_YR(savedEntity.getSchoolYear());
-            responseDto.setENTR_DT(savedEntity.getEntranceDate());
-            responseDto.setSTD_STAT_CD(savedEntity.getStatusCode());
-            responseDto.setSTD_ZIP(savedEntity.getZip());
-            responseDto.setSTD_ADDR(savedEntity.getAddress());
-            responseDto.setSTD_DADDR(savedEntity.getDetailAddress());
-            responseDto.setSTD_TELNO(savedEntity.getTel());
-            responseDto.setSTD_EML_ADDR(savedEntity.getEmail());
-            responseDto.setUSE_YN(savedEntity.getUseYn());
-            
-            if (savedEntity.getUser() != null) {
-                responseDto.setUSER_ID2(savedEntity.getUser().getUserId());
-            } else {
-                responseDto.setUSER_ID2(dto.getUSER_ID2());
-            }
-
-            return responseDto;
-        } catch (IllegalArgumentException e) {
-            System.err.println("학생 등록 실패 (데이터 유효성/사용자 오류): " + e.getMessage());
+            return convertToDto(savedEntity);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            System.err.println("학생 등록 실패: " + e.getMessage());
             throw e;
         } catch (Exception e) {
-            System.err.println("학생 등록 실패 (서비스 내부 오류): " + e.getMessage());
+            System.err.println("학생 등록 중 예상치 못한 오류 발생: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("학생 등록 처리 중 예상치 못한 오류 발생", e);
         }
     }
 
-    public String generateStudentNo() {
-        String prefix = "STD";
-        Integer maxNo = stdInfoRepository.findMaxStdNoNumber(prefix);
-        int nextNo = (maxNo != null) ? maxNo + 1 : 1;
-        return String.format(prefix + "%03d", nextNo);
+    public String generateStudentNo(LocalDate entranceDate, String scsbjtCd) {
+        if (entranceDate == null) {
+            throw new IllegalArgumentException("입학일자가 없어 학번을 생성할 수 없습니다.");
+        }
+        if (scsbjtCd == null || scsbjtCd.isEmpty()) {
+            throw new IllegalArgumentException("학과 코드가 없어 학번을 생성할 수 없습니다.");
+        }
+
+        String year = String.valueOf(entranceDate.getYear());
+
+        if (!DEPT_MAP.containsKey(scsbjtCd)) {
+             throw new IllegalArgumentException("학번 생성에 필요한 유효하지 않은 학과 코드입니다: " + scsbjtCd);
+        }
+
+        Integer maxSequence = stdInfoRepository.findMaxSequenceForStudentId(year, scsbjtCd);
+        int nextSequence = (maxSequence != null) ? maxSequence + 1 : 1;
+
+        String sequencePart = String.format("%03d", nextSequence);
+
+        return year + scsbjtCd + sequencePart;
     }
     
     @Transactional(readOnly = true)
-    public Page<StdInfoDto> getAllStudents(Pageable pageable) {
-        Page<StdInfo> studentPage = stdInfoRepository.findAll(pageable);
+    public Page<StdInfoDto> getAllStudents(Pageable pageable, String searchName, String searchDept, String searchStatus) {
+        Specification<StdInfo> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
 
-        return studentPage.map(stdInfo -> {
-            StdInfoDto dto = new StdInfoDto();
-            
-            dto.setSTD_NO(stdInfo.getStdNo());
-            dto.setSTD_NM(stdInfo.getStdNm());
-            dto.setSCSBJT_CD(stdInfo.getScsbjtCd());
-            dto.setSCH_YR(stdInfo.getSchoolYear());
-            dto.setENTR_DT(stdInfo.getEntranceDate());
-            dto.setSTD_STAT_CD(stdInfo.getStatusCode());
-            dto.setSTD_ZIP(stdInfo.getZip());
-            dto.setSTD_ADDR(stdInfo.getAddress());
-            dto.setSTD_DADDR(stdInfo.getDetailAddress());
-            dto.setSTD_TELNO(stdInfo.getTel());
-            dto.setSTD_EML_ADDR(stdInfo.getEmail());
-            dto.setUSE_YN(stdInfo.getUseYn());
-
-            if (stdInfo.getUser() != null) {
-                dto.setUSER_ID2(stdInfo.getUser().getUserId());
-            } else {
-                dto.setUSER_ID2(null);
+            if (searchName != null && !searchName.trim().isEmpty()) {
+                predicates.add(cb.like(cb.lower(root.get("stdNm")), "%" + searchName.toLowerCase() + "%"));
             }
-            return dto;
-        });
+            if (searchDept != null && !searchDept.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("scsbjtCd"), searchDept));
+            }
+            if (searchStatus != null && !searchStatus.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("statusCode"), searchStatus));
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        Page<StdInfo> studentPage = stdInfoRepository.findAll(spec, pageable);
+        return studentPage.map(this::convertToDto);
     }
 
-
-
-    // ✨ 1. 학생 정보 수정 메서드 추가
-    @Transactional // 데이터 변경이 발생하므로 @Transactional 필요
+    @Transactional
     public StdInfoDto updateStudent(String stdNo, StdInfoDto dto) {
-        // 학번(stdNo)으로 기존 학생 정보 조회
         StdInfo existingStudent = stdInfoRepository.findByStdNo(stdNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 학번(" + stdNo + ")의 학생을 찾을 수 없습니다."));
 
-        // DTO의 정보로 기존 엔티티 필드 업데이트
-        // (null 체크는 필요에 따라 추가)
+        if (!DEPT_MAP.containsKey(dto.getSCSBJT_CD())) {
+            throw new IllegalArgumentException("유효하지 않은 학과 코드입니다: " + dto.getSCSBJT_CD());
+        }
+
+        User updatedByUser = null;
+        if (dto.getUSER_ID2() != null && !dto.getUSER_ID2().isEmpty()) {
+            updatedByUser = userRepository.findByUserId(dto.getUSER_ID2())
+                    .orElseThrow(() -> new IllegalArgumentException("학생 정보를 수정하는 관리자 ID(" + dto.getUSER_ID2() + ")를 찾을 수 없습니다."));
+        }
+
+        // 전화번호 중복 체크 (수정 시): 자기 자신의 전화번호는 허용
+        if (dto.getSTD_TELNO() != null && !dto.getSTD_TELNO().trim().isEmpty()) {
+            Optional<StdInfo> existingStudentWithTel = stdInfoRepository.findByTel(dto.getSTD_TELNO());
+            if (existingStudentWithTel.isPresent() && !existingStudentWithTel.get().getStdNo().equals(stdNo)) {
+                throw new IllegalArgumentException("입력하신 전화번호(" + dto.getSTD_TELNO() + ")는 이미 다른 학생에게 등록된 전화번호입니다.");
+            }
+        }
+
         existingStudent.setStdNm(dto.getSTD_NM());
         existingStudent.setScsbjtCd(dto.getSCSBJT_CD());
         existingStudent.setSchoolYear(dto.getSCH_YR());
@@ -141,52 +200,43 @@ public class AdminStdService {
         existingStudent.setDetailAddress(dto.getSTD_DADDR());
         existingStudent.setTel(dto.getSTD_TELNO());
         existingStudent.setEmail(dto.getSTD_EML_ADDR());
-        existingStudent.setUseYn(dto.getUSE_YN() != null ? dto.getUSE_YN() : "Y"); // USE_YN이 DTO에 없으면 기본값 설정
+        existingStudent.setUseYn(dto.getUSE_YN() != null ? dto.getUSE_YN() : "Y");
+        
+        existingStudent.setUser(updatedByUser); // `user` 필드에 관리자 User 엔티티 설정
 
-        // USER_ID2가 변경될 경우 User 엔티티 업데이트
-        if (dto.getUSER_ID2() != null && !dto.getUSER_ID2().equals(existingStudent.getUser() != null ? existingStudent.getUser().getUserId() : null)) {
-            User newUser = userRepository.findByUserId(dto.getUSER_ID2())
-                    .orElseThrow(() -> new IllegalArgumentException("새로운 관리자 사용자 (ID: " + dto.getUSER_ID2() + ")를 찾을 수 없습니다."));
-            existingStudent.setUser(newUser);
-        } else if (dto.getUSER_ID2() == null && existingStudent.getUser() != null) {
-            // DTO에서 USER_ID2가 null인데 기존 학생에게 User가 연결되어 있었다면 연결 해제
-            existingStudent.setUser(null);
-        }
-
-        // 변경된 엔티티 저장 (JPA 영속성 컨텍스트 덕분에 명시적 save는 필수는 아니지만, 명확성을 위해 호출)
         StdInfo updatedEntity = stdInfoRepository.save(existingStudent);
 
-        // 업데이트된 엔티티를 DTO로 변환하여 반환
-        StdInfoDto responseDto = new StdInfoDto();
-        responseDto.setSTD_NO(updatedEntity.getStdNo());
-        responseDto.setSTD_NM(updatedEntity.getStdNm());
-        responseDto.setSCSBJT_CD(updatedEntity.getScsbjtCd());
-        responseDto.setSCH_YR(updatedEntity.getSchoolYear());
-        responseDto.setENTR_DT(updatedEntity.getEntranceDate());
-        responseDto.setSTD_STAT_CD(updatedEntity.getStatusCode());
-        responseDto.setSTD_ZIP(updatedEntity.getZip());
-        responseDto.setSTD_ADDR(updatedEntity.getAddress());
-        responseDto.setSTD_DADDR(updatedEntity.getDetailAddress());
-        responseDto.setSTD_TELNO(updatedEntity.getTel());
-        responseDto.setSTD_EML_ADDR(updatedEntity.getEmail());
-        responseDto.setUSE_YN(updatedEntity.getUseYn());
-        if (updatedEntity.getUser() != null) {
-            responseDto.setUSER_ID2(updatedEntity.getUser().getUserId());
-        }
-
-        return responseDto;
+        return convertToDto(updatedEntity);
     }
 
-
-
-    // ✨ 2. 학생 삭제 메서드 추가
-    @Transactional // 데이터 변경이 발생하므로 @Transactional 필요
+    @Transactional
     public void deleteStudent(String stdNo) {
-        // 학번(stdNo)으로 학생 조회
         StdInfo studentToDelete = stdInfoRepository.findByStdNo(stdNo)
                 .orElseThrow(() -> new IllegalArgumentException("해당 학번(" + stdNo + ")의 학생을 찾을 수 없습니다."));
 
-        // 학생 삭제
         stdInfoRepository.delete(studentToDelete);
+    }
+
+    private StdInfoDto convertToDto(StdInfo stdInfo) {
+        StdInfoDto dto = new StdInfoDto();
+        dto.setSTD_NO(stdInfo.getStdNo());
+        dto.setSTD_NM(stdInfo.getStdNm());
+        dto.setSCSBJT_CD(stdInfo.getScsbjtCd());
+        dto.setSCH_YR(stdInfo.getSchoolYear());
+        dto.setENTR_DT(stdInfo.getEntranceDate());
+        dto.setSTD_STAT_CD(stdInfo.getStatusCode());
+        dto.setSTD_ZIP(stdInfo.getZip());
+        dto.setSTD_ADDR(stdInfo.getAddress());
+        dto.setSTD_DADDR(stdInfo.getDetailAddress());
+        dto.setSTD_TELNO(stdInfo.getTel());
+        dto.setSTD_EML_ADDR(stdInfo.getEmail());
+        dto.setUSE_YN(stdInfo.getUseYn());
+        
+        if (stdInfo.getUser() != null) {
+            dto.setUSER_ID2(stdInfo.getUser().getUserId());
+        } else {
+            dto.setUSER_ID2(null);
+        }
+        return dto;
     }
 }

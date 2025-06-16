@@ -14,10 +14,13 @@ import lombok.*;
 @Builder
 public class EmplInfo {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id; // 자동 증가 PK
+    @Column(name = "empl_id") 
+    private Long emplId; 
+
 
     @Column(name = "empl_no", length = 20, nullable = false, unique = true)
     private String emplNo; // 비즈니스 키
