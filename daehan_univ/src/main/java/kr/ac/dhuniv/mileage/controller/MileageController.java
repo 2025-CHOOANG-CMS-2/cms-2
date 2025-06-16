@@ -73,7 +73,7 @@ public class MileageController {
 	
 	//비고과 프로그램 이수자에게 마일리지 지급 데이터베이스 저장
     @PostMapping("/employee/mileage/{prgId}")
-    public String payMileage(@PathVariable("prgId") String prgId) {
+    public String payMileage(@PathVariable("prgId") Long prgId) {
     	mileageService.payMileageForProgram(prgId);
     	return "/employee/mileage/mileage-payment.html";
     }

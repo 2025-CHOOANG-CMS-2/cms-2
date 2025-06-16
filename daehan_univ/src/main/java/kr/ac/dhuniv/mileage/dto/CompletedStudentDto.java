@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class CompletedStudentDto {
+	private Long stdId;                   //자동증가값
 	private String stdNo;                 //학번
 	private String stdNm;                 //학생 이름
 	private String prgNm;                 //비고과 프로그램명
