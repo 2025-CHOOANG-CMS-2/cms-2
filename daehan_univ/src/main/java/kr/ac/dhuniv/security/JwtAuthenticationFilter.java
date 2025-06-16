@@ -29,6 +29,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // JWT 발급 및 검증을 담당하는 JwtTokenProvider를 주입받음
     private final JwtTokenProvider jwtTokenProvider;
 
+
+
+
     /**
      * ✅ doFilterInternal 메서드
      * - 요청마다 실행되며, SecurityContext에 인증 정보를 채우는 핵심 메서드
@@ -42,7 +45,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
+        // JWT 필터에서 logout URL 은 skip
+        if (request.getRequestURI().equals("/api/auth/logout")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
         // 🔹 요청에서 쿠키 기반 JWT 토큰 추출
         String token = resolveToken(request);  // 쿠키 이름이 AUTH_TOKEN인 값을 가져옴
 

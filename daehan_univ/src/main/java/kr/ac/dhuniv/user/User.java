@@ -14,7 +14,8 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // BIGSERIAL, AUTO_INCREMENT
-    private Long id;  // 의미 없는 내부 PK
+    @Column(name="user_idx")
+    private Long userIdx;  // 의미 없는 내부 PK
 
     @Column(name = "user_id", length = 20, nullable = false, unique = true)
     private String userId;  // 학번 or 사번

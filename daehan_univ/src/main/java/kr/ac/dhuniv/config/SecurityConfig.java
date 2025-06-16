@@ -33,7 +33,7 @@ public class SecurityConfig {
         http
                 // 🔹 CSRF 보호 비활성화 (쿠키 SameSite로 방어, REST API용)
                 .csrf(csrf -> csrf.disable())
-
+                .logout(logout -> logout.disable())  // Spring Security LogoutFilter 비활성화
                 // 🔹 세션 생성 금지 (JWT 기반이므로 상태 저장 불필요)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
@@ -41,7 +41,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // /api/auth/** → 로그인, 회원가입 등은 누구나 접근 허용
-                        .requestMatchers("/login","/api/auth/**","/css/**","/js/**","/admin/index").permitAll()
+                        .requestMatchers("/","/login","/api/auth/**","/css/**","/js/**","/admin/index","/student/index","/employee/index").permitAll()
 
                         // /api/admin/** → ADMIN 권한 사용자만 접근 허용
                         .requestMatchers("/admin/**","/api/admin/**").hasRole("ADMIN")

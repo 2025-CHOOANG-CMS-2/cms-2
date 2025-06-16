@@ -75,9 +75,11 @@ public class AuthController {
         if (roles.contains("ADMIN")) {
             redirectUrl = "/admin/index";  // 관리자 메인 페이지
         } else if (roles.stream().anyMatch(r ->
-                List.of("ROLE_EMPLOYEE", "ROLE_COUNSELOR", "ROLE_PROFESSOR").contains(r))) {
-            redirectUrl = "/employee/index";  // 교직원용 메인 페이지
+                List.of("EMPLOYEE", "COUNSELOR", "PROFESSOR").contains(r))) {
+            System.out.println("roles = " + roles.toString());
+            redirectUrl = "/employees/index";  // 교직원용 메인 페이지
         } else {
+            //System.out.println("roles = " + roles.toString());
             redirectUrl = "/student/index";   // 학생용 메인 페이지
         }
 
