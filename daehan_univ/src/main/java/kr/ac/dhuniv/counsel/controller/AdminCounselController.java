@@ -9,6 +9,6 @@ public class AdminCounselController {
 	@GetMapping("/admin_counselor_management")
 	public String admin_counselor_management() {
 		
-		return "/admin/admin-counselor-management";
+		return "/admin/counsel/admin-counselor-management";
 	}
 }
