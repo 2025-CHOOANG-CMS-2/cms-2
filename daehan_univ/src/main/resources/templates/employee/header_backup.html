@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" th:fragment="common-head">
- <head>
+<html lang="ko">
+ <head th:fragment="common-head">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>대한대학교 CMS 포털 - 교직원</title>
@@ -171,8 +171,7 @@
       }
     </style>
   </head>
-  <body>
-  <header>
+  <body th:fragment="staff-header">
     <!-- 헤더 -->
     <header class="header d-flex">
       <div class="header-left">
@@ -180,7 +179,7 @@
       </div>
       <div class="header-center">
         <img
-          src="/images/logo-white.png"
+          src="../../static/images/logo-white.png"
           alt="logo"
           height="30"
           class="me-2"
@@ -249,12 +248,13 @@
           >마일리지관리</a
         >
         <div class="submenu" id="submenu-마일리지" style="display: none">
-          <a class="nav-link" href="/mileage/points">대시보드</a>
+          <a class="nav-link" href="/mileage/points">마일리지배점</a>
           <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+          <a class="nav-link" href="/mileage/status">마일리지현황</a>
         </div>
       </nav>
     </aside>
-</header>
+
 
     <!-- 스크립트 -->
     <script>

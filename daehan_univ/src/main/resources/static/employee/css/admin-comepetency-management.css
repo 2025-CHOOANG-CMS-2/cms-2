@@ -1,0 +1,77 @@
+@charset "UTF-8";
+  .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .sidebar .nav-link {
+            color: rgba(255,255,255,0.8);
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+        .main-content {
+            background-color: #f8f9fa;
+            min-height: 100vh;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            margin-bottom: 20px;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 0.5rem 1.5rem;
+        }
+        .table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .competency-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        .competency-card:hover {
+            transform: translateX(5px);
+        }
+        .competency-communication { border-left-color: #3498db; }
+        .competency-creativity { border-left-color: #9b59b6; }
+        .competency-leadership { border-left-color: #e74c3c; }
+        .competency-problem-solving { border-left-color: #f39c12; }
+        .competency-teamwork { border-left-color: #27ae60; }
+        
+        .color-picker {
+            width: 100%;
+            height: 40px;
+            border-radius: 5px;
+            border: 1px solid #ced4da;
+            cursor: pointer;
+        }
+        
+        .competency-detail {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .sub-competency-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-left: 3px solid #3498db;
+        }

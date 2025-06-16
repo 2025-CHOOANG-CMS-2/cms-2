@@ -1,7 +1,7 @@
 package kr.ac.dhuniv.mileage.domain;
 
 import jakarta.persistence.*;
-import kr.ac.dhuniv.std_info.StdInfo;
+import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.*;
 
 import java.math.BigDecimal;

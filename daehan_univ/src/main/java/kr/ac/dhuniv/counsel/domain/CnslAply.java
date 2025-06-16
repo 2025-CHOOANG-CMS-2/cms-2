@@ -2,7 +2,7 @@ package kr.ac.dhuniv.counsel.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.empl_info.EmplInfo;
-import kr.ac.dhuniv.std_info.StdInfo;
+import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.*;
 
 import java.time.LocalDateTime;
