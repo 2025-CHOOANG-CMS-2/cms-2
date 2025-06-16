@@ -42,6 +42,6 @@ public class StdMileageHist {
     private NcsPrgMileage programMileage;
 
     @ManyToOne(fetch = FetchType.LAZY)                              //학생기준 여러건의 마일리지 이력이 한건의 마일리지 총합과 매핑됨(N:1)
-    @JoinColumn(name = "std_no", referencedColumnName = "std_no")
+    @JoinColumn(name = "std_id", referencedColumnName = "std_id")
     private StdMileageTotal studentTotal;
 }
