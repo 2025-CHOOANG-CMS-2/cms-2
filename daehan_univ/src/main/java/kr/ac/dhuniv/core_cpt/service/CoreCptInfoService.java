@@ -2,10 +2,10 @@ package kr.ac.dhuniv.core_cpt.service;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoDetailDTO;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoListDTO;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoRequestDTO;
-import kr.ac.dhuniv.core_cpt.dto.SubCompetencyDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoDetailDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoListDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoRequestDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.SubCompetencyDTO;
 import kr.ac.dhuniv.core_cpt.repository.CoreCptInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -119,6 +119,7 @@ public class CoreCptInfoService {
         // 엔티티 -> DTO 수동 변환
         for (CoreCptInfo entity : topList) {
             CoreCptInfoListDTO dto = CoreCptInfoListDTO.builder()
+                    .cciId(entity.getCciId())
                     .cciCode(entity.getCciCode())       // 코드
                     .cciNm(entity.getCciNm())       // 이름
                     .cciDesc(entity.getCciDesc())   // 설명
@@ -147,6 +148,7 @@ public class CoreCptInfoService {
         for (CoreCptInfo child : entity.getChildren()) {
             // (3-1) 각 하위 역량 엔티티를 DTO 로 변환
             SubCompetencyDTO subDto = new SubCompetencyDTO();
+
             subDto.setCciCode(child.getCciCode());     // 하위 역량 코드
             subDto.setCciNm(child.getCciNm());     // 하위 역량명
             subDto.setCciDesc(child.getCciDesc()); // 하위 역량 설명
@@ -158,7 +160,8 @@ public class CoreCptInfoService {
 
         // (4) CoreCptInfoDetailDTO 인스턴스 생성 및 상위 정보 설정
         CoreCptInfoDetailDTO detailDto = new CoreCptInfoDetailDTO();
-        detailDto.setCciCode(entity.getCciCode());               // 상위 역량 코드
+        detailDto.setCciId(entity.getCciId());               // 상위 역량 코드
+        detailDto.setCciCode(entity.getCciCode());
         detailDto.setCciNm(entity.getCciNm());               // 상위 역량명
         detailDto.setCciDesc(entity.getCciDesc());           // 상위 역량 설명
         detailDto.setWeight(entity.getWeight());             // 상위 역량 가중치
@@ -172,6 +175,7 @@ public class CoreCptInfoService {
     public CoreCptInfoDetailDTO toDetailDTO(CoreCptInfo entity) {
         // (이미 작성하신 for-loop 기반 SubCompetencyDTO 변환 로직과 동일)
         CoreCptInfoDetailDTO dto = new CoreCptInfoDetailDTO();
+        dto.setCciId(entity.getCciId());
         dto.setCciCode(entity.getCciCode());
         dto.setCciNm(entity.getCciNm());
         dto.setCciDesc(entity.getCciDesc());

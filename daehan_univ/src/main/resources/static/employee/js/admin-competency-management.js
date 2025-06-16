@@ -61,6 +61,10 @@ function loadCompetencyList() {
  */
 function selectCompetency(cciId) {
     selectedCompetency = cciId;
+    if (!cciId) {
+        console.warn("cciId 값이 없습니다. API 호출을 생략합니다.");
+        return;
+    }
     fetch(`/api/competencies/${cciId}`)
         .then(res => res.json())
         .then(data => updateCompetencyDetails(data))
@@ -222,3 +226,68 @@ function deleteSubCompetency(subId) {
         alert(`하위 역량 ${subId} 삭제됨`);
     }
 }
+/**
+*  코멘트 관련 js---------------------------------------------------
+* */
+// 모달 열기
+function openCommentModal() {
+    if (!selectedCompetency) {
+        alert("상위 역량을 먼저 선택해주세요.");
+        return;
+    }
+    new bootstrap.Modal(document.getElementById('addCommentModal')).show();
+}
+
+// 코멘트 저장
+function addComment() {
+    const min = parseInt(document.getElementById('minScore').value, 10);
+    const max = parseInt(document.getElementById('maxScore').value, 10);
+    const content = document.getElementById('commentContent').value;
+
+    if (min > max) {
+        alert("최소 점수는 최대 점수보다 작거나 같아야 합니다.");
+        return;
+    }
+
+    const dto = {
+        minScore: min,
+        maxScore: max,
+        content: content
+    };
+    console.log("DTO 확인", dto);
+    fetch(`/api/competencies/${selectedCompetency}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto)
+    })
+        .then(res => res.json())
+        .then(data => {
+            alert("코멘트가 추가되었습니다.");
+            bootstrap.Modal.getInstance(document.getElementById('addCommentModal')).hide();
+            document.getElementById('addCommentForm').reset();
+            loadComments(selectedCompetency);
+        })
+        .catch(err => {
+            console.error("코멘트 추가 실패", err);
+            alert("코멘트 추가 중 오류 발생");
+        });
+}
+
+// 코멘트 목록 불러오기
+function loadComments(cciId) {
+    fetch(`/api/competencies/${cciId}/comments`)
+        .then(res => res.json())
+        .then(list => {
+            const area = document.getElementById('commentList');
+            area.innerHTML = '';
+            list.forEach(c => {
+                area.innerHTML += `<div class="border p-2 mb-1 small">
+          <strong>${c.minScore} ~ ${c.maxScore}점:</strong> ${c.content}
+        </div>`;
+            });
+        })
+        .catch(err => console.error("코멘트 목록 불러오기 실패", err));
+}
+/**
+ *  코멘트 관련  끝 js---------------------------------------------------
+ * */
