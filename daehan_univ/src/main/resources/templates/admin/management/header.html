@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="ko" th:fragment="common-head">
- <head>
+<html lang="ko">
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>대한대학교 CMS 포털 - 교직원</title>
-    <!-- Bootstrap & Icons -->
+    <title>대한대학교 CMS 포털 - 관리자</title>
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -14,21 +13,18 @@
       rel="stylesheet"
     />
     <style>
-      /* 공통 스타일 */
       body {
         background-color: #fafafa;
         margin: 0;
         padding: 0;
         font-family: "Segoe UI", sans-serif;
       }
-
-      /* 헤더 영역 (교직원용 포레스트 그린) */
       .header {
         position: fixed;
         top: 0;
         width: 100%;
         height: 60px;
-        background-color: #2d4f3a;
+        background-color: #5a1e2c;
         color: white;
         z-index: 1040;
         display: flex;
@@ -54,8 +50,6 @@
         font-size: 0.9rem;
         gap: 1rem;
       }
-
-      /* 사용자 정보 및 버튼 */
       .user-box {
         display: flex;
         align-items: center;
@@ -76,15 +70,13 @@
       .user-btn:hover {
         color: #ffc107;
       }
-
-      /* 사이드바 */
       .sidebar {
         position: fixed;
         top: 60px;
         left: 0;
         width: 240px;
         height: 100%;
-        background-color: #2d4f3a;
+        background-color: #5a1e2c;
         padding: 1rem 0;
         color: white;
         z-index: 1030;
@@ -100,15 +92,11 @@
         font-size: 0.95rem;
         line-height: 1.4;
       }
-
-      /* 본문 */
       .main-content {
         margin-top: 60px;
         margin-left: 240px;
         padding: 1.5rem;
       }
-
-      /* 메뉴 스타일 */
       .nav-link {
         color: #e0e8f0;
         padding: 0.75rem 1.5rem;
@@ -119,15 +107,15 @@
         text-decoration: none;
       }
       .nav-link:hover {
-        background-color: #3b624d;
+        background-color: #732836;
         color: #ffffff;
       }
       .nav-link.active {
-        background-color: #46775c;
+        background-color: #8a3d4a;
         font-weight: bold;
       }
       .submenu {
-        background-color: #3b624d;
+        background-color: #732836;
       }
       .submenu a {
         padding-left: 2.5rem;
@@ -138,15 +126,11 @@
         font-size: 0.75rem;
         margin-left: 0.5rem;
       }
-
-      /* 햄버거 메뉴 (모바일) */
       .hamburger {
         display: none;
         cursor: pointer;
         font-size: 1.25rem;
       }
-
-      /* 반응형 대응 */
       @media (max-width: 768px) {
         .sidebar {
           left: -240px;
@@ -172,44 +156,36 @@
     </style>
   </head>
   <body>
-  <header>
-    <!-- 헤더 -->
     <header class="header d-flex">
       <div class="header-left">
-        <span class="hamburger" id="hamburger">&#9776;</span> CMS 교직원 포털
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 관리자 포털
       </div>
       <div class="header-center">
         <img
-          src="/images/logo-white.png"
+          src="../../static/images/logo-white.png"
           alt="logo"
           height="30"
           class="me-2"
         />
         대한대학교
       </div>
-      <div class="header-right" id="user-info">
-        <div id="user-logged-in" class="user-box">
+      <div class="header-right">
+        <div class="user-box">
           <div class="user-info">
-            <div><strong>김교직</strong> (STAFF001)</div>
-            <div class="small">학사운영팀</div>
+            <div><strong>관리자</strong> (ADMIN001)</div>
+            <div class="small">시스템관리자</div>
           </div>
           <button class="user-btn" title="로그아웃">
             <i class="bi bi-box-arrow-right"></i>
           </button>
         </div>
-        <div id="user-logged-out" class="user-box">
-          <button class="user-btn" title="로그인">
-            <i class="bi bi-box-arrow-in-right"></i> 로그인
-          </button>
-        </div>
       </div>
     </header>
 
-    <!-- 사이드바 -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-user-info">
-        <div><strong>김교직</strong> (STAFF001)</div>
-        <div>학사운영팀</div>
+        <div><strong>관리자</strong> (ADMIN001)</div>
+        <div>시스템관리자</div>
         <div class="mt-2">
           <button class="user-btn" title="로그아웃">
             <i class="bi bi-box-arrow-right"></i> 로그아웃
@@ -217,6 +193,9 @@
         </div>
       </div>
       <nav class="nav flex-column">
+        <a class="nav-link" href="/admin/student">학생관리</a>
+        <a class="nav-link" href="/admin/staff">교직원관리</a>
+
         <a class="nav-link" href="/notice">공지사항관리</a>
 
         <a class="nav-link has-submenu" href="#" data-menu="역량"
@@ -249,14 +228,18 @@
           >마일리지관리</a
         >
         <div class="submenu" id="submenu-마일리지" style="display: none">
-          <a class="nav-link" href="/mileage/points">대시보드</a>
+          <a class="nav-link" href="/mileage/points">마일리지배점</a>
           <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+          <a class="nav-link" href="/mileage/status">마일리지현황</a>
         </div>
       </nav>
     </aside>
-</header>
 
-    <!-- 스크립트 -->
+    <main class="main-content">
+      <h1>관리자 메인 콘텐츠</h1>
+      <p>해당 영역에 관리자 전용 기능들이 표시됩니다.</p>
+    </main>
+
     <script>
       const sidebar = document.getElementById("sidebar");
       const hamburger = document.getElementById("hamburger");
