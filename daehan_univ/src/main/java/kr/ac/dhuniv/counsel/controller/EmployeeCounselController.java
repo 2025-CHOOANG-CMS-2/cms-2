@@ -3,6 +3,7 @@ package kr.ac.dhuniv.counsel.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
+/*
 @Controller
 public class EmployeeCounselController {
 
@@ -19,3 +20,4 @@ public class EmployeeCounselController {
 	}
 	
 }
+*/

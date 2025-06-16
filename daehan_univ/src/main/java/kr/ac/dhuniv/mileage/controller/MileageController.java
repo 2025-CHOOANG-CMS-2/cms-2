@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
 import kr.ac.dhuniv.mileage.service.MileageService;
-import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
+//import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
 import lombok.RequiredArgsConstructor;
 
 @Controller
 @RequiredArgsConstructor
 public class MileageController {
 
-    private final NcsCmpInfoService ncsCmpInfoService;
+    //private final NcsCmpInfoService ncsCmpInfoService;
 	
 	private final MileageService mileageService;
 

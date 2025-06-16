@@ -1,8 +1,80 @@
 let editingCounselorId = null
 
 document.addEventListener("DOMContentLoaded", () => {
+  fetchCounselors();	
   initializeEventListeners()
 })
+
+// 1. 백엔드 API를 호출해서 상담사 데이터를 가져오는 함수
+async function fetchCounselors() {
+    try {
+        // 우리가 만든 API 주소를 호출합니다.
+        const response = await fetch('/api/admin/counselors');
+        if (!response.ok) {
+            throw new Error('데이터를 불러오는 데 실패했습니다.');
+        }
+        const counselors = await response.json(); // JSON 데이터를 자바스크립트 객체로 변환
+        renderCounselors(counselors); // 받은 데이터로 화면을 그리는 함수 호출
+    } catch (error) {
+        console.error(error);
+        // 사용자에게 에러 알림을 보여줄 수 있습니다.
+        alert('상담사 목록을 불러오는 중 오류가 발생했습니다.');
+    }
+}
+
+// 2. 받아온 데이터로 실제 HTML을 만들어 화면에 그려주는 함수
+function renderCounselors(counselors) {
+    const grid = document.querySelector('.counselor-grid');
+    grid.innerHTML = ''; // 기존에 내용이 있다면 깨끗하게 비웁니다.
+
+    if (counselors.length === 0) {
+        grid.innerHTML = '<p>등록된 상담사가 없습니다.</p>';
+        return;
+    }
+
+    counselors.forEach(counselor => {
+        const statusText = counselor.status === 'active' ? '활성' : '비활성';
+        
+        // JSON 데이터를 사용해 상담사 카드 HTML을 동적으로 생성합니다.
+        const cardHTML = `
+            <div class="counselor-card-admin" data-status="${counselor.status}" data-specialty="${counselor.specialty}">
+                <div class="counselor-header">
+                    <div class="counselor-avatar">${counselor.name.charAt(0)}</div>
+                    <div class="counselor-basic-info">
+                        <h3>${counselor.name}</h3>
+                        <p class="counselor-id">ID: ${counselor.counselorId}</p>
+                        <span class="status-badge ${counselor.status}">${statusText}</span>
+                    </div>
+                    <div class="counselor-actions">
+                        <button class="btn btn-outline btn-sm" title="수정"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-outline btn-sm" title="상태변경"><i class="fas fa-power-off"></i></button>
+                        <button class="btn btn-outline btn-sm" title="삭제"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+                <div class="counselor-details">
+                    <div class="detail-row">
+                        <span class="label">전문분야:</span>
+                        <span class="value">${counselor.specialty}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">이메일:</span>
+                        <span class="value">${counselor.email}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">연락처:</span>
+                        <span class="value">${counselor.phone}</span>
+                    </div>
+                </div>
+                <div class="counselor-stats">
+                    <div class="stat-item"><i class="fas fa-comments"></i><span>상담: ${counselor.consultationCount}건</span></div>
+                    <div class="stat-item"><i class="fas fa-star"></i><span>평점: ${counselor.averageRating.toFixed(1)}</span></div>
+                </div>
+            </div>
+        `;
+        // 생성된 카드를 그리드 영역에 추가합니다.
+        grid.insertAdjacentHTML('beforeend', cardHTML);
+    });
+}
 
 function initializeEventListeners() {
   // 검색 기능
