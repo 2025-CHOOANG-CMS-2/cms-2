@@ -14,6 +14,7 @@ public class CounselorListDto {
 	private String phone;
 	private String specialty;
 	private String status;
+	private String intro;
 	private Long consultationCount;
 	private Double averageRating;
 }
