@@ -1,9 +1,7 @@
 package kr.ac.dhuniv.mileage.controller;
-/*
+
 import java.util.List;
 
-import kr.ac.dhuniv.mileage.service.MileageService;
-import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
-//import kr.ac.dhuniv.mileage.service.MileageService;
+import kr.ac.dhuniv.mileage.service.MileageService;
 //import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MileageController {
 
-	private final NcsCmpInfoService ncsCmpInfoService;
+//    private final NcsCmpInfoService ncsCmpInfoService;
 	
 	private final MileageService mileageService;
 
@@ -73,7 +71,8 @@ public class MileageController {
 		return  "/employee/program/index.html";
 	}
 	
-
+	//비고과 프로그램 이수자에게 마일리지 지급 데이터베이스 저장
+    @PostMapping("/employee/mileage/{prgId}")
     public String payMileage(@PathVariable("prgId") Long prgId) {
     	mileageService.payMileageForProgram(prgId);
     	return "/employee/mileage/mileage-payment.html";
@@ -81,10 +80,8 @@ public class MileageController {
     
     @GetMapping("/completed-students")
     public String getCompletedStudents() {
-
     	System.out.println("테스트");
     	System.out.println(mileageService.getAllCompletedStudents());
-
         return "/employee/mileage/mileage-payment.html";
     }
     
@@ -96,4 +93,3 @@ public class MileageController {
 //        return mileageService.searchCompletedStudents(programName, studentName);
 //    }
 }
-*/

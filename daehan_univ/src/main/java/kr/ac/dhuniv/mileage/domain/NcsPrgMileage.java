@@ -38,7 +38,7 @@ public class NcsPrgMileage {
     /**
      * 연관된 비교과 프로그램 정보
      */
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prg_id", referencedColumnName = "prg_id")
     private NcsPrgInfo program;
 

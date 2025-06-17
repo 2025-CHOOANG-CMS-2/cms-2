@@ -1,5 +1,5 @@
 package kr.ac.dhuniv.mileage.service;
-/*
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,7 +12,7 @@ import kr.ac.dhuniv.mileage.domain.StdMileageHist;
 import kr.ac.dhuniv.mileage.domain.StdMileageTotal;
 import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
 import kr.ac.dhuniv.mileage.repository.NcsCmpInfoRepository2;
-
+import kr.ac.dhuniv.mileage.repository.NcsPrgMileageRepository2;
 import kr.ac.dhuniv.mileage.repository.StdMileageHistRepository;
 import kr.ac.dhuniv.mileage.repository.StdMileageTotalRepository;
 import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
@@ -25,7 +25,7 @@ public class MileageService {
 	private final StdMileageHistRepository mileageHistRepository; //학생 마일리지 점수 이력 Repository
     private final NcsCmpInfoRepository2 cmpInfoRepository;        //비교과 프로그램 이수 정보 Repository
     private final StdMileageTotalRepository totalRepository;      //학생 마일리지 총점 Repository
-/    private final NcsPrgMileageRepository2 prgMileageRepository;  //비교과 프로그램 마일리지 정보 Repository
+    private final NcsPrgMileageRepository2 prgMileageRepository;  //비교과 프로그램 마일리지 정보 Repository
 
     @Transactional
     public void payMileageForProgram(Long prgId) {
@@ -74,4 +74,3 @@ public class MileageService {
 //        return cmpInfoRepository.findCompletedStudentsByCondition(programName, studentName);
 //    }
 }
-*/
