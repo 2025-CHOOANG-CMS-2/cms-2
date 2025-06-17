@@ -52,7 +52,7 @@
       </div>
       <nav class="nav flex-column">
         <a class="nav-link" href="/admin/student">학생관리</a>
-        <a class="nav-link active" href="/admin/staff">교직원관리</a>
+        <a class="nav-link active" href="/admin/employee">교직원관리</a>
         <a class="nav-link" href="/notice">공지사항관리</a>
         <a class="nav-link has-submenu" href="#" data-menu="역량"
           >핵심역량개발관리</a
@@ -104,11 +104,8 @@
         <div class="col-auto">
           <select class="form-select" id="searchDept">
             <option value="">부서 전체</option>
-            <option value="ADMIN">행정팀</option>
-            <option value="ACADEMIC">교무팀</option>
-            <option value="STUDENT">학생팀</option>
-            <option value="IT">정보팀</option>
-          </select>
+            <!-- JavaScript에서 동적으로 부서 옵션 채울 예정 -->
+            </select>
         </div>
         <div class="col-auto">
           <select class="form-select" id="searchStatus">
@@ -119,7 +116,7 @@
           </select>
         </div>
         <div class="col-auto">
-          <button type="button" class="btn btn-primary" onclick="filterStaff()">
+          <button type="button" class="btn btn-primary" onclick="filterEmployees()">
             검색
           </button>
         </div>
@@ -138,7 +135,7 @@
               <th>관리</th>
             </tr>
           </thead>
-          <tbody id="staffTableBody"></tbody>
+          <tbody id="employeeTableBody"></tbody>
         </table>
       </div>
       <nav class="d-flex justify-content-between align-items-center">
@@ -199,7 +196,7 @@
           </div>
           <div class="modal-body">
             <form id="addForm">
-              <div class="staff-detail-card">
+              <div class="employee-detail-card">
                 <div class="detail-section">
                   <div class="section-title">기본 정보</div>
 
@@ -210,7 +207,8 @@
                         type="text"
                         class="form-control form-control-sm"
                         id="add_id"
-                        placeholder="사번을 입력하세요"
+                        readonly
+                        value="사번은 자동 생성됩니다."
                       />
                     </div>
                     <div class="detail-item">
@@ -226,10 +224,7 @@
                       <div class="detail-label">부서</div>
                       <select class="form-select form-select-sm" id="add_dept">
                         <option value="">부서를 선택하세요</option>
-                        <option value="ADMIN">행정팀</option>
-                        <option value="ACADEMIC">교무팀</option>
-                        <option value="STUDENT">학생팀</option>
-                        <option value="IT">정보팀</option>
+                        <!-- JavaScript에서 동적으로 부서 옵션 채울 예정 -->
                       </select>
                     </div>
                   </div>
@@ -345,7 +340,7 @@
             >
               <i class="bi bi-x-circle me-1"></i>취소
             </button>
-            <button type="button" class="btn btn-success" onclick="addStaff()">
+            <button type="button" class="btn btn-success" onclick="addEmployee()">
               <i class="bi bi-check-circle me-1"></i>등록
             </button>
           </div>
@@ -368,7 +363,7 @@
           </div>
           <div class="modal-body">
             <form id="editForm">
-              <div class="staff-detail-card">
+              <div class="employee-detail-card">
                 <div class="detail-section">
                   <div class="section-title">기본 정보</div>
 
@@ -393,10 +388,7 @@
                     <div class="detail-item">
                       <div class="detail-label">부서</div>
                       <select class="form-select form-select-sm" id="edit_dept">
-                        <option value="ADMIN">행정팀</option>
-                        <option value="ACADEMIC">교무팀</option>
-                        <option value="STUDENT">학생팀</option>
-                        <option value="IT">정보팀</option>
+                        <!-- JavaScript에서 동적으로 부서 옵션 채울 예정 -->
                       </select>
                     </div>
                   </div>
@@ -505,7 +497,7 @@
             >
               <i class="bi bi-x-circle me-1"></i>취소
             </button>
-            <button type="button" class="btn btn-primary" onclick="saveStaff()">
+            <button type="button" class="btn btn-primary" onclick="saveEmployee()">
               <i class="bi bi-check-circle me-1"></i>저장
             </button>
           </div>
