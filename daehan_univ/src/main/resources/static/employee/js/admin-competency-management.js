@@ -273,21 +273,40 @@ function addComment() {
         });
 }
 
-// 코멘트 목록 불러오기
+/**
+ * ✅ 점수 구간 코멘트 목록을 로드하여 화면에 출력
+ * @param cciId 상위 역량 ID
+ */
 function loadComments(cciId) {
-    fetch(`/api/competencies/${cciId}/comments`)
-        .then(res => res.json())
+    fetch(`/api/competencies/comments/${cciId}/`)
+        .then(res => {
+            console.log("코멘트 등록 api 테스트");
+            if (!res.ok) throw new Error("코멘트 조회 실패");
+            return res.json();
+        })
         .then(list => {
-            const area = document.getElementById('commentList');
-            area.innerHTML = '';
+            const area = document.getElementById("commentList");
+            area.innerHTML = ""; // 기존 내용 초기화
+
+            if (list.length === 0) {
+                area.innerHTML = `<div class="text-muted small">등록된 코멘트가 없습니다.</div>`;
+                return;
+            }
+
             list.forEach(c => {
-                area.innerHTML += `<div class="border p-2 mb-1 small">
-          <strong>${c.minScore} ~ ${c.maxScore}점:</strong> ${c.content}
-        </div>`;
+                area.innerHTML += `
+          <div class="border rounded p-2 mb-1 small">
+            <strong>${c.minScore} ~ ${c.maxScore}점</strong>: ${c.content}
+          </div>`;
             });
         })
-        .catch(err => console.error("코멘트 목록 불러오기 실패", err));
+        .catch(err => {
+            console.error("코멘트 로드 실패", err);
+            alert("코멘트 목록을 불러오는 중 오류가 발생했습니다.");
+        });
 }
+
+
 /**
  *  코멘트 관련  끝 js---------------------------------------------------
  * */

@@ -3,10 +3,14 @@ package kr.ac.dhuniv.core_cpt.service;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptCommentTemplate;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import kr.ac.dhuniv.core_cpt.dto.comment.CoreCptCommentRequestDTO;
+import kr.ac.dhuniv.core_cpt.dto.comment.CoreCptCommentResponseDTO;
 import kr.ac.dhuniv.core_cpt.repository.CoreCptCommentTemplateRepository;
 import kr.ac.dhuniv.core_cpt.repository.CoreCptInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,5 +46,26 @@ public class CoreCptCommentService {
 
         // (3) DB에 저장
         return commentRepo.save(entity);
+    }
+
+    /**
+     * ✅ 상위 역량별 점수 구간 코멘트 목록 조회
+     * @param cciId 상위 역량 ID
+     * @return DTO 리스트
+     */
+    public List<CoreCptCommentResponseDTO> getComments(Long cciId) {
+        // DB에서 코멘트 목록 조회
+        List<CoreCptCommentTemplate> entities = commentRepo.findByCoreCpt_CciIdOrderByMinScoreAsc(cciId);
+
+        // 엔티티 → DTO 변환
+        return entities.stream()
+                .map(entity -> CoreCptCommentResponseDTO.builder()
+                        .id(entity.getCmt_id())
+                        .minScore(entity.getMinScore())
+                        .maxScore(entity.getMaxScore())
+                        .content(entity.getContent())
+                        .scoreLevel(entity.getScoreLevel())
+                        .build())
+                .collect(Collectors.toList());
     }
 }
