@@ -1,7 +1,8 @@
 package kr.ac.dhuniv.counsel.repository; // 경로는 실제 위치에 맞게 수정
 
-import kr.ac.dhuniv.empl_info.EmplInfo;
+
 import kr.ac.dhuniv.counsel.dto.UnregisteredEmpDto;
+import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import java.util.List;

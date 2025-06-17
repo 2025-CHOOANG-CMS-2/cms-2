@@ -1,7 +1,9 @@
 package kr.ac.dhuniv.mileage.controller;
-
+/*
 import java.util.List;
 
+import kr.ac.dhuniv.mileage.service.MileageService;
+import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MileageController {
 
-//    private final NcsCmpInfoService ncsCmpInfoService;
+	private final NcsCmpInfoService ncsCmpInfoService;
 	
-	//private final MileageService mileageService;
+	private final MileageService mileageService;
 
 	@GetMapping("/student/mileage")
 	public String test1() {
@@ -94,3 +96,4 @@ public class MileageController {
 //        return mileageService.searchCompletedStudents(programName, studentName);
 //    }
 }
+*/

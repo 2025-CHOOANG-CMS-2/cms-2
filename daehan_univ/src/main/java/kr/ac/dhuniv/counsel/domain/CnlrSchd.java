@@ -12,7 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import kr.ac.dhuniv.empl_info.EmplInfo;
+
+import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
