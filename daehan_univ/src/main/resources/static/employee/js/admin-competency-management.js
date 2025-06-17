@@ -80,7 +80,7 @@ function updateCompetencyDetails(comp) {
       <div class="competency-detail mb-4">
         <div class="row mb-2">
           <div class="col-md-3 fw-bold">역량 코드</div>
-          <div class="col-md-9">${comp.cciId}</div>
+          <div class="col-md-9">${comp.cciCode}</div>
         </div>
         <div class="row mb-2">
           <div class="col-md-3 fw-bold">역량 설명</div>
@@ -395,4 +395,145 @@ function deleteComment(commentId) {
 }
 /**
  *  코멘트 관련  끝 js---------------------------------------------------
+ * */
+
+/**
+ * 상위 하위 역량 수정/삭제 시작 ---------------------------------------------------------
+ */
+// ✅ 전역 변수 - 수정 대상 ID
+let editingCompetencyId = null;
+
+/**
+ * ✅ 상위 역량 수정 버튼 클릭 시 실행
+ */
+function editCompetency() {
+    if (!selectedCompetency) {
+        alert("수정할 상위 역량이 선택되지 않았습니다.");
+        return;
+    }
+
+    // 선택된 상세 정보를 fetch (이미 로드되어 있다면 캐시 활용 가능)
+    fetch(`/api/competencies/${selectedCompetency}`)
+        .then(res => res.json())
+        .then(data => {
+            // 모달 input에 값 채우기
+            document.getElementById('editCompetencyName').value = data.cciNm;
+            document.getElementById('editCompetencyDescription').value = data.cciDesc;
+            document.getElementById('editCompetencyWeight').value = data.weight ?? 0;
+            document.getElementById('editCompetencyColor').value = data.colorHex ?? '#000000';
+
+            // 수정 대상 ID 보관
+            editingCompetencyId = selectedCompetency;
+
+            // 모달 표시
+            new bootstrap.Modal(document.getElementById('editCompetencyModal')).show();
+        })
+        .catch(err => {
+            console.error("상세 조회 실패", err);
+            alert("상세 정보를 불러오지 못했습니다.");
+        });
+}
+
+/**
+ * ✅ 하위 역량 수정 버튼 클릭 시 실행
+ */
+function editSubCompetency(subId) {
+    console.log(subId);
+    fetch(`/api/competencies/${subId}`)
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('editCompetencyName').value = data.cciNm;
+            document.getElementById('editCompetencyDescription').value = data.cciDesc;
+            document.getElementById('editCompetencyWeight').value = data.weight ?? 0;
+            document.getElementById('editCompetencyColor').value = data.colorHex ?? '#000000';
+
+            editingCompetencyId = subId;
+            new bootstrap.Modal(document.getElementById('editCompetencyModal')).show();
+        })
+        .catch(err => {
+            console.error("하위 역량 조회 실패", err);
+            alert("하위 역량 정보를 불러오지 못했습니다.");
+        });
+}
+
+/**
+ * ✅ 수정 내용 저장
+ */
+function saveEditedCompetency() {
+    const form = document.getElementById('editCompetencyForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const dto = {
+        cciNm: document.getElementById('editCompetencyName').value,
+        cciDesc: document.getElementById('editCompetencyDescription').value,
+        weight: parseInt(document.getElementById('editCompetencyWeight').value, 10),
+        colorHex: document.getElementById('editCompetencyColor').value,
+        regUserId: 'admin01' // 수정자 ID
+    };
+
+    fetch(`/api/competencies/${editingCompetencyId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dto)
+    })
+        .then(res => {
+            if (!res.ok) throw new Error("수정 실패");
+            return res.json();
+        })
+        .then(() => {
+            alert("수정이 완료되었습니다.");
+            bootstrap.Modal.getInstance(document.getElementById('editCompetencyModal')).hide();
+            loadCompetencyList(); // 목록 새로고침
+        })
+        .catch(err => {
+            console.error("수정 실패", err);
+            alert("수정 중 오류가 발생했습니다.");
+        });
+}
+
+/**
+ * ✅ 상위 역량 삭제
+ */
+function deleteCompetency() {
+    if (!selectedCompetency) {
+        alert("삭제할 상위 역량이 선택되지 않았습니다.");
+        return;
+    }
+
+    if (confirm("정말 삭제하시겠습니까?")) {
+        fetch(`/api/competencies/${selectedCompetency}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error("삭제 실패");
+                alert("삭제되었습니다.");
+                loadCompetencyList();
+            })
+            .catch(err => {
+                console.error("삭제 실패", err);
+                alert("삭제 중 오류가 발생했습니다.");
+            });
+    }
+}
+
+/**
+ * ✅ 하위 역량 삭제
+ */
+function deleteSubCompetency(subId) {
+    if (confirm("정말 삭제하시겠습니까?")) {
+        fetch(`/api/competencies/${subId}`, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error("삭제 실패");
+                alert("삭제되었습니다.");
+                selectCompetency(selectedCompetency); // 현재 상세 재로드
+            })
+            .catch(err => {
+                console.error("삭제 실패", err);
+                alert("삭제 중 오류가 발생했습니다.");
+            });
+    }
+}
+/**
+ *  상위 하위 역량 수정/삭제 끝 --------------------------------------------------------------------------------
  * */

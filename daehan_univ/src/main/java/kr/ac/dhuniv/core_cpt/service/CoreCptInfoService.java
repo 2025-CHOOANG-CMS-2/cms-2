@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.service;
 
+import jakarta.transaction.Transactional;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
 import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoDetailDTO;
@@ -148,7 +149,7 @@ public class CoreCptInfoService {
         for (CoreCptInfo child : entity.getChildren()) {
             // (3-1) 각 하위 역량 엔티티를 DTO 로 변환
             SubCompetencyDTO subDto = new SubCompetencyDTO();
-
+            subDto.setCciId(child.getCciId());
             subDto.setCciCode(child.getCciCode());     // 하위 역량 코드
             subDto.setCciNm(child.getCciNm());     // 하위 역량명
             subDto.setCciDesc(child.getCciDesc()); // 하위 역량 설명
@@ -172,6 +173,7 @@ public class CoreCptInfoService {
         // (5) 최종 DTO 반환
         return detailDto;
     }
+    /*
     public CoreCptInfoDetailDTO toDetailDTO(CoreCptInfo entity) {
         // (이미 작성하신 for-loop 기반 SubCompetencyDTO 변환 로직과 동일)
         CoreCptInfoDetailDTO dto = new CoreCptInfoDetailDTO();
@@ -190,6 +192,79 @@ public class CoreCptInfoService {
         List<SubCompetencyDTO> subs = new ArrayList<>();
         for (CoreCptInfo child : entity.getChildren()) {
             SubCompetencyDTO sub = new SubCompetencyDTO();
+            sub.setCciCode(child.getCciCode());
+            sub.setCciNm(child.getCciNm());
+            sub.setCciDesc(child.getCciDesc());
+            sub.setWeight(child.getWeight());
+            subs.add(sub);
+        }
+        dto.setChildren(subs);
+
+        return dto;
+    }*/
+
+    /**
+     * ✅ 역량 수정 서비스
+     * - 상위/하위 역량 공통 처리
+     *
+     * @param cciId 수정할 역량 ID
+     * @param dto 클라이언트 전달 데이터
+     * @return 수정된 상세 DTO
+     */
+    @Transactional
+    public CoreCptInfoDetailDTO updateCompetency(Long cciId, CoreCptInfoRequestDTO dto) {
+        // ✅ cciId 기반 역량 엔티티 조회
+        CoreCptInfo entity = repository.findByCciId(cciId)
+                .orElseThrow(() -> new IllegalArgumentException("역량을 찾을 수 없습니다. ID: " + cciId));
+
+        // ✅ 엔티티 값 수정 (dirty checking에 의해 자동 업데이트)
+        entity.setCciNm(dto.getCciNm());
+        entity.setCciDesc(dto.getCciDesc());
+        entity.setWeight(dto.getWeight());
+        entity.setColorHex(dto.getColorHex());
+        entity.setUpdUserId(dto.getRegUserId());      // 수정자 ID 기록
+        entity.setUpdDt(LocalDateTime.now());         // 수정일시 기록
+
+        // ✅ 수정 결과 DTO 변환
+        return toDetailDTO(entity);
+    }
+
+    /**
+     * ✅ 역량 삭제 서비스
+     * - 상위/하위 역량 공통 처리
+     *
+     * @param cciId 삭제할 역량 ID
+     */
+    @Transactional
+    public void deleteCompetency(Long cciId) {
+        // ✅ cciId 기반 역량 엔티티 조회
+        CoreCptInfo entity = repository.findByCciId(cciId)
+                .orElseThrow(() -> new IllegalArgumentException("역량을 찾을 수 없습니다. ID: " + cciId));
+
+        // ✅ 삭제 실행
+        repository.delete(entity);
+    }
+
+    /**
+     * ✅ 엔티티 → 상세 DTO 변환
+     * - 기존 toDetailDTO와 동일 로직
+     */
+    public CoreCptInfoDetailDTO toDetailDTO(CoreCptInfo entity) {
+        // ✅ 기본 필드 설정
+        CoreCptInfoDetailDTO dto = new CoreCptInfoDetailDTO();
+        dto.setCciId(entity.getCciId());
+        dto.setCciCode(entity.getCciCode());
+        dto.setCciNm(entity.getCciNm());
+        dto.setCciDesc(entity.getCciDesc());
+        dto.setWeight(entity.getWeight());
+        dto.setColorHex(entity.getColorHex());
+        dto.setQuestionCount(entity.getQuestions() != null ? entity.getQuestions().size() : 0);
+
+        // ✅ 하위 역량 리스트 변환
+        List<SubCompetencyDTO> subs = new ArrayList<>();
+        for (CoreCptInfo child : entity.getChildren()) {
+            SubCompetencyDTO sub = new SubCompetencyDTO();
+            sub.setCciId(child.getCciId());
             sub.setCciCode(child.getCciCode());
             sub.setCciNm(child.getCciNm());
             sub.setCciDesc(child.getCciDesc());

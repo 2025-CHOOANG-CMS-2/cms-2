@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.service;
 
+import jakarta.transaction.Transactional;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptCommentTemplate;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import kr.ac.dhuniv.core_cpt.dto.comment.CoreCptCommentRequestDTO;
@@ -112,7 +113,15 @@ public class CoreCptCommentService {
                 .content(comment.getContent())
                 .build();
     }
+    @Transactional
+    public void deleteCommentById(Long commentId) {
+        // 주어진 ID의 코멘트가 존재하는지 검증
+        CoreCptCommentTemplate comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("코멘트를 찾을 수 없습니다. ID: " + commentId));
 
+        // 삭제 실행
+        commentRepo.delete(comment);
+    }
 
 
 }
