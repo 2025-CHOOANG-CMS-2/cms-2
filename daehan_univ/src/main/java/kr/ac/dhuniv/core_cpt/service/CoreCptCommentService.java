@@ -9,6 +9,7 @@ import kr.ac.dhuniv.core_cpt.repository.CoreCptInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,8 +65,54 @@ public class CoreCptCommentService {
                         .minScore(entity.getMinScore())
                         .maxScore(entity.getMaxScore())
                         .content(entity.getContent())
-                        .scoreLevel(entity.getScoreLevel())
+                        //.scoreLevel(entity.getScoreLevel())
                         .build())
                 .collect(Collectors.toList());
     }
+
+    /**
+     * ✅ 특정 상위 역량의 모든 점수 구간 코멘트를 조회
+     * @param cciId 상위 역량 ID
+     * @return DTO 리스트
+     */
+    public List<CoreCptCommentResponseDTO> getCommentsByCompetency(Long cciId) {
+        List<CoreCptCommentTemplate> entities = commentRepo.findByCoreCpt_CciId(cciId);
+        List<CoreCptCommentResponseDTO> dtos = new ArrayList<>();
+
+        for (CoreCptCommentTemplate e : entities) {
+            CoreCptCommentResponseDTO dto = new CoreCptCommentResponseDTO();
+            dto.setId(e.getCmt_id());
+            dto.setMinScore(e.getMinScore());
+            dto.setMaxScore(e.getMaxScore());
+            dto.setContent(e.getContent());
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
+    public CoreCptCommentResponseDTO  updateComment(Long cciId, Long commentId, CoreCptCommentResponseDTO dto) {
+        CoreCptCommentTemplate comment = commentRepo.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("코멘트를 찾을 수 없습니다: " + commentId));
+
+        if (!comment.getCoreCpt().getCciId().equals(cciId)) {
+            throw new IllegalArgumentException("코멘트가 해당 상위 역량에 속하지 않습니다.");
+        }
+
+        // 수정
+        comment.setMinScore(dto.getMinScore());
+        comment.setMaxScore(dto.getMaxScore());
+        comment.setContent(dto.getContent());
+
+        commentRepo.save(comment);
+
+        return new CoreCptCommentResponseDTO().builder()
+                .id(comment.getCmt_id())
+                .minScore(comment.getMinScore())
+                .maxScore(comment.getMaxScore())
+                .content(comment.getContent())
+                .build();
+    }
+
+
+
 }

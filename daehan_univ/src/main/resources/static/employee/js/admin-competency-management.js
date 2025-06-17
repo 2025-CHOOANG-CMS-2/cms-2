@@ -144,7 +144,10 @@ function updateCompetencyDetails(comp) {
  */
 function addCompetency() {
     const form = document.getElementById('addCompetencyForm');
-    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
 
     const dto = {
         cciNm: document.getElementById('competencyName').value,
@@ -164,7 +167,10 @@ function addCompetency() {
             bootstrap.Modal.getInstance(document.getElementById('addCompetencyModal')).hide();
             loadCompetencyList();
         })
-        .catch(err => { console.error(err); alert('등록 오류'); });
+        .catch(err => {
+            console.error(err);
+            alert('등록 오류');
+        });
 }
 
 /**
@@ -180,8 +186,13 @@ function openSubCompetencyModal(parentCciId) {
  */
 function addSubCompetency() {
     const form = document.getElementById('addSubCompetencyForm');
-    if (!form.checkValidity()) { form.reportValidity(); return; }
-    if (!subModalParentId) { return alert('상위 역량 지정 필요'); }
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+    if (!subModalParentId) {
+        return alert('상위 역량 지정 필요');
+    }
 
     const dto = {
         cciNm: document.getElementById('subCompetencyName').value,
@@ -192,7 +203,7 @@ function addSubCompetency() {
 
     fetch(`/api/competencies/child/${subModalParentId}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(dto)
     })
         .then(res => {
@@ -226,9 +237,10 @@ function deleteSubCompetency(subId) {
         alert(`하위 역량 ${subId} 삭제됨`);
     }
 }
+
 /**
-*  코멘트 관련 js---------------------------------------------------
-* */
+ *  코멘트 관련 js---------------------------------------------------
+ * */
 // 모달 열기
 function openCommentModal() {
     if (!selectedCompetency) {
@@ -254,23 +266,45 @@ function addComment() {
         maxScore: max,
         content: content
     };
-    console.log("DTO 확인", dto);
-    fetch(`/api/competencies/${selectedCompetency}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dto)
-    })
-        .then(res => res.json())
-        .then(data => {
-            alert("코멘트가 추가되었습니다.");
-            bootstrap.Modal.getInstance(document.getElementById('addCommentModal')).hide();
-            document.getElementById('addCommentForm').reset();
-            loadComments(selectedCompetency);
+
+    // 수정 모드인 경우
+    if (window.editingCommentId) {
+        fetch(`/api/competencies/${selectedCompetency}/comments/${window.editingCommentId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dto)
         })
-        .catch(err => {
-            console.error("코멘트 추가 실패", err);
-            alert("코멘트 추가 중 오류 발생");
-        });
+            .then(res => res.json())
+            .then(() => {
+                alert("코멘트가 수정되었습니다.");
+                bootstrap.Modal.getInstance(document.getElementById('addCommentModal')).hide();
+                document.getElementById('addCommentForm').reset();
+                window.editingCommentId = null;
+                loadComments(selectedCompetency);
+            })
+            .catch(err => {
+                console.error("코멘트 수정 실패", err);
+                alert("코멘트 수정 중 오류 발생");
+            });
+    } else {
+        // 기존 등록 로직
+        fetch(`/api/competencies/${selectedCompetency}/comments`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(dto)
+        })
+            .then(res => res.json())
+            .then(() => {
+                alert("코멘트가 추가되었습니다.");
+                bootstrap.Modal.getInstance(document.getElementById('addCommentModal')).hide();
+                document.getElementById('addCommentForm').reset();
+                loadComments(selectedCompetency);
+            })
+            .catch(err => {
+                console.error("코멘트 추가 실패", err);
+                alert("코멘트 추가 중 오류 발생");
+            });
+    }
 }
 
 /**
@@ -278,13 +312,14 @@ function addComment() {
  * @param cciId 상위 역량 ID
  */
 function loadComments(cciId) {
-    fetch(`/api/competencies/comments/${cciId}/`)
+    fetch(`/api/competencies/comments/${cciId}`)
         .then(res => {
             console.log("코멘트 등록 api 테스트");
             if (!res.ok) throw new Error("코멘트 조회 실패");
             return res.json();
         })
         .then(list => {
+            cachedCommentList = list;  // 💡 로드 시 캐시
             const area = document.getElementById("commentList");
             area.innerHTML = ""; // 기존 내용 초기화
 
@@ -294,10 +329,24 @@ function loadComments(cciId) {
             }
 
             list.forEach(c => {
-                area.innerHTML += `
-          <div class="border rounded p-2 mb-1 small">
-            <strong>${c.minScore} ~ ${c.maxScore}점</strong>: ${c.content}
-          </div>`;
+                const div = document.createElement("div");
+                div.className = "border rounded p-2 mb-1 small d-flex justify-content-between align-items-center";
+
+                div.innerHTML = `
+      <div>
+        <strong>${c.minScore} ~ ${c.maxScore}점</strong>: ${c.content}
+      </div>
+      <div class="ms-2">
+        <button class="btn btn-sm btn-outline-primary me-1" onclick="editComment(${c.id})">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-danger" onclick="deleteComment(${c.id})">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    `;
+
+                area.appendChild(div);
             });
         })
         .catch(err => {
@@ -306,7 +355,44 @@ function loadComments(cciId) {
         });
 }
 
+function editComment(commentId) {
+    // commentId로 기존 데이터를 fetch 하거나
+    // 이미 로드된 list에서 해당 데이터를 찾아서 모달에 채움 (여기서는 간단하게 list를 유지한다고 가정)
 
+    const comment = cachedCommentList.find(c => c.id === commentId);
+    if (!comment) {
+        alert("코멘트 데이터를 찾을 수 없습니다.");
+        return;
+    }
+
+    // 모달 input에 기존 값 채우기
+    document.getElementById("minScore").value = comment.minScore;
+    document.getElementById("maxScore").value = comment.maxScore;
+    document.getElementById("commentContent").value = comment.content;
+
+    // 수정 모드 표시용으로 전역변수에 ID 보관
+    window.editingCommentId = commentId;
+
+    // 모달 열기
+    new bootstrap.Modal(document.getElementById('addCommentModal')).show();
+}
+
+function deleteComment(commentId) {
+    if (confirm("정말 삭제하시겠습니까?")) {
+        fetch(`/api/competencies/comments/${commentId}`, {
+            method: 'DELETE'
+        })
+            .then(res => {
+                if (!res.ok) throw new Error("삭제 실패");
+                alert("삭제 완료");
+                loadComments(selectedCompetency);
+            })
+            .catch(err => {
+                console.error("코멘트 삭제 실패", err);
+                alert("삭제 중 오류 발생");
+            });
+    }
+}
 /**
  *  코멘트 관련  끝 js---------------------------------------------------
  * */

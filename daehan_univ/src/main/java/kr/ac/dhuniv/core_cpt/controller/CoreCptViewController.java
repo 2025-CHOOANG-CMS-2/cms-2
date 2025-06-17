@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.controller;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -8,6 +9,8 @@ public class CoreCptViewController {
 
 	@GetMapping("/employees/core-empl-cpt")
 	public String getEmpCorePage() {
+		System.out.println(new BCryptPasswordEncoder().encode("1234"));
+
 		return "employee/competency/admin-competency-management";
 			
 	}

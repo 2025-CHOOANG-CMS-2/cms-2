@@ -1,13 +1,17 @@
 package kr.ac.dhuniv.core_cpt.dto.comment;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * ✅ CoreCptCommentRequestDTO
  * - 점수 구간 코멘트 등록용 요청 DTO
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class CoreCptCommentRequestDTO {
     private Integer minScore;     // 최소 점수 (예: 0)
     private Integer maxScore;     // 최대 점수 (예: 60)

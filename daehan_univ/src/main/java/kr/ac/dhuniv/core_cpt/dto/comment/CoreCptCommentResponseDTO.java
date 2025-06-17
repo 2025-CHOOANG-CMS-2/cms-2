@@ -1,7 +1,9 @@
 package kr.ac.dhuniv.core_cpt.dto.comment;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * ✅ CoreCptCommentResponseDTO
@@ -9,6 +11,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CoreCptCommentResponseDTO {
     private Long id;              // 코멘트 ID
     private Integer minScore;     // 최소 점수
