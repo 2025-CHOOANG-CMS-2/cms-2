@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.core_cpt.dto;
+package kr.ac.dhuniv.core_cpt.dto.coreinfo;
 
 import lombok.*;
 
@@ -8,6 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class CoreCptInfoListDTO {
+    private Long cciId;
     private String cciCode;       // 핵심역량 ID
     private String cciNm;       // 이름
     private String cciDesc;     // 설명

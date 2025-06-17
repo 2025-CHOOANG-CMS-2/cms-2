@@ -1,9 +1,9 @@
 package kr.ac.dhuniv.core_cpt.controller;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoDetailDTO;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoListDTO;
-import kr.ac.dhuniv.core_cpt.dto.CoreCptInfoRequestDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoDetailDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoListDTO;
+import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoRequestDTO;
 
 import kr.ac.dhuniv.core_cpt.service.CoreCptInfoService;
 import lombok.RequiredArgsConstructor;

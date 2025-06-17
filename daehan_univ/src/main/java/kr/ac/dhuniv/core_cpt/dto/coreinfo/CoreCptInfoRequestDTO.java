@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.core_cpt.dto;
+package kr.ac.dhuniv.core_cpt.dto.coreinfo;
 
 import lombok.*;
 

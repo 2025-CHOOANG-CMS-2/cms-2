@@ -18,11 +18,11 @@ public class StdMileageTotal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id; // 자동 증가 PK
+    @Column(name = "mlg_tot_id")
+    private Long mlgTotId; // 자동 증가 PK
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "std_no", referencedColumnName = "std_no")
+    @JoinColumn(name = "std_id", referencedColumnName = "std_id")
     private StdInfo student;
 
     @Column(name = "tot_mlg_score", precision = 10, scale = 3)

@@ -46,7 +46,8 @@ public class AuthController {
                         loginRequest.getPassword()     // 사용자 PW
                 )
         );
-
+        System.out.println("loginRequest = " + loginRequest.getUserId());
+        System.out.println("loginRequest = " + loginRequest.getPassword());
         // 🔹 인증 성공 시 사용자 권한 목록 추출 (예: ROLE_ADMIN, ROLE_STUDENT 등)
         List<String> roles = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority) // GrantedAuthority -> 권한 문자열 추출
