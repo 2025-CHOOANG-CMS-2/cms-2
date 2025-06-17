@@ -11,6 +11,8 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public class StdInfoDto {
 
+	@JsonProperty("STD_ID")
+    private Long STD_ID;
     @JsonProperty("STD_NO")
     private String STD_NO;
     @JsonProperty("STD_NM")
@@ -37,4 +39,5 @@ public class StdInfoDto {
     private String USER_ID2;
     @JsonProperty("USE_YN")
     private String USE_YN;
+   
 }
