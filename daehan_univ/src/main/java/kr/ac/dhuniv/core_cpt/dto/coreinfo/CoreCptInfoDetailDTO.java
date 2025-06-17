@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.core_cpt.dto;
+package kr.ac.dhuniv.core_cpt.dto.coreinfo;
 
 
 import lombok.*;
@@ -7,7 +7,8 @@ import java.util.List;
 @Getter
 @Setter
 public class CoreCptInfoDetailDTO {
-    private String cciCode;                   // 상위 역량 코드
+    private Long cciId;                   // 상위 역량 id
+    private String cciCode;
     private String cciNm;                   // 역량명
     private String cciDesc;                 // 설명
     private Integer weight;                 // 가중치 (%)
