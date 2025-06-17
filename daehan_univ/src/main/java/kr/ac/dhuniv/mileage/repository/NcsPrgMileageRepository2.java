@@ -13,3 +13,4 @@ public interface NcsPrgMileageRepository2 extends JpaRepository<NcsPrgMileage, L
     Optional<NcsPrgMileage> findByProgram_PrgId(Long prgId);
 }
 
+*/
