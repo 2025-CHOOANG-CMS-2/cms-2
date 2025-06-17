@@ -1,5 +1,10 @@
 package kr.ac.dhuniv.ncs.domain;
 
+import jakarta.persistence.*;
+//import kr.ac.dhuniv.std_info.StdInfo;
+import lombok.*;
+
+>>>>>>> dev_kjsu586
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
@@ -77,4 +82,16 @@ public class NcsPrgAply {
      */
     @Column(name = "aply_stat_cd", length = 10)
     private String applyStatusCode;
+}
+    private String statusCode;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prg_id", referencedColumnName = "prg_id")
+    private NcsPrgInfo program;
+    
+    /*
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "std_no", referencedColumnName = "std_no")
+    private StdInfo student;
+    */
 }

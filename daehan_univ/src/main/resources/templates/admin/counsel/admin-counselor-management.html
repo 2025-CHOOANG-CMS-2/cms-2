@@ -151,10 +151,7 @@
                 <div class="filter-group"><label>상태:</label><select class="filter-select" id="statusFilter"><option value="all">전체</option><option value="active">활성</option><option value="inactive">비활성</option></select></div>
                 <div class="filter-group"><label>전문분야:</label><select class="filter-select" id="specialtyFilter"><option value="all">전체</option><option value="career">진로 상담</option><option value="academic">학업 상담</option><option value="psychological">심리 상담</option><option value="employment">취업 상담</option></select></div>
             </div>
-            <div class="counselor-grid">
-                <div class="counselor-card-admin" data-status="active" data-specialty="academic"><div class="counselor-header"><div class="counselor-avatar">김</div><div class="counselor-basic-info"><h3>김상담</h3><p class="counselor-id">ID: C001</p><span class="status-badge active">활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">학업 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">10년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">kim.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-1234-5678</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 245건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.8</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.03</span></div></div></div>
-                <div class="counselor-card-admin" data-status="active" data-specialty="career"><div class="counselor-header"><div class="counselor-avatar">이</div><div class="counselor-basic-info"><h3>이상담</h3><p class="counselor-id">ID: C002</p><span class="status-badge active">활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">진로 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">8년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">lee.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-2345-6789</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 189건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.7</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.05</span></div></div></div>
-                <div class="counselor-card-admin" data-status="inactive" data-specialty="employment"><div class="counselor-header"><div class="counselor-avatar">최</div><div class="counselor-basic-info"><h3>최상담</h3><p class="counselor-id">ID: C004</p><span class="status-badge inactive">비활성</span></div><div class="counselor-actions"><button class="btn btn-outline btn-sm"><i class="fas fa-edit"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-power-off"></i></button><button class="btn btn-outline btn-sm"><i class="fas fa-trash"></i></button></div></div><div class="counselor-details"><div class="detail-row"><span class="label">전문분야:</span><span class="value">취업 상담</span></div><div class="detail-row"><span class="label">경력:</span><span class="value">15년</span></div><div class="detail-row"><span class="label">이메일:</span><span class="value">choi.counselor@edu.ac.kr</span></div><div class="detail-row"><span class="label">연락처:</span><span class="value">010-4567-8901</span></div></div><div class="counselor-stats"><div class="stat-item"><i class="fas fa-comments"></i><span>상담: 178건</span></div><div class="stat-item"><i class="fas fa-star"></i><span>평점: 4.6</span></div><div class="stat-item"><i class="fas fa-calendar"></i><span>가입: 2023.01</span></div></div></div>
+            <div class="counselor-grid">        
             </div>
         </div>
     </main>
@@ -169,6 +166,12 @@
             </div>
             <div class="modal-body">
                 <form id="counselorForm">
+                <div class="form-group">
+			        <label class="form-label">교직원 선택</label>
+			        <select class="form-control" id="counselorEmplNo" required>
+			            <option value="">상담사 역할을 가진 교직원을 선택하세요</option>
+			            </select>
+			    </div>                          
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">이름</label>
@@ -184,19 +187,15 @@
                             <label class="form-label">연락처</label>
                             <input type="tel" class="form-control" id="counselorPhone" required>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">경력 (년)</label>
-                            <input type="number" class="form-control" id="counselorExperience" min="0" required>
-                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">전문분야</label>
                         <select class="form-control" id="counselorSpecialty" required>
                             <option value="">선택해주세요</option>
-                            <option value="career">진로 상담</option>
-                            <option value="academic">학업 상담</option>
-                            <option value="psychological">심리 상담</option>
-                            <option value="employment">취업 상담</option>
+                            <option value="진로 상담">진로 상담</option>
+                            <option value="학업 상담">학업 상담</option>
+                            <option value="심리 상담">심리 상담</option>
+                            <option value="취업 상담">취업 상담</option>
                         </select>
                     </div>
                     <div class="form-group">
