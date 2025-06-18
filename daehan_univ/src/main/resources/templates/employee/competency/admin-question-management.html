@@ -952,8 +952,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadTopCompetencies();      // 상위 역량 불러오기
             bindTopCompetencyChange();  // change 이벤트 연결
-            loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
-            // ✅ 이곳에 추가
+            //loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
+            searchQuestions(0);         // 페이지 0부터 조건 없이 페이징 목록 불러오기
             document.getElementById('subCompetency').addEventListener('change', loadNextQstCode);
         });
         /**
@@ -997,69 +997,57 @@
          * */
 
         /**
-         * ✅ 검색 버튼 클릭 시 실행되는 함수
-         * - 입력된 조건을 기반으로 서버에 요청하고 결과를 렌더링
-         * - 페이지네이션과 연동
-         * @param {number} pageNo 요청할 페이지 번호 (기본 1)
+         * ✅ 조건 + 페이지 요청
          */
-        function searchQuestions(pageNo = 1) {
-            // 🔹 필터 값 읽기
-            const topCptId = document.getElementById('competencyFilter').value || '';
-            const subCptId = document.getElementById('subCompetencyFilter').value || '';
-            const status = document.getElementById('statusFilter').value || '';
-            const keyword = document.getElementById('searchQuestion').value || '';
-
-            // 🔹 URL 파라미터 구성
+        function searchQuestions(pageNo = 0) {
             const params = new URLSearchParams();
-            params.append('page', pageNo);               // 페이지 번호 추가
-            params.append('size', 10);                   // 페이지 크기 (고정 or 선택 가능)
-            if (topCptId) params.append('topCptId', topCptId);
-            if (subCptId) params.append('subCptId', subCptId);
-            if (status) params.append('status', status);
-            if (keyword) params.append('keyword', keyword);
+            params.append("page", pageNo);
+            params.append("size", 10); // 고정 or 선택값
+            const topCptId = document.getElementById("competencyFilter").value;
+            const subCptId = document.getElementById("subCompetencyFilter").value;
+            const keyword = document.getElementById("searchQuestion").value;
 
-            // 🔹 서버 요청
-            fetch('/api/questions/filter?' + params.toString())
-                .then(res => res.json())
-                .then(data => {
-                    // 🔹 목록 렌더링
-                    renderQuestionList(data.questions);
-                    // 🔹 페이지네이션 렌더링
-                    renderPagination(data.pageInfo, searchQuestions);
+            if (topCptId) params.append("topCptId", topCptId);
+            if (subCptId) params.append("subCptId", subCptId);
+            if (keyword) params.append("keyword", keyword);
+            const url = "/api/questions/filter?" + params.toString();
+            console.log("📌 문항 조회 요청 URL:", url);  // 요청 URL 확인
+
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) {
+                        // HTTP 에러 코드 로그
+                        console.error(`❌ 서버 응답 실패: ${res.status} ${res.statusText}`);
+                        throw new Error(`HTTP error: ${res.status}`);
+                    }
+                    return res.json();
                 })
-                .catch(() => {
-                    alert('문항 조회에 실패했습니다.');
+                .then(data => {
+                    console.log("✅ 문항 조회 응답 데이터:", data); // 응답 데이터 출력
+                    renderQuestionList(data.content);
+                    renderPagination(data);
+                })
+                .catch(err => {
+                    alert("문항 조회 실패");
+                    console.error("❗ fetch 처리 중 에러 발생:", err); // 에러 상세 출력
                 });
         }
 
         /**
-         * ✅ 검색 결과를 화면에 출력
-         * @param questions 서버에서 받은 문항 리스트
+         * ✅ 문항 목록 출력
          */
         function renderQuestionList(questions) {
-            const container = document.querySelector('.card-body');
-            container.innerHTML = ''; // 기존 목록 제거
-
-            questions.forEach((q, idx) => {
+            const container = document.querySelector(".card-body");
+            container.innerHTML = "";
+            questions.forEach((q, i) => {
                 container.innerHTML += `
-        <div class="question-card">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                    <span class="badge badge-competency" style="background:${q.colorHex}">${q.competencyName}</span>
-                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
-                    <span class="badge bg-info">${q.qstCode}</span>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+            <div class="question-card">
+                <span class="badge" style="background:${q.colorHex}">${q.competencyName}</span>
+                <span class="badge bg-secondary">${q.subCompetencyName}</span>
+                <span class="badge bg-info">${q.qstCode}</span>
+                <h6>Q${i + 1}: ${q.questionText}</h6>
             </div>
-            <h6 class="mb-2">Q${idx + 1}. ${q.questionText}</h6>
-        </div>`;
+        `;
             });
         }
 
@@ -1086,17 +1074,14 @@
 
         /**
          * ✅ 페이지네이션 렌더링
-         * @param {object} pageInfo 서버에서 전달된 페이지 정보
-         * @param {function} callback 페이지 클릭 시 호출할 함수 (예: searchQuestions)
          */
-        function renderPagination(pageInfo, callback) {
-            const paginationEl = document.querySelector('.pagination');
-            paginationEl.innerHTML = '';
-
-            for (let i = 1; i <= pageInfo.totalPages; i++) {
+        function renderPagination(page) {
+            const paginationEl = document.querySelector(".pagination");
+            paginationEl.innerHTML = "";
+            for (let i = 0; i < page.totalPages; i++) {
                 paginationEl.innerHTML += `
-            <li class="page-item ${pageInfo.currentPage === i ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="${callback.name}(${i})">${i}</a>
+            <li class="page-item ${page.number === i ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="searchQuestions(${i})">${i + 1}</a>
             </li>
         `;
             }
