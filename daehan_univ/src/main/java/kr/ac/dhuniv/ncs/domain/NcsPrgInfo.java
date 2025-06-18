@@ -106,4 +106,7 @@ public class NcsPrgInfo {
      */
     @Column(name = "aply_end_ymd")
     private LocalDateTime aplyEndDate;
+    
+    @Column(name = "image_url")
+    private String imageUrl;
 }
