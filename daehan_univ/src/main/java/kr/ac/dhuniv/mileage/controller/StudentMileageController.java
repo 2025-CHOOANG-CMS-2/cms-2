@@ -8,15 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.ac.dhuniv.mileage.dto.CmpInfoResponseDto;
-import kr.ac.dhuniv.mileage.service.NcsCmpInfoService;
+import kr.ac.dhuniv.mileage.service.StudentMileageService;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/ncs/cmp")
-public class NcsCmpInfoController {
+public class StudentMileageController {
 
-	private final NcsCmpInfoService cmpInfoService;
+	private final StudentMileageService cmpInfoService;
 
     @GetMapping("/student/{stdNo}")
     public List<CmpInfoResponseDto> getCompletedPrograms(@PathVariable("stdId") Long stdId) {
