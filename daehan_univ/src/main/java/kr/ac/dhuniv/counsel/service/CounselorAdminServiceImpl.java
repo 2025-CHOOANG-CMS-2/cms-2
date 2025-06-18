@@ -1,18 +1,24 @@
 package kr.ac.dhuniv.counsel.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.ac.dhuniv.counsel.domain.CnlrSchd;
 import kr.ac.dhuniv.counsel.domain.CnslrInfo;
 import kr.ac.dhuniv.counsel.dto.CounselorListDto;
 import kr.ac.dhuniv.counsel.dto.CreateCounselorRequestDto;
 import kr.ac.dhuniv.counsel.dto.UnregisteredEmpDto;
 import kr.ac.dhuniv.counsel.dto.UpdateCounselorRequestDto;
+import kr.ac.dhuniv.counsel.repository.CnlrSchdRepository;
 import kr.ac.dhuniv.counsel.repository.CnslrInfoRepository;
 import kr.ac.dhuniv.counsel.repository.EmplInfoRepository;
+import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -22,6 +28,7 @@ public class CounselorAdminServiceImpl implements CounselorAdminService {
 
     private final CnslrInfoRepository cnslrInfoRepository;
     private final EmplInfoRepository emplInfoRepository;
+    private final CnlrSchdRepository cnlrSchdRepository;
 
     @Override
     public List<CounselorListDto> getCounselorList() {
@@ -62,22 +69,51 @@ public class CounselorAdminServiceImpl implements CounselorAdminService {
     }
     
     @Override
-    @Transactional // 데이터를 생성/수정/삭제 하므로 @Transactional 필요
+    @Transactional
     public void createCounselor(CreateCounselorRequestDto requestDto) {
-        // 이미 등록된 교직원인지 확인하는 방어 로직 (선택)
         cnslrInfoRepository.findByEmplNo(requestDto.getEmplNo()).ifPresent(c -> {
             throw new IllegalArgumentException("이미 등록된 상담사입니다.");
         });
+        
+        // 1. emplNo로 EmplInfo 엔티티를 먼저 조회합니다.
+        EmplInfo employee = emplInfoRepository.findByEmplNo(requestDto.getEmplNo())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 교직원입니다."));
 
-        // DTO를 Entity로 변환하여 생성
+        // 2. 상담사 프로필 정보를 저장합니다.
         CnslrInfo newCounselor = new CnslrInfo(
             requestDto.getEmplNo(),
             requestDto.getCnslSpec(),
             requestDto.getIsActive(),
             requestDto.getIntro()
         );
-        
         cnslrInfoRepository.save(newCounselor);
+        
+        // 3. [수정된 로직] 앞으로 다가올 평일 5일에 대한 기본 스케줄을 생성합니다.
+        LocalDate today = LocalDate.now();
+        int schedulesCreated = 0;
+        int daysToAdd = 1;
+
+        while (schedulesCreated < 5) {
+            LocalDate nextDay = today.plusDays(daysToAdd);
+            DayOfWeek dayOfWeek = nextDay.getDayOfWeek();
+            
+            // 주말(토,일)이 아니면 스케줄 생성
+            if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
+                String scheduleId = "SCHD-" + nextDay.toString() + "-" + requestDto.getEmplNo();
+
+                CnlrSchd defaultSchedule = CnlrSchd.builder()
+                        .schdId(scheduleId) // schdId는 고유해야 하므로 생성 규칙이 필요합니다.
+                        .employee(employee) // String이 아닌 EmplInfo 객체를 전달
+                        .dayCode(nextDay)   // 요일 문자열이 아닌, 실제 날짜(LocalDate)를 전달
+                        .startTime(LocalTime.of(9, 0))
+                        .endTime(LocalTime.of(17, 0))
+                        .build();
+                
+                cnlrSchdRepository.save(defaultSchedule);
+                schedulesCreated++;
+            }
+            daysToAdd++;
+        }
     }
     
     @Override

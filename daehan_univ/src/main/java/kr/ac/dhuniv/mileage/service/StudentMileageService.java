@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class NcsCmpInfoService {
+public class StudentMileageService {
 
 	private final NcsCmpInfoRepository2 cmpInfoRepository;
 
