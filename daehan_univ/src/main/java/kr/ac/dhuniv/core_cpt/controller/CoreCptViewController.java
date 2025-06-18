@@ -19,6 +19,10 @@ public class CoreCptViewController {
 		return "employee/competency/admin-diagnosis-management";
 			
 	}
+	@GetMapping("/employees/question-management")
+	public String getEmpQuestionManagementPage() {
+		return "employee/competency/admin-question-management";
+	}
 	@GetMapping("/employees/core-diagnosis-result")
 	public String getEmpCoreResultPage() {
 		return "employee/competency/admin-diagnosis-result";

@@ -237,15 +237,7 @@
                                 <option value="sub3">비언어적 소통</option>
                             </select>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <label for="difficultyFilter" class="form-label">난이도</label>
-                            <select class="form-select" id="difficultyFilter">
-                                <option value="">전체</option>
-                                <option value="easy">쉬움</option>
-                                <option value="medium">보통</option>
-                                <option value="hard">어려움</option>
-                            </select>
-                        </div>
+
                         <div class="col-md-3 mb-3">
                             <label for="statusFilter" class="form-label">상태</label>
                             <select class="form-select" id="statusFilter">
@@ -535,30 +527,18 @@
                                     <option value="sub3">비언어적 소통</option>
                                 </select>
                             </div>
+                            <!-- 문항 코드 표시용 -->
+                            <div class="mb-2">
+                                <label class="form-label">문항 코드</label>
+                                <div id="qstCodeDisplay" class="form-control bg-light"></div>
+                                <input type="hidden" id="qstCodeHidden">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="questionText" class="form-label">문항 내용 *</label>
                             <textarea class="form-control" id="questionText" rows="3" required></textarea>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="questionType" class="form-label">문항 유형 *</label>
-                                <select class="form-select" id="questionType" required>
-                                    <option value="likert5">5점 리커트 척도</option>
-                                    <option value="likert7">7점 리커트 척도</option>
-                                    <option value="multiple">객관식 (단일 선택)</option>
-                                    <option value="checkbox">객관식 (다중 선택)</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="difficulty" class="form-label">난이도</label>
-                                <select class="form-select" id="difficulty">
-                                    <option value="easy">쉬움</option>
-                                    <option value="medium" selected>보통</option>
-                                    <option value="hard">어려움</option>
-                                </select>
-                            </div>
-                        </div>
+
                         
                         <div id="optionsContainer">
                             <label class="form-label">선택지 *</label>
@@ -674,218 +654,459 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // 문항 검색
-        function searchQuestions() {
-            const competency = document.getElementById('competencyFilter').value;
-            const subCompetency = document.getElementById('subCompetencyFilter').value;
-            const difficulty = document.getElementById('difficultyFilter').value;
-            const status = document.getElementById('statusFilter').value;
-            const keyword = document.getElementById('searchQuestion').value;
-            
-            console.log('검색 조건:', { competency, subCompetency, difficulty, status, keyword });
-            alert('검색 기능이 실행되었습니다. 실제 구현 시 서버에서 데이터를 가져옵니다.');
-        }
-
-        // 문항 저장
+        // ✅ 문항 저장 (문항 + 선택지)
         function saveQuestion() {
+            // 폼 유효성 검사
             const form = document.getElementById('addQuestionForm');
-            
             if (!form.checkValidity()) {
                 form.reportValidity();
                 return;
             }
-            
-            const competency = document.getElementById('competency').value;
-            const subCompetency = document.getElementById('subCompetency').value;
-            const questionText = document.getElementById('questionText').value;
-            const questionType = document.getElementById('questionType').value;
-            const difficulty = document.getElementById('difficulty').value;
-            const isActive = document.getElementById('isActive').checked;
-            const isRequired = document.getElementById('isRequired').checked;
-            
-            console.log('문항 저장:', { 
-                competency, 
-                subCompetency, 
-                questionText, 
-                questionType, 
-                difficulty, 
-                isActive, 
-                isRequired 
+
+            // 폼 데이터 수집
+            const payload = {
+                qstCode: generateQstCode(), // 문항 코드 생성 (임시 또는 서버 생성 가능)
+                questionText: document.getElementById('questionText').value,
+                qstOrd: 1, // 필요시 동적으로
+                coreCptInfoId: 1, // 선택된 역량 ID (예: 드롭다운 값 활용)
+                regUserId: 'admin', // 현재 로그인 사용자 ID (예: 세션 기반)
+                options: []
+            };
+
+            // 선택지 수집
+            document.querySelectorAll('#optionsContainer .option-input').forEach((opt) => {
+                payload.options.push({
+                    text: opt.querySelector('input[type=text]').value,
+                    score: parseInt(opt.querySelector('input[type=number]').value),
+                    isCorrect: opt.querySelector('input[type=radio], input[type=checkbox]')?.checked || false
+                });
             });
-            
-            alert('문항이 저장되었습니다.');
-            
-            // 모달 닫기
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addQuestionModal'));
-            modal.hide();
-            
-            // 폼 초기화
-            form.reset();
-        }
 
-        // 문항 수정
-        function editQuestion(questionId) {
-            alert(`문항 ID ${questionId} 수정 기능을 실행합니다.`);
-            // 실제 구현에서는 수정 모달 열기
+            // fetch POST 호출
+            fetch('/api/questions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert('문항이 성공적으로 저장되었습니다.');
+                        location.reload(); // 목록 갱신
+                    } else {
+                        alert('문항 저장에 실패했습니다.');
+                    }
+                });
         }
-
-        // 문항 삭제
-        function deleteQuestion(questionId) {
-            if (confirm('선택한 문항을 정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
-                alert(`문항 ID ${questionId}이(가) 삭제되었습니다.`);
-                // 실제 구현에서는 서버 API 호출
-            }
-        }
-
-        // 문항 일괄 등록
-        function importQuestions() {
-            const fileInput = document.getElementById('importFile');
-            
-            if (!fileInput.files || fileInput.files.length === 0) {
-                alert('파일을 선택해주세요.');
+        /**
+         * ✅ 선택된 하위 역량에 대한 문항 코드 생성 요청
+         */
+        function loadNextQstCode() {
+            const subCptId = document.getElementById('subCompetency').value;
+            if (!subCptId) {
+                alert('하위 역량을 선택해주세요.');
                 return;
             }
-            
-            const file = fileInput.files[0];
-            console.log('파일 업로드:', file.name);
-            
-            alert('파일이 업로드되었습니다. 처리 중...');
-            
-            // 모달 닫기
-            const modal = bootstrap.Modal.getInstance(document.getElementById('importQuestionsModal'));
-            modal.hide();
-            
-            // 실제 구현에서는 파일 업로드 및 처리 로직 추가
-            setTimeout(() => {
-                alert('45개 문항이 성공적으로 등록되었습니다.');
-            }, 1500);
+
+            fetch(`/api/questions/next-code?subCptId=${subCptId}`)
+                .then(res => res.text())
+                .then(code => {
+                    console.log("생성된 코드: ", code);
+                    document.getElementById('qstCodeDisplay').innerText = code; // 코드 표시용 요소
+                    // 필요시 hidden input에 저장
+                    document.getElementById('qstCodeHidden').value = code;
+                })
+                .catch(() => alert("문항 코드 생성 실패"));
+        }
+        /**
+         * ✅ 문항 삭제
+         * @param {number} qstId 삭제할 문항 ID
+         */
+        function deleteQuestion(qstId) {
+            if (!confirm("정말 삭제하시겠습니까?")) return;
+
+            fetch(`/api/questions/${qstId}`, {
+                method: 'DELETE'
+            }).then(res => {
+                if (res.ok) {
+                    alert("삭제되었습니다.");
+                    loadQuestions(); // 목록 새로고침
+                } else {
+                    alert("삭제 실패");
+                }
+            });
+        }
+        /**
+         * ✅ 문항 수정 모달 열기 (기본은 fetch 로 데이터를 가져온 후 모달에 세팅)
+         * @param {number} qstId 수정할 문항 ID
+         */
+        function editQuestion(qstId) {
+            fetch(`/api/questions/${qstId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 모달에 값 세팅 (예시)
+                    document.getElementById('questionText').value = data.questionText;
+                    document.getElementById('competency').value = data.topCptId; // 상위 역량 ID
+                    loadSubCompetencies(data.topCptId); // 하위 역량 로드
+                    setTimeout(() => {
+                        document.getElementById('subCompetency').value = data.subCptId;
+                    }, 300); // 하위 select 로딩 후 값 세팅
+
+                    // 선택지도 세팅 (필요하면 renderOptions(data.options) 작성)
+                });
+            // 모달 열기
+            new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
         }
 
-        // 문항 유형에 따른 선택지 UI 변경
-        document.getElementById('questionType').addEventListener('change', function() {
-            const questionType = this.value;
-            const optionsContainer = document.getElementById('optionsContainer');
-            
-            // 선택지 UI 초기화
-            optionsContainer.innerHTML = '<label class="form-label">선택지 *</label>';
-            
-            if (questionType === 'likert5') {
-                // 5점 리커트 척도 선택지
-                for (let i = 1; i <= 5; i++) {
-                    const optionText = i === 1 ? '전혀 그렇지 않다' : 
-                                      i === 2 ? '그렇지 않다' : 
-                                      i === 3 ? '보통이다' : 
-                                      i === 4 ? '그렇다' : '매우 그렇다';
-                    
-                    const optionHtml = `
-                        <div class="option-input mb-2">
-                            <div class="input-group">
-                                <span class="input-group-text">${i}</span>
-                                <input type="text" class="form-control" placeholder="${optionText}" value="${optionText}" required>
-                                <span class="input-group-text">점수</span>
-                                <input type="number" class="form-control" value="${i}" min="0" max="5" required style="width: 70px;">
-                            </div>
-                        </div>
-                    `;
-                    
-                    optionsContainer.innerHTML += optionHtml;
-                }
-            } else if (questionType === 'likert7') {
-                // 7점 리커트 척도 선택지
-                for (let i = 1; i <= 7; i++) {
-                    const optionText = i === 1 ? '전혀 그렇지 않다' : 
-                                      i === 2 ? '그렇지 않다' : 
-                                      i === 3 ? '약간 그렇지 않다' : 
-                                      i === 4 ? '보통이다' : 
-                                      i === 5 ? '약간 그렇다' : 
-                                      i === 6 ? '그렇다' : '매우 그렇다';
-                    
-                    const optionHtml = `
-                        <div class="option-input mb-2">
-                            <div class="input-group">
-                                <span class="input-group-text">${i}</span>
-                                <input type="text" class="form-control" placeholder="${optionText}" value="${optionText}" required>
-                                <span class="input-group-text">점수</span>
-                                <input type="number" class="form-control" value="${i}" min="0" max="7" required style="width: 70px;">
-                            </div>
-                        </div>
-                    `;
-                    
-                    optionsContainer.innerHTML += optionHtml;
-                }
-            } else if (questionType === 'multiple' || questionType === 'checkbox') {
-                // 객관식 선택지
-                for (let i = 1; i <= 4; i++) {
-                    const optionHtml = `
-                        <div class="option-input mb-2">
-                            <div class="input-group">
-                                <span class="input-group-text">${i}</span>
-                                <input type="text" class="form-control" placeholder="선택지 ${i}" required>
-                                <span class="input-group-text">점수</span>
-                                <input type="number" class="form-control" value="${i}" min="0" max="10" required style="width: 70px;">
-                                ${questionType === 'multiple' ? 
-                                    `<div class="input-group-text">
-                                        <input class="form-check-input" type="radio" name="correctOption" value="${i}">
-                                        <span class="ms-2">정답</span>
-                                    </div>` : 
-                                    `<div class="input-group-text">
-                                        <input class="form-check-input" type="checkbox" name="correctOption" value="${i}">
-                                        <span class="ms-2">정답</span>
-                                    </div>`
-                                }
-                            </div>
-                        </div>
-                    `;
-                    
-                    optionsContainer.innerHTML += optionHtml;
-                }
-                
-                // 선택지 추가 버튼
-                optionsContainer.innerHTML += `
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addOption()">
-                        <i class="fas fa-plus me-1"></i>
-                        선택지 추가
-                    </button>
-                `;
+        /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+         * */
+        // ✅ 문항 목록 조회 및 렌더링
+        function loadQuestions() {
+            fetch('/api/questions')
+                .then(res => res.json())
+                .then(data => {
+                    renderQuestionList(data);
+                })
+                .catch(err => {
+                    console.error('문항 목록 조회 실패:', err);
+                    alert('문항 목록 조회에 실패했습니다.');
+                });
+        }
+        // ✅ 문항 목록을 화면에 출력
+        function renderQuestionList(questions) {
+            const container = document.querySelector('.card-body');
+            container.innerHTML = ''; // 기존 내용 초기화
+
+            if (questions.length === 0) {
+                container.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+                return;
             }
-        });
 
-        // 선택지 추가
-        function addOption() {
-            const optionsContainer = document.getElementById('optionsContainer');
-            const optionInputs = optionsContainer.querySelectorAll('.option-input');
-            const newIndex = optionInputs.length + 1;
-            const questionType = document.getElementById('questionType').value;
-            
-            const optionHtml = `
-                <div class="option-input mb-2">
-                    <div class="input-group">
-                        <span class="input-group-text">${newIndex}</span>
-                        <input type="text" class="form-control" placeholder="선택지 ${newIndex}" required>
-                        <span class="input-group-text">점수</span>
-                        <input type="number" class="form-control" value="${newIndex}" min="0" max="10" required style="width: 70px;">
-                        ${questionType === 'multiple' ? 
-                            `<div class="input-group-text">
-                                <input class="form-check-input" type="radio" name="correctOption" value="${newIndex}">
-                                <span class="ms-2">정답</span>
-                            </div>` : 
-                            `<div class="input-group-text">
-                                <input class="form-check-input" type="checkbox" name="correctOption" value="${newIndex}">
-                                <span class="ms-2">정답</span>
-                            </div>`
-                        }
-                    </div>
+            questions.forEach((q, index) => {
+                const html = `
+        <div class="question-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                     <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color: #fff;">
+                        ${q.competencyName}
+                    </span>
+                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+                    <span class="badge bg-dark me-2">${q.qstCode}</span>
                 </div>
-            `;
-            
-            // 추가 버튼 앞에 새 선택지 삽입
-            const addButton = optionsContainer.querySelector('button');
-            addButton.insertAdjacentHTML('beforebegin', optionHtml);
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <h6 class="mb-2">Q${index + 1}. ${q.questionText}</h6>
+            <div class="question-options">
+                ${renderOptions()} <!-- 공통 리커트 척도 -->
+            </div>
+            <div class="mt-2 text-muted small">
+                <span class="me-3">문항 코드: ${q.qstCode}</span>
+                <span class="badge bg-success">활성</span>
+            </div>
+        </div>
+        `;
+                container.innerHTML += html;
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('진단 문항 관리 페이지가 로드되었습니다.');
+        // ✅ 리커트 척도 옵션 HTML
+        function renderOptions() {
+            return `
+        <div class="option-item"><input type="radio" disabled> 전혀 그렇지 않다 (1점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇지 않다 (2점)</div>
+        <div class="option-item"><input type="radio" disabled> 보통이다 (3점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇다 (4점)</div>
+        <div class="option-item"><input type="radio" disabled> 매우 그렇다 (5점)</div>
+    `;
+        }
+        /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+         * */
+
+        /**
+         * 상/하위 역량 불러오는 js 파트
+         * */
+        /**
+         * ✅ 역량 영역 드롭다운 로딩 (상위 역량)
+         */
+        function loadTopCompetencies() {
+            fetch('/api/competencies/list')
+                .then(res => res.json())
+                .then(topList => {
+                    console.log('상위 역량 목록:', topList);
+                    renderTopCompetencyOptions(topList);
+                });
+        }
+
+        /**
+         * ✅ 상위 역량 옵션 렌더링
+         * @param topList 상위 역량 데이터 배열
+         */
+        function renderTopCompetencyOptions(topList) {
+            const topSelects = [
+                document.getElementById('competencyFilter'),
+                document.getElementById('competency')
+            ];
+
+            // 각 select 초기화
+            topSelects.forEach(sel => {
+                if (sel.id.includes('Filter')) {
+                    sel.innerHTML = '<option value="">전체</option>';
+                } else {
+                    sel.innerHTML = '<option value="">선택하세요</option>';
+                }
+            });
+
+            // 상위 역량 삽입
+            topList.forEach(top => {
+                topSelects.forEach(sel => {
+                    sel.innerHTML += `<option value="${top.cciId}">${top.cciNm}</option>`;
+                });
+            });
+        }
+
+        /**
+         * ✅ 상위 역량 선택 시 하위 역량 로딩
+         * @param cciId 상위 역량 ID
+         */
+        function loadSubCompetencies(cciId) {
+            if (!cciId) {
+                clearSubCompetencyOptions();
+                return;
+            }
+
+            fetch(`/api/competencies/${cciId}`)
+                .then(res => res.json())
+                .then(detail => {
+                    console.log(`상위 역량 ${cciId} 상세:`, detail);
+                    renderSubCompetencyOptions(detail.children);
+                });
+        }
+
+        /**
+         * ✅ 하위 역량 옵션 렌더링
+         * @param children 하위 역량 배열
+         */
+        function renderSubCompetencyOptions(children) {
+            const subSelects = [
+                document.getElementById('subCompetencyFilter'),
+                document.getElementById('subCompetency')
+            ];
+
+            subSelects.forEach(sel => {
+                if (sel.id.includes('Filter')) {
+                    sel.innerHTML = '<option value="">전체</option>';
+                } else {
+                    sel.innerHTML = '<option value="">선택하세요</option>';
+                }
+            });
+
+            children.forEach(sub => {
+                subSelects.forEach(sel => {
+                    sel.innerHTML += `<option value="${sub.cciId}">${sub.cciNm}</option>`;
+                });
+            });
+        }
+
+        /**
+         * ✅ 하위 역량 select 초기화
+         */
+        function clearSubCompetencyOptions() {
+            const subSelects = [
+                document.getElementById('subCompetencyFilter'),
+                document.getElementById('subCompetency')
+            ];
+
+            subSelects.forEach(sel => {
+                if (sel.id.includes('Filter')) {
+                    sel.innerHTML = '<option value="">전체</option>';
+                } else {
+                    sel.innerHTML = '<option value="">선택하세요</option>';
+                }
+            });
+        }
+
+        /**
+         * ✅ 상위 역량 select change 이벤트 바인딩
+         */
+        function bindTopCompetencyChange() {
+            const topSelects = [
+                document.getElementById('competencyFilter'),
+                document.getElementById('competency')
+            ];
+
+            topSelects.forEach(sel => {
+                sel.addEventListener('change', (e) => {
+                    const cciId = e.target.value;
+                    loadSubCompetencies(cciId);
+                });
+            });
+        }
+
+        // ✅ 페이지 로드 시
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTopCompetencies();      // 상위 역량 불러오기
+            bindTopCompetencyChange();  // change 이벤트 연결
+            loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
+            // ✅ 이곳에 추가
+            document.getElementById('subCompetency').addEventListener('change', loadNextQstCode);
         });
+        /**
+         * 상/하위 역량 불러오는 js 파트
+         * */
+
+        // 문항 추가 모달이 열릴 때 선택지 로드
+        document.getElementById('addQuestionModal').addEventListener('show.bs.modal', function () {
+            loadLikertOptions();
+        });
+
+        /**
+         * ✅ DB에서 리커트 척도 선택지를 로드하여 모달에 렌더링
+         */
+        function loadLikertOptions() {
+            fetch('/api/options/likert')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('optionsContainer');
+                    container.innerHTML = ''; // 기존 내용 제거
+
+                    data.forEach(opt => {
+                        container.innerHTML += `
+                    <div class="option-input mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text">${opt.ord}</span>
+                            <input type="text" class="form-control" value="${opt.optionText}" readonly>
+                            <span class="input-group-text">점수</span>
+                            <input type="number" class="form-control" value="${opt.score}" readonly style="width: 70px;">
+                        </div>
+                    </div>
+                `;
+                    });
+                })
+                .catch(() => {
+                    alert('리커트 척도 선택지 로드에 실패했습니다.');
+                });
+        }
+        /**
+         * 필터링 관련 js
+         * */
+
+        /**
+         * ✅ 검색 버튼 클릭 시 실행되는 함수
+         * - 입력된 조건을 기반으로 서버에 요청하고 결과를 렌더링
+         * - 페이지네이션과 연동
+         * @param {number} pageNo 요청할 페이지 번호 (기본 1)
+         */
+        function searchQuestions(pageNo = 1) {
+            // 🔹 필터 값 읽기
+            const topCptId = document.getElementById('competencyFilter').value || '';
+            const subCptId = document.getElementById('subCompetencyFilter').value || '';
+            const status = document.getElementById('statusFilter').value || '';
+            const keyword = document.getElementById('searchQuestion').value || '';
+
+            // 🔹 URL 파라미터 구성
+            const params = new URLSearchParams();
+            params.append('page', pageNo);               // 페이지 번호 추가
+            params.append('size', 10);                   // 페이지 크기 (고정 or 선택 가능)
+            if (topCptId) params.append('topCptId', topCptId);
+            if (subCptId) params.append('subCptId', subCptId);
+            if (status) params.append('status', status);
+            if (keyword) params.append('keyword', keyword);
+
+            // 🔹 서버 요청
+            fetch('/api/questions/filter?' + params.toString())
+                .then(res => res.json())
+                .then(data => {
+                    // 🔹 목록 렌더링
+                    renderQuestionList(data.questions);
+                    // 🔹 페이지네이션 렌더링
+                    renderPagination(data.pageInfo, searchQuestions);
+                })
+                .catch(() => {
+                    alert('문항 조회에 실패했습니다.');
+                });
+        }
+
+        /**
+         * ✅ 검색 결과를 화면에 출력
+         * @param questions 서버에서 받은 문항 리스트
+         */
+        function renderQuestionList(questions) {
+            const container = document.querySelector('.card-body');
+            container.innerHTML = ''; // 기존 목록 제거
+
+            questions.forEach((q, idx) => {
+                container.innerHTML += `
+        <div class="question-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <span class="badge badge-competency" style="background:${q.colorHex}">${q.competencyName}</span>
+                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+                    <span class="badge bg-info">${q.qstCode}</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <h6 class="mb-2">Q${idx + 1}. ${q.questionText}</h6>
+        </div>`;
+            });
+        }
+
+
+        /**
+         * 필터링 관련 js 끝
+         * */
+
+        /**
+         * 페이징 관련 js 시작
+         * */
+        /**
+         * ✅ 특정 페이지 로드
+         * @param {number} pageNo 페이지 번호
+         */
+        function loadPage(pageNo) {
+            fetch(`/api/questions?page=${pageNo}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderQuestionList(data.questions); // 목록 렌더링
+                    renderPagination(data.pageInfo);    // 페이지네이션 렌더링
+                });
+        }
+
+        /**
+         * ✅ 페이지네이션 렌더링
+         * @param {object} pageInfo 서버에서 전달된 페이지 정보
+         * @param {function} callback 페이지 클릭 시 호출할 함수 (예: searchQuestions)
+         */
+        function renderPagination(pageInfo, callback) {
+            const paginationEl = document.querySelector('.pagination');
+            paginationEl.innerHTML = '';
+
+            for (let i = 1; i <= pageInfo.totalPages; i++) {
+                paginationEl.innerHTML += `
+            <li class="page-item ${pageInfo.currentPage === i ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="${callback.name}(${i})">${i}</a>
+            </li>
+        `;
+            }
+        }
+
+        /**
+         * 페이징 관련 js 끝
+         * */
+
     </script>
+
 </body>
 </html>

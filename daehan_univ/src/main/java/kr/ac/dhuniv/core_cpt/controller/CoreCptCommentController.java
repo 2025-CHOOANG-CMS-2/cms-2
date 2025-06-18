@@ -62,4 +62,15 @@ public class CoreCptCommentController {
         CoreCptCommentResponseDTO updated = commentService.updateComment(cciId, commentId, dto);
         return ResponseEntity.ok(updated);
     }
+    // ✅ 점수 구간 코멘트 삭제 API
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable("commentId") Long commentId) {
+
+        // 서비스에 삭제 로직 위임
+        commentService.deleteCommentById(commentId);
+
+        // 성공 시 200 OK 또는 204 No Content 반환
+        return ResponseEntity.noContent().build();
+    }
 }
