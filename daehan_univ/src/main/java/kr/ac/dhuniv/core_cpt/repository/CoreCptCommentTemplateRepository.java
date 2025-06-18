@@ -16,4 +16,6 @@ public interface CoreCptCommentTemplateRepository extends JpaRepository<CoreCptC
      * @return 코멘트 리스트
      */
     List<CoreCptCommentTemplate> findByCoreCpt_CciIdOrderByMinScoreAsc(Long cciId);
+    // 특정 상위 역량의 코멘트 목록 조회
+    List<CoreCptCommentTemplate> findByCoreCpt_CciId(Long cciId);
 }
