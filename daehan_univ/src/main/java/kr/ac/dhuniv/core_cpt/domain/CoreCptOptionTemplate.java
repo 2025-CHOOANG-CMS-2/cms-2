@@ -4,20 +4,17 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "core_cpt_qst_option")
+@Table(name = "core_cpt_option_template")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CoreCptQstOption {
+public class CoreCptOptionTemplate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "qst_id", nullable = false)
-    private CoreCptQst coreCptQst;
+    @Column(name="option_id")
+    private Long optionId;
 
     @Column(name = "option_text", length = 500, nullable = false)
     private String optionText;
@@ -25,7 +22,6 @@ public class CoreCptQstOption {
     @Column(name = "score", nullable = false)
     private Integer score;
 
-    @Column(name = "is_correct")
-    private Boolean isCorrect = false;
+    @Column(name = "ord", nullable = false)
+    private Integer ord;  // 선택지 순서
 }
-

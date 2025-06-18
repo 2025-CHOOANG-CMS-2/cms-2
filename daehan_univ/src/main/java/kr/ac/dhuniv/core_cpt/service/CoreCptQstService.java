@@ -1,14 +1,18 @@
 package kr.ac.dhuniv.core_cpt.service;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
+import kr.ac.dhuniv.core_cpt.domain.CoreCptOptionTemplate;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
-import kr.ac.dhuniv.core_cpt.domain.CoreCptQstOption;
+
 import kr.ac.dhuniv.core_cpt.dto.qst.CoreCptQstListDTO;
 import kr.ac.dhuniv.core_cpt.dto.qst.CoreCptQstRequestDTO;
 import kr.ac.dhuniv.core_cpt.repository.CoreCptInfoRepository;
-import kr.ac.dhuniv.core_cpt.repository.CoreCptQstOptionRepository;
+
+import kr.ac.dhuniv.core_cpt.repository.CoreCptOptionTemplateRepository;
 import kr.ac.dhuniv.core_cpt.repository.CoreCptQstRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,41 +28,64 @@ import java.util.List;
 public class CoreCptQstService {
 
     private final CoreCptQstRepository qstRepository;           // 진단 문항 리포지토리
-    private final CoreCptQstOptionRepository optionRepository; // 선택지 리포지토리
+    private final CoreCptOptionTemplateRepository optionRepository;
     private final CoreCptInfoRepository cptInfoRepository;      // 역량 정보 리포지토리
 
     /**
-     * ✅ 진단 문항 등록
-     * @param dto 진단 문항 + 선택지 정보
+     * ✅ 조건 기반 문항 검색
+     * - Repository에서 Page<CoreCptQst>를 조회하고 map으로 DTO 변환
+     *
+     * @param topCptId 상위 역량 ID (nullable)
+     * @param subCptId 하위 역량 ID (nullable)
+     * @param pageable 페이지 정보 (page, size, sort 등)
+     * @param keyword 문항 내용 검색어 (nullable)
+     * @return Page<CoreCptQstListDTO> 변환된 DTO 페이지
+     */
+    public Page<CoreCptQstListDTO> filterQuestionList(Long topCptId, Long subCptId, Pageable pageable, String keyword) {
+        // (1) qstRepository에서 조건 기반 페이징 조회 실행
+        Page<CoreCptQst> page = qstRepository.filter(topCptId, subCptId, keyword, pageable);
+
+        // (2) 조회된 Page<CoreCptQst>를 Page<CoreCptQstListDTO>로 변환
+        return page.map(q -> {
+            CoreCptInfo subCpt = q.getCoreCptInfo();           // 하위 역량 엔티티
+            CoreCptInfo topCpt = subCpt.getParent();           // 상위 역량 엔티티 (nullable)
+
+            return CoreCptQstListDTO.builder()
+                    .qstId(q.getQstId())                       // 문항 ID
+                    .qstCode(q.getQstCode())                   // 문항 코드
+                    .questionText(q.getQstCont())              // 문항 내용
+                    .competencyName(topCpt != null ? topCpt.getCciNm() : "")  // 상위 역량명
+                    .subCompetencyName(subCpt.getCciNm())      // 하위 역량명
+                    .colorHex(topCpt != null ? topCpt.getColorHex() : "#999") // 상위 역량 색상 (기본값 #999)
+                    .build();
+        });
+    }
+    /**
+     * ✅ 문항 등록
+     *
+     * @param dto 등록할 문항 DTO
      */
     public void addQuestion(CoreCptQstRequestDTO dto) {
-        // 상위 역량 정보 조회
-        CoreCptInfo cptInfo = cptInfoRepository.findById(dto.getCoreCptInfoId())
-                .orElseThrow(() -> new IllegalArgumentException("역량 정보가 존재하지 않습니다. ID=" + dto.getCoreCptInfoId()));
+        // (1) 하위 역량 조회
+        CoreCptInfo subCpt = cptInfoRepository.findById(dto.getCoreCptInfoId())
+                .orElseThrow(() -> new IllegalArgumentException("역량 없음: ID=" + dto.getCoreCptInfoId()));
 
-        // 문항 저장
-        CoreCptQst qst = CoreCptQst.builder()
+        // (2) 선택지 템플릿 조회 (리커트 공통 ID 지정)
+        CoreCptOptionTemplate optionTemplate = optionRepository.findById(dto.getOptionTemplateId())
+                .orElseThrow(() -> new IllegalArgumentException("선택지 템플릿 없음: ID=" + dto.getOptionTemplateId()));
+
+        // (3) 문항 저장
+        CoreCptQst entity = CoreCptQst.builder()
                 .qstCode(dto.getQstCode())
                 .qstCont(dto.getQuestionText())
                 .qstOrd(dto.getQstOrd())
-                .coreCptInfo(cptInfo)
+                .coreCptInfo(subCpt)
+                .optionTemplate(optionTemplate)
                 .regUserId(dto.getRegUserId())
                 .regDt(LocalDateTime.now())
                 .build();
 
-        qst = qstRepository.save(qst); // 저장 후 ID 획득
-
-        // 선택지 저장
-        for (CoreCptQstRequestDTO.OptionDTO optionDTO : dto.getOptions()) {
-            CoreCptQstOption option = CoreCptQstOption.builder()
-                    .coreCptQst(qst)
-                    .optionText(optionDTO.getText())
-                    .score(optionDTO.getScore())
-                    .isCorrect(optionDTO.getIsCorrect())
-                    .build();
-
-            optionRepository.save(option);
-        }
+        qstRepository.save(entity);
     }
 
     /**
@@ -78,11 +105,17 @@ public class CoreCptQstService {
         List<CoreCptQstListDTO> result = new ArrayList<>();
 
         for (CoreCptQst q : questions) {
+            CoreCptInfo sub = q.getCoreCptInfo();                // 하위 역량
+            CoreCptInfo top = sub.getParent();                   // 상위 역량
+
             result.add(CoreCptQstListDTO.builder()
                     .qstId(q.getQstId())
                     .qstCode(q.getQstCode())
                     .questionText(q.getQstCont())
                     .competencyName(q.getCoreCptInfo().getCciNm())
+                    .topCompetencyName(top != null ? top.getCciNm() : "-")  // 상위 역량명
+                    .colorHex(top != null ? top.getColorHex() : "#6c757d") // default gray
+                    .subCompetencyName(sub.getCciNm())                      // 하위 역량명
                     .build());
         }
 
@@ -91,34 +124,30 @@ public class CoreCptQstService {
 
     /**
      * ✅ 하위 역량의 다음 문항 코드 생성
+     *
      * @param subCptId 하위 역량 ID
-     * @return 새 문항 코드
+     * @return 생성된 문항 코드
      */
     public String generateNextQstCode(Long subCptId) {
-        // 하위 역량 존재 여부 확인
+        // (1) 하위 역량 존재 여부 확인
         CoreCptInfo subCpt = cptInfoRepository.findById(subCptId)
-                .orElseThrow(() -> new IllegalArgumentException("하위 역량이 존재하지 않습니다. ID=" + subCptId));
+                .orElseThrow(() -> new IllegalArgumentException("하위 역량을 찾을 수 없습니다: ID=" + subCptId));
 
-        // 하위 역량인지 확인
-        if (subCpt.getParent() == null) {
-            throw new IllegalArgumentException("상위 역량이 아닌 하위 역량 ID를 입력해야 합니다.");
-        }
-
-        // 해당 하위 역량의 최대 문항 코드 조회
+        // (2) 기존 최대 문항 코드 조회
         String maxCode = qstRepository.findMaxQstCodeBySubCpt(subCptId);
 
-        // 순번 추출
-        int nextSeq = 1;
+        // (3) 순번 계산
+        int nextSeq = 1;  // 기본 1번
         if (maxCode != null && maxCode.contains("-")) {
-            String[] parts = maxCode.split("-");
             try {
+                String[] parts = maxCode.split("-");
                 nextSeq = Integer.parseInt(parts[1]) + 1;
             } catch (NumberFormatException e) {
-                nextSeq = 1; // fallback
+                nextSeq = 1;  // fallback
             }
         }
 
-        // 문항 코드 생성 (하위 역량 코드 + - + 순번 2자리)
+        // (4) 새 코드 생성 (하위 역량 코드 + - + 2자리 순번)
         return subCpt.getCciCode() + "-" + String.format("%02d", nextSeq);
     }
 }

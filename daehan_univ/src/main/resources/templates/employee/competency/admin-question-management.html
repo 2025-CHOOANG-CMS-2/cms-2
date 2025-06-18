@@ -237,7 +237,7 @@
                                 <option value="sub3">비언어적 소통</option>
                             </select>
                         </div>
-                     
+
                         <div class="col-md-3 mb-3">
                             <label for="statusFilter" class="form-label">상태</label>
                             <select class="form-select" id="statusFilter">
@@ -527,6 +527,12 @@
                                     <option value="sub3">비언어적 소통</option>
                                 </select>
                             </div>
+                            <!-- 문항 코드 표시용 -->
+                            <div class="mb-2">
+                                <label class="form-label">문항 코드</label>
+                                <div id="qstCodeDisplay" class="form-control bg-light"></div>
+                                <input type="hidden" id="qstCodeHidden">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="questionText" class="form-label">문항 내용 *</label>
@@ -691,38 +697,137 @@
                     }
                 });
         }
+        /**
+         * ✅ 선택된 하위 역량에 대한 문항 코드 생성 요청
+         */
+        function loadNextQstCode() {
+            const subCptId = document.getElementById('subCompetency').value;
+            if (!subCptId) {
+                alert('하위 역량을 선택해주세요.');
+                return;
+            }
 
-        // ✅ 문항 삭제
+            fetch(`/api/questions/next-code?subCptId=${subCptId}`)
+                .then(res => res.text())
+                .then(code => {
+                    console.log("생성된 코드: ", code);
+                    document.getElementById('qstCodeDisplay').innerText = code; // 코드 표시용 요소
+                    // 필요시 hidden input에 저장
+                    document.getElementById('qstCodeHidden').value = code;
+                })
+                .catch(() => alert("문항 코드 생성 실패"));
+        }
+        /**
+         * ✅ 문항 삭제
+         * @param {number} qstId 삭제할 문항 ID
+         */
         function deleteQuestion(qstId) {
-            if (!confirm('해당 문항을 삭제하시겠습니까?')) return;
+            if (!confirm("정말 삭제하시겠습니까?")) return;
 
             fetch(`/api/questions/${qstId}`, {
                 method: 'DELETE'
-            })
-                .then(res => {
-                    if (res.ok) {
-                        alert('문항이 삭제되었습니다.');
-                        location.reload();
-                    } else {
-                        alert('문항 삭제에 실패했습니다.');
-                    }
+            }).then(res => {
+                if (res.ok) {
+                    alert("삭제되었습니다.");
+                    loadQuestions(); // 목록 새로고침
+                } else {
+                    alert("삭제 실패");
+                }
+            });
+        }
+        /**
+         * ✅ 문항 수정 모달 열기 (기본은 fetch 로 데이터를 가져온 후 모달에 세팅)
+         * @param {number} qstId 수정할 문항 ID
+         */
+        function editQuestion(qstId) {
+            fetch(`/api/questions/${qstId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // 모달에 값 세팅 (예시)
+                    document.getElementById('questionText').value = data.questionText;
+                    document.getElementById('competency').value = data.topCptId; // 상위 역량 ID
+                    loadSubCompetencies(data.topCptId); // 하위 역량 로드
+                    setTimeout(() => {
+                        document.getElementById('subCompetency').value = data.subCptId;
+                    }, 300); // 하위 select 로딩 후 값 세팅
+
+                    // 선택지도 세팅 (필요하면 renderOptions(data.options) 작성)
                 });
+            // 모달 열기
+            new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
         }
 
-        // ✅ 문항 목록 조회 (데모, 실제는 서버 데이터 렌더링)
+        /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+         * */
+        // ✅ 문항 목록 조회 및 렌더링
         function loadQuestions() {
             fetch('/api/questions')
                 .then(res => res.json())
                 .then(data => {
-                    console.log('서버로부터 받은 문항 목록:', data);
-                    // TODO: 화면에 렌더링
+                    renderQuestionList(data);
+                })
+                .catch(err => {
+                    console.error('문항 목록 조회 실패:', err);
+                    alert('문항 목록 조회에 실패했습니다.');
                 });
         }
+        // ✅ 문항 목록을 화면에 출력
+        function renderQuestionList(questions) {
+            const container = document.querySelector('.card-body');
+            container.innerHTML = ''; // 기존 내용 초기화
 
-        // ✅ 문항 코드 생성 (간단 예시)
-        function generateQstCode() {
-            return 'AUTO-' + Date.now(); // 예: AUTO-1718601234567
+            if (questions.length === 0) {
+                container.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+                return;
+            }
+
+            questions.forEach((q, index) => {
+                const html = `
+        <div class="question-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                     <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color: #fff;">
+                        ${q.competencyName}
+                    </span>
+                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+                    <span class="badge bg-dark me-2">${q.qstCode}</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <h6 class="mb-2">Q${index + 1}. ${q.questionText}</h6>
+            <div class="question-options">
+                ${renderOptions()} <!-- 공통 리커트 척도 -->
+            </div>
+            <div class="mt-2 text-muted small">
+                <span class="me-3">문항 코드: ${q.qstCode}</span>
+                <span class="badge bg-success">활성</span>
+            </div>
+        </div>
+        `;
+                container.innerHTML += html;
+            });
         }
+
+        // ✅ 리커트 척도 옵션 HTML
+        function renderOptions() {
+            return `
+        <div class="option-item"><input type="radio" disabled> 전혀 그렇지 않다 (1점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇지 않다 (2점)</div>
+        <div class="option-item"><input type="radio" disabled> 보통이다 (3점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇다 (4점)</div>
+        <div class="option-item"><input type="radio" disabled> 매우 그렇다 (5점)</div>
+    `;
+        }
+        /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+         * */
+
         /**
          * 상/하위 역량 불러오는 js 파트
          * */
@@ -848,11 +953,158 @@
             loadTopCompetencies();      // 상위 역량 불러오기
             bindTopCompetencyChange();  // change 이벤트 연결
             loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
+            // ✅ 이곳에 추가
+            document.getElementById('subCompetency').addEventListener('change', loadNextQstCode);
         });
         /**
          * 상/하위 역량 불러오는 js 파트
          * */
 
+        // 문항 추가 모달이 열릴 때 선택지 로드
+        document.getElementById('addQuestionModal').addEventListener('show.bs.modal', function () {
+            loadLikertOptions();
+        });
+
+        /**
+         * ✅ DB에서 리커트 척도 선택지를 로드하여 모달에 렌더링
+         */
+        function loadLikertOptions() {
+            fetch('/api/options/likert')
+                .then(res => res.json())
+                .then(data => {
+                    const container = document.getElementById('optionsContainer');
+                    container.innerHTML = ''; // 기존 내용 제거
+
+                    data.forEach(opt => {
+                        container.innerHTML += `
+                    <div class="option-input mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text">${opt.ord}</span>
+                            <input type="text" class="form-control" value="${opt.optionText}" readonly>
+                            <span class="input-group-text">점수</span>
+                            <input type="number" class="form-control" value="${opt.score}" readonly style="width: 70px;">
+                        </div>
+                    </div>
+                `;
+                    });
+                })
+                .catch(() => {
+                    alert('리커트 척도 선택지 로드에 실패했습니다.');
+                });
+        }
+        /**
+         * 필터링 관련 js
+         * */
+
+        /**
+         * ✅ 검색 버튼 클릭 시 실행되는 함수
+         * - 입력된 조건을 기반으로 서버에 요청하고 결과를 렌더링
+         * - 페이지네이션과 연동
+         * @param {number} pageNo 요청할 페이지 번호 (기본 1)
+         */
+        function searchQuestions(pageNo = 1) {
+            // 🔹 필터 값 읽기
+            const topCptId = document.getElementById('competencyFilter').value || '';
+            const subCptId = document.getElementById('subCompetencyFilter').value || '';
+            const status = document.getElementById('statusFilter').value || '';
+            const keyword = document.getElementById('searchQuestion').value || '';
+
+            // 🔹 URL 파라미터 구성
+            const params = new URLSearchParams();
+            params.append('page', pageNo);               // 페이지 번호 추가
+            params.append('size', 10);                   // 페이지 크기 (고정 or 선택 가능)
+            if (topCptId) params.append('topCptId', topCptId);
+            if (subCptId) params.append('subCptId', subCptId);
+            if (status) params.append('status', status);
+            if (keyword) params.append('keyword', keyword);
+
+            // 🔹 서버 요청
+            fetch('/api/questions/filter?' + params.toString())
+                .then(res => res.json())
+                .then(data => {
+                    // 🔹 목록 렌더링
+                    renderQuestionList(data.questions);
+                    // 🔹 페이지네이션 렌더링
+                    renderPagination(data.pageInfo, searchQuestions);
+                })
+                .catch(() => {
+                    alert('문항 조회에 실패했습니다.');
+                });
+        }
+
+        /**
+         * ✅ 검색 결과를 화면에 출력
+         * @param questions 서버에서 받은 문항 리스트
+         */
+        function renderQuestionList(questions) {
+            const container = document.querySelector('.card-body');
+            container.innerHTML = ''; // 기존 목록 제거
+
+            questions.forEach((q, idx) => {
+                container.innerHTML += `
+        <div class="question-card">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <span class="badge badge-competency" style="background:${q.colorHex}">${q.competencyName}</span>
+                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+                    <span class="badge bg-info">${q.qstCode}</span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <h6 class="mb-2">Q${idx + 1}. ${q.questionText}</h6>
+        </div>`;
+            });
+        }
+
+
+        /**
+         * 필터링 관련 js 끝
+         * */
+
+        /**
+         * 페이징 관련 js 시작
+         * */
+        /**
+         * ✅ 특정 페이지 로드
+         * @param {number} pageNo 페이지 번호
+         */
+        function loadPage(pageNo) {
+            fetch(`/api/questions?page=${pageNo}`)
+                .then(res => res.json())
+                .then(data => {
+                    renderQuestionList(data.questions); // 목록 렌더링
+                    renderPagination(data.pageInfo);    // 페이지네이션 렌더링
+                });
+        }
+
+        /**
+         * ✅ 페이지네이션 렌더링
+         * @param {object} pageInfo 서버에서 전달된 페이지 정보
+         * @param {function} callback 페이지 클릭 시 호출할 함수 (예: searchQuestions)
+         */
+        function renderPagination(pageInfo, callback) {
+            const paginationEl = document.querySelector('.pagination');
+            paginationEl.innerHTML = '';
+
+            for (let i = 1; i <= pageInfo.totalPages; i++) {
+                paginationEl.innerHTML += `
+            <li class="page-item ${pageInfo.currentPage === i ? 'active' : ''}">
+                <a class="page-link" href="#" onclick="${callback.name}(${i})">${i}</a>
+            </li>
+        `;
+            }
+        }
+
+        /**
+         * 페이징 관련 js 끝
+         * */
 
     </script>
 

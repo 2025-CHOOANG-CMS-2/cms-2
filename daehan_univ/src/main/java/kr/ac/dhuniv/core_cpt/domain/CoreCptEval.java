@@ -25,8 +25,7 @@ public class CoreCptEval {
     @Column(name = "eval_code", length = 20, nullable = false, unique = true)
     private String evalCode; // 비즈니스 키
 
-    @Column(name = "ans_score", precision = 10, scale = 3)
-    private BigDecimal answerScore;
+
 
     @Column(name = "ans_dt")
     private LocalDateTime answerDate;
@@ -38,4 +37,8 @@ public class CoreCptEval {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qst_id", referencedColumnName = "qst_id")
     private CoreCptQst question;
+    @ManyToOne(fetch = FetchType.LAZY)
+
+    @JoinColumn(name = "option_id", referencedColumnName = "option_id")
+    private CoreCptOptionTemplate selectedOption;  // ✅ 선택지 ID
 }
