@@ -1747,3 +1747,57 @@ body {
   padding: 0.5rem 0;
 }
 
+/* ======================================================== */
+/* 상담사 대시보드 - 예외 설정 레이아웃 상세 조정 (최종본) */
+/* ======================================================== */
+
+/* 1. 전체 2단 레이아웃 비율 조정 (선택 사항) */
+/* 오른쪽 영역이 더 넓은 공간을 갖도록 비율을 조절합니다. */
+.two-column-layout {
+  display: grid;
+  /* 왼쪽 : 오른쪽 비율을 1:1.2 정도로 조정 */
+  grid-template-columns: 1fr 1.2fr; 
+  gap: 2rem;
+  align-items: start;
+}
+
+
+/* 2. '예외 설정' 섹션 안의 캘린더를 '납작하게' 만들기 */
+.exception-settings-container .calendar-day {
+  aspect-ratio: auto; /* 정사각형 비율 해제 */
+  height: 45px;       /* 날짜 칸의 높이를 줄여서 납작하게 만듭니다. */
+  font-size: 0.85rem;
+}
+
+
+/* 3. '근무 시간 선택' 영역을 '넓고 짧게' 만들기 (핵심) */
+/* 시간 슬롯들을 감싸는 그리드 컨테이너 */
+.time-slots {
+  display: grid;
+  /* 가능한 많은 슬롯을 한 줄에 채우고, 각 슬롯의 최소 너비는 70px로 설정 */
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 8px; /* 슬롯 사이의 간격 */
+}
+
+/* 개별 시간 슬롯 스타일 */
+.time-slot {
+  /* 여기에 있는 padding과 font-size를 조절하여 각 버튼의 크기를 조절합니다. */
+  padding: 8px; 
+  font-size: 0.8rem;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.time-slot:hover {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+
+.time-slot.selected {
+  background-color: #2d4f3a; /* 선택 시 색상 */
+  color: white;
+  border-color: #2d4f3a;
+}

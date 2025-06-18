@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+	<link rel="stylesheet" href="/css/student-mypage.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a th:href="@{/}" class="sidebar-brand"> 
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교육 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a th:href="@{/}" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    메인화면
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/student_mypage.do(studentId=${stdInfo.stdNo})}" class="nav-link active">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/notice}" class="nav-link">
+                    <i class="bi bi-megaphone"></i>
+                    공지사항
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/competency-diagnosis}" class="nav-link">
+                    <i class="bi bi-clipboard-data"></i>
+                    학생역량진단
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/extracurricular-programs}" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    비교과 프로그램
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/counseling}" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    상담관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a th:href="@{/mileage}" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 조회
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="text-end">
+                    <div class="fw-medium" id="headerUserName" th:text="${stdInfo.stdNm}">김학생</div>
+                    <small class="text-muted" id="headerUserDept" 
+                           th:text="${(stdInfo != null and stdInfo.scsbjtCd != null and departmentMap.containsKey(stdInfo.scsbjtCd)) ? departmentMap.get(stdInfo.scsbjtCd) : stdInfo.scsbjtCd} + ' ' + ${stdInfo.schoolYear} + '학년'">
+                           컴퓨터공학과 3학년
+                    </small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" th:href="@{/student_mypage.do(studentId=${stdInfo.stdNo})}">마이페이지</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a th:href="@{/}" class="text-white-50">홈</a></li>
+                        <li class="breadcrumb-item active text-white">마이페이지</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-person me-2"></i>마이페이지</h1>
+                <p class="mb-0 mt-2">개인정보를 관리하고 활동 이력을 확인하세요</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Profile Overview -->
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="profile-card">
+                        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
+                            <i class="bi bi-person" id="avatarIcon"></i>
+                            <div class="avatar-upload">
+                                <i class="bi bi-camera text-white"></i>
+                            </div>
+                        </div>
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                        
+                        <!-- 학생 이름 동적 출력 -->
+                        <h4 id="profileName" th:text="${stdInfo.stdNm}">김학생</h4>
+                        <!-- 학과, 학년만 동적 출력 (학번 제외) -->
+                        <p class="text-muted mb-3" id="profileInfo" 
+                           th:text="${(stdInfo != null and stdInfo.scsbjtCd != null and departmentMap.containsKey(stdInfo.scsbjtCd)) ? departmentMap.get(stdInfo.scsbjtCd) : stdInfo.scsbjtCd} + ' ' + ${stdInfo.schoolYear} + '학년'">
+                           컴퓨터공학과 3학년
+                        </p>
+                        
+                        <div class="d-grid gap-2">
+                            <!-- <button class="btn btn-outline-primary btn-custom" onclick="editProfile()">
+                                <i class="bi bi-pencil-square me-1"></i>프로필 수정
+                            </button> -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Stats -->
+                    <div class="info-card">
+                        <h6 class="mb-3">
+                            <i class="bi bi-graph-up me-2"></i>나의 활동 요약
+                        </h6>
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-primary mb-0" th:text="(${stdInfo != null} ? 1250 : 0)">1,250</div>
+                                <small class="text-muted">보유 마일리지</small>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="h4 text-success mb-0" th:text="(${stdInfo != null} ? 3 : 0)">3</div>
+                                <small class="text-muted">참여 프로그램</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-warning mb-0" th:text="(${stdInfo != null} ? 5 : 0)">5</div>
+                                <small class="text-muted">상담 횟수</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="h4 text-info mb-0" th:text="(${stdInfo != null} ? 85 : 0) + '%'">85%</div>
+                                <small class="text-muted">역량진단 점수</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    <!-- Tab Navigation -->
+                    <ul class="nav nav-tabs mb-4" id="mypageTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab" href="#personalInfoTab">
+                                <i class="bi bi-person-lines-fill me-1"></i>개인정보
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#passwordTab">
+                                <i class="bi bi-shield-lock me-1"></i>비밀번호 변경
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#activityTab">
+                                <i class="bi bi-activity me-1"></i>활동 이력
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <!-- Personal Info Tab -->
+                        <div class="tab-pane fade show active" id="personalInfoTab">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-person-lines-fill me-2"></i>개인정보 수정
+                                </h5>
+                                
+                                <form id="personalInfoForm">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="studentId" th:value="${stdInfo.stdNo}" readonly>
+                                                <label for="studentId">학번</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="text" class="form-control" id="name" th:value="${stdInfo.stdNm}" required>
+                                                <label for="name">이름</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="department" required>
+                                                    <option th:each="entry : ${departmentMap.entrySet()}" 
+                                                            th:value="${entry.key}" 
+                                                            th:text="${entry.value}"
+                                                            th:selected="${stdInfo != null and stdInfo.scsbjtCd == entry.key}">
+                                                        학과명 (코드)
+                                                    </option>
+                                                </select>
+                                                <label for="department">학과</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <select class="form-select" id="grade" required>
+                                                    <option value="1" th:selected="${stdInfo != null and stdInfo.schoolYear == 1}">1학년</option>
+                                                    <option value="2" th:selected="${stdInfo != null and stdInfo.schoolYear == 2}">2학년</option>
+                                                    <option value="3" th:selected="${stdInfo != null and stdInfo.schoolYear == 3}">3학년</option>
+                                                    <option value="4" th:selected="${stdInfo != null and stdInfo.schoolYear == 4}">4학년</option>
+                                                </select>
+                                                <label for="grade">학년</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="email" class="form-control" id="email" th:value="${stdInfo.stdEmlAddr}" required>
+                                                <label for="email">이메일</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-floating">
+                                                <input type="tel" class="form-control" id="phone" th:value="${stdInfo.stdTelno}" required>
+                                                <label for="phone">휴대폰 번호</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="address" th:value="${stdInfo.stdAddr}">
+                                        <label for="address">주소</label>
+                                    </div>
+									
+									<div class="form-floating">
+                                        <input type="text" class="form-control" id="detailAddress" th:value="${stdInfo.stdDaddr}">
+                                        <label for="detailAddress">상세 주소</label>
+                                    </div>
+									<div class="form-floating">
+                                        <input type="text" class="form-control" id="zipCode" th:value="${stdInfo.stdZip}">
+                                        <label for="zipCode">우편번호</label>
+                                    </div>
+                                    <!-- 
+                                    <div class="form-floating">
+                                        <textarea class="form-control" id="bio" style="height: 100px" placeholder="자기소개를 입력하세요">안녕하세요! 컴퓨터공학과 3학년 김학생입니다. 프로그래밍과 AI에 관심이 많습니다.</textarea>
+                                        <label for="bio">자기소개</label>
+                                    </div>
+									 -->
+
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary btn-custom" onclick="resetPersonalInfo()">
+                                            <i class="bi bi-arrow-clockwise me-1"></i>초기화
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-custom">
+                                            <i class="bi bi-check me-1"></i>저장
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Password Tab -->
+                        <div class="tab-pane fade" id="passwordTab">
+                            <div class="info-card">
+                                <h5 class="mb-4">
+                                    <i class="bi bi-shield-lock me-2"></i>비밀번호 변경
+                                </h5>
+                                
+                                <form id="passwordForm">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="currentPassword" required>
+                                        <label for="currentPassword">현재 비밀번호</label>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="newPassword" required onkeyup="checkPasswordStrength()">
+                                        <label for="newPassword">새 비밀번호</label>
+                                        <div class="password-strength" id="passwordStrength"></div>
+                                        <small class="text-muted" id="passwordHelp">8자 이상, 영문/숫자/특수문자 포함</small>
+                                    </div>
+
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="confirmPassword" required onkeyup="checkPasswordMatch()">
+                                        <label for="confirmPassword">새 비밀번호 확인</label>
+                                        <small class="text-muted" id="passwordMatch"></small>
+                                    </div>
+
+                                    <div class="alert alert-info">
+                                        <i class="bi bi-info-circle me-2"></i>
+                                        <strong>비밀번호 보안 수칙</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>8자 이상의 길이</li>
+                                            <li>영문 대소문자, 숫자, 특수문자 조합</li>
+                                            <li>개인정보와 관련된 정보 사용 금지</li>
+                                            <li>정기적인 비밀번호 변경 권장</li>
+                                        </ul>
+                                    </div>
+
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <button type="button" class="btn btn-outline-secondary btn-custom" onclick="clearPasswordForm()">
+                                            <i class="bi bi-x me-1"></i>취소
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-custom" id="passwordSubmitBtn" disabled>
+                                            <i class="bi bi-shield-check me-1"></i>비밀번호 변경
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Activity Tab -->
+                        <div class="tab-pane fade" id="activityTab">
+                            <div class="info-card">
+                                <div class="d-flex justify-content-between align-items-center mb-4">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-activity me-2"></i>활동 이력
+                                    </h5>
+                                    <div class="d-flex gap-2">
+                                        <select class="form-select" style="width: auto;" id="activityFilter">
+                                            <option value="all">전체</option>
+                                            <option value="program">비교과 프로그램</option>
+                                            <option value="counseling">상담</option>
+                                            <option value="diagnosis">역량진단</s_optgroupion>
+                                            <option value="mileage">마일리지</option>
+                                        </select>
+                                        <button class="btn btn-outline-primary" onclick="exportActivity()">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="activityList">
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-success">
+                                                <i class="bi bi-calendar-check"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">창업 아이디어 경진대회 참여</h6>
+                                                        <p class="text-muted mb-1 small">비교과 프로그램에 참여하여 150 마일리지를 획득했습니다.</p>
+                                                        <small class="text-muted">2024-01-20 14:30</small>
+                                                    </div>
+                                                    <span class="badge bg-success">+150P</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-primary">
+                                                <i class="bi bi-chat-dots"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">진로 상담 완료</h6>
+                                                        <p class="text-muted mb-1 small">김교수님과 진로 상담을 진행했습니다.</p>
+                                                        <small class="text-muted">2024-01-18 10:00</small>
+                                                    </div>
+                                                    <span class="badge bg-info">상담</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-warning">
+                                                <i class="bi bi-clipboard-data"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">핵심역량진단 완료</h6>
+                                                        <p class="text-muted mb-1 small">2024년 1학기 핵심역량진단을 완료했습니다. (종합점수: 85점)</p>
+                                                        <small class="text-muted">2024-01-15 16:45</small>
+                                                    </div>
+                                                    <span class="badge bg-warning">85점</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-info">
+                                                <i class="bi bi-star"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">봉사활동 마일리지 지급</h6>
+                                                        <p class="text-muted mb-1 small">지역 아동센터 학습 지도 봉사활동 참여로 마일리지를 획득했습니다.</p>
+                                                        <small class="text-muted">2024-01-10 18:00</small>
+                                                    </div>
+                                                    <span class="badge bg-success">+80P</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="activity-item">
+                                        <div class="d-flex align-items-start">
+                                            <div class="activity-icon bg-secondary">
+                                                <i class="bi bi-person-plus"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h6 class="mb-1">계정 생성</h6>
+                                                        <p class="text-muted mb-1 small">교육 관리 시스템에 가입했습니다.</p>
+                                                        <small class="text-muted">2024-01-05 09:00</small>
+                                                    </div>
+                                                    <span class="badge bg-secondary">가입</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center mt-4">
+                                    <button class="btn btn-outline-primary" onclick="loadMoreActivity()">
+                                        <i class="bi bi-arrow-down me-1"></i>더 보기
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                                <hr class="my-4">
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+  
+    <!-- Custom Message Modal -->
+    <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">알림</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="messageModalBody">
+                    <!-- 메시지 내용이 여기에 들어갑니다. -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/mypage/student-mypage.js"></script>
+</body>
+</html>
