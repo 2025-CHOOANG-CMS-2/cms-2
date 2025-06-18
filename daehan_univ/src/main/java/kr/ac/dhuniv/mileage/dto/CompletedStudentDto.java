@@ -14,5 +14,6 @@ public class CompletedStudentDto {
 	private String prgNm;                 //비고과 프로그램명
 	private String cciNm;                 //핵심역량명
     private LocalDateTime completeDate;   //이수 완료일
+    private String status;            //마일리지 지급여부('지급완료', '미지급')
     private BigDecimal mileageScore;      //마일리지 점수
 }
