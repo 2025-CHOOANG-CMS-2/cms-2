@@ -61,4 +61,42 @@ public class CoreCptInfoController {
         CoreCptInfoDetailDTO detail = service.getDetailByCciId(cciId);
         return ResponseEntity.ok(detail);
     }
+
+    /**
+     * ✅ 역량 수정 API
+     * - 상위/하위 역량 구분 없이 cciId로 수정
+     * - PUT /api/competencies/{cciId}
+     *
+     * @param cciId 수정할 역량 ID
+     * @param dto 클라이언트가 보낸 수정 데이터
+     * @return 수정된 역량 상세 DTO
+     */
+    @PutMapping("/{cciId}")
+    public ResponseEntity<CoreCptInfoDetailDTO> updateCompetency(
+            @PathVariable("cciId") Long cciId,
+            @RequestBody CoreCptInfoRequestDTO dto) {
+
+        // ✅ 서비스 호출하여 수정 처리
+        CoreCptInfoDetailDTO updated = service.updateCompetency(cciId, dto);
+
+        // ✅ 응답 반환
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * ✅ 역량 삭제 API
+     * - 상위/하위 역량 구분 없이 cciId로 삭제
+     * - DELETE /api/competencies/{cciId}
+     *
+     * @param cciId 삭제할 역량 ID
+     * @return 204 No Content
+     */
+    @DeleteMapping("/{cciId}")
+    public ResponseEntity<Void> deleteCompetency(@PathVariable("cciId") Long cciId) {
+        // ✅ 서비스 호출하여 삭제 처리
+        service.deleteCompetency(cciId);
+
+        // ✅ 삭제 성공 시 204 반환
+        return ResponseEntity.noContent().build();
+    }
 }

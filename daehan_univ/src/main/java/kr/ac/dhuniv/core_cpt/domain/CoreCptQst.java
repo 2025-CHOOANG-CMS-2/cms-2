@@ -26,6 +26,9 @@ public class CoreCptQst {
 
     @Column(name = "qst_ord")
     private Integer qstOrd; //문항 순서
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "option_template_id")
+    private CoreCptOptionTemplate optionTemplate;   // ✅ 공통 선택지 템플릿 참조
 
     @Column(name = "reg_user_id", length = 20)
     private String regUserId; //등록자 ID

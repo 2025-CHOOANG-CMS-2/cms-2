@@ -5,8 +5,12 @@ import kr.ac.dhuniv.counsel.dto.UnregisteredEmpDto;
 import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import java.util.List;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
+@Repository
 public interface EmplInfoRepository extends JpaRepository<EmplInfo, Long> {
 
 	@Query(value = 
@@ -19,4 +23,6 @@ public interface EmplInfoRepository extends JpaRepository<EmplInfo, Long> {
         "AND e.empl_no NOT IN (SELECT ci.empl_no FROM public.cnslr_info ci)",
         nativeQuery = true)
     List<Object[]> findUnregisteredCounselorsNative();
+    
+    Optional<EmplInfo> findByEmplNo(String emplNo);
 }
