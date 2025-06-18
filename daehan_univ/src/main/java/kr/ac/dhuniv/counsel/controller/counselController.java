@@ -15,24 +15,24 @@ public class counselController {
 	@GetMapping("/counselor_dashboard") //상담 예약 확인 페이지
 	public String counselor_dashboard() {
 		 
-		return "employee/counselor-dashboard";
+		return "/employee/counsel/counselor-dashboard";
 	}
 	
 	@GetMapping("/counselor_results") //상담사 결과 작성 페이지
 	public String counselor_results() {
 		 
-		return "employee/counselor-results";
+		return "/employee/counsel/counselor-results";
 	}
 	
 	@GetMapping("/counsel_book") //상담 예약 페이지
 	public String counsel_book() {
 		
-		return "/student/counsel-book";
+		return "/student/counsel/counsel-book";
 	}
 	
 	@GetMapping("/counsel_history") //상담 예약 조회 페이지
 	public String counsel_history() {
 		
-		return "/student/counsel-history";
+		return "/student/counsel/counsel-history";
 	}
 }
