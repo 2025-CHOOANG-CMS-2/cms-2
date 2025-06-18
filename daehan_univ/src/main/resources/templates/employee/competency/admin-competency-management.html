@@ -162,7 +162,43 @@
 		</div>
 	</div>
 </div>
-
+<!-- ✅ 상위/하위 역량 수정 모달 -->
+<div class="modal fade" id="editCompetencyModal" tabindex="-1">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"><i class="fas fa-edit me-2"></i> 역량 수정</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+			</div>
+			<div class="modal-body">
+				<form id="editCompetencyForm">
+					<div class="mb-3">
+						<label for="editCompetencyName" class="form-label">역량명 *</label>
+						<input type="text" class="form-control" id="editCompetencyName" required>
+					</div>
+					<div class="mb-3">
+						<label for="editCompetencyDescription" class="form-label">역량 설명 *</label>
+						<textarea class="form-control" id="editCompetencyDescription" rows="3" required></textarea>
+					</div>
+					<div class="mb-3">
+						<label for="editCompetencyWeight" class="form-label">가중치 (%)</label>
+						<input type="number" class="form-control" id="editCompetencyWeight" min="0" max="100">
+					</div>
+					<div class="mb-3">
+						<label for="editCompetencyColor" class="form-label">표시 색상</label>
+						<input type="color" class="form-control" id="editCompetencyColor">
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+				<button type="button" class="btn btn-primary" onclick="saveEditedCompetency()">
+					<i class="fas fa-save me-1"></i> 저장
+				</button>
+			</div>
+		</div>
+	</div>
+</div>
 <!-- 하위 역량 추가 모달 -->
 <div class="modal fade" id="addSubCompetencyModal" tabindex="-1">
 	<div class="modal-dialog">
