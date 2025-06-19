@@ -59,6 +59,7 @@ public class StdInfo {
     @Column(name = "std_eml_addr", unique = true, length = 320)
     private String stdEmlAddr; // 이메일
 
+
     @Column(name = "use_yn", nullable = false, length = 1)
     private String useYn; // 학생 정보 자체의 사용 여부 (Y/N)
     
@@ -69,3 +70,4 @@ public class StdInfo {
     @Column(name = "created_by", length = 20)
     private String createdBy;
 }
+

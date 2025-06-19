@@ -725,7 +725,13 @@ body {
 
 		    const row = `
 		      <tr>
-		        <td><input type="checkbox" name="selectedIds" value="${item.stdNo}" class="payment-checkbox"></td>
+		        <td>
+		          <input type="checkbox" name="selectedIds" value="${item.stdNo}" class="payment-checkbox">
+		          <!-- hidden fields -->
+		          <input type="hidden" name="stdId" value="${item.stdId}">
+		          <input type="hidden" name="prgId" value="${item.prgId}">
+		          <input type="hidden" name="cmpId" value="${item.cmpId}">
+		        </td>
 		        <td>${item.stdNo}</td>
 		        <td>${item.stdNm}</td>
 		        <td>${item.prgNm}</td>
@@ -767,50 +773,45 @@ body {
 
 		// 체크박스 선택된 자에게 마일리지 지급
         function processSelectedPayments() {
-            const selectedCheckboxes = document.querySelectorAll('.payment-checkbox:checked');
-            
-            if (selectedCheckboxes.length === 0) {
-                alert('지급할 학생을 선택해주세요.');
-                return;
-            }
-            
-            let totalMileage = 0;
-            const selectedStudents = [];
-            
-            selectedCheckboxes.forEach(checkbox => {
-                const row = checkbox.closest('tr');
-                const studentId = row.cells[1].textContent;
-                const studentName = row.cells[2].textContent;
-                const mileageInput = row.querySelector('input[type="number"]');
-                const mileage = parseInt(mileageInput.value) || 0;
-                
-                selectedStudents.push({
-                    id: studentId,
-                    name: studentName,
-                    mileage: mileage
-                });
-                
-                totalMileage += mileage;
-            });
-            
-            if (confirm(`${selectedStudents.length}명의 학생에게 총 ${totalMileage.toLocaleString()}P를 지급하시겠습니까?`)) {
-                // 실제로는 서버에 요청을 보내야 함
-                alert(`마일리지 지급이 완료되었습니다.\n지급 대상: ${selectedStudents.length}명\n총 지급 포인트: ${totalMileage.toLocaleString()}P`);
-                
-                // 상태 업데이트
-                selectedCheckboxes.forEach(checkbox => {
-                    const row = checkbox.closest('tr');
-                    const statusCell = row.cells[6];
-                    const mileageInput = row.querySelector('input[type="number"]');
-                    
-                    statusCell.innerHTML = '<span class="text-success">지급완료</span>';
-                    mileageInput.disabled = true;
-                    checkbox.disabled = true;
-                    checkbox.checked = false;
-                });
-                
-                document.getElementById('selectAllPayment').checked = false;
-            }
+	      const selectedRows = [...document.querySelectorAll(".payment-checkbox:checked")];
+	      	if (selectedRows.length === 0) {
+	      	  alert("지급할 학생을 선택하세요2.");
+	      	  return;
+	      	}
+	
+	      const payload = selectedRows.map((checkbox, index) => {
+	    	const tr = checkbox.closest("tr");
+	    	
+	    	// hidden 필드
+	    	const stdId = tr.querySelector("input[name='stdId']").value;
+	    	const prgId = tr.querySelector("input[name='prgId']").value;
+	    	const cmpId = tr.querySelector("input[name='cmpId']").value;
+
+	    	//일반 visible 데이터
+	      	const stdNo = tr.children[1].textContent;
+	      	const stdNm = tr.children[2].textContent;
+	      	const prgNm = tr.children[3].textContent;
+	      	const mileageInput = tr.querySelector("input[type='number']");
+	      	const mileageScore = parseFloat(mileageInput.value) || 0;
+	  
+	      	return { stdId, prgId, cmpId, mileageScore };
+	      });
+	      
+	      fetch("/api/employee/mileage/payment", {
+	      	method: "POST",
+	      	headers: {
+	      	  "Content-Type": "application/json",
+	      	},
+	      	body: JSON.stringify(payload),
+	      })
+	      	.then((res) => {
+	      	  if (res.ok) {
+	      	    alert("마일리지 지급 완료");
+	      	    location.reload(); // or refresh table
+	      	  } else {
+	      	    alert("지급 실패");
+	      	  }
+	      	});
         }
 
         function exportToExcel() {

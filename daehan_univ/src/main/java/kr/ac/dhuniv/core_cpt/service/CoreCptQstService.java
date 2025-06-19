@@ -32,31 +32,59 @@ public class CoreCptQstService {
     private final CoreCptInfoRepository cptInfoRepository;      // 역량 정보 리포지토리
 
     /**
-     * ✅ 조건 기반 문항 검색
-     * - Repository에서 Page<CoreCptQst>를 조회하고 map으로 DTO 변환
-     *
-     * @param topCptId 상위 역량 ID (nullable)
-     * @param subCptId 하위 역량 ID (nullable)
-     * @param pageable 페이지 정보 (page, size, sort 등)
-     * @param keyword 문항 내용 검색어 (nullable)
-     * @return Page<CoreCptQstListDTO> 변환된 DTO 페이지
+     * ✅ 문항 단건 조회
+     * @param id 문항 ID
+     * @return CoreCptQstListDTO 문항 + 역량 정보
      */
-    public Page<CoreCptQstListDTO> filterQuestionList(Long topCptId, Long subCptId, Pageable pageable, String keyword) {
-        // (1) qstRepository에서 조건 기반 페이징 조회 실행
+    public CoreCptQstListDTO getQuestionById(Long id) {
+        // (1) 문항 엔티티 조회
+        CoreCptQst entity = qstRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("문항 없음: ID=" + id));
+
+        // (2) 연관된 역량 정보 조회
+        CoreCptInfo sub = entity.getCoreCptInfo();        // 하위 역량
+        CoreCptInfo top = sub.getParent();                // 상위 역량
+
+        // (3) 엔티티 → DTO 변환
+        return CoreCptQstListDTO.builder()
+                .qstId(entity.getQstId())                        // 문항 ID
+                .qstCode(entity.getQstCode())                    // 문항 코드
+                .questionText(entity.getQstCont())               // 문항 내용
+                .competencyName(top != null ? top.getCciNm() : "")     // 상위 역량명 (예비용 필드)
+                .topCompetencyName(top != null ? top.getCciNm() : "")  // 상위 역량명
+                .colorHex(top != null ? top.getColorHex() : "#999")    // 상위 역량 색상
+                .subCompetencyName(sub.getCciNm())               // 하위 역량명
+                // 🔑 추가
+                .topCompetencyId(top != null ? top.getCciId() : null)
+                .subCompetencyId(sub.getCciId())
+                .build();
+
+    }
+    /**
+     * ✅ 조건 + 페이징 문항 목록 조회
+     *
+     * @param topCptId 상위 역량 ID
+     * @param subCptId 하위 역량 ID
+     * @param keyword  검색어
+     * @param pageable 페이징 정보
+     * @return Page<DTO>
+     */
+    public Page<CoreCptQstListDTO> filterQuestionList(Long topCptId, Long subCptId, String keyword, Pageable pageable) {
+        // DB에서 Page<CoreCptQst> 조회
         Page<CoreCptQst> page = qstRepository.filter(topCptId, subCptId, keyword, pageable);
 
-        // (2) 조회된 Page<CoreCptQst>를 Page<CoreCptQstListDTO>로 변환
+        // Entity → DTO 변환하며 Page 그대로 유지
         return page.map(q -> {
-            CoreCptInfo subCpt = q.getCoreCptInfo();           // 하위 역량 엔티티
-            CoreCptInfo topCpt = subCpt.getParent();           // 상위 역량 엔티티 (nullable)
+            CoreCptInfo sub = q.getCoreCptInfo();
+            CoreCptInfo top = sub.getParent();
 
             return CoreCptQstListDTO.builder()
-                    .qstId(q.getQstId())                       // 문항 ID
-                    .qstCode(q.getQstCode())                   // 문항 코드
-                    .questionText(q.getQstCont())              // 문항 내용
-                    .competencyName(topCpt != null ? topCpt.getCciNm() : "")  // 상위 역량명
-                    .subCompetencyName(subCpt.getCciNm())      // 하위 역량명
-                    .colorHex(topCpt != null ? topCpt.getColorHex() : "#999") // 상위 역량 색상 (기본값 #999)
+                    .qstId(q.getQstId())
+                    .qstCode(q.getQstCode())
+                    .questionText(q.getQstCont())
+                    .competencyName(top != null ? top.getCciNm() : "")
+                    .subCompetencyName(sub.getCciNm())
+                    .colorHex(top != null ? top.getColorHex() : "#999")
                     .build();
         });
     }
@@ -149,5 +177,32 @@ public class CoreCptQstService {
 
         // (4) 새 코드 생성 (하위 역량 코드 + - + 2자리 순번)
         return subCpt.getCciCode() + "-" + String.format("%02d", nextSeq);
+    }
+
+    /**
+     * 핵심역량 문항 수정 메소드
+     * */
+    public void updateQuestion(Long id, CoreCptQstRequestDTO dto) {
+        // 기존 문항 조회
+        CoreCptQst qst = qstRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("문항을 찾을 수 없습니다: ID=" + id));
+
+        // 하위 역량
+        CoreCptInfo subCpt = cptInfoRepository.findById(dto.getCoreCptInfoId())
+                .orElseThrow(() -> new IllegalArgumentException("역량 없음: ID=" + dto.getCoreCptInfoId()));
+
+        // 선택지 템플릿
+        CoreCptOptionTemplate optionTemplate = optionRepository.findById(dto.getOptionTemplateId())
+                .orElseThrow(() -> new IllegalArgumentException("선택지 템플릿 없음: ID=" + dto.getOptionTemplateId()));
+
+        // 값 변경
+        qst.setQstCont(dto.getQuestionText());
+        qst.setQstOrd(dto.getQstOrd());
+        qst.setCoreCptInfo(subCpt);
+        qst.setOptionTemplate(optionTemplate);
+        qst.setUpdUserId(dto.getRegUserId());
+        qst.setUpdDt(LocalDateTime.now());
+
+        qstRepository.save(qst);
     }
 }

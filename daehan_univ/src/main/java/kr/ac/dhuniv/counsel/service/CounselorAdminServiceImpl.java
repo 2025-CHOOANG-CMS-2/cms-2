@@ -9,12 +9,14 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.ac.dhuniv.counsel.domain.CnlrDefaultSchd;
 import kr.ac.dhuniv.counsel.domain.CnlrSchd;
 import kr.ac.dhuniv.counsel.domain.CnslrInfo;
 import kr.ac.dhuniv.counsel.dto.CounselorListDto;
 import kr.ac.dhuniv.counsel.dto.CreateCounselorRequestDto;
 import kr.ac.dhuniv.counsel.dto.UnregisteredEmpDto;
 import kr.ac.dhuniv.counsel.dto.UpdateCounselorRequestDto;
+import kr.ac.dhuniv.counsel.repository.CnlrDefaultSchdRepository;
 import kr.ac.dhuniv.counsel.repository.CnlrSchdRepository;
 import kr.ac.dhuniv.counsel.repository.CnslrInfoRepository;
 import kr.ac.dhuniv.counsel.repository.EmplInfoRepository;
@@ -29,6 +31,7 @@ public class CounselorAdminServiceImpl implements CounselorAdminService {
     private final CnslrInfoRepository cnslrInfoRepository;
     private final EmplInfoRepository emplInfoRepository;
     private final CnlrSchdRepository cnlrSchdRepository;
+    private final CnlrDefaultSchdRepository cnlrDefaultSchdRepository;
 
     @Override
     public List<CounselorListDto> getCounselorList() {
@@ -88,42 +91,39 @@ public class CounselorAdminServiceImpl implements CounselorAdminService {
         );
         cnslrInfoRepository.save(newCounselor);
         
-        // 3. [수정된 로직] 앞으로 다가올 평일 5일에 대한 기본 스케줄을 생성합니다.
-        LocalDate today = LocalDate.now();
-        int schedulesCreated = 0;
-        int daysToAdd = 1;
+     // [최종 수정 로직]
+        // CnlrSchd 테이블이 아닌 CnlrDefaultSchd 테이블에 기본 패턴을 저장합니다.
+        for (int i = 1; i <= 7; i++) {
+            boolean isWorking = (i >= 1 && i <= 5); // 월(1)~금(5)은 근무일
+            LocalTime startTime = isWorking ? LocalTime.of(9, 0) : null;
+            LocalTime endTime = isWorking ? LocalTime.of(17, 0) : null;
 
-        while (schedulesCreated < 5) {
-            LocalDate nextDay = today.plusDays(daysToAdd);
-            DayOfWeek dayOfWeek = nextDay.getDayOfWeek();
+            CnlrDefaultSchd defaultSchedule = CnlrDefaultSchd.builder()
+                    .employee(employee) // 이전에 조회한 EmplInfo 객체
+                    .dayOfWeek(i)      // 1:월요일, 2:화요일 ... 7:일요일
+                    .isWorkingDay(isWorking)
+                    .startTime(startTime)
+                    .endTime(endTime)
+                    .build();
             
-            // 주말(토,일)이 아니면 스케줄 생성
-            if (dayOfWeek != DayOfWeek.SATURDAY && dayOfWeek != DayOfWeek.SUNDAY) {
-                String scheduleId = "SCHD-" + nextDay.toString() + "-" + requestDto.getEmplNo();
-
-                CnlrSchd defaultSchedule = CnlrSchd.builder()
-                        .schdId(scheduleId) // schdId는 고유해야 하므로 생성 규칙이 필요합니다.
-                        .employee(employee) // String이 아닌 EmplInfo 객체를 전달
-                        .dayCode(nextDay)   // 요일 문자열이 아닌, 실제 날짜(LocalDate)를 전달
-                        .startTime(LocalTime.of(9, 0))
-                        .endTime(LocalTime.of(17, 0))
-                        .build();
-                
-                cnlrSchdRepository.save(defaultSchedule);
-                schedulesCreated++;
-            }
-            daysToAdd++;
+            cnlrDefaultSchdRepository.save(defaultSchedule);
         }
     }
     
     @Override
     @Transactional
     public void deleteCounselor(String counselorId) {
-        // 먼저 삭제할 엔티티가 있는지 확인
+    	
+    	// [수정] 1. 관련된 '기본 반복 일정' 데이터부터 삭제
+        cnlrDefaultSchdRepository.deleteByEmployee_EmplNo(counselorId);
+    	
+        // 2. 관련된 '특정일 예외 일정' 데이터 삭제 (이전 코드)
+    	cnlrSchdRepository.deleteByEmployee_EmplNo(counselorId);
+    	
+        // 3. 상담사 프로필 정보 삭제
         CnslrInfo counselor = cnslrInfoRepository.findByEmplNo(counselorId)
                 .orElseThrow(() -> new IllegalArgumentException("삭제할 상담사를 찾을 수 없습니다."));
         
-        // 엔티티를 직접 삭제 (물리적 삭제)
         cnslrInfoRepository.delete(counselor);
     }
     
