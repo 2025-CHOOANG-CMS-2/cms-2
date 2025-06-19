@@ -39,6 +39,9 @@ public class User {
 
     @Column(name = "failed_login_cnt", nullable = false)
     private Integer failedLoginCnt;
+    
+    @Column(name = "user_yn", length = 1, nullable = false)
+    private String userYn;
 
     // ✅ 다중 권한 관계 추가
     @ManyToMany(fetch = FetchType.EAGER)
