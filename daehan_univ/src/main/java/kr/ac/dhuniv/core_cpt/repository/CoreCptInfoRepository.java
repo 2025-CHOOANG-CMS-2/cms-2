@@ -16,6 +16,6 @@ public interface CoreCptInfoRepository extends JpaRepository<CoreCptInfo, Long>{
     Optional<CoreCptInfo> findByCciId(Long cciId);
 
     // 상위 역량 (parent == null) 목록 조회
-    List<CoreCptInfo> findByParentIsNull();
+    List<CoreCptInfo> findByParentIsNullOrderByCciIdAsc();
 
 }
