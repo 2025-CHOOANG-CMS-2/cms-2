@@ -3,22 +3,75 @@
 // ===============================================
 // 사이드바 및 서브메뉴 토글 로직
 // ===============================================
-const sidebar = document.getElementById("sidebar");
-const hamburger = document.getElementById("hamburger");
-if (hamburger && sidebar) {
-    hamburger.addEventListener("click", () => {
-        sidebar.classList.toggle("show"); // 'active' -> 'show'로 변경: HTML과 일치
-    });
-}
+document.addEventListener('DOMContentLoaded', function () { // DOMContentLoaded로 전체를 감쌈
+    const sidebar = document.getElementById("sidebar");
+    const hamburger = document.getElementById("hamburger");
+    if (hamburger && sidebar) {
+        hamburger.addEventListener("click", () => {
+            sidebar.classList.toggle("show");
+        });
+    }
 
-// ===============================================
-// 전역 변수 (필요시)
-// ===============================================
+    const menuLinks = document.querySelectorAll("[data-menu]");
+    menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+            e.preventDefault();
+            const key = menu.getAttribute("data-menu");
+            const submenu = document.getElementById(`submenu-${key}`);
+
+            document.querySelectorAll(".submenu").forEach((sm) => {
+                if (sm !== submenu) sm.style.display = "none";
+            });
+
+            if (submenu) {
+                submenu.style.display =
+                    submenu.style.display === "block" ? "none" : "block";
+            }
+        });
+    });
+
+    // ===============================================
+    // 전역 변수
+    // ===============================================
+    // 전역 변수는 DOMContentLoaded 바깥에 선언하는 것이 일반적이지만,
+    // 이 스크립트가 단일 파일로 구성된다면 이 안에서 관리해도 무방합니다.
+    // 여기서는 기존 구조를 유지합니다.
+
+    // ===============================================
+    // 초기화 및 이벤트 리스너 연결
+    // ===============================================
+    populateDeptDropdowns(); // 페이지 로드 시 학과 드롭다운 먼저 채우기
+    fetchStudents(currentPage, pageSize); // 초기 학생 목록 로드
+
+    // 검색 버튼 클릭 이벤트 리스너 연결
+    const filterButton = document.getElementById("filterButton");
+    if (filterButton) {
+        filterButton.addEventListener("click", filterStudents);
+    } else {
+        console.warn("경고: HTML에서 ID 'filterButton'을 가진 검색 버튼을 찾을 수 없습니다. HTML을 확인해주세요.");
+    }
+
+    // 상세 보기 모달에서 수정 버튼 클릭 시 수정 모달 열기
+    const editFromDetailBtn = document.getElementById("editFromDetailBtn");
+    if (editFromDetailBtn) {
+        editFromDetailBtn.addEventListener('click', function() {
+            if (currentEditingStudent) {
+                const detailModalInstance = bootstrap.Modal.getInstance(document.getElementById("detailModal"));
+                if (detailModalInstance) {
+                    detailModalInstance.hide();
+                }
+                openEditModal(currentEditingStudent);
+            }
+        });
+    }
+});
+
+
 let currentPage = 0; // 현재 페이지 (0부터 시작)
 const pageSize = 10; // 페이지당 항목 수
 let currentEditingStudent = null; // 현재 수정 중인 학생 정보 객체
 
-// 새로운 학과 목록 데이터 (백엔드의 DEPT_MAP과 동일하게 유지되어야 함)
+// 학과 목록 데이터 (백엔드의 AdminStdService.SCSBJT_MAP과 동일하게 유지되어야 함)
 const DEPT_LIST = [
     { code: "001", name: "국어국문학과" },
     { code: "002", name: "영어영문학과" },
@@ -28,13 +81,13 @@ const DEPT_LIST = [
     { code: "006", name: "사회복지학과" },
     { code: "007", name: "통계학과" },
     { code: "008", name: "천문학과" },
-    { code: "009", "name": "화학과" },
+    { code: "009", name: "화학과" },
     { code: "010", name: "기계공학과" },
     { code: "011", name: "컴퓨터공학과" },
     { code: "012", name: "건축학과" },
     { code: "013", name: "스마트시스템과학과" },
     { code: "014", name: "동양화과" },
-    { code: "015", "name": "조소과" },
+    { code: "015", name: "조소과" },
     { code: "016", name: "공예과" },
     { code: "017", name: "교육학과" },
     { code: "018", name: "식품영양학과" },
@@ -68,6 +121,9 @@ function getStatusLabel(statusCode) {
         "ENROLL": "재학",
         "LEAVE": "휴학",
         "GRAD": "졸업",
+        "EXPEL": "제적",
+        "GRAD_WAIT": "졸업유예",
+        "ABSENT_LEAVE": "자퇴"
     };
     return statusMap[statusCode] || statusCode;
 }
@@ -79,14 +135,11 @@ function getStatusLabel(statusCode) {
  */
 function getStatusBadgeClass(status) {
     switch (status) {
-        case "ENROLL":
-            return "status-enroll"; // 이 클래스는 student-management.css에 정의되어야 함
-        case "LEAVE":
-            return "status-leave"; // 이 클래스는 student-management.css에 정의되어야 함
-        case "GRAD":
-            return "status-grad"; // 이 클래스는 student-management.css에 정의되어야 함
-        default:
-            return "status-default"; // 이 클래스는 student-management.css에 정의되어야 함
+        case "ENROLL": return "status-enroll";
+        case "LEAVE": return "status-leave";
+        case "GRAD": return "status-grad";
+        case "EXPEL": return "status-expel";
+        default: return "status-default";
     }
 }
 
@@ -136,35 +189,6 @@ function populateDeptDropdowns() {
 // ===============================================
 // 데이터 로드, 테이블 렌더링 및 페이지네이션 핵심 로직
 // ===============================================
-
-// DOMContentLoaded: HTML 문서가 완전히 로드되고 파싱된 후에 실행
-document.addEventListener('DOMContentLoaded', () => {
-    populateDeptDropdowns(); // 페이지 로드 시 학과 드롭다운 먼저 채우기
-    fetchStudents(currentPage, pageSize); // 초기 학생 목록 로드
-
-    // 검색 버튼 클릭 이벤트 리스너 연결
-    const filterButton = document.getElementById("filterButton");
-    if (filterButton) {
-        filterButton.addEventListener("click", filterStudents);
-    } else {
-        console.warn("경고: HTML에서 ID 'filterButton'을 가진 검색 버튼을 찾을 수 없습니다. HTML을 확인해주세요.");
-    }
-
-    // 사이드바 서브메뉴 토글 로직 (기존 HTML에서 가져옴)
-    document.querySelectorAll('.nav-link.has-submenu').forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            const key = this.getAttribute("data-menu");
-            const submenu = document.getElementById(`submenu-${key}`);
-            if (submenu) {
-                document.querySelectorAll(".submenu").forEach((sm) => {
-                    if (sm !== submenu) sm.style.display = "none";
-                });
-                submenu.style.display = submenu.style.display === 'block' ? 'none' : 'block';
-            }
-        });
-    });
-});
 
 /**
  * 백엔드 API에서 학생 목록을 비동기적으로 가져와 테이블과 페이지네이션 UI를 업데이트합니다.
@@ -276,100 +300,45 @@ async function fetchStudents(page = 0, size = 10, searchName = '', searchDept = 
         prevLink.setAttribute('aria-label', 'Previous');
         prevLink.innerHTML = '<span aria-hidden="true">&laquo;</span>';
         prevLink.onclick = (e) => {
-            e.preventDefault(); // 기본 링크 동작 방지
-            if (currentPageFromBackend > 0) {
-                const { name, dept, status } = getCurrentSearchParams();
-                fetchStudents(currentPageFromBackend - 1, size, name, dept, status);
-            }
+            e.preventDefault();
+            const { name, dept, status } = getCurrentSearchParams();
+            fetchStudents(currentPageFromBackend - 1, pageSize, name, dept, status);
         };
-        prevLi.appendChild(prevLink);
-        paginationUl.appendChild(prevLi);
+        paginationUl.appendChild(prevLi).appendChild(prevLink);
+
 
         // 페이지 번호 버튼들 생성
-        let startPage = Math.max(0, currentPageFromBackend - 2); // 현재 페이지 기준으로 시작 페이지 계산
-        let endPage = Math.min(totalPages - 1, currentPageFromBackend + 2); // 현재 페이지 기준으로 끝 페이지 계산
+        const maxPagesToShow = 5; // 화면에 보여줄 최대 페이지 번호 개수
+        let startPage = Math.max(0, currentPageFromBackend - Math.floor(maxPagesToShow / 2));
+        let endPage = Math.min(totalPages - 1, startPage + maxPagesToShow - 1);
 
-        // 페이지 버튼 범위 조정 (항상 최소 5개 버튼 표시)
-        if (endPage - startPage < 4 && totalPages > 1) { // 5개 버튼이 안 될 경우
-            if (currentPageFromBackend < 2) { // 앞쪽에 가까우면 끝 페이지 조정
-                endPage = Math.min(totalPages - 1, 4);
-                startPage = 0;
-            } else if (currentPageFromBackend > totalPages - 3) { // 뒤쪽에 가까우면 시작 페이지 조정
-                startPage = Math.max(0, totalPages - 5);
-                endPage = totalPages - 1;
-            }
+        // 시작 페이지 조정 (끝 페이지가 충분히 나오지 않을 경우)
+        if (endPage - startPage + 1 < maxPagesToShow && totalPages > maxPagesToShow) {
+            startPage = Math.max(0, endPage - maxPagesToShow + 1);
         }
 
-        // 1페이지로 가는 버튼 (필요시)
-        if (startPage > 0) {
-            const li = document.createElement('li');
-            li.classList.add('page-item');
-            const link = document.createElement('a');
-            link.classList.add('page-link');
-            link.href = "#";
-            link.textContent = '1';
-            link.onclick = (e) => {
-                e.preventDefault();
-                const { name, dept, status } = getCurrentSearchParams();
-                fetchStudents(0, size, name, dept, status);
-            };
-            li.appendChild(link);
-            paginationUl.appendChild(li);
-            if (startPage > 1) {
-                const ellipsis = document.createElement('li');
-                ellipsis.classList.add('page-item', 'disabled');
-                ellipsis.innerHTML = '<span class="page-link">...</span>';
-                paginationUl.appendChild(ellipsis);
-            }
-        }
-
-        // 실제 페이지 번호 버튼들
         for (let i = startPage; i <= endPage; i++) {
             const li = document.createElement('li');
             li.classList.add('page-item');
             if (i === currentPageFromBackend) {
-                li.classList.add('active'); // 현재 페이지 활성화 표시
+                li.classList.add('active'); // 현재 페이지 활성화
             }
             const link = document.createElement('a');
             link.classList.add('page-link');
             link.href = "#";
-            link.textContent = i + 1; // 페이지 번호는 1부터 시작하므로 +1
+            link.textContent = i + 1; // 페이지 번호는 1부터 시작
             link.onclick = (e) => {
                 e.preventDefault();
                 const { name, dept, status } = getCurrentSearchParams();
-                fetchStudents(i, size, name, dept, status);
+                fetchStudents(i, pageSize, name, dept, status);
             };
-            li.appendChild(link);
-            paginationUl.appendChild(li);
-        }
-
-        // 마지막 페이지로 가는 버튼 (필요시)
-        if (endPage < totalPages - 1) {
-            if (endPage < totalPages - 2) {
-                const ellipsis = document.createElement('li');
-                ellipsis.classList.add('page-item', 'disabled');
-                ellipsis.innerHTML = '<span class="page-link">...</span>';
-                paginationUl.appendChild(ellipsis);
-            }
-            const li = document.createElement('li');
-            li.classList.add('page-item');
-            const link = document.createElement('a');
-            link.classList.add('page-link');
-            link.href = "#";
-            link.textContent = totalPages;
-            link.onclick = (e) => {
-                e.preventDefault();
-                const { name, dept, status } = getCurrentSearchParams();
-                fetchStudents(totalPages - 1, size, name, dept, status);
-            };
-            li.appendChild(link);
-            paginationUl.appendChild(li);
+            paginationUl.appendChild(li).appendChild(link);
         }
 
         // '다음' 버튼 생성
         const nextLi = document.createElement('li');
         nextLi.classList.add('page-item');
-        if (currentPageFromBackend === totalPages - 1) {
+        if (currentPageFromBackend === totalPages - 1 || totalPages === 0) {
             nextLi.classList.add('disabled'); // 마지막 페이지일 경우 비활성화
         }
         const nextLink = document.createElement('a');
@@ -379,30 +348,25 @@ async function fetchStudents(page = 0, size = 10, searchName = '', searchDept = 
         nextLink.innerHTML = '<span aria-hidden="true">&raquo;</span>';
         nextLink.onclick = (e) => {
             e.preventDefault();
-            if (currentPageFromBackend < totalPages - 1) {
-                const { name, dept, status } = getCurrentSearchParams();
-                fetchStudents(currentPageFromBackend + 1, size, name, dept, status);
-            }
+            const { name, dept, status } = getCurrentSearchParams();
+            fetchStudents(currentPageFromBackend + 1, pageSize, name, dept, status);
         };
-        nextLi.appendChild(nextLink);
-        paginationUl.appendChild(nextLi);
-
+        paginationUl.appendChild(nextLi).appendChild(nextLink);
     } catch (error) {
         console.error('학생 목록을 가져오는 중 오류 발생:', error);
-        alert('학생 목록을 불러오지 못했습니다. 서버 상태를 확인해주세요.');
+        alert('학생 목록을 불러오지 못했습니다. 서버 상태를 확인해주세요: ' + error.message);
     }
 }
 
+
 /**
- * 검색 필드의 값을 가져와 학생 목록을 새로 필터링합니다.
- * 항상 첫 페이지부터 검색 결과를 표시합니다.
+ * 검색 필드의 값을 가져와 학생 목록을 새로 필터링하고 첫 페이지부터 표시합니다.
  */
 function filterStudents() {
     const searchName = document.getElementById("searchName") ? document.getElementById("searchName").value : '';
     const searchDept = document.getElementById("searchDept") ? document.getElementById("searchDept").value : '';
     const searchStatus = document.getElementById("searchStatus") ? document.getElementById("searchStatus").value : '';
-
-    fetchStudents(0, pageSize, searchName, searchDept, searchStatus); // 검색 시 항상 0페이지부터 시작
+    fetchStudents(0, pageSize, searchName, searchDept, searchStatus); // 항상 첫 페이지부터 필터링
 }
 
 
@@ -412,10 +376,10 @@ function filterStudents() {
 
 /**
  * 학생 상세 정보를 모달에 표시합니다.
- * @param {object} student - 표시할 학생 정보 객체
+ * @param {object} student - 표시할 학생 정보 객체 (StdInfoDto)
  */
 function showDetail(student) {
-    currentEditingStudent = student; // 현재 상세 보거나 수정할 학생 정보 저장
+    currentEditingStudent = student; // 현재 수정할 학생 정보 저장
 
     const modalBody = document.getElementById("detailContent");
     if (!modalBody) {
@@ -423,102 +387,96 @@ function showDetail(student) {
         return;
     }
 
-    // 학생 상세 정보 HTML 구성
     modalBody.innerHTML = `
-    <div class="student-detail-card">
-      <div class="detail-section">
-        <div class="section-title">기본 정보</div>
-        <div class="detail-row">
-          <div class="detail-item">
-            <div class="detail-label">학번</div>
-            <div class="detail-value">${student.STD_NO || ''}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">학생명</div>
-            <div class="detail-value">${student.STD_NM || ''}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">학과명</div>
-            <div class="detail-value">${getDeptName(student.SCSBJT_CD) || ''}</div>
-          </div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-item">
-            <div class="detail-label">학년</div>
-            <div class="detail-value">${student.SCH_YR || ''}학년</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">재학여부</div>
-            <div class="detail-value">
-              <span class="badge ${getStatusBadgeClass(student.STD_STAT_CD)}"> <!-- 'status-badge' -> 'badge'로 변경 -->
-                ${getStatusLabel(student.STD_STAT_CD) || ''}
-              </span>
+        <div class="student-detail-card">
+            <div class="detail-section">
+                <div class="section-title">기본 정보</div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <div class="detail-label">학번</div>
+                        <div class="detail-value">${student.STD_NO || ''}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">이름</div>
+                        <div class="detail-value">${student.STD_NM || ''}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">학과</div>
+                        <div class="detail-value">${getDeptName(student.SCSBJT_CD) || ''}</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item">
+                        <div class="detail-label">학년</div>
+                        <div class="detail-value">${student.SCH_YR || ''}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">상태</div>
+                        <div class="detail-value">
+                            <span class="badge ${getStatusBadgeClass(student.STD_STAT_CD)}">
+                                ${getStatusLabel(student.STD_STAT_CD) || ''}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">입학일자</div>
+                        <div class="detail-value">${student.ENTR_DT || 'N/A'}</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">입학일자</div>
-            <div class="detail-value">${student.ENTR_DT || 'N/A'}</div>
-          </div>
-        </div>
-      </div>
 
-      <div class="detail-section">
-        <div class="section-title">주소 정보</div>
-        <div class="detail-row two-items">
-          <div class="detail-item">
-            <div class="detail-label">우편번호</div>
-            <div class="detail-value">${student.STD_ZIP || 'N/A'}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">주소</div>
-            <div class="detail-value">${student.STD_ADDR || 'N/A'}</div>
-          </div>
-        </div>
-        <div class="detail-row">
-          <div class="detail-item full-width">
-            <div class="detail-label">상세주소</div>
-            <div class="detail-value">${student.STD_DADDR || 'N/A'}</div>
-          </div>
-        </div>
-      </div>
+            <div class="detail-section">
+                <div class="section-title">주소 정보</div>
+                <div class="detail-row two-items">
+                    <div class="detail-item">
+                        <div class="detail-label">우편번호</div>
+                        <div class="detail-value">${student.STD_ZIP || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">주소</div>
+                        <div class="detail-value">${student.STD_ADDR || 'N/A'}</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item full-width">
+                        <div class="detail-label">상세주소</div>
+                        <div class="detail-value">${student.STD_DADDR || 'N/A'}</div>
+                    </div>
+                </div>
+            </div>
 
-      <div class="detail-section">
-        <div class="section-title">연락처</div>
-        <div class="detail-row two-items">
-          <div class="detail-item">
-            <div class="detail-label">이메일</div>
-            <div class="detail-value">${student.STD_EML_ADDR || ''}</div>
-          </div>
-          <div class="detail-item">
-            <div class="detail-label">전화번호</div>
-            <div class="detail-value">${student.STD_TELNO || ''}</div>
-          </div>
+            <div class="detail-section">
+                <div class="section-title">연락처</div>
+                <div class="detail-row two-items">
+                    <div class="detail-item">
+                        <div class="detail-label">이메일</div>
+                        <div class="detail-value">${student.STD_EML_ADDR || ''}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">전화번호</div>
+                        <div class="detail-value">${student.STD_TELNO || ''}</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item full-width">
+                        <div class="detail-label">등록 관리자 (User ID)</div>
+                        <div class="detail-value">${student.CREATED_BY || '정보 없음'}</div>
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-item full-width">
+                        <div class="detail-label">프로필 이미지</div>
+                        <div class="detail-value">
+                            <img src="${student.PROFILE_IMAGE_URL || 'https://placehold.co/100x100?text=No+Image'}" alt="프로필 이미지" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="detail-row">
-          <div class="detail-item full-width">
-            <div class="detail-label">등록 관리자</div>
-            <div class="detail-value">${student.USER_ID2 || '정보 없음'}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+    `;
 
-    // 상세 모달에서 수정 버튼 클릭 시 수정 모달 열기
-    const editFromDetailBtn = document.getElementById("editFromDetailBtn");
-    if (editFromDetailBtn) {
-        editFromDetailBtn.onclick = function () {
-            // 상세 모달 닫기
-            const detailModalInstance = bootstrap.Modal.getInstance(document.getElementById("detailModal"));
-            if (detailModalInstance) {
-                detailModalInstance.hide();
-            }
-            openEditModal(currentEditingStudent); // 수정 모달 열기
-        };
-    }
-
-    // 부트스트랩 모달 인스턴스 생성 및 표시
-    new bootstrap.Modal(document.getElementById("detailModal")).show();
+    const detailModal = new bootstrap.Modal(document.getElementById("detailModal"));
+    detailModal.show();
 }
 
 // ===============================================
@@ -527,69 +485,69 @@ function showDetail(student) {
 
 /**
  * 학생 수정 모달을 열고 선택된 학생의 정보로 폼 필드를 채웁니다.
- * @param {object} student - 수정할 학생 정보 객체
  */
 function openEditModal(student) {
     currentEditingStudent = student; // 현재 수정할 학생 정보 저장
 
-    // 폼 필드에 StdInfoDto 필드명에 맞춰서 데이터 채우기 (대문자 스네이크 케이스)
-    document.getElementById("edit_id").value = student.STD_NO || ''; // 학번 필드에 STD_NO 값 채우기 (읽기 전용)
-    document.getElementById("edit_name").value = student.STD_NM || '';
-    document.getElementById("edit_dept").value = student.SCSBJT_CD || ''; // 학과 드롭다운 선택
-    document.getElementById("edit_year").value = student.SCH_YR || '';
-    document.getElementById("edit_status").value = student.STD_STAT_CD || '';
-    document.getElementById("edit_admission_date").value = student.ENTR_DT || '';
-    document.getElementById("edit_zipcode").value = student.STD_ZIP || '';
-    document.getElementById("edit_address").value = student.STD_ADDR || '';
-    document.getElementById("edit_address_detail").value = student.STD_DADDR || '';
-    document.getElementById("edit_email").value = student.STD_EML_ADDR || '';
-    document.getElementById("edit_phone").value = student.STD_TELNO || '';
-    // USER_ID2는 등록/수정 관리자 ID이므로, 수정 모달에서는 표시하거나 직접 수정하지 않을 수 있음
-    // document.getElementById("edit_user_id2").value = student.USER_ID2 || '';
+    // HTML 폼 필드에 데이터 채우기 (StdInfoDto의 필드명에 맞춰 수정)
+    // document.getElementById("edit_std_id").value = student.STD_ID || ''; // DTO에서 ID 가져오기
+    document.getElementById("edit_std_no").value = student.STD_NO || ''; // 학번은 readOnly
+    document.getElementById("edit_std_nm").value = student.STD_NM || '';
+    document.getElementById("edit_scsbjt_cd").value = student.SCSBJT_CD || '';
+    document.getElementById("edit_sch_yr").value = student.SCH_YR || '';
+    document.getElementById("edit_entr_dt").value = student.ENTR_DT || '';
+    document.getElementById("edit_std_stat_cd").value = student.STD_STAT_CD || '';
+    document.getElementById("edit_std_zip").value = student.STD_ZIP || '';
+    document.getElementById("edit_std_addr").value = student.STD_ADDR || '';
+    document.getElementById("edit_std_daddr").value = student.STD_DADDR || '';
+    document.getElementById("edit_std_telno").value = student.STD_TELNO || '';
+    document.getElementById("edit_std_eml_addr").value = student.STD_EML_ADDR || '';
+    document.getElementById("edit_use_yn").value = student.USE_YN || '';
+    document.getElementById("edit_created_by").value = student.CREATED_BY || '';
 
-    // 상세 모달이 열려있다면 닫기
-    const detailModal = bootstrap.Modal.getInstance(document.getElementById("detailModal"));
-    if (detailModal) {
-        detailModal.hide();
-    }
-
-    // 수정 모달 열기
-    new bootstrap.Modal(document.getElementById("editModal")).show();
+    const editModal = new bootstrap.Modal(document.getElementById("editModal"));
+    editModal.show();
 }
 
 /**
  * 수정된 학생 정보를 백엔드로 전송하여 저장합니다.
  */
 async function saveStudent() {
-    // 수정할 학생의 학번을 가져옴 (URL 경로 변수로 사용)
-    const studentStdNo = document.getElementById("edit_id").value;
-    
-    // 백엔드 StdInfoDto 필드명에 맞춰서 데이터 구성
-    const updatedStudentData = {
-        // "STD_NO"는 경로변수로 전달되므로 요청 본문에 포함하지 않음 (선택 사항)
-        "STD_NM": document.getElementById("edit_name").value,
-        "SCSBJT_CD": document.getElementById("edit_dept").value, // 드롭다운에서 선택된 숫자 학과 코드
-        "SCH_YR": parseInt(document.getElementById("edit_year").value),
-        "ENTR_DT": document.getElementById("edit_admission_date").value,
-        "STD_STAT_CD": document.getElementById("edit_status").value,
-        "STD_ZIP": document.getElementById("edit_zipcode").value,
-        "STD_ADDR": document.getElementById("edit_address").value,
-        "STD_DADDR": document.getElementById("edit_address_detail").value,
-        "STD_EML_ADDR": document.getElementById("edit_email").value,
-        "STD_TELNO": document.getElementById("edit_phone").value,
-        // USER_ID2와 USE_YN은 현재 로그인한 관리자의 정보 또는 기존 값을 유지 (백엔드에서 처리될 것임)
-        "USER_ID2": currentEditingStudent.USER_ID2, // 기존 등록 관리자 ID 유지
-        "USE_YN": currentEditingStudent.USE_YN // 기존 사용 여부 유지
+    const stdNo = document.getElementById("edit_std_no").value; // 학번은 PathVariable로 사용
+
+    const updatedData = {
+        STD_ID: currentEditingStudent.STD_ID, // 기존 ID를 유지하여 전송
+        STD_NO: stdNo, // DTO에도 포함 (Backend @RequestBody 매핑 위함)
+        STD_NM: document.getElementById("edit_std_nm").value.trim(),
+        SCSBJT_CD: document.getElementById("edit_scsbjt_cd").value,
+        SCH_YR: parseInt(document.getElementById("edit_sch_yr").value),
+        ENTR_DT: document.getElementById("edit_entr_dt").value,
+        STD_STAT_CD: document.getElementById("edit_std_stat_cd").value,
+        STD_ZIP: document.getElementById("edit_std_zip").value,
+        STD_ADDR: document.getElementById("edit_std_addr").value,
+        STD_DADDR: document.getElementById("edit_std_daddr").value,
+        STD_TELNO: document.getElementById("edit_std_telno").value.trim(),
+        STD_EML_ADDR: document.getElementById("edit_std_eml_addr").value.trim(),
+        USE_YN: document.getElementById("edit_use_yn").value,
+        PROFILE_IMAGE_URL: currentEditingStudent.PROFILE_IMAGE_URL, // 프로필 이미지는 별도 업로드 함수 사용 가정
+        CREATED_BY: document.getElementById("edit_created_by").value
     };
 
+    // 프론트엔드 유효성 검사 (추가적으로 필요하면 더 구현)
+    if (
+        !updatedData.STD_NM || !updatedData.SCSBJT_CD || 
+        isNaN(updatedData.SCH_YR) || !updatedData.ENTR_DT || !updatedData.STD_STAT_CD ||
+        !updatedData.STD_TELNO || !updatedData.STD_EML_ADDR
+    ) {
+        alert("모든 필수 정보를 입력해주세요.");
+        return;
+    }
+
     try {
-        // PUT 요청으로 API 호출 (URL에 학번 포함)
-        const response = await fetch(`/admin/student/${studentStdNo}`, {
+        const response = await fetch(`/admin/student/${stdNo}`, { // 학번을 PathVariable로 전달
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(updatedStudentData)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(updatedData)
         });
 
         if (!response.ok) {
@@ -597,25 +555,22 @@ async function saveStudent() {
             throw new Error(`학생 정보 업데이트 실패! (HTTP ${response.status} ${response.statusText}): ${errorBody}`);
         }
 
-        const result = await response.json(); // 등록 성공 시 백엔드에서 반환된 StdInfoDto
+        const result = await response.json();
         console.log("학생 정보 업데이트 성공:", result);
         alert("학생 정보가 성공적으로 수정되었습니다.");
 
-        // 수정 모달 닫기
         const editModal = bootstrap.Modal.getInstance(document.getElementById("editModal"));
-        if (editModal) {
-            editModal.hide();
-        }
+        if (editModal) { editModal.hide(); }
 
-        // 현재 페이지와 검색 조건을 유지하며 학생 목록 새로고침
         const { name, dept, status } = getCurrentSearchParams();
-        fetchStudents(currentPage, pageSize, name, dept, status);
+        fetchStudents(currentPage, pageSize, name, dept, status); // 업데이트 후 목록 새로고침
 
     } catch (error) {
         console.error("학생 정보 업데이트 중 오류 발생:", error);
         alert("학생 정보 업데이트 중 오류가 발생했습니다: " + error.message);
     }
 }
+
 
 // ===============================================
 // 학생 등록 모달 (`addModal`) 관련 함수
@@ -633,28 +588,38 @@ function openAddModal() {
 
         const addForm = document.getElementById('addForm');
         if (addForm) {
-            addForm.reset(); // 폼 필드 초기화
-            // 학번 필드는 읽기 전용이고 백엔드에서 생성되므로 메시지 표시
-            if (document.getElementById('add_id')) document.getElementById('add_id').value = "학번은 자동 생성됩니다.";
+            addForm.reset();
+            // 학번은 백엔드에서 자동 생성되므로, 폼에서는 표시만
+            if (document.getElementById('add_std_no')) {
+                document.getElementById('add_std_no').value = "학번은 자동 생성됩니다.";
+                document.getElementById('add_std_no').readOnly = true;
+            }
             
-            // 기본값 설정 (필요시)
-            if (document.getElementById('add_year')) document.getElementById('add_year').value = "1";
-            if (document.getElementById('add_status')) document.getElementById('add_status').value = "ENROLL";
-            
-            // 기타 필드 초기화
-            if (document.getElementById('add_email')) document.getElementById('add_email').value = "";
-            if (document.getElementById('add_dept')) document.getElementById('add_dept').value = "";
-            // 기타 필드들: add_name, add_admission_date, add_zipcode, add_address, add_address_detail, add_phone
-            // 명시적으로 빈 값으로 설정하여 확실히 초기화
-            if (document.getElementById('add_name')) document.getElementById('add_name').value = "";
-            if (document.getElementById('add_admission_date')) document.getElementById('add_admission_date').value = "";
-            if (document.getElementById('add_zipcode')) document.getElementById('add_zipcode').value = "";
-            if (document.getElementById('add_address')) document.getElementById('add_address').value = "";
-            if (document.getElementById('add_address_detail')) document.getElementById('add_address_detail').value = "";
-            if (document.getElementById('add_phone')) document.getElementById('add_phone').value = "";
+            // 기본값 설정
+            if (document.getElementById('add_use_yn')) document.getElementById('add_use_yn').value = "Y";
+            if (document.getElementById('add_std_stat_cd')) document.getElementById('add_std_stat_cd').value = "ENROLL"; // 기본 재학
+            if (document.getElementById('add_sch_yr')) document.getElementById('add_sch_yr').value = 1; // 기본 1학년
+            if (document.getElementById('add_entr_dt')) {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작
+                const day = String(today.getDate()).padStart(2, '0');
+                document.getElementById('add_entr_dt').value = `${year}-${month}-${day}`;
+            }
+
+            // 그 외 필드는 비우기
+            if (document.getElementById('add_std_nm')) document.getElementById('add_std_nm').value = "";
+            if (document.getElementById('add_scsbjt_cd')) document.getElementById('add_scsbjt_cd').value = ""; // 학과 선택 유도
+            if (document.getElementById('add_std_zip')) document.getElementById('add_std_zip').value = "";
+            if (document.getElementById('add_std_addr')) document.getElementById('add_std_addr').value = "";
+            if (document.getElementById('add_std_daddr')) document.getElementById('add_std_daddr').value = "";
+            if (document.getElementById('add_std_telno')) document.getElementById('add_std_telno').value = "";
+            if (document.getElementById('add_std_eml_addr')) document.getElementById('add_std_eml_addr').value = "";
+            // CREATED_BY는 로그인된 관리자의 ID로 자동 채워져야 함 (백엔드에서 처리하거나, 프론트엔드에서 세션 등으로 가져와야 함)
+            if (document.getElementById('add_created_by')) document.getElementById('add_created_by').value = "admin"; // 임시값
         }
     } else {
-        console.error("오류: 'addModal' 요소 (학생 등록 모달)를 찾을 수 없습니다.");
+        console.error("오류: 'addModal' 요소를 찾을 수 없습니다.");
     }
 }
 
@@ -662,42 +627,36 @@ function openAddModal() {
  * 새 학생 정보를 백엔드로 전송하여 등록합니다.
  */
 async function addStudent() {
-    // 폼 필드에서 데이터 가져와 백엔드 StdInfoDto 필드명에 맞춰 구성
-    const studentData = {
-        "STD_NM": document.getElementById('add_name').value,
-        "SCSBJT_CD": document.getElementById('add_dept').value, // 드롭다운에서 선택된 숫자 학과 코드
-        "SCH_YR": parseInt(document.getElementById('add_year').value),
-        "ENTR_DT": document.getElementById('add_admission_date').value,
-        "STD_STAT_CD": document.getElementById('add_status').value, // ENROLL, LEAVE, GRAD 중 하나
-        "STD_ZIP": document.getElementById('add_zipcode').value,
-        "STD_ADDR": document.getElementById('add_address').value,
-        "STD_DADDR": document.getElementById('add_address_detail').value,
-        "STD_TELNO": document.getElementById('add_phone').value,
-        "STD_EML_ADDR": document.getElementById('add_email').value,
-        // 이 부분은 실제 로그인한 관리자의 정보 또는 기존 값을 유지 (백엔드에서 처리될 것임)
-        "USER_ID2": "admin", // !!! 요청에 따라 'admin'으로 설정 !!!
-        "USE_YN": "Y" // 기본값 'Y'
+    const newStudentData = {
+        STD_NM: document.getElementById("add_std_nm").value.trim(),
+        SCSBJT_CD: document.getElementById("add_scsbjt_cd").value,
+        SCH_YR: parseInt(document.getElementById("add_sch_yr").value),
+        ENTR_DT: document.getElementById("add_entr_dt").value,
+        STD_STAT_CD: document.getElementById("add_std_stat_cd").value,
+        STD_ZIP: document.getElementById("add_std_zip").value,
+        STD_ADDR: document.getElementById("add_std_addr").value,
+        STD_DADDR: document.getElementById("add_std_daddr").value,
+        STD_TELNO: document.getElementById("add_std_telno").value.trim(),
+        STD_EML_ADDR: document.getElementById("add_std_eml_addr").value.trim(),
+        USE_YN: document.getElementById("add_use_yn").value,
+        PROFILE_IMAGE_URL: null, // 초기 등록 시 프로필 이미지 없음
+        CREATED_BY: document.getElementById("add_created_by").value
     };
 
-    // 필수 필드 유효성 검사 (FRONT-END)
     if (
-        !studentData.STD_NM || !studentData.SCSBJT_CD || 
-        isNaN(studentData.SCH_YR) || !studentData.ENTR_DT || 
-        !studentData.STD_STAT_CD || !studentData.STD_EML_ADDR || 
-        !studentData.STD_TELNO || !studentData.USER_ID2
+        !newStudentData.STD_NM || !newStudentData.SCSBJT_CD || 
+        isNaN(newStudentData.SCH_YR) || !newStudentData.ENTR_DT || !newStudentData.STD_STAT_CD ||
+        !newStudentData.STD_TELNO || !newStudentData.STD_EML_ADDR || !newStudentData.CREATED_BY
     ) {
-        alert("모든 필수 정보를 입력해주세요 (학생명, 학과명, 학년, 입학일자, 재학여부, 이메일, 전화번호).");
+        alert("모든 필수 정보를 입력해주세요.");
         return;
     }
-
+    
     try {
-        // POST 요청으로 API 호출
         const response = await fetch('/admin/student', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(studentData)
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newStudentData)
         });
 
         if (!response.ok) {
@@ -705,17 +664,13 @@ async function addStudent() {
             throw new Error(`학생 등록 실패! (HTTP ${response.status} ${response.statusText}): ${errorBody}`);
         }
 
-        const result = await response.json(); // 등록 성공 시 백엔드에서 반환된 StdInfoDto
+        const result = await response.json();
         console.log('학생 등록 성공:', result);
         alert(`학생 ${result.STD_NM}(학번: ${result.STD_NO})이(가) 성공적으로 등록되었습니다!`);
 
-        // 등록 모달 닫기
         const addModal = bootstrap.Modal.getInstance(document.getElementById('addModal'));
-        if (addModal) {
-            addModal.hide();
-        }
+        if (addModal) { addModal.hide(); }
 
-        // 학생 목록 첫 페이지부터 다시 로드하여 최신 정보 반영
         fetchStudents(0, pageSize);
 
     } catch (error) {
@@ -734,16 +689,13 @@ async function addStudent() {
  */
 async function deleteStudent(stdNo) {
     if (!confirm(`학번 ${stdNo} 학생을 정말 삭제하시겠습니까?`)) {
-        return; // 사용자가 취소하면 아무것도 하지 않음
+        return;
     }
 
     try {
-        // DELETE 요청으로 API 호출 (URL에 학번 포함)
         const response = await fetch(`/admin/student/${stdNo}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' }
         });
 
         if (!response.ok) {
@@ -754,7 +706,6 @@ async function deleteStudent(stdNo) {
         console.log('학생 삭제 성공:', stdNo);
         alert(`학생 ${stdNo}이(가) 성공적으로 삭제되었습니다.`);
 
-        // 학생 목록 새로고침 (삭제 후 현재 페이지 유지)
         const { name, dept, status } = getCurrentSearchParams();
         fetchStudents(currentPage, pageSize, name, dept, status);
 

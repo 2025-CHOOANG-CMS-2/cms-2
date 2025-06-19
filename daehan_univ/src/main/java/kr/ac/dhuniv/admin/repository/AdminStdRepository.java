@@ -5,28 +5,24 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import java.util.Optional;
 
 public interface AdminStdRepository extends JpaRepository<StdInfo, Long>, JpaSpecificationExecutor<StdInfo> {
 
-    Optional<StdInfo> findByStdEmlAddr(String stdEmlAddr); // stdEmlAddr 필드에 대한 쿼리 메서드
+    // User 엔티티의 userId를 통해 StdInfo를 조회합니다.
+    Optional<StdInfo> findByUser_UserId(String userId);
 
-    Optional<StdInfo> findByStdTelno(String stdTelno);     // stdTelno 필드에 대한 쿼리 메서드
+    // 이메일 중복 체크용
+    Optional<StdInfo> findByStdEmlAddr(String stdEmlAddr);
 
-    Optional<StdInfo> findByStdNo(String stdNo); // 학번(stdNo)으로 학생 정보 조회
+    // 전화번호 중복 체크용
+    Optional<StdInfo> findByStdTelno(String stdTelno);
 
-    /**
-     * 특정 연도와 학과 코드에 해당하는 학번들 중 가장 큰 순번 부분을 찾아 반환합니다.
-     * 학번 형식: `YYYY` (4자리 연도) + `DDD` (3자리 학과코드) + `SSS` (3자리 순번) = 총 10자리
-     * 예: "2025001001"
-     *
-     * @param year 학번의 연도 부분 (예: "2025")
-     * @param deptCode 학번의 학과 코드 부분 (예: "001")
-     * @return 해당 연도와 학과 코드 조합 내에서 가장 큰 순번 (예: 1, 2, ...), 없으면 null
-     */
-    @Query("SELECT MAX(CAST(SUBSTRING(s.stdNo, 8, 3) AS int)) " + // 8번째부터 3자리 (순번)
+    // 학번 생성을 위한 최대 시퀀스 조회
+    @Query("SELECT MAX(CAST(SUBSTRING(s.user.userId, 7, 3) AS int)) " + // userId의 7번째 문자부터 3자리 (순번)
            "FROM StdInfo s " +
-           "WHERE SUBSTRING(s.stdNo, 1, 4) = :year " + // 1번째부터 4자리 (연도)
-           "AND SUBSTRING(s.stdNo, 5, 3) = :deptCode") // 5번째부터 3자리 (학과코드)
-    Integer findMaxSequenceForStudentId(@Param("year") String year, @Param("deptCode") String deptCode);
+           "WHERE SUBSTRING(s.user.userId, 1, 4) = :year " + // userId의 1번째 문자부터 4자리 (년도)
+           "AND SUBSTRING(s.user.userId, 5, 2) = :scsbjtCd") // userId의 5번째 문자부터 2자리 (학과 코드)
+    Optional<Integer> findMaxSequenceForStudentId(@Param("year") String year, @Param("scsbjtCd") String scsbjtCd);
 }

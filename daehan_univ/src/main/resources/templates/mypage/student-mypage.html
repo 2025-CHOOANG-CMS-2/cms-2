@@ -72,8 +72,8 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
-        <header class="header">
+        <!-- Header: 시간과 사용자 정보 간격 조정 및 정렬 -->
+        <header class="header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
                     <i class="bi bi-list"></i>
@@ -86,7 +86,9 @@
             
             <div class="d-flex align-items-center gap-3">
                 <div class="text-end">
+                    <!-- 이름만 출력 -->
                     <div class="fw-medium" id="headerUserName" th:text="${stdInfo.stdNm}">김학생</div>
+                    <!-- 학과 학년만 출력하도록 변경 -->
                     <small class="text-muted" id="headerUserDept" 
                            th:text="${(stdInfo != null and stdInfo.scsbjtCd != null and departmentMap.containsKey(stdInfo.scsbjtCd)) ? departmentMap.get(stdInfo.scsbjtCd) : stdInfo.scsbjtCd} + ' ' + ${stdInfo.schoolYear} + '학년'">
                            컴퓨터공학과 3학년
@@ -125,13 +127,17 @@
             <div class="row">
                 <div class="col-lg-4">
                     <div class="profile-card">
-                        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()">
-                            <i class="bi bi-person" id="avatarIcon"></i>
+                        <!-- ⭐ 프로필 사진 동적 표시를 위한 style 속성 수정 (data-profile-image-url 추가) ⭐ -->
+                        <div class="profile-avatar" onclick="document.getElementById('avatarInput').click()"
+                             th:style="${stdInfo != null and stdInfo.profileImageUrl != null and !stdInfo.profileImageUrl.isEmpty() ? 'background-image: url(' + stdInfo.profileImageUrl + '); background-size: cover; background-position: center;' : ''}"
+                             th:attr="data-profile-image-url=${stdInfo != null and stdInfo.profileImageUrl != null and !stdInfo.profileImageUrl.isEmpty() ? stdInfo.profileImageUrl : '/images/default_profile.png'}">
+                            <!-- 이미지가 로드되지 않았을 때 기본 아이콘 표시 -->
+                            <i class="bi bi-person" th:if="${stdInfo == null or stdInfo.profileImageUrl == null or stdInfo.profileImageUrl.isEmpty()}" id="avatarIcon"></i> 
                             <div class="avatar-upload">
                                 <i class="bi bi-camera text-white"></i>
                             </div>
                         </div>
-                        <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                        <input type="file" id="avatarInput" accept="image/*" style="display: none;">
                         
                         <!-- 학생 이름 동적 출력 -->
                         <h4 id="profileName" th:text="${stdInfo.stdNm}">김학생</h4>
@@ -185,11 +191,6 @@
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="tab" href="#passwordTab">
                                 <i class="bi bi-shield-lock me-1"></i>비밀번호 변경
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#activityTab">
-                                <i class="bi bi-activity me-1"></i>활동 이력
                             </a>
                         </li>
                     </ul>
@@ -340,133 +341,11 @@
                                 </form>
                             </div>
                         </div>
-
-                        <!-- Activity Tab -->
-                        <div class="tab-pane fade" id="activityTab">
-                            <div class="info-card">
-                                <div class="d-flex justify-content-between align-items-center mb-4">
-                                    <h5 class="mb-0">
-                                        <i class="bi bi-activity me-2"></i>활동 이력
-                                    </h5>
-                                    <div class="d-flex gap-2">
-                                        <select class="form-select" style="width: auto;" id="activityFilter">
-                                            <option value="all">전체</option>
-                                            <option value="program">비교과 프로그램</option>
-                                            <option value="counseling">상담</option>
-                                            <option value="diagnosis">역량진단</s_optgroupion>
-                                            <option value="mileage">마일리지</option>
-                                        </select>
-                                        <button class="btn btn-outline-primary" onclick="exportActivity()">
-                                            <i class="bi bi-download"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div id="activityList">
-                                    <div class="activity-item">
-                                        <div class="d-flex align-items-start">
-                                            <div class="activity-icon bg-success">
-                                                <i class="bi bi-calendar-check"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="mb-1">창업 아이디어 경진대회 참여</h6>
-                                                        <p class="text-muted mb-1 small">비교과 프로그램에 참여하여 150 마일리지를 획득했습니다.</p>
-                                                        <small class="text-muted">2024-01-20 14:30</small>
-                                                    </div>
-                                                    <span class="badge bg-success">+150P</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="activity-item">
-                                        <div class="d-flex align-items-start">
-                                            <div class="activity-icon bg-primary">
-                                                <i class="bi bi-chat-dots"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="mb-1">진로 상담 완료</h6>
-                                                        <p class="text-muted mb-1 small">김교수님과 진로 상담을 진행했습니다.</p>
-                                                        <small class="text-muted">2024-01-18 10:00</small>
-                                                    </div>
-                                                    <span class="badge bg-info">상담</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="activity-item">
-                                        <div class="d-flex align-items-start">
-                                            <div class="activity-icon bg-warning">
-                                                <i class="bi bi-clipboard-data"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="mb-1">핵심역량진단 완료</h6>
-                                                        <p class="text-muted mb-1 small">2024년 1학기 핵심역량진단을 완료했습니다. (종합점수: 85점)</p>
-                                                        <small class="text-muted">2024-01-15 16:45</small>
-                                                    </div>
-                                                    <span class="badge bg-warning">85점</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="activity-item">
-                                        <div class="d-flex align-items-start">
-                                            <div class="activity-icon bg-info">
-                                                <i class="bi bi-star"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="mb-1">봉사활동 마일리지 지급</h6>
-                                                        <p class="text-muted mb-1 small">지역 아동센터 학습 지도 봉사활동 참여로 마일리지를 획득했습니다.</p>
-                                                        <small class="text-muted">2024-01-10 18:00</small>
-                                                    </div>
-                                                    <span class="badge bg-success">+80P</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="activity-item">
-                                        <div class="d-flex align-items-start">
-                                            <div class="activity-icon bg-secondary">
-                                                <i class="bi bi-person-plus"></i>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
-                                                        <h6 class="mb-1">계정 생성</h6>
-                                                        <p class="text-muted mb-1 small">교육 관리 시스템에 가입했습니다.</p>
-                                                        <small class="text-muted">2024-01-05 09:00</small>
-                                                    </div>
-                                                    <span class="badge bg-secondary">가입</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="text-center mt-4">
-                                    <button class="btn btn-outline-primary" onclick="loadMoreActivity()">
-                                        <i class="bi bi-arrow-down me-1"></i>더 보기
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                                <hr class="my-4">
-                             </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                    </div><!-- tab-content 닫힘 -->
+                </div><!-- col-lg-8 닫힘 -->
+            </div><!-- row 닫힘 -->
+        </div><!-- container 닫힘 -->
+    </div><!-- main-content 닫힘 -->
   
     <!-- Custom Message Modal -->
     <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
