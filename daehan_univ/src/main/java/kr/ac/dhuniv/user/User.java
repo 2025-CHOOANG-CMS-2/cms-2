@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.user;
 import jakarta.persistence.*;
+import kr.ac.dhuniv.std_info.dto.StdInfoDto;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,4 +48,5 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Role 엔티티 FK
     )
     private List<Role> roles;
+
 }

@@ -32,6 +32,35 @@ public class CoreCptQstService {
     private final CoreCptInfoRepository cptInfoRepository;      // 역량 정보 리포지토리
 
     /**
+     * ✅ 문항 단건 조회
+     * @param id 문항 ID
+     * @return CoreCptQstListDTO 문항 + 역량 정보
+     */
+    public CoreCptQstListDTO getQuestionById(Long id) {
+        // (1) 문항 엔티티 조회
+        CoreCptQst entity = qstRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("문항 없음: ID=" + id));
+
+        // (2) 연관된 역량 정보 조회
+        CoreCptInfo sub = entity.getCoreCptInfo();        // 하위 역량
+        CoreCptInfo top = sub.getParent();                // 상위 역량
+
+        // (3) 엔티티 → DTO 변환
+        return CoreCptQstListDTO.builder()
+                .qstId(entity.getQstId())                        // 문항 ID
+                .qstCode(entity.getQstCode())                    // 문항 코드
+                .questionText(entity.getQstCont())               // 문항 내용
+                .competencyName(top != null ? top.getCciNm() : "")     // 상위 역량명 (예비용 필드)
+                .topCompetencyName(top != null ? top.getCciNm() : "")  // 상위 역량명
+                .colorHex(top != null ? top.getColorHex() : "#999")    // 상위 역량 색상
+                .subCompetencyName(sub.getCciNm())               // 하위 역량명
+                // 🔑 추가
+                .topCompetencyId(top != null ? top.getCciId() : null)
+                .subCompetencyId(sub.getCciId())
+                .build();
+
+    }
+    /**
      * ✅ 조건 + 페이징 문항 목록 조회
      *
      * @param topCptId 상위 역량 ID
@@ -148,5 +177,32 @@ public class CoreCptQstService {
 
         // (4) 새 코드 생성 (하위 역량 코드 + - + 2자리 순번)
         return subCpt.getCciCode() + "-" + String.format("%02d", nextSeq);
+    }
+
+    /**
+     * 핵심역량 문항 수정 메소드
+     * */
+    public void updateQuestion(Long id, CoreCptQstRequestDTO dto) {
+        // 기존 문항 조회
+        CoreCptQst qst = qstRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("문항을 찾을 수 없습니다: ID=" + id));
+
+        // 하위 역량
+        CoreCptInfo subCpt = cptInfoRepository.findById(dto.getCoreCptInfoId())
+                .orElseThrow(() -> new IllegalArgumentException("역량 없음: ID=" + dto.getCoreCptInfoId()));
+
+        // 선택지 템플릿
+        CoreCptOptionTemplate optionTemplate = optionRepository.findById(dto.getOptionTemplateId())
+                .orElseThrow(() -> new IllegalArgumentException("선택지 템플릿 없음: ID=" + dto.getOptionTemplateId()));
+
+        // 값 변경
+        qst.setQstCont(dto.getQuestionText());
+        qst.setQstOrd(dto.getQstOrd());
+        qst.setCoreCptInfo(subCpt);
+        qst.setOptionTemplate(optionTemplate);
+        qst.setUpdUserId(dto.getRegUserId());
+        qst.setUpdDt(LocalDateTime.now());
+
+        qstRepository.save(qst);
     }
 }

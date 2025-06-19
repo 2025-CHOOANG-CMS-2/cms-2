@@ -54,16 +54,19 @@ public class StdInfo {
 
     @Column(name = "use_yn", nullable = false, length = 1) // varchar(1)
     private String useYn; // 사용 여부 (Y/N)
-
+/**
     // user_info 테이블의 user_id (VARCHAR)를 참조하도록 수정합니다.
     // user_id2 컬럼은 user_info 테이블의 user_id (VARCHAR)를 참조
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id2", referencedColumnName = "user_id", insertable = false, updatable = false) // user_info의 user_id 컬럼을 참조 (varchar(20))
-    private User user; // 등록 및 수정 관리자 정보 (User 엔티티와 연관)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_idx", referencedColumnName = "user_idx", insertable = false, updatable = false) // user_info의 user_id 컬럼을 참조 (varchar(20))\
+    @Column(name = "user_idx")
+    private User user; // 등록 및 수정 관리자 정보 (User 엔티티와 연관)*/
 
     // user_id2 값을 직접 다루기 위한 필드를 추가합니다.
     // 이는 @JoinColumn의 insertable/updatable = false 때문에 필요합니다.
     // JPA가 user 객체를 통해 user_id2를 관리하지 않고, 우리가 직접 String으로 값을 설정할 수 있도록 합니다.
     @Column(name = "user_id2", length = 20)
     private String userId2Value;
+
 }
+

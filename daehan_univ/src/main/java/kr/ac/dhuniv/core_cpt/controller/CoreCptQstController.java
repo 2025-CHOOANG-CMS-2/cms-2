@@ -67,6 +67,12 @@ public class CoreCptQstController {
         service.deleteQuestion(id);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<CoreCptQstListDTO> getQuestion(@PathVariable Long id) {
+        // 서비스 레이어로 조회 위임
+        CoreCptQstListDTO dto = service.getQuestionById(id);
+        return ResponseEntity.ok(dto);
+    }
 
     /**
      * ✅ 진단 문항 목록 조회 API
@@ -87,6 +93,13 @@ public class CoreCptQstController {
     public ResponseEntity<String> generateNextQstCode(@RequestParam Long subCptId) {
         String nextCode = service.generateNextQstCode(subCptId);
         return ResponseEntity.ok(nextCode);
+    }
+    /** 핵심역량 문항 수정 API
+     * */
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateQuestion(@PathVariable("id") Long id, @RequestBody CoreCptQstRequestDTO dto) {
+        service.updateQuestion(id, dto);
+        return ResponseEntity.ok().build();
     }
 }
 
