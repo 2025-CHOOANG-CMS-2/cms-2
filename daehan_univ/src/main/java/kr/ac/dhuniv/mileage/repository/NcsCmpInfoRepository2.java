@@ -3,6 +3,7 @@ package kr.ac.dhuniv.mileage.repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +38,9 @@ public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
      */
     @Query("""
     	    SELECT new kr.ac.dhuniv.mileage.dto.CompletedStudentDto(
+    	        s.stdId,
+    	        p.prgId,
+    	        a.cmpId,
     	        s.stdNo,
     	        s.stdNm,
     	        p.prgNm,
@@ -57,13 +61,16 @@ public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
     	      AND (:programId IS NULL OR p.prgId = :programId)
     	      AND h.mlgId IS NULL
     	""")
-    	List<CompletedStudentDto> findCompletedStudentsByFilter(
-    	    @Param("startDate") LocalDateTime startDate,
-    	    @Param("endDate") LocalDateTime endDate,
-    	    @Param("coreCptId") Long coreCptId,
-    	    @Param("programId") Long programId
-    	);
+	List<CompletedStudentDto> findCompletedStudentsByFilter(
+	    @Param("startDate") LocalDateTime startDate,
+	    @Param("endDate") LocalDateTime endDate,
+	    @Param("coreCptId") Long coreCptId,
+	    @Param("programId") Long programId
+	);
 
+    @Query("SELECT a FROM NcsCmpInfo a WHERE a.student.stdNo = :stdId AND a.program.prgNm = :prgId")
+    Optional<NcsCmpInfo> findByStudentAndProgramId(@Param("stdId") Long stdId, @Param("prgId") Long prgId);
+    
 }
 
 
