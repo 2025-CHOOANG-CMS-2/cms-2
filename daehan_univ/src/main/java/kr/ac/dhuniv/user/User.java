@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.user;
 import jakarta.persistence.*;
+import kr.ac.dhuniv.std_info.dto.StdInfoDto;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,6 +39,9 @@ public class User {
 
     @Column(name = "failed_login_cnt", nullable = false)
     private Integer failedLoginCnt;
+    
+    @Column(name = "user_yn", length = 1, nullable = false)
+    private String userYn;
 
     // ✅ 다중 권한 관계 추가
     @ManyToMany(fetch = FetchType.EAGER)
@@ -47,4 +51,5 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "role_id") // Role 엔티티 FK
     )
     private List<Role> roles;
+
 }

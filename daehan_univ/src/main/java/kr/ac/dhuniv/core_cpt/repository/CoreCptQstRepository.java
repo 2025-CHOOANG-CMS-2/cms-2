@@ -26,15 +26,20 @@ public interface CoreCptQstRepository extends JpaRepository<CoreCptQst, Long> {
 
 
     /**
-     * ✅ 조건 기반 문항 검색 쿼리
-     * - 상위, 하위 역량, 키워드 조건으로 필터링
+     * ✅ 조건 + 페이징 쿼리
+     *
+     * @param topCptId 상위 역량 ID
+     * @param subCptId 하위 역량 ID
+     * @param keyword 검색어
+     * @param pageable 페이징
+     * @return Page<CoreCptQst>
      */
     @Query("""
-    SELECT q FROM CoreCptQst q
-    WHERE (:topCptId IS NULL OR q.coreCptInfo.parent.cciId = :topCptId)
-    AND (:subCptId IS NULL OR q.coreCptInfo.cciId = :subCptId)
-    AND (:keyword IS NULL OR q.qstCont LIKE %:keyword%)
-""")
+        SELECT q FROM CoreCptQst q
+        WHERE (:topCptId IS NULL OR q.coreCptInfo.parent.cciId = :topCptId)
+        AND (:subCptId IS NULL OR q.coreCptInfo.cciId = :subCptId)
+        AND (:keyword IS NULL OR q.qstCont LIKE %:keyword%)
+    """)
     Page<CoreCptQst> filter(
             @Param("topCptId") Long topCptId,
             @Param("subCptId") Long subCptId,

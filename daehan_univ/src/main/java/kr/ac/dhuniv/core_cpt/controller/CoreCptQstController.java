@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,33 +26,24 @@ public class CoreCptQstController {
 
     private final CoreCptQstService service;
     /**
-     * ✅ 검색/필터 조건 기반 문항 목록 조회 API
-     * - 클라이언트에서 전달한 조건(topCptId, subCptId, status, keyword)에 맞는 문항 반환
+     * ✅ 조건 기반 + 페이징 문항 목록 조회 API
      *
-     * @param topCptId 상위 역량 ID (nullable)
-     * @param subCptId 하위 역량 ID (nullable)
-     * @param status 상태 필터 (nullable) — 현재 DB 컬럼 없으면 미사용
-     * @param keyword 문항 내용 검색어 (nullable)
-     * @return 조건에 맞는 문항 리스트
+     * @param topCptId 상위 역량 ID (선택)
+     * @param subCptId 하위 역량 ID (선택)
+     * @param keyword  검색어 (선택)
+     * @param pageable 페이징 정보 (page, size, sort)
+     * @return Page 객체 (문항 + 페이징 정보)
      */
     @GetMapping("/filter")
-    public ResponseEntity<?> filterQuestions(
+    public ResponseEntity<Page<CoreCptQstListDTO>> filterQuestions(
             @RequestParam(required = false) Long topCptId,
             @RequestParam(required = false) Long subCptId,
             @RequestParam(required = false) String keyword,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @PageableDefault(size = 10, sort = "qstId") Pageable pageable
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("qstOrd").ascending());
-        Page<CoreCptQstListDTO> resultPage = service.filterQuestionList(topCptId, subCptId, pageable, keyword);
-        return ResponseEntity.ok(Map.of(
-                "questions", resultPage.getContent(),
-                "pageInfo", Map.of(
-                        "currentPage", resultPage.getNumber() + 1,
-                        "totalPages", resultPage.getTotalPages(),
-                        "totalElements", resultPage.getTotalElements()
-                )
-        ));
+        // 서비스에서 Page 형태로 반환
+        Page<CoreCptQstListDTO> result = service.filterQuestionList(topCptId, subCptId, keyword, pageable);
+        return ResponseEntity.ok(result);
     }
 
     /**
@@ -75,6 +67,12 @@ public class CoreCptQstController {
         service.deleteQuestion(id);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<CoreCptQstListDTO> getQuestion(@PathVariable Long id) {
+        // 서비스 레이어로 조회 위임
+        CoreCptQstListDTO dto = service.getQuestionById(id);
+        return ResponseEntity.ok(dto);
+    }
 
     /**
      * ✅ 진단 문항 목록 조회 API
@@ -95,6 +93,13 @@ public class CoreCptQstController {
     public ResponseEntity<String> generateNextQstCode(@RequestParam Long subCptId) {
         String nextCode = service.generateNextQstCode(subCptId);
         return ResponseEntity.ok(nextCode);
+    }
+    /** 핵심역량 문항 수정 API
+     * */
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateQuestion(@PathVariable("id") Long id, @RequestBody CoreCptQstRequestDTO dto) {
+        service.updateQuestion(id, dto);
+        return ResponseEntity.ok().build();
     }
 }
 
