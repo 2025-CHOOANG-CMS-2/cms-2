@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import kr.ac.dhuniv.counsel.domain.CnslrInfo;
 import kr.ac.dhuniv.counsel.dto.CounselorListDto;
+import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
 
 @Repository
 public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
@@ -50,5 +51,17 @@ public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
 
     // 수정 기능을 위한 메소드
     Optional<CnslrInfo> findByEmplNo(String emplNo);
+    
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
+            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
+            "WHERE ci.isActive = true AND ci.cnslSpec = :specialty")
+     List<CounselorSimpleDto> findActiveCounselorsBySpecialty(@Param("specialty") String specialty);
+    
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
+            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
+            "WHERE ci.isActive = true " +
+            "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
+            "AND (:counselorId = 'all' OR ci.emplNo = :counselorId)")
+     List<CounselorSimpleDto> findActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
     
 }

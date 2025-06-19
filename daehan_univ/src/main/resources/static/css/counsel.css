@@ -1801,3 +1801,8 @@ body {
   color: white;
   border-color: #2d4f3a;
 }
+
+#calendarGrid .calendar-day {
+	aspect-ratio: auto;
+	height: 80px;
+} 
