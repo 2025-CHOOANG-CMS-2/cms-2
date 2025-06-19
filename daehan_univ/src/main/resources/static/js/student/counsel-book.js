@@ -1,165 +1,224 @@
+/**
+ * counsel-book.js
+ * 학생 상담 예약 페이지의 동적 기능을 처리합니다. (API 연동 기반)
+ */
+
 // 전역 변수
-const currentDate = new Date()
-let selectedDate = null
-let selectedTime = null
-let selectedCounselor = null
+const viewDate = new Date();
+let availableDataCache = {}; // 월별 예약 가능 데이터를 캐싱하여 불필요한 API 호출을 줄임
+let selectedInfo = {
+    date: null,
+    time: null,
+    counselor: null // { emplNo, name } 형태의 객체
+};
 
+// 페이지 로드 후 초기화
 document.addEventListener("DOMContentLoaded", () => {
-  initializeCalendar()
-  initializeEventListeners()
-})
+    initializeEventListeners();
+    handleFilterChange(); // 페이지 로드 시 필터에 맞춰 초기 데이터 로딩
+});
 
-function initializeCalendar() {
-  updateCalendarDisplay()
-  generateCalendar()
-}
-
-function updateCalendarDisplay() {
-  const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"]
-  document.getElementById("currentMonth").textContent =
-    `${currentDate.getFullYear()}년 ${monthNames[currentDate.getMonth()]}`
-}
-
-function generateCalendar() {
-  const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1)
-  const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0)
-  const startDate = new Date(firstDay)
-  startDate.setDate(startDate.getDate() - firstDay.getDay())
-
-  for (let i = 0; i < 42; i++) {
-    const date = new Date(startDate)
-    date.setDate(startDate.getDate() + i)
-    const dayEl = document.createElement("div")
-    dayEl.className = "calendar-day"
-    dayEl.textContent = date.getDate()
-
-    if (date.getMonth() !== currentDate.getMonth()) {
-      dayEl.classList.add("unavailable")
-    } else if (date >= new Date()) {
-      dayEl.classList.add("available")
-      dayEl.addEventListener("click", () => selectDate(date))
-    } else {
-      dayEl.classList.add("unavailable")
-    }
-    calendarGrid.appendChild(dayEl)
-  }
-}
-
-function selectDate(date) {
-  document.querySelectorAll(".calendar-day.selected").forEach((d) => d.classList.remove("selected"))
-  event.target.classList.add("selected")
-  selectedDate = date
-  updateTimeSlots()
-}
-
-function updateTimeSlots() {
-  const slots = document.querySelectorAll(".time-slot")
-  slots.forEach((slot) => {
-    slot.classList.remove("selected", "unavailable")
-    slot.replaceWith(slot.cloneNode(true))
-  })
-  document.querySelectorAll(".time-slot").forEach((slot) => {
-    if (Math.random() > 0.3) {
-      slot.addEventListener("click", () => selectTime(slot))
-    } else {
-      slot.classList.add("unavailable")
-    }
-  })
-}
-
-function selectTime(slot) {
-  if (slot.classList.contains("unavailable")) return
-  document.querySelectorAll(".time-slot.selected").forEach((s) => s.classList.remove("selected"))
-  slot.classList.add("selected")
-  selectedTime = slot.dataset.time
-}
-
-document.querySelectorAll(".counselor-card").forEach((card) => {
-  card.addEventListener("click", function () {
-    document.querySelectorAll(".counselor-card.selected").forEach((c) => c.classList.remove("selected"))
-    this.classList.add("selected")
-    selectedCounselor = this.dataset.counselor
-  })
-})
-
-document.getElementById("prevMonth").addEventListener("click", () => {
-  currentDate.setMonth(currentDate.getMonth() - 1)
-  updateCalendarDisplay()
-  generateCalendar()
-})
-
-document.getElementById("nextMonth").addEventListener("click", () => {
-  currentDate.setMonth(currentDate.getMonth() + 1)
-  updateCalendarDisplay()
-  generateCalendar()
-})
-
+/**
+ * 모든 이벤트 리스너를 등록하는 함수
+ */
 function initializeEventListeners() {
-  document.getElementById("bookingForm").addEventListener("submit", (e) => {
-    e.preventDefault()
-    submitBooking()
-  })
+    document.getElementById('counselingTypeFilter').addEventListener('change', handleFilterChange);
+    document.getElementById('counselorFilter').addEventListener('change', fetchAndRenderCalendar); // 상담사 변경 시 캘린더만 새로고침
+    document.getElementById('prevMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth() - 1); fetchAndRenderCalendar(); });
+    document.getElementById('nextMonth').addEventListener('click', () => { viewDate.setMonth(viewDate.getMonth() + 1); fetchAndRenderCalendar(); });
+    document.getElementById('bookingForm').addEventListener('submit', handleBookingSubmit);
+}
 
-  // 상담 유형에 따라 상담사 필터링
-  const typeSelect = document.querySelector('select[name="counselingType"]')
-  typeSelect.addEventListener("change", function () {
-    const selectedType = this.value
-    const counselorSection = document.querySelector(".counselor-section")
-    const counselorSelect = document.querySelector(".counselor-select")
+/**
+ * 상담 유형 필터 변경 시 실행되는 메인 함수
+ */
+async function handleFilterChange() {
+    const type = document.getElementById('counselingTypeFilter').value;
+    const counselorSelect = document.getElementById('counselorFilter');
 
-    if (!selectedType) {
-      counselorSection.style.display = "none"
-    } else {
-      counselorSection.style.display = "block"
-      counselorSelect.classList.add("show")
+    counselorSelect.innerHTML = '<option value="all">모든 상담사</option>';
 
-      document.querySelectorAll(".counselor-card").forEach((card) => {
-        if (card.dataset.type === selectedType) {
-          card.style.display = "flex"
-        } else {
-          card.style.display = "none"
+    if (type !== 'all') {
+        try {
+            // [수정] API 호출 주소를 올바르게 변경합니다.
+            const response = await fetch(`/api/counseling/counselors?type=${type}`);
+            if (!response.ok) throw new Error('상담사 목록 로딩 실패');
+            
+            const counselors = await response.json();
+            counselors.forEach(c => {
+                counselorSelect.insertAdjacentHTML('beforeend', `<option value="${c.emplNo}">${c.emplNm}</option>`);
+            });
+        } catch (error) {
+            console.error("상담사 목록 로딩 실패:", error);
         }
-        card.classList.remove("selected")
-      })
     }
-    selectedCounselor = null
-  })
+    
+    fetchAndRenderCalendar();
 }
 
-function submitBooking() {
-  if (!selectedDate || !selectedTime || !selectedCounselor) {
-    showNotification("날짜, 시간, 상담사를 모두 선택해주세요.", "error")
-    return
-  }
-  const fd = new FormData(document.getElementById("bookingForm"))
-  const data = {
-    date: selectedDate.toISOString().split("T")[0],
-    time: selectedTime,
-    counselor: selectedCounselor,
-    type: fd.get("counselingType"),
-    method: fd.get("counselingMethod"),
-    content: fd.get("content"),
-    phone: fd.get("phone"),
-  }
-  console.log("예약 데이터:", data)
-  const btn = document.querySelector('#bookingForm button[type="submit"]')
-  const txt = btn.innerHTML
-  btn.innerHTML = '<div class="loading"></div> 예약 중...'
-  btn.disabled = true
-  setTimeout(() => {
-    btn.innerHTML = txt
-    btn.disabled = false
-    showNotification("상담 예약이 완료되었습니다!", "success")
-    document.getElementById("bookingForm").reset()
-    selectedDate = selectedTime = selectedCounselor = null
-    document.querySelectorAll(".selected").forEach((el) => el.classList.remove("selected"))
-    document.querySelector(".counselor-section").style.display = "none"
-  }, 2000)
+/**
+ * 백엔드에서 예약 가능 데이터를 가져와 캘린더를 그리는 함수
+ */
+async function fetchAndRenderCalendar() {
+    const type = document.getElementById('counselingTypeFilter').value;
+    const counselorId = document.getElementById('counselorFilter').value;
+    const year = viewDate.getFullYear();
+    const month = viewDate.getMonth() + 1;
+
+    try {
+        // [수정] API 호출 주소를 백엔드 컨트롤러에 맞게 변경합니다.
+        const url = `/api/counseling/available-slots?year=${year}&month=${month}&type=${type}&counselorId=${counselorId}`;
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            // 404 에러가 발생하면 response.ok가 false가 됩니다.
+            throw new Error('예약 가능 시간 로딩 실패');
+        }
+        
+        availableDataCache = await response.json();
+        renderCalendar(year, month - 1);
+        clearTimeSlotsAndSelection();
+
+    } catch (error) {
+        console.error("fetchAndRenderCalendar에서 에러 발생:", error);
+        // 화면의 캘린더를 비워 에러 상태임을 명확히 보여줄 수 있습니다.
+        document.getElementById("calendarGrid").innerHTML = '<div class="empty-state-sm" style="grid-column: span 7;">예약 정보를 불러올 수 없습니다.</div>';
+    }
 }
 
-function showNotification(msg, type = "success") {
-  const n = document.getElementById("notification")
-  n.textContent = msg
-  n.className = `notification ${type} show`
-  setTimeout(() => n.classList.remove("show"), 3000)
+/**
+ * 캘린더 UI를 그리고 날짜를 채우는 함수
+ */
+function renderCalendar(year, month) {
+    const calendarGrid = document.getElementById("calendarGrid");
+    const monthDisplay = document.getElementById("currentMonth");
+    monthDisplay.textContent = `${year}년 ${month + 1}월`;
+    calendarGrid.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        calendarGrid.insertAdjacentHTML('beforeend', '<div class="calendar-day empty"></div>');
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayCell = document.createElement("div");
+        dayCell.className = "calendar-day";
+        dayCell.textContent = day;
+        
+        const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+
+        if (availableDataCache[dateStr] && availableDataCache[dateStr].length > 0) {
+            dayCell.classList.add("available");
+            dayCell.addEventListener("click", () => handleDateClick(dateStr, dayCell));
+        } else {
+            dayCell.classList.add("unavailable");
+        }
+        calendarGrid.appendChild(dayCell);
+    }
+}
+
+/**
+ * 날짜 클릭 시 시간 슬롯 렌더링
+ */
+function handleDateClick(dateStr, dayCell) {
+    selectedInfo.date = dateStr;
+    selectedInfo.time = null; // 날짜를 새로 선택했으니 시간은 초기화
+
+    document.querySelectorAll("#calendarGrid .calendar-day.selected").forEach(d => d.classList.remove("selected"));
+    dayCell.classList.add("selected");
+    
+    const timeSlots = availableDataCache[dateStr] || [];
+    const slotsContainer = document.getElementById("timeSlots");
+    slotsContainer.innerHTML = ""; 
+
+    if (timeSlots.length === 0) {
+        slotsContainer.innerHTML = '<div class="empty-state-sm">선택 가능한 시간이 없습니다.</div>';
+        return;
+    }
+
+    timeSlots.forEach(timeData => { // timeData는 { counselorEmplNo, counselorName, time } 형태일 수 있음
+        const slotEl = document.createElement("div");
+        slotEl.className = "time-slot";
+        slotEl.dataset.time = timeData.time; // 예: "09:00"
+        slotEl.textContent = timeData.time;
+        // 툴팁으로 상담사 이름 표시 (선택사항)
+        slotEl.title = `${timeData.counselorName} 상담사`; 
+
+        slotEl.addEventListener("click", () => {
+            selectedInfo.time = timeData.time;
+            selectedInfo.counselor = { emplNo: timeData.counselorEmplNo, name: timeData.counselorName };
+
+            document.querySelectorAll("#timeSlots .time-slot.selected").forEach(s => s.classList.remove("selected"));
+            slotEl.classList.add("selected");
+            updateSelectedInfo();
+        });
+        slotsContainer.appendChild(slotEl);
+    });
+    updateSelectedInfo();
+}
+
+/**
+ * 오른쪽 폼의 '선택 정보' 텍스트를 업데이트하는 함수
+ */
+function updateSelectedInfo() {
+    const infoText = document.getElementById("selectedInfoText");
+    if (selectedInfo.date && selectedInfo.time && selectedInfo.counselor) {
+        infoText.textContent = `선택된 예약: ${selectedInfo.counselor.name} 상담사, ${selectedInfo.date} ${selectedInfo.time}`;
+        infoText.style.color = '#333';
+    } else {
+        infoText.textContent = '상담 날짜와 시간을 선택해주세요.';
+        infoText.style.color = '#999';
+    }
+}
+
+/**
+ * 시간 선택 및 선택 정보를 초기화하는 함수
+ */
+function clearTimeSlotsAndSelection() {
+    document.getElementById("timeSlots").innerHTML = '<div class="empty-state-sm">날짜를 먼저 선택해주세요.</div>';
+    selectedInfo = { date: null, time: null, counselor: null };
+    updateSelectedInfo();
+}
+
+
+/**
+ * 최종 '상담 예약하기' 폼 제출 처리 함수
+ */
+async function handleBookingSubmit(event) {
+    event.preventDefault();
+    
+    if (!selectedInfo.date || !selectedInfo.time || !selectedInfo.counselor) {
+        alert("상담 날짜, 시간, 상담사를 모두 선택해주세요.");
+        return;
+    }
+
+    const form = event.target;
+    const reservationData = {
+        stdNo: '20231234', // TODO: 실제 로그인한 학생의 학번으로 교체 필요
+        emplNo: selectedInfo.counselor.emplNo,
+        applyDateTime: `${selectedInfo.date}T${selectedInfo.time}:00`,
+        counselingMethod: form.elements.counselingMethod.value,
+        content: form.elements.content.value,
+    };
+
+    try {
+        // TODO: 백엔드에 이 API를 만들어야 합니다.
+        const response = await fetch('/api/reservations', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reservationData)
+        });
+
+        if (!response.ok) throw new Error('예약에 실패했습니다.');
+
+        alert('상담 예약이 성공적으로 완료되었습니다.');
+        window.location.reload();
+
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
 }
