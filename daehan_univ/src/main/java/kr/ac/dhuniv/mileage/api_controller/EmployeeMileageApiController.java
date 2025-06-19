@@ -24,7 +24,7 @@
 //public class EmployeeMileageApiController {
 //
 //	private final EmployeeMileageService mileageService;
-//
+//    
 //	// 프로그램 이수자 중 마일리지 미지급자 목록 조회(전체목록 또는 검색목록)
 //    @GetMapping("/completed-students")
 //    public List<CompletedStudentDto> getCompletedStudents(
@@ -32,19 +32,19 @@
 //            @RequestParam(name="endDate", required = false) LocalDate endDate,
 //            @RequestParam(name="coreCompetency", required = false) Long coreCompetency,
 //            @RequestParam(name="programId", required = false) Long programId) {
-//
+//    	
 //    	// LocalDateTime으로 변환
 //        LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;  //00:00:00
 //        LocalDateTime endDateTime = endDate != null ? endDate.atTime(LocalTime.MAX) : null;  //23:59:59.999999999
 //        System.out.println(mileageService.getCompletedStudents(startDateTime, endDateTime, coreCompetency, programId));
 //        return mileageService.getCompletedStudents(startDateTime, endDateTime, coreCompetency, programId);
 //    }
-//
+//    
 //    @PostMapping("/payment")
 //    public ResponseEntity<Void> payMileage(@RequestBody List<MileagePaymentRequest> requests) {
 //    	System.out.println("테스트: " + requests);
 //        mileageService.saveMileagePayments(requests);
 //        return ResponseEntity.ok().build();
 //    }
-//
+//    
 //}

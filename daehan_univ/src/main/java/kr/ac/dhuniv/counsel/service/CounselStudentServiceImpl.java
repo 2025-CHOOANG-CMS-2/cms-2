@@ -35,7 +35,7 @@
 //
 //    @Override
 //    public Map<String, List<AvailableSlotsDto>> getAvailableSlotsForMonth(Integer year, Integer month, String counselingType, String counselorId) {
-//
+//        
 //        // 1. 필터에 맞는 상담사 목록(ID, 이름) 조회
 //        List<CounselorSimpleDto> counselors = cnslrInfoRepository.findActiveCounselorsByFilter(counselingType, counselorId);
 //        if (counselors.isEmpty()) {
@@ -75,7 +75,7 @@
 //                    CnlrDefaultSchd defaultSchd = defaultMap.getOrDefault(emplNo, Collections.emptyList()).stream()
 //                        .filter(d -> d.getDayOfWeek() == dayOfWeek && d.getIsWorkingDay())
 //                        .findFirst().orElse(null);
-//
+//                    
 //                    if (defaultSchd == null) continue;
 //                    startTime = defaultSchd.getStartTime();
 //                    endTime = defaultSchd.getEndTime();

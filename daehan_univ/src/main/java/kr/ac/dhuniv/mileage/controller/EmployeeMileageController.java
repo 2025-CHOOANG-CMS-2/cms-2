@@ -16,7 +16,7 @@
 //@Controller
 //@RequiredArgsConstructor
 //public class EmployeeMileageController {
-//
+//	
 //	private final EmployeeMileageService mileageService;
 //
 //	// 마일리지 지급 화면 (핵심역량목록, 비교과프로그램목록은 검색 옵션에 사용)
@@ -28,7 +28,7 @@
 //		m.addAttribute("ncsPrograms", ncsPrograms);            // 비교과 프로그램 목록
 //		return  "/employee/mileage/mileage-payment.html";
 //	}
-//
+//	
 //	// 비고과 프로그램 이수자에게 마일리지 지급 데이터베이스 저장
 //    @PostMapping("/employee/mileage/{prgId}")
 //    public String payMileage(@PathVariable("prgId") Long prgId) {

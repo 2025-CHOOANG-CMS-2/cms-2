@@ -100,7 +100,7 @@
 //            if (!DEPT_MAP.containsKey(dto.getSCSBJT_CD())) {
 //                throw new IllegalArgumentException("유효하지 않은 학과 코드입니다: " + dto.getSCSBJT_CD());
 //            }
-//
+//            
 //            // 4. 새로운 학번 생성 (YYYYDDDSSS 체계)
 //            String newStdNo = generateStudentNo(dto.getENTR_DT(), dto.getSCSBJT_CD());
 //            dto.setSTD_NO(newStdNo); // DTO에 생성된 학번 설정 (클라이언트 반환용)
@@ -112,7 +112,7 @@
 //
 //            // 6. user_info 테이블에 학생 계정 생성 및 권한 부여 (동일 트랜잭션 내)
 //            String userIdForAccount = newStdNo; // user_id는 학번과 동일하게 사용
-//            String defaultPassword = newStdNo;
+//            String defaultPassword = newStdNo; 
 //            String encodedPassword = passwordEncoder.encode(defaultPassword);
 //
 //            // user_info 테이블에서 userId 중복 체크 (혹시 모를 학번-ID 중복 방지)
@@ -123,7 +123,7 @@
 //            // 'STUDENT' 권한 정보 조회
 //            Role studentRole = roleRepository.findByRoleName("STUDENT")
 //                    .orElseThrow(() -> new IllegalStateException("'STUDENT' 권한을 찾을 수 없습니다. role_info 테이블에 'STUDENT' 권한이 존재하는지 확인하세요."));
-//
+//            
 //            User newUserAccount = User.builder()
 //                    .userId(userIdForAccount)
 //                    .userPw(encodedPassword)
@@ -132,9 +132,9 @@
 //                    .updatedAt(LocalDateTime.now())
 //                    .failedLoginCnt(0)
 //                    .build();
-//
-//            newUserAccount = userRepository.save(newUserAccount);
-//            userRepository.flush();
+//            
+//            newUserAccount = userRepository.save(newUserAccount); 
+//            userRepository.flush(); 
 //
 //            System.out.println("DEBUG: User account created and persisted with userIdx: " + newUserAccount.getUserIdx());
 //
@@ -200,7 +200,7 @@
 //
 //        return year + scsbjtCd + sequencePart;
 //    }
-//
+//    
 //    /**
 //     * 학생 목록을 페이징하여 조회하고, 검색 조건에 따라 필터링합니다.
 //     */
@@ -264,7 +264,7 @@
 //        String newEncodedPassword = passwordEncoder.encode(newDefaultPassword);
 //        existingUserAccount.setUserPw(newEncodedPassword);
 //        existingUserAccount.setUpdatedAt(LocalDateTime.now());
-//
+//        
 //        userRepository.save(existingUserAccount);
 //
 //
@@ -304,7 +304,7 @@
 //        // ⭐⭐ 수정됨: userId2Value에 관리자 ID 직접 할당 (임시) ⭐⭐
 //        // TODO: 나중에 Spring Security 세션에서 현재 로그인한 관리자의 user_id를 가져와 할당하도록 변경
 //        existingStudent.setUserId2Value("admin"); // 하드코딩된 'admin' 사용 (사용자님이 언급하신 "admin" 데이터)
-//
+//        
 //        StdInfo updatedEntity = stdInfoRepository.save(existingStudent);
 //
 //        return convertToDto(updatedEntity);
@@ -351,7 +351,7 @@
 //        dto.setSTD_TELNO(stdInfo.getStdTelno());
 //        dto.setSTD_EML_ADDR(stdInfo.getStdEmlAddr());
 //        dto.setUSE_YN(stdInfo.getUseYn());
-//
+//        
 //        dto.setUSER_ID2(stdInfo.getUserId2Value()); // 관리자 user_id를 직접 DTO에 설정
 //        return dto;
 //    }

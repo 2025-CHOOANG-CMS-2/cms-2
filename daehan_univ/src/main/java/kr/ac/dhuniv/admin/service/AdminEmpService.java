@@ -69,14 +69,14 @@
 //        try {
 //            // 1. 새로운 사번 자동 생성 (YYYYDDDSSS 형식)
 //            String currentYear = String.valueOf(LocalDate.now().getYear());
-//            String deptCode = dto.getDEPT_CD();
+//            String deptCode = dto.getDEPT_CD(); 
 //
 //            if (!DEPT_MAP.containsKey(deptCode)) {
 //                throw new IllegalArgumentException("유효하지 않은 부서 코드입니다: " + deptCode);
 //            }
 //
-//            String newEmplNo = generateEmployeeNo(currentYear, deptCode);
-//            dto.setSTAFF_NO(newEmplNo);
+//            String newEmplNo = generateEmployeeNo(currentYear, deptCode); 
+//            dto.setSTAFF_NO(newEmplNo); 
 //
 //            // 2. 이메일 중복 체크 (empl_info 테이블)
 //            if (dto.getSTAFF_EML_ADDR() != null && !dto.getSTAFF_EML_ADDR().trim().isEmpty()) {
@@ -99,8 +99,8 @@
 //
 //            // 5. user_info 테이블에 교직원 본인의 계정 생성 및 권한 부여
 //            String userIdForAccount = newEmplNo; // 교직원 계정의 ID는 사번으로 설정
-//            String defaultPassword = newEmplNo;
-//            String encodedPassword = passwordEncoder.encode(defaultPassword);
+//            String defaultPassword = newEmplNo; 
+//            String encodedPassword = passwordEncoder.encode(defaultPassword); 
 //
 //            if (userRepository.findByUserId(userIdForAccount).isPresent()) {
 //                throw new IllegalStateException("생성된 사번(" + userIdForAccount + ")에 해당하는 사용자 계정이 이미 존재합니다. 재시도 필요.");
@@ -108,7 +108,7 @@
 //
 //            Role employeeRole = roleRepository.findByRoleName("EMPLOYEE")
 //                    .orElseThrow(() -> new IllegalStateException("'EMPLOYEE' 권한을 찾을 수 없습니다. role_info 테이블에 'EMPLOYEE' 권한이 존재하는지 확인하세요."));
-//
+//            
 //            User newUserAccount = User.builder()
 //                    .userId(userIdForAccount)
 //                    .userPw(encodedPassword)
@@ -117,17 +117,17 @@
 //                    .updatedAt(LocalDateTime.now())
 //                    .failedLoginCnt(0)
 //                    .build();
-//            userRepository.save(newUserAccount);
-//
+//            userRepository.save(newUserAccount); 
+//            
 //            // ⭐⭐⭐ 6. EmplInfo 엔티티에 연결할 관리자 User 객체 조회 ⭐⭐⭐
 //            // DTO에서 받은 USER_ID2 값을 사용하여 User 테이블에서 해당 관리자 ID의 User 객체를 찾습니다.
-//          //  User adminUser = userRepository.findByUserId(dto.getUSER_ID2()) // 예: "admin" 이라는 user_id로 조회
-//                //    .orElseThrow(() -> new IllegalStateException("등록 관리자 계정 (ID: " + dto.getUSER_ID2() + ")을 찾을 수 없습니다. user_info 테이블에 해당 계정이 존재하는지 확인하세요."));
+//            User adminUser = userRepository.findByUserId(dto.getUSER_ID2()) // 예: "admin" 이라는 user_id로 조회
+//                    .orElseThrow(() -> new IllegalStateException("등록 관리자 계정 (ID: " + dto.getUSER_ID2() + ")을 찾을 수 없습니다. user_info 테이블에 해당 계정이 존재하는지 확인하세요."));
 //
 //            // ⭐⭐⭐ 7. EmplInfo 엔티티 빌드 및 저장 - 'user' 필드에 관리자 User 객체 연결 ⭐⭐⭐
 //            // EmplInfo 엔티티에 'private User user;' 필드가 있으므로, user() 빌더 메서드 사용
 //            EmplInfo entity = EmplInfo.builder()
-//                   // .emplNo(dto.getSTAFF_NO())
+//                    .emplNo(dto.getSTAFF_NO())
 //                    .emplNm(dto.getSTAFF_NM())
 //                    .deptCd(dto.getDEPT_CD())
 //                    .positionCd(dto.getPOSITION_CD())
@@ -139,7 +139,7 @@
 //                    .emplTelno(dto.getSTAFF_TELNO())
 //                    .emplEmailAddr(dto.getSTAFF_EML_ADDR())
 //                    .useYn(dto.getUSE_YN() != null ? dto.getUSE_YN() : "Y")
-//               //     .user(adminUser) // ⭐⭐ DTO에서 받은 USER_ID2에 해당하는 User 객체를 'user' 필드에 연결 ⭐⭐
+//                    .user(adminUser) // ⭐⭐ DTO에서 받은 USER_ID2에 해당하는 User 객체를 'user' 필드에 연결 ⭐⭐
 //                    .build();
 //
 //            EmplInfo savedEntity = empInfoRepository.save(entity);
@@ -189,7 +189,7 @@
 //    @Transactional(readOnly = true)
 //    public EmplInfoDto getEmployeeByEmplNo(String emplNo) {
 //        EmplInfo emplInfo = empInfoRepository.findByEmplNo(emplNo)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 사번(" + emplNo + ")의 교직원 정보를 찾을 수 없습니다."));
+//            .orElseThrow(() -> new IllegalArgumentException("해당 사번(" + emplNo + ")의 교직원 정보를 찾을 수 없습니다."));
 //        return convertToDto(emplInfo);
 //    }
 //
@@ -218,7 +218,7 @@
 //        String newEncodedPassword = passwordEncoder.encode(newDefaultPassword);
 //        existingUserAccount.setUserPw(newEncodedPassword);
 //        existingUserAccount.setUpdatedAt(LocalDateTime.now());
-//
+//        
 //        userRepository.save(existingUserAccount);
 //
 //        // 3. 이메일 중복 체크 (수정 시: 자기 자신의 이메일은 허용)
@@ -265,7 +265,7 @@
 //        existingEmployee.setEmplEmailAddr(dto.getSTAFF_EML_ADDR());
 //        existingEmployee.setUseYn(dto.getUSE_YN() != null ? dto.getUSE_YN() : "Y");
 //        existingEmployee.setUser(adminUser); // ⭐⭐ DTO에서 받은 USER_ID2에 해당하는 User 객체를 'user' 필드에 연결 ⭐⭐
-//
+//        
 //        EmplInfo updatedEntity = empInfoRepository.save(existingEmployee);
 //
 //        return convertToDto(updatedEntity);
