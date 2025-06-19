@@ -5,12 +5,16 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
+import kr.ac.dhuniv.mileage.dto.MileagePaymentRequest;
 import kr.ac.dhuniv.mileage.service.EmployeeMileageService;
 import lombok.RequiredArgsConstructor;
 
@@ -32,7 +36,15 @@ public class EmployeeMileageApiController {
     	// LocalDateTime으로 변환
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;  //00:00:00
         LocalDateTime endDateTime = endDate != null ? endDate.atTime(LocalTime.MAX) : null;  //23:59:59.999999999
-        
+        System.out.println(mileageService.getCompletedStudents(startDateTime, endDateTime, coreCompetency, programId));
         return mileageService.getCompletedStudents(startDateTime, endDateTime, coreCompetency, programId);
     }
+    
+    @PostMapping("/payment")
+    public ResponseEntity<Void> payMileage(@RequestBody List<MileagePaymentRequest> requests) {
+    	System.out.println("테스트: " + requests);
+        mileageService.saveMileagePayments(requests);
+        return ResponseEntity.ok().build();
+    }
+    
 }
