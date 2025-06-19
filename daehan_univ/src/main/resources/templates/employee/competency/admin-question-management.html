@@ -101,7 +101,7 @@
                             관리자
                         </h4>
                     </div>
-                    
+
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link" href="admin-index.html">
@@ -177,7 +177,7 @@
                     </ul>
 
                     <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
-                    
+
                     <ul class="nav flex-column">
                         <li class="nav-item">
                             <a class="nav-link" href="login.html">
@@ -198,9 +198,8 @@
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
-                                <i class="fas fa-plus me-2"></i>
-                                문항 추가
+                            <button type="button" class="btn btn-primary" onclick="openAddQuestionModal()" data-bs-toggle="modal" data-bs-target="#addQuestionModal">
+                                <i class="fas fa-plus me-2"></i> 문항 추가
                             </button>
                             <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importQuestionsModal">
                                 <i class="fas fa-file-import me-2"></i>
@@ -238,15 +237,7 @@
                             </select>
                         </div>
 
-                        <div class="col-md-3 mb-3">
-                            <label for="statusFilter" class="form-label">상태</label>
-                            <select class="form-select" id="statusFilter">
-                                <option value="">전체</option>
-                                <option value="active">활성</option>
-                                <option value="inactive">비활성</option>
-                                <option value="draft">초안</option>
-                            </select>
-                        </div>
+
                     </div>
                     <div class="row">
                         <div class="col-md-9 mb-3">
@@ -272,219 +263,13 @@
                         <span class="badge bg-primary">총 45개 문항</span>
                     </div>
                     <div class="card-body">
-                        <!-- 문항 1 -->
-                        <div class="question-card">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <span class="badge badge-competency badge-communication me-2">의사소통역량</span>
-                                    <span class="badge bg-secondary me-2">언어적 표현력</span>
-                                    <span class="badge bg-info">보통</span>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(1)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(1)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h6 class="mb-2">Q1. 나는 내 생각과 의견을 명확하게 표현할 수 있다.</h6>
-                            <div class="question-options">
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q1" id="q1_1" disabled>
-                                        <label class="form-check-label" for="q1_1">
-                                            전혀 그렇지 않다 (1점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q1" id="q1_2" disabled>
-                                        <label class="form-check-label" for="q1_2">
-                                            그렇지 않다 (2점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q1" id="q1_3" disabled>
-                                        <label class="form-check-label" for="q1_3">
-                                            보통이다 (3점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q1" id="q1_4" disabled>
-                                        <label class="form-check-label" for="q1_4">
-                                            그렇다 (4점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q1" id="q1_5" disabled>
-                                        <label class="form-check-label" for="q1_5">
-                                            매우 그렇다 (5점)
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-2 text-muted small">
-                                <span class="me-3">문항 ID: COMM001-Q01</span>
-                                <span class="me-3">최종 수정일: 2023-05-15</span>
-                                <span class="badge bg-success">활성</span>
-                            </div>
-                        </div>
+                        <!-- 1) 문항을 그릴 영역 -->
+                        <div id="questionList"><!-- renderQuestionList에서 innerHTML 세팅 --></div>
 
-                        <!-- 문항 2 -->
-                        <div class="question-card">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <span class="badge badge-competency badge-communication me-2">의사소통역량</span>
-                                    <span class="badge bg-secondary me-2">경청 능력</span>
-                                    <span class="badge bg-info">보통</span>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(2)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(2)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h6 class="mb-2">Q2. 나는 다른 사람의 의견을 주의 깊게 듣고 이해하려고 노력한다.</h6>
-                            <div class="question-options">
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q2" id="q2_1" disabled>
-                                        <label class="form-check-label" for="q2_1">
-                                            전혀 그렇지 않다 (1점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q2" id="q2_2" disabled>
-                                        <label class="form-check-label" for="q2_2">
-                                            그렇지 않다 (2점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q2" id="q2_3" disabled>
-                                        <label class="form-check-label" for="q2_3">
-                                            보통이다 (3점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q2" id="q2_4" disabled>
-                                        <label class="form-check-label" for="q2_4">
-                                            그렇다 (4점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q2" id="q2_5" disabled>
-                                        <label class="form-check-label" for="q2_5">
-                                            매우 그렇다 (5점)
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-2 text-muted small">
-                                <span class="me-3">문항 ID: COMM001-Q02</span>
-                                <span class="me-3">최종 수정일: 2023-05-15</span>
-                                <span class="badge bg-success">활성</span>
-                            </div>
-                        </div>
-
-                        <!-- 문항 3 -->
-                        <div class="question-card">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <span class="badge badge-competency badge-creativity me-2">창의역량</span>
-                                    <span class="badge bg-secondary me-2">발산적 사고</span>
-                                    <span class="badge bg-warning">어려움</span>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(3)">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(3)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <h6 class="mb-2">Q3. 주어진 문제에 대해 다양한 해결책을 생각해낼 수 있다.</h6>
-                            <div class="question-options">
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q3" id="q3_1" disabled>
-                                        <label class="form-check-label" for="q3_1">
-                                            전혀 그렇지 않다 (1점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q3" id="q3_2" disabled>
-                                        <label class="form-check-label" for="q3_2">
-                                            그렇지 않다 (2점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q3" id="q3_3" disabled>
-                                        <label class="form-check-label" for="q3_3">
-                                            보통이다 (3점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q3" id="q3_4" disabled>
-                                        <label class="form-check-label" for="q3_4">
-                                            그렇다 (4점)
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="option-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="q3" id="q3_5" disabled>
-                                        <label class="form-check-label" for="q3_5">
-                                            매우 그렇다 (5점)
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-2 text-muted small">
-                                <span class="me-3">문항 ID: CREA001-Q01</span>
-                                <span class="me-3">최종 수정일: 2023-05-16</span>
-                                <span class="badge bg-success">활성</span>
-                            </div>
-                        </div>
-
-                        <!-- 페이지네이션 -->
+                        <!-- 2) 페이징을 그릴 영역 -->
                         <nav class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">이전</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">다음</a>
-                                </li>
+                            <ul class="pagination justify-content-center" id="pagination">
+                                <!-- renderPagination에서 페이지 버튼 추가 -->
                             </ul>
                         </nav>
                     </div>
@@ -506,6 +291,8 @@
                 </div>
                 <div class="modal-body">
                     <form id="addQuestionForm">
+                        <input type="hidden" id="qstIdHidden">
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="competency" class="form-label">역량 영역 *</label>
@@ -539,7 +326,7 @@
                             <textarea class="form-control" id="questionText" rows="3" required></textarea>
                         </div>
 
-                        
+
                         <div id="optionsContainer">
                             <label class="form-label">선택지 *</label>
                             <div class="option-input mb-2">
@@ -583,7 +370,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="row mt-3">
                             <div class="col-md-6">
                                 <div class="form-check form-switch">
@@ -602,7 +389,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-                    <button type="button" class="btn btn-primary" onclick="saveQuestion()">
+                    <button type="button" class="btn btn-primary" onclick="handleSaveOrUpdate()">
                         <i class="fas fa-save me-2"></i>
                         저장
                     </button>
@@ -627,7 +414,7 @@
                         <label for="importFile" class="form-label">엑셀 파일 업로드</label>
                         <input class="form-control" type="file" id="importFile" accept=".xlsx, .xls, .csv">
                         <div class="form-text">
-                            지정된 양식의 엑셀 파일을 업로드하세요. 
+                            지정된 양식의 엑셀 파일을 업로드하세요.
                             <a href="#" class="text-primary">양식 다운로드</a>
                         </div>
                     </div>
@@ -654,49 +441,64 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // ✅ 문항 저장 (문항 + 선택지)
-        function saveQuestion() {
-            // 폼 유효성 검사
-            const form = document.getElementById('addQuestionForm');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
-            }
+        function openAddQuestionModal() {
+            document.getElementById('qstIdHidden').value = '';
+            document.getElementById('qstCodeHidden').value = '';
+            document.getElementById('qstCodeDisplay').innerText = '';
+            document.getElementById('questionText').value = '';
+            document.getElementById('competency').value = '';
+            clearSubCompetencyOptions();
+            loadLikertOptions();
 
-            // 폼 데이터 수집
+            new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
+        }
+
+        function handleSaveOrUpdate() {
+            const qstId = document.getElementById('qstIdHidden').value;
+            if (qstId) {
+                saveOrUpdateQuestion(true, qstId);  // 수정
+            } else {
+                saveOrUpdateQuestion(false, null);  // 등록
+            }
+        }
+        // ✅ 문항 저장 (문항 + 선택지)
+        function saveOrUpdateQuestion(isUpdate = false, qstId = null) {
             const payload = {
-                qstCode: generateQstCode(), // 문항 코드 생성 (임시 또는 서버 생성 가능)
+                qstCode: document.getElementById('qstCodeHidden').value,
                 questionText: document.getElementById('questionText').value,
-                qstOrd: 1, // 필요시 동적으로
-                coreCptInfoId: 1, // 선택된 역량 ID (예: 드롭다운 값 활용)
-                regUserId: 'admin', // 현재 로그인 사용자 ID (예: 세션 기반)
+                qstOrd: 1,
+                coreCptInfoId: Number(document.getElementById('subCompetency').value),
+                regUserId: 'admin',
+                optionTemplateId: 1,
                 options: []
             };
 
-            // 선택지 수집
             document.querySelectorAll('#optionsContainer .option-input').forEach((opt) => {
                 payload.options.push({
                     text: opt.querySelector('input[type=text]').value,
                     score: parseInt(opt.querySelector('input[type=number]').value),
-                    isCorrect: opt.querySelector('input[type=radio], input[type=checkbox]')?.checked || false
+                    isCorrect: false
                 });
             });
 
-            // fetch POST 호출
-            fetch('/api/questions', {
-                method: 'POST',
+            const method = isUpdate ? 'PUT' : 'POST';
+            const url = isUpdate ? `/api/questions/${qstId}` : '/api/questions';
+
+            fetch(url, {
+                method: method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
-            })
-                .then(res => {
-                    if (res.ok) {
-                        alert('문항이 성공적으로 저장되었습니다.');
-                        location.reload(); // 목록 갱신
-                    } else {
-                        alert('문항 저장에 실패했습니다.');
-                    }
-                });
+            }).then(res => {
+                if (res.ok) {
+                    alert(isUpdate ? '문항이 수정되었습니다.' : '문항이 저장되었습니다.');
+                    location.reload();
+                } else {
+                    alert(isUpdate ? '문항 수정 실패' : '문항 저장 실패');
+                }
+            });
         }
+
+
         /**
          * ✅ 선택된 하위 역량에 대한 문항 코드 생성 요청
          */
@@ -743,19 +545,25 @@
             fetch(`/api/questions/${qstId}`)
                 .then(res => res.json())
                 .then(data => {
-                    // 모달에 값 세팅 (예시)
-                    document.getElementById('questionText').value = data.questionText;
-                    document.getElementById('competency').value = data.topCptId; // 상위 역량 ID
-                    loadSubCompetencies(data.topCptId); // 하위 역량 로드
-                    setTimeout(() => {
-                        document.getElementById('subCompetency').value = data.subCptId;
-                    }, 300); // 하위 select 로딩 후 값 세팅
+                    // 값 세팅
+                    document.getElementById('qstIdHidden').value = data.qstId;  // ✅ qstId 저장
+                    document.getElementById('competency').value = data.topCompetencyId;
+                    loadSubCompetencies(data.topCompetencyId);
 
-                    // 선택지도 세팅 (필요하면 renderOptions(data.options) 작성)
+                    setTimeout(() => {
+                        document.getElementById('subCompetency').value = data.subCompetencyId;
+                    }, 300);
+
+                    document.getElementById('questionText').value = data.questionText;
+                    document.getElementById('qstCodeDisplay').innerText = data.qstCode;
+                    document.getElementById('qstCodeHidden').value = data.qstCode;
+
+                    // 선택지 세팅 필요 시 작성
                 });
-            // 모달 열기
+
             new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
         }
+
 
         /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
          * */
@@ -771,50 +579,56 @@
                     alert('문항 목록 조회에 실패했습니다.');
                 });
         }
-        // ✅ 문항 목록을 화면에 출력
-        function renderQuestionList(questions) {
-            const container = document.querySelector('.card-body');
-            container.innerHTML = ''; // 기존 내용 초기화
+        /**
+         * ✅ 문항 목록을 화면에 출력 (questionList 만 비웁니다)
+         * @param {Array} questions 서버에서 받은 문항 리스트
+         */
+        /**
+         * ✅ 문항 목록을 화면에 출력 (questionList 만 비웁니다)
+         * @param {Array} questions 서버에서 받은 문항 리스트
 
-            if (questions.length === 0) {
-                container.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+        function renderQuestionList(questions) {
+            const listEl = document.getElementById('questionList');
+            listEl.innerHTML = '';  // pagination 영역과 분리하여 초기화
+
+            if (!questions || questions.length === 0) {
+                listEl.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
                 return;
             }
 
-            questions.forEach((q, index) => {
-                const html = `
-        <div class="question-card">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                     <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color: #fff;">
-                        ${q.competencyName}
-                    </span>
-                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
-                    <span class="badge bg-dark me-2">${q.qstCode}</span>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-            </div>
-            <h6 class="mb-2">Q${index + 1}. ${q.questionText}</h6>
-            <div class="question-options">
-                ${renderOptions()} <!-- 공통 리커트 척도 -->
-            </div>
-            <div class="mt-2 text-muted small">
-                <span class="me-3">문항 코드: ${q.qstCode}</span>
-                <span class="badge bg-success">활성</span>
-            </div>
+            questions.forEach((q, idx) => {
+                listEl.innerHTML += `
+      <div class="question-card">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color:#fff;">
+              ${q.cciNm}
+            </span>
+            <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+            <span class="badge bg-info">${q.qstCode}</span>
+          </div>
+          <div>
+            <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
         </div>
-        `;
-                container.innerHTML += html;
+        <h6 class="mb-2">Q${idx+1}. ${q.questionText}</h6>
+        <div class="question-options">
+          ${renderOptions()}
+        </div>
+        <div class="mt-2 text-muted small">
+          <span class="me-3">문항 코드: ${q.qstCode}</span>
+          <span class="badge bg-success">활성</span>
+        </div>
+      </div>
+    `;
             });
         }
-
+         */
         // ✅ 리커트 척도 옵션 HTML
         function renderOptions() {
             return `
@@ -952,8 +766,8 @@
         document.addEventListener('DOMContentLoaded', () => {
             loadTopCompetencies();      // 상위 역량 불러오기
             bindTopCompetencyChange();  // change 이벤트 연결
-            loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
-            // ✅ 이곳에 추가
+            //loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
+            searchQuestions(0);         // 페이지 0부터 조건 없이 페이징 목록 불러오기
             document.getElementById('subCompetency').addEventListener('change', loadNextQstCode);
         });
         /**
@@ -997,71 +811,80 @@
          * */
 
         /**
-         * ✅ 검색 버튼 클릭 시 실행되는 함수
-         * - 입력된 조건을 기반으로 서버에 요청하고 결과를 렌더링
-         * - 페이지네이션과 연동
-         * @param {number} pageNo 요청할 페이지 번호 (기본 1)
+         * ✅ 문항 조회 + 렌더링
          */
-        function searchQuestions(pageNo = 1) {
-            // 🔹 필터 값 읽기
-            const topCptId = document.getElementById('competencyFilter').value || '';
-            const subCptId = document.getElementById('subCompetencyFilter').value || '';
-            const status = document.getElementById('statusFilter').value || '';
-            const keyword = document.getElementById('searchQuestion').value || '';
+        function searchQuestions(pageNo = 0) {
+            const topCptId = document.getElementById('competencyFilter').value;
+            const subCptId = document.getElementById('subCompetencyFilter').value;
+            const keyword = document.getElementById('searchQuestion').value;
 
-            // 🔹 URL 파라미터 구성
             const params = new URLSearchParams();
-            params.append('page', pageNo);               // 페이지 번호 추가
-            params.append('size', 10);                   // 페이지 크기 (고정 or 선택 가능)
+            params.append('page', pageNo);
+            params.append('size', 10);
             if (topCptId) params.append('topCptId', topCptId);
             if (subCptId) params.append('subCptId', subCptId);
-            if (status) params.append('status', status);
             if (keyword) params.append('keyword', keyword);
 
-            // 🔹 서버 요청
-            fetch('/api/questions/filter?' + params.toString())
-                .then(res => res.json())
-                .then(data => {
-                    // 🔹 목록 렌더링
-                    renderQuestionList(data.questions);
-                    // 🔹 페이지네이션 렌더링
-                    renderPagination(data.pageInfo, searchQuestions);
+            fetch(`/api/questions/filter?${params.toString()}`)
+                .then(res => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.json();
                 })
-                .catch(() => {
-                    alert('문항 조회에 실패했습니다.');
+                .then(data => {
+                    renderQuestionList(data.content);
+                    renderPagination(data);
+                })
+                .catch(err => {
+                    console.error('문항 조회 실패:', err);
+                    alert('문항 조회 실패: ' + err.message);
                 });
         }
 
+
+        // 초기 로드 시 바로 0페이지부터 조회
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTopCompetencies();
+            bindTopCompetencyChange();
+            searchQuestions(0);
+        });
+
         /**
-         * ✅ 검색 결과를 화면에 출력
-         * @param questions 서버에서 받은 문항 리스트
+         * ✅ 문항 목록 출력
          */
         function renderQuestionList(questions) {
-            const container = document.querySelector('.card-body');
-            container.innerHTML = ''; // 기존 목록 제거
+            const listEl = document.getElementById('questionList');
+            listEl.innerHTML = '';
+
+            if (!questions || questions.length === 0) {
+                listEl.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+                return;
+            }
 
             questions.forEach((q, idx) => {
-                container.innerHTML += `
-        <div class="question-card">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-                <div>
-                    <span class="badge badge-competency" style="background:${q.colorHex}">${q.competencyName}</span>
-                    <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
-                    <span class="badge bg-info">${q.qstCode}</span>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+                listEl.innerHTML += `
+        <div class="question-card position-relative">
+            <!-- 우측 상단 수정/삭제 버튼 -->
+            <div class="position-absolute top-0 end-0 mt-2 me-2">
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})" title="수정">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})" title="삭제">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <h6 class="mb-2">Q${idx + 1}. ${q.questionText}</h6>
-        </div>`;
+
+            <!-- 문항 정보 -->
+            <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color:#fff;">
+                ${q.competencyName}
+            </span>
+            <span class="badge bg-secondary">${q.subCompetencyName}</span>
+            <span class="badge bg-info">${q.qstCode}</span>
+            <h6>Q${idx + 1}. ${q.questionText}</h6>
+        </div>
+        `;
             });
         }
+
 
 
         /**
@@ -1085,22 +908,26 @@
         }
 
         /**
-         * ✅ 페이지네이션 렌더링
-         * @param {object} pageInfo 서버에서 전달된 페이지 정보
-         * @param {function} callback 페이지 클릭 시 호출할 함수 (예: searchQuestions)
+         * ✅ 페이징 렌더링
          */
-        function renderPagination(pageInfo, callback) {
-            const paginationEl = document.querySelector('.pagination');
-            paginationEl.innerHTML = '';
+        function renderPagination(page) {
+            const paginationEl = document.getElementById('pagination');
+            if (!paginationEl) {
+                console.warn('.pagination 요소를 찾을 수 없습니다.');
+                return;
+            }
 
-            for (let i = 1; i <= pageInfo.totalPages; i++) {
+            paginationEl.innerHTML = '';
+            for (let i = 0; i < page.totalPages; i++) {
                 paginationEl.innerHTML += `
-            <li class="page-item ${pageInfo.currentPage === i ? 'active' : ''}">
-                <a class="page-link" href="#" onclick="${callback.name}(${i})">${i}</a>
-            </li>
+          <li class="page-item ${page.number === i ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="searchQuestions(${i})">${i + 1}</a>
+          </li>
         `;
             }
         }
+
+
 
         /**
          * 페이징 관련 js 끝
