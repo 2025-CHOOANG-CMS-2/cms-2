@@ -19,74 +19,91 @@
     <th:block th:replace="s_header :: sidebar"></th:block>
     
     <main class="main-content">
-      <div class="content-header">
-        <h1>상담 예약</h1>
-        <div class="breadcrumb">
-          <i class="fas fa-home"></i> 홈 &gt; 상담센터 &gt; 상담 예약
+        <div class="content-header">
+            <h1>상담 예약</h1>
+            <div class="breadcrumb">
+                <i class="fas fa-home"></i> &nbsp; 홈 &gt; 상담센터 &gt; 상담 예약
+            </div>
         </div>
-      </div>
       
-      <div class="row g-4">
-        <div class="col-lg-6">
-          <div class="card-ui">
-             <div class="calendar-container">
-              <h3><i class="fas fa-calendar-alt"></i> 예약 날짜 선택</h3>
-              <div class="calendar-header">
-                <button class="calendar-nav" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                <h4 id="currentMonth">2025년 6월</h4>
-                <button class="calendar-nav" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
-              </div>
-              <div class="calendar-weekdays">
-				  <div>일</div>
-				  <div>월</div>
-				  <div>화</div>
-				  <div>수</div>
-				  <div>목</div>
-				  <div>금</div>
-				  <div>토</div>
-			  </div>
-              <div class="calendar-grid" id="calendarGrid"></div>
-              <h4 style="margin-top:20px; margin-bottom:15px;"><i class="fas fa-clock"></i> 예약 시간 선택</h4>
-              <div class="time-slots" id="timeSlots">
-                <div class="time-slot" data-time="09:00">09:00</div>
-                <div class="time-slot" data-time="10:00">10:00</div>
-                <div class="time-slot" data-time="11:00">11:00</div>
-                <div class="time-slot" data-time="13:00">13:00</div>
-                </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6">
-          <div class="card-ui">
-            <div class="booking-form">
-              <h3><i class="fas fa-edit"></i> 예약 정보 입력</h3>
-              <form id="bookingForm">
-                 <div class="form-group">
-                  <label class="form-label">상담 유형</label>
-                  <select class="form-control" name="counselingType" required>
-                    <option value="">선택해주세요</option>
+        <div class="card-ui filter-section mb-4">
+            <h3 class="filter-title"><i class="fas fa-filter"></i> 상담 필터</h3>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">1. 상담 유형 선택</label>
+                    <select class="form-control" id="counselingTypeFilter" name="counselingType">
+                        <option value="all">전체 유형</option>
+                        <option value="진로 상담">진로 상담</option>
+                        <option value="학업 상담">학업 상담</option>
+                        <option value="심리 상담">심리 상담</option>
+                        <option value="취업 상담">취업 상담</option>
                     </select>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">상담 방식</label>
-                  <select class="form-control" name="counselingMethod" required>
-                    <option value="">선택해주세요</option>
-                    </select>
+                <div class="col-md-6">
+                    <label class="form-label">2. 상담사 선택 (선택 사항)</label>
+                    <select class="form-control" id="counselorFilter" name="counselor">
+                        <option value="all">모든 상담사</option>
+                        </select>
                 </div>
-                <div class="form-group">
-                  <label class="form-label">상담 내용</label>
-                  <textarea class="form-control" name="content" rows="4" placeholder="상담받고 싶은 내용을 자세히 작성해주세요" required></textarea>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">연락처</label>
-                  <input type="tel" class="form-control" name="phone" placeholder="010-0000-0000" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 mt-3"><i class="fas fa-calendar-check"></i> 상담 예약하기</button>
-              </form>
             </div>
-          </div>
         </div>
-      </div>
+
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card-ui">
+                    <div class="calendar-container">
+                        <h3><i class="fas fa-calendar-alt"></i> 3. 예약 날짜 및 시간 선택</h3>
+                        <div class="calendar-header">
+                            <button class="calendar-nav" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                            <h4 id="currentMonth"></h4>
+                            <button class="calendar-nav" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="calendar-weekdays">
+                            <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            </div>
+                        <div class="time-slots-container mt-4">
+                            <h4><i class="fas fa-clock"></i> 예약 시간 선택</h4>
+                            <div class="time-slots" id="timeSlots">
+                                <div class="empty-state-sm">날짜를 먼저 선택해주세요.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card-ui">
+                    <div class="booking-form">
+                        <h3><i class="fas fa-edit"></i> 4. 예약 정보 입력</h3>
+                        <form id="bookingForm">
+                            <div class="selected-info-box">
+                                <h5>선택 정보</h5>
+                                <p id="selectedInfoText">상담 날짜와 시간을 선택해주세요.</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">상담 방식</label>
+                                <select class="form-control" name="counselingMethod" required>
+                                    <option value="">선택해주세요</option>
+                                    <option value="online">온라인(채팅)</option>
+                                    <option value="offline">대면</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">상담 내용</label>
+                                <textarea class="form-control" name="content" rows="4" placeholder="상담받고 싶은 내용을 자세히 작성해주세요" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">연락처</label>
+                                <input type="tel" class="form-control" name="phone" placeholder="010-0000-0000" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-3"><i class="fas fa-calendar-check"></i> 상담 예약하기</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div class="notification" id="notification"></div>
