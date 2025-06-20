@@ -1,67 +1,63 @@
 package kr.ac.dhuniv.counsel.repository;
 
-import java.util.List;
-import java.util.Optional;
-
+import kr.ac.dhuniv.counsel.domain.CnslrInfo;
+import kr.ac.dhuniv.counsel.dto.CounselorListDto;
+import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import kr.ac.dhuniv.counsel.domain.CnslrInfo;
-import kr.ac.dhuniv.counsel.dto.CounselorListDto;
-import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
 
-    // [최종 수정된 쿼리 1: 목록 조회]
+    // [최종 수정] 모든 JPQL 쿼리의 JOIN 방식을 명시적 ON 절로 변경
+    
     @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorListDto(" +
-           "  ci.emplNo, " +
-           "  ei.emplNm, " +
-           "  ei.emplEmailAddr, " +
-           "  ei.emplTelno, " +
+           "  ci.employee.user.userId, " +
+           "  ci.employee.emplNm, " +
+           "  ci.employee.emplEmailAddr, " +
+           "  ci.employee.emplTelno, " +
            "  ci.cnslSpec, " +
            "  CASE WHEN ci.isActive = true THEN 'active' ELSE 'inactive' END, " +
-           "  ci.intro, " + // [수정] intro 필드 추가
-           "  COUNT(DISTINCT cr.cnslRsltId), " +
-           "  COALESCE(AVG(cr.satisfactionScore), 0.0)" + 
+           "  ci.intro, " +
+           "  COUNT(DISTINCT ca.id), " +
+           "  COALESCE(AVG(cr.satisfactionScore), 0.0)" +
            ") " +
            "FROM CnslrInfo ci " +
-           "JOIN EmplInfo ei ON ci.emplNo = ei.emplNo " +
-           "LEFT JOIN CnslAply ca ON ci.emplNo = ca.employee.emplNo " +
-           "LEFT JOIN CnslRslt cr ON ca.cnslAplyId = cr.counselingApplication.cnslAplyId " +
-           "GROUP BY ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, ci.cnslSpec, ci.isActive, ci.intro") // [수정] GROUP BY 에 intro 추가
-    List<CounselorListDto> findCounselorList();
-    
-    // [최종 수정된 쿼리 2: 상세 조회]
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorListDto(" +
-           "  ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, " +
-           "  ci.cnslSpec, CASE WHEN ci.isActive = true THEN 'active' ELSE 'inactive' END, " +
-           "  ci.intro, " + // [수정] intro 필드 추가
-           "  COUNT(DISTINCT cr.cnslRsltId), COALESCE(AVG(cr.satisfactionScore), 0.0)" +
-           ") " +
-           "FROM CnslrInfo ci " +
-           "JOIN EmplInfo ei ON ci.emplNo = ei.emplNo " +
-           "LEFT JOIN CnslAply ca ON ci.emplNo = ca.employee.emplNo " +
-           "LEFT JOIN CnslRslt cr ON ca.cnslAplyId = cr.counselingApplication.cnslAplyId " +
-           "WHERE ci.emplNo = :emplNo " +
-           "GROUP BY ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, ci.cnslSpec, ci.isActive, ci.intro") // [수정] GROUP BY 에 intro 추가
-    Optional<CounselorListDto> findCounselorDetailByEmplNo(@Param("emplNo") String emplNo);
+           // ci.employee와 ca.employee가 동일한 EmplInfo 객체인 경우를 조인
+           "LEFT JOIN CnslAply ca ON ci.employee = ca.employee " +
+           // ca와 cr.counselingApplication이 동일한 CnslAply 객체인 경우를 조인
+           "LEFT JOIN CnslRslt cr ON ca = cr.counselingApplication " +
+           "WHERE ci.isActive = true " +
+           "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
+           "AND (:counselorId = 'all' OR ci.employee.user.userId = :counselorId) " +
+           "GROUP BY ci.cnslrId, ci.employee.emplNm, ci.employee.emplEmailAddr, ci.employee.emplTelno, ci.cnslSpec, ci.intro, ci.isActive")
+    List<CounselorListDto> findActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
 
-    // 수정 기능을 위한 메소드
-    Optional<CnslrInfo> findByEmplNo(String emplNo);
     
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
-            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
-            "WHERE ci.isActive = true AND ci.cnslSpec = :specialty")
-     List<CounselorSimpleDto> findActiveCounselorsBySpecialty(@Param("specialty") String specialty);
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
+           "FROM CnslrInfo ci " +
+           "WHERE ci.isActive = true AND (:specialty = 'all' OR ci.cnslSpec = :specialty)")
+    List<CounselorSimpleDto> findSimpleActiveCounselorsBySpecialty(@Param("specialty") String specialty);
+
+
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorListDto(" +
+           "  ci.employee.user.userId, ci.employee.emplNm, ci.employee.emplEmailAddr, ci.employee.emplTelno, " +
+           "  ci.cnslSpec, CASE WHEN ci.isActive = true THEN 'active' ELSE 'inactive' END, ci.intro, " +
+           "  COUNT(DISTINCT ca.id), COALESCE(AVG(cr.satisfactionScore), 0.0)" +
+           ") " +
+           "FROM CnslrInfo ci " +
+           "LEFT JOIN CnslAply ca ON ci.employee = ca.employee " +
+           "LEFT JOIN CnslRslt cr ON ca = cr.counselingApplication " +
+           "WHERE ci.employee.user.userId = :userId " +
+           "GROUP BY ci.cnslrId, ci.employee.emplNm, ci.employee.emplEmailAddr, ci.employee.emplTelno, ci.cnslSpec, ci.intro, ci.isActive")
+    Optional<CounselorListDto> findCounselorDetailByUserId(@Param("userId") String userId);
     
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
-            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
-            "WHERE ci.isActive = true " +
-            "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
-            "AND (:counselorId = 'all' OR ci.emplNo = :counselorId)")
-     List<CounselorSimpleDto> findActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
     
+    Optional<CnslrInfo> findByEmployee_User_UserId(String userId);
+
 }
