@@ -1,6 +1,7 @@
 package kr.ac.dhuniv.core_cpt.repository;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptCommentTemplate;
+import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,4 +19,7 @@ public interface CoreCptCommentTemplateRepository extends JpaRepository<CoreCptC
     List<CoreCptCommentTemplate> findByCoreCpt_CciIdOrderByMinScoreAsc(Long cciId);
     // 특정 상위 역량의 코멘트 목록 조회
     List<CoreCptCommentTemplate> findByCoreCpt_CciId(Long cciId);
+
+    // CoreCptCommentTemplateRepository
+    Optional<CoreCptCommentTemplate> findTopByCoreCptAndMinScoreLessThanEqualOrderByMinScoreDesc(CoreCptInfo info, Integer score);
 }
