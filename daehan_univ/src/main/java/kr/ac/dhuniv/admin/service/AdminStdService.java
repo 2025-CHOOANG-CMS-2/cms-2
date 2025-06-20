@@ -27,10 +27,9 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID; // 필요한 경우 임포트 유지
 
 @Service
-@RequiredArgsConstructor // final 필드에 대한 생성자를 자동으로 주입합니다. @Autowired 명시적 추가 불필요
+@RequiredArgsConstructor
 @Slf4j
 public class AdminStdService {
 
@@ -39,8 +38,8 @@ public class AdminStdService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // 학과 코드와 이름 매핑 (마이페이지 서비스와 동일하게 유지 권장)
-    private static final Map<String, String> SCSBJT_MAP = new HashMap<>();
+    // ⭐ 학과 코드와 이름 매핑 (3자리로 유지, 사용자님이 처음 주신 그대로) ⭐
+    public static final Map<String, String> SCSBJT_MAP = new HashMap<>();
     static {
         SCSBJT_MAP.put("001", "국어국문학과");
         SCSBJT_MAP.put("002", "영어영문학과");
@@ -65,7 +64,7 @@ public class AdminStdService {
         SCSBJT_MAP.put("021", "의예과");
     }
 
-    // 학생 상태 코드와 라벨 매핑 (마이페이지 서비스와 동일하게 유지 권장)
+    // 학생 상태 코드와 라벨 매핑 (변동 없음)
     private static final Map<String, String> STATUS_MAP = new HashMap<>();
     static {
         STATUS_MAP.put("ENROLL", "재학");
@@ -75,24 +74,6 @@ public class AdminStdService {
         STATUS_MAP.put("GRAD_WAIT", "졸업유예");
         STATUS_MAP.put("ABSENT_LEAVE", "자퇴");
     }
-
-    // ⭐ @Autowired 생성자 제거: @RequiredArgsConstructor가 자동으로 생성자를 주입합니다. ⭐
-    /*
-    @Autowired
-    public AdminStdService(AdminStdRepository stdInfoRepository, UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
-        this.stdInfoRepository = stdInfoRepository;
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
-    */
-
-    // 파일 업로드 관련 필드는 AdminStdService에서는 사용하지 않는 것으로 보입니다.
-    // 만약 관리자 페이지에서 학생 프로필 이미지를 업로드하는 기능이 있다면, 해당 로직을 여기에 추가해야 합니다.
-    // 현재는 이 서비스가 이미지 업로드를 직접 처리하지 않으므로 관련 필드는 삭제합니다.
-    // private final String uploadBaseDir = System.getProperty("user.dir") + "/uploads";
-    // private final String uploadProfileDir = uploadBaseDir + "/std_profile/";
-    // ... (생성자에서 디렉토리 생성 로직도 제거)
 
     /**
      * 새로운 학생을 등록합니다.
@@ -111,15 +92,15 @@ public class AdminStdService {
         log.info("[Service - insertStudent] CREATED_BY 값: '{}'", dto.getCREATED_BY());
 
         try {
-            // 1. 새로운 학번 자동 생성 (YYYY + 학과코드 + SSS 형식)
+            // 1. 새로운 학번 자동 생성 (YYYY + 학과코드(3자리) + SSS 형식)
             String currentYear = String.valueOf(LocalDate.now().getYear());
-            String scsbjtCode = dto.getSCSBJT_CD();
+            String scsbjtCode = dto.getSCSBJT_CD(); // 예: "003", "011" 등 3자리 코드
 
             if (!SCSBJT_MAP.containsKey(scsbjtCode)) {
                 throw new IllegalArgumentException("유효하지 않은 학과 코드입니다: " + scsbjtCode);
             }
 
-            String newStdNo = generateStudentNo(currentYear, scsbjtCode);
+            String newStdNo = generateStudentNo(currentYear, scsbjtCode); // ⭐ 3자리 학과 코드 그대로 전달 ⭐
             dto.setSTD_NO(newStdNo); // DTO에 생성된 학번 설정 (User.userId로 사용될 값)
 
             // 2. 이메일 중복 체크 (std_info 테이블 기준)
@@ -147,7 +128,7 @@ public class AdminStdService {
             String encodedPassword = passwordEncoder.encode(defaultPassword); // 비밀번호 암호화
 
             if (userRepository.findByUserId(userIdForAccount).isPresent()) {
-                throw new IllegalStateException("생성된 학번(" + userIdForAccount + ")에 해당하는 사용자 계정이 이미 존재합니다. 데이터 불일치 가능성.");
+                throw new IllegalStateException("생성된 학번(" + userIdForAccount + ")에 해당하는 사용자 계정이 이미 존재합니다. 데이터 불일치 가능성. (이전 학번이 잘못 생성된 경우)");
             }
 
             Role studentRole = roleRepository.findByRoleName("STUDENT")
@@ -176,7 +157,7 @@ public class AdminStdService {
             StdInfo entity = StdInfo.builder()
                     .user(newUserAccount) // 새로 생성된 User 객체를 StdInfo에 연결 (이것이 std_no 컬럼에 저장됨)
                     .stdNm(dto.getSTD_NM())
-                    .scsbjtCd(dto.getSCSBJT_CD())
+                    .scsbjtCd(dto.getSCSBJT_CD()) // 엔티티에 3자리 코드 그대로 저장
                     .schoolYear(dto.getSCH_YR())
                     .entranceDate(dto.getENTR_DT())
                     .statusCode(dto.getSTD_STAT_CD())
@@ -352,34 +333,29 @@ public class AdminStdService {
     }
 
     /**
-     * 새로운 학생 학번을 생성합니다. (YYYY + 학과코드(DD) + SSS 형식)
-     * 예: 202501001 (2025년, 컴퓨터공학과(01), 순번 001)
-     * 학과 코드가 2자리로 가정되어 SUBSTRING(s.user.userId, 5, 2)로 변경했습니다.
+     * 새로운 학생 학번을 생성합니다. (YYYY + 학과코드(DDD) + SSS 형식)
+     * 예: 2025003001 (2025년, 철학과(003), 순번 001)
+     * DTO에서 받은 3자리 학과 코드를 그대로 사용하여 학번을 구성합니다.
      *
      * @param year 현재 년도 (String)
-     * @param scsbjtCd 학과 코드 (String) - 2자리로 예상
-     * @return 생성된 새로운 학번
+     * @param scsbjtCd 학과 코드 (String) - DTO에서 넘어온 3자리 학과 코드 (예: "003")
+     * @return 생성된 새로운 학번 (YYYYDDDSSS 형식)
      */
     private String generateStudentNo(String year, String scsbjtCd) {
         if (year == null || year.isEmpty()) {
             throw new IllegalArgumentException("년도 정보가 없어 학번을 생성할 수 없습니다.");
         }
-        if (scsbjtCd == null || scsbjtCd.isEmpty()) {
-            throw new IllegalArgumentException("학과 코드가 없어 학번을 생성할 수 없습니다.");
-        }
-        // 학과 코드 길이를 확인하고 필요한 경우 패딩 (예: "1" -> "01")
-        if (scsbjtCd.length() == 1) {
-            scsbjtCd = "0" + scsbjtCd;
+        if (scsbjtCd == null || scsbjtCd.isEmpty() || scsbjtCd.length() != 3) { // ⭐ 3자리 학과 코드 유효성 검사 추가 ⭐
+            throw new IllegalArgumentException("학과 코드는 3자리여야 합니다: " + scsbjtCd);
         }
 
-
-        // findMaxSequenceForStudentId 쿼리의 substring 인덱스를 5, 2로 변경하여 학과 코드가 2자리임을 반영했습니다.
+        // findMaxSequenceForStudentId 쿼리의 substring 인덱스를 5, 3으로 변경하여 학과 코드가 3자리임을 반영했습니다.
         Optional<Integer> maxSequenceOptional = stdInfoRepository.findMaxSequenceForStudentId(year, scsbjtCd);
-        int nextSequence = maxSequenceOptional.orElse(0) + 1;
+        int nextSequence = maxSequenceOptional.orElse(0) + 1; // maxSequenceOptional이 비어있으면 0부터 시작 +1
 
-        String sequencePart = String.format("%03d", nextSequence);
+        String sequencePart = String.format("%03d", nextSequence); // 3자리 순번 (예: 001, 002)
 
-        return year + scsbjtCd + sequencePart;
+        return year + scsbjtCd + sequencePart; // ⭐ 3자리 학과 코드 그대로 사용 ⭐
     }
 
 
@@ -404,7 +380,7 @@ public class AdminStdService {
         }
         
         dto.setSTD_NM(stdInfo.getStdNm());
-        dto.setSCSBJT_CD(stdInfo.getScsbjtCd());
+        dto.setSCSBJT_CD(stdInfo.getScsbjtCd()); // 엔티티의 3자리 학과 코드를 DTO에 그대로 매핑
         dto.setSCH_YR(stdInfo.getSchoolYear());
         dto.setENTR_DT(stdInfo.getEntranceDate());
         dto.setSTD_STAT_CD(stdInfo.getStatusCode()); // 엔티티 필드명 'statusCode'를 DTO 'STD_STAT_CD'에 매핑

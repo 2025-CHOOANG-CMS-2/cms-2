@@ -20,9 +20,12 @@ public interface AdminStdRepository extends JpaRepository<StdInfo, Long>, JpaSpe
     Optional<StdInfo> findByStdTelno(String stdTelno);
 
     // 학번 생성을 위한 최대 시퀀스 조회
-    @Query("SELECT MAX(CAST(SUBSTRING(s.user.userId, 7, 3) AS int)) " + // userId의 7번째 문자부터 3자리 (순번)
+    // 학번 (user.userId)의 8번째 문자부터 3자리 (순번)을 추출하여 int로 캐스팅
+    // 학번 (user.userId)의 1번째 문자부터 4자리 (년도)와 5번째 문자부터 3자리 (학과 코드)로 필터링
+    // ⭐ SUBSTRING(s.user.userId, 5, 3)으로 변경하여 3자리 학과 코드를 추출 ⭐
+    @Query("SELECT MAX(CAST(SUBSTRING(s.user.userId, 8, 3) AS int)) " + // 순번 시작 인덱스도 8로 변경 (YYYYDDDSSS)
            "FROM StdInfo s " +
-           "WHERE SUBSTRING(s.user.userId, 1, 4) = :year " + // userId의 1번째 문자부터 4자리 (년도)
-           "AND SUBSTRING(s.user.userId, 5, 2) = :scsbjtCd") // userId의 5번째 문자부터 2자리 (학과 코드)
+           "WHERE SUBSTRING(s.user.userId, 1, 4) = :year " +
+           "AND SUBSTRING(s.user.userId, 5, 3) = :scsbjtCd") // ⭐ 학과 코드 추출도 5번째부터 3자리로 변경 ⭐
     Optional<Integer> findMaxSequenceForStudentId(@Param("year") String year, @Param("scsbjtCd") String scsbjtCd);
 }

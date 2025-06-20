@@ -85,7 +85,7 @@
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
-            justify-content: space-between; /* 변경: justify-content-between으로 명시 */
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -150,8 +150,20 @@
         }
 
         .form-floating {
-            margin-bottom: 1rem;
+            margin-bottom: 1rem; /* 부트스트랩 기본값보다 좀 더 여유롭게 */
         }
+        /* 추가: 연속된 form-floating 요소 사이의 상단 마진 */
+        .form-floating + .form-floating,
+        .form-floating + .row,
+        .row + .form-floating {
+            margin-top: 1rem;
+        }
+        /* form-floating 내 select 및 input의 하단 여백 제거 (form-floating이 이미 마진을 가짐) */
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            margin-bottom: 0 !important;
+        }
+
 
         .form-control {
             border-radius: 10px;
@@ -227,51 +239,51 @@
         .strength-medium { background-color: var(--warning-color); }
         .strength-strong { background-color: var(--success-color); }
 
-        /* ⭐ 탭 네비게이션 스타일 수정 시작 ⭐ */
-        .nav-tabs {
-            border-bottom: 2px solid #dee2e6; /* 하단 border를 좀 더 두껍게 */
-            display: flex; /* Flexbox 사용 */
-            width: 100%; /* 너비 100%로 설정하여 공간 채움 */
-        }
+        /* 탭 네비게이션 중앙 정렬 및 반반 정렬 */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
 
-        .nav-tabs .nav-item {
-            flex-grow: 1; /* ⭐ 중요: 각 탭 항목이 사용 가능한 공간을 채우도록 함 ⭐ */
-            text-align: center; /* 텍스트 중앙 정렬 */
-            margin-bottom: 0; /* Bootstrap 기본 마진 제거 */
-        }
+.nav-tabs .nav-item {
+    flex: 0 0 50%; /* 각각 너비 50%로 고정 */
+    text-align: center;
+}
 
-        .nav-tabs .nav-link {
-            color: #495057;
-            border: 1px solid #dee2e6; /* 모든 탭에 테두리 추가 */
-            border-bottom: none; /* 하단 테두리는 nav-tabs에서 관리 */
-            border-radius: 10px 10px 0 0; /* 상단 모서리 둥글게 */
-            padding: 1rem 0; /* ⭐ 상하 패딩을 늘리고 좌우 패딩을 0으로 하여 너비가 자동으로 조절되도록 ⭐ */
-            font-weight: 600; /* 글씨를 더 진하게 */
-            transition: all 0.3s ease;
-            display: block; /* 링크가 블록 요소처럼 동작하도록 */
-            margin-right: 5px; /* 탭 사이에 약간의 간격 */
-        }
+.nav-tabs .nav-link {
+    width: 100%; /* 각 탭이 부모(nav-item) 너비 꽉 채움 */
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f1f3f5;
+    transition: background-color 0.3s, color 0.3s;
+}
 
-        .nav-tabs .nav-link:last-child {
-            margin-right: 0; /* 마지막 탭은 오른쪽 간격 없음 */
-        }
+.nav-tabs .nav-link:hover {
+    background-color: #e9f0ff;
+    color: var(--secondary-color);
+}
 
-        .nav-tabs .nav-link:hover {
-            color: var(--secondary-color);
-            background-color: #f0f0f0; /* 호버 시 배경색 변경 */
-            border-color: #c9d9e6; /* 호버 시 테두리 색상 변경 */
-        }
+.nav-tabs .nav-link.active {
+    color: var(--secondary-color);
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 white;
+    border-bottom: 3px solid var(--secondary-color);
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.2);
+}
 
-        .nav-tabs .nav-link.active {
-            color: var(--secondary-color); /* 활성 탭 텍스트 색상 */
-            background-color: white; /* 활성 탭 배경색 */
-            border-color: var(--secondary-color) var(--secondary-color) white; /* 활성 탭 상단/좌우 테두리 색상, 하단은 흰색으로 덮음 */
-            border-bottom-color: white; /* ⭐ 중요: 활성 탭의 하단 테두리를 배경색과 동일하게 만들어 끊어진 느낌 제거 ⭐ */
-            font-weight: bold; /* 활성 탭 글씨를 더 굵게 */
-            z-index: 1; /* 활성 탭이 다른 탭 위로 오도록 */
-            position: relative; /* z-index 적용을 위해 필요 */
-        }
-        /* ⭐ 탭 네비게이션 스타일 수정 끝 ⭐ */
+.nav-tabs .nav-link .bi {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
 
         /* Responsive */
         @media (max-width: 768px) {
@@ -289,5 +301,32 @@
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column; /* 모바일에서 탭을 세로로 정렬 */
+                justify-content: flex-start; /* 모바일에서도 왼쪽 정렬 */
+                border-bottom: none; /* 모바일에서는 하단 경계선 제거 */
+            }
+            .nav-tabs .nav-item {
+                width: 100%; /* 모바일에서는 탭이 전체 너비를 차지 */
+                margin-right: 0;
+                margin-bottom: 0.5rem; /* 세로 정렬 시 탭 간격 */
+            }
+            .nav-tabs .nav-link {
+                border-radius: 0.5rem; /* 모바일에서 전체 탭 둥글게 */
+                border: 1px solid #dee2e6; /* 모바일에서는 모든 테두리 다시 활성화 */
+                margin-right: 0; /* 모바일에서 간격 제거 */
+                margin-left: 0; /* 모바일에서 간격 제거 */
+            }
+            .nav-tabs .nav-item:last-child .nav-link {
+                border-right: 1px solid #dee2e6; /* 모바일에서 마지막 탭 오른쪽 테두리도 유지 */
+            }
+            .nav-tabs .nav-link.active {
+                border-bottom-color: var(--secondary-color); /* 활성 탭 하단 테두리 강조 */
+                border-right: 1px solid var(--secondary-color); /* 활성 탭 오른쪽 테두리도 강조 */
+            }
+            .nav-tabs .nav-link.active::after {
+                height: 0; /* 모바일에서는 하단 밑줄 효과 제거 */
             }
         }

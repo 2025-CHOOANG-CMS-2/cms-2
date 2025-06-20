@@ -92,8 +92,11 @@ public class StdMypageApiController {
     public ResponseEntity<Map<String, String>> updatePersonalInfo(@RequestBody StdInfoDto updatedInfo) {
         log.info("API: 개인 정보 업데이트 요청: 학번: {}", updatedInfo.getSTD_NO());
         Map<String, String> response = new HashMap<>();
+
+        // use_yn을 무조건 "Y"로 세팅
+        updatedInfo.setUSE_YN("Y");
+
         try {
-            // 서비스에 DTO의 STD_NO (즉 userId)와 DTO 객체 전달
             boolean success = stdMypageService.updatePersonalInfo(updatedInfo.getSTD_NO(), updatedInfo);
             if (success) {
                 response.put("message", "개인 정보가 성공적으로 업데이트되었습니다.");
