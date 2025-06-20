@@ -1,8 +1,8 @@
-<<<<<<< HEAD
+//<<<<<<< HEAD
 package kr.ac.dhuniv.mileage.repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+//import java.time.LocalDateTime;
+//import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,16 +11,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import kr.ac.dhuniv.mileage.dto.CompletedStudentDto;
-import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
+//import kr.ac.dhuniv.ncs.domain.NcsCmpInfo;
 
-@Repository
-public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
+//@Repository
+//public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
 
     // 특정 프로그램 ID로 이수자 목록 조회
-    List<NcsCmpInfo> findByProgram_PrgId(Long prgId);
+   // List<NcsCmpInfo> findByProgram_PrgId(Long prgId);
     
     // 특정 학생 ID로 이수자 목록 조회
-    List<NcsCmpInfo> findByStudent_StdId(Long stdId);
+   // List<NcsCmpInfo> findByStudent_StdId(Long stdId);
     
     /*
      * StdInfo 엔티티가 `private User user`를 사용하도록 변경됨에 따라,
@@ -69,8 +69,8 @@ public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
     Optional<NcsCmpInfo> findByStudentAndProgramId(@Param("stdId") Long stdId, @Param("prgId") Long prgId);
     */
     
-}
-=======
+//}
+//=======
 //package kr.ac.dhuniv.mileage.repository;
 //
 //import java.time.LocalDate;
@@ -147,4 +147,4 @@ public interface NcsCmpInfoRepository2 extends JpaRepository<NcsCmpInfo, Long> {
 //}
 //
 //
->>>>>>> 719e435733ab23b1c0e98395ed16698c4562da7f
+//>>>>>>> 719e435733ab23b1c0e98395ed16698c4562da7f
