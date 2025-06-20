@@ -1,3 +1,4 @@
+/*
 package kr.ac.dhuniv.counsel.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -38,4 +39,4 @@ public class CounselStudentApiController {
     }
 
     // 여기에 나중에 상담 예약을 생성하는 POST API가 추가될 것입니다.
-}
+}*/
