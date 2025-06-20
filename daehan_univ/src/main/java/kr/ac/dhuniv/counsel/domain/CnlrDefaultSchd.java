@@ -17,7 +17,7 @@ public class CnlrDefaultSchd {
 
     // 월요일(1) ~ 일요일(7)을 저장
     @Column(nullable = false)
-    private Integer dayOfWeek; 
+    private Integer dayOfWeek;
 
     @Column
     private LocalTime startTime;
@@ -41,7 +41,7 @@ public class CnlrDefaultSchd {
         this.isWorkingDay = isWorkingDay;
         this.employee = employee;
     }
-    
+
     // 정보 수정을 위한 메소드
     public void update(LocalTime startTime, LocalTime endTime, Boolean isWorkingDay) {
         this.startTime = startTime;

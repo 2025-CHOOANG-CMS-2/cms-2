@@ -18,7 +18,7 @@
 //import kr.ac.dhuniv.counsel.dto.UpdateCounselorRequestDto;
 //import kr.ac.dhuniv.counsel.repository.CnlrDefaultSchdRepository;
 //import kr.ac.dhuniv.counsel.repository.CnlrSchdRepository;
-////import kr.ac.dhuniv.counsel.repository.CnslrInfoRepository;
+//import kr.ac.dhuniv.counsel.repository.CnslrInfoRepository;
 //import kr.ac.dhuniv.counsel.repository.EmplInfoRepository;
 //import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 //import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@
 //@Transactional(readOnly = true)
 //public class CounselorAdminServiceImpl implements CounselorAdminService {
 //
-//  //  private final CnslrInfoRepository cnslrInfoRepository;
+//    private final CnslrInfoRepository cnslrInfoRepository;
 //    private final EmplInfoRepository emplInfoRepository;
 //    private final CnlrSchdRepository cnlrSchdRepository;
 //    private final CnlrDefaultSchdRepository cnlrDefaultSchdRepository;

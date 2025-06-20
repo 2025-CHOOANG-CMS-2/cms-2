@@ -35,7 +35,7 @@ public class CnlrSchd {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empl_no", referencedColumnName = "empl_no")
     private EmplInfo employee;
-    
+
     @Builder
     public CnlrSchd(String schdId, LocalDate dayCode, LocalTime startTime, LocalTime endTime, EmplInfo employee) {
         this.schdId = schdId;
