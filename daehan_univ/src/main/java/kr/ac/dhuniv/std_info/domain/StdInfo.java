@@ -38,7 +38,7 @@ public class StdInfo {
     @Column(name = "sch_yr", nullable = false)
     private Integer schoolYear; // 학년
 
-    @Column(name = "entr_dt", nullable = false)
+    @Column(name = "entr_dt", nullable = false, updatable = false)
     private LocalDate entranceDate; // 입학일자
 
     @Column(name = "std_stat_cd", nullable = false, length = 10)
