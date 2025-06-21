@@ -805,12 +805,13 @@
             onchange="searchPrograms()"
           >
             <option value="">전체 카테고리</option>
-            <option value="1">리더십</option>
-            <option value="2">글로벌</option>
-            <option value="3">전문성</option>
-            <option value="4">AI역량</option>
-            <option value="5">창업</option>
-            <option value="6">상담</option>
+            <option value="1">의사소통역량</option>
+            <option value="2">창의역량</option>
+            <option value="3">문제해결역량</option>
+            <option value="4">리더십역량</option>
+            <option value="5">팀워크역량</option>
+            <option value="6">자기관리역량</option>
+            <option value="7">정보활용역량</option>
           </select>
         </div>
       </div>
@@ -822,12 +823,14 @@
             <tr>
               <th>번호</th>
               <th>프로그램명</th>
-              <th style="width: 100px">카테고리</th>
+              <th style="width: 150px">카테고리</th>
+              <!-- 기존 100px → 150px -->
               <th style="width: 80px">정원</th>
               <th style="width: 100px">마일리지</th>
               <th style="width: 120px">신청기간</th>
               <th style="width: 120px">운영기간</th>
-              <th style="width: 100px">상태</th>
+              <th style="width: 140px">상태</th>
+              <!-- 기존 100px → 140px -->
               <th style="width: 120px">관리</th>
             </tr>
           </thead>
@@ -878,7 +881,7 @@
               </div>
             </div>
             <div class="form-section">
-              <h4>기간</h4>
+              <h4>기간 정보</h4>
               <div class="detail-grid">
                 <div class="detail-item">
                   <span class="detail-label">신청기간</span>
@@ -888,7 +891,6 @@
                   <span class="detail-label">프로그램 기간</span>
                   <span class="detail-value" id="detailProgramPeriod"></span>
                 </div>
-                \
                 <div class="detail-item">
                   <span class="detail-label">수강정원</span>
                   <span class="detail-value" id="detailCapacity"></span>
@@ -1048,17 +1050,15 @@
               </div>
             </div>
 
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">담당자</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="manager"
-                  placeholder="예: 김교수"
-                  maxlength="50"
-                />
-              </div>
+            <div class="form-group">
+              <label class="form-label">담당자</label>
+              <input
+                type="text"
+                class="form-control"
+                id="manager"
+                placeholder="예: 김교수"
+                maxlength="50"
+              />
             </div>
           </form>
         </div>
@@ -1073,6 +1073,7 @@
         </div>
       </div>
     </div>
+
     <script>
       // DOM 요소들
       const programTableBody = document.getElementById("programTableBody");
@@ -1125,7 +1126,7 @@
           .replace(/\.$/, "");
       }
 
-      // 테이블 행 생성 - 이미지 제거
+      // 테이블 행 생성
       function createTableRow(program, index) {
         // 안전성 체크
         if (!program) {
@@ -1229,7 +1230,7 @@
         paginationContainer.innerHTML = paginationHTML;
       }
 
-      // 프로그램 상세 보기 - 이미지 제거
+      // 프로그램 상세 보기
       function viewProgram(prgId) {
         const program = programs.find((p) => p.prgId === prgId);
         if (program) {
@@ -1253,8 +1254,6 @@
           ).textContent = `${formatDate(program.prgStDt)} ~ ${formatDate(
             program.prgEndDt
           )}`;
-          document.getElementById("detailLocation").textContent =
-            program.location || "-";
           document.getElementById("detailDescription").textContent =
             program.prgDesc || "-";
 
@@ -1314,8 +1313,6 @@
         document.getElementById("prgEndDt").value = formatDateTimeForInput(
           editingProgram.prgEndDt
         );
-        document.getElementById("location").value =
-          editingProgram.location || "";
         document.getElementById("manager").value = editingProgram.manager || "";
 
         programModal.classList.add("show");
