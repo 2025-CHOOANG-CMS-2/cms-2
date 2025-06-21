@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CoreCptForMlgDto {
+public class CoreCptForMlgDTO {
 	private Long id;
     private String name;
 }

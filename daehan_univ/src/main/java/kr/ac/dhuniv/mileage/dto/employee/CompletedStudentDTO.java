@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.mileage.dto;
+package kr.ac.dhuniv.mileage.dto.employee;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -8,9 +8,9 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class CompletedStudentDto {
+public class CompletedStudentDTO {
 	private Long stdId;                   //학생정보 ID
-	private Long prdId;                   //비교과 프로그램 ID
+	private Long prgId;                   //비교과 프로그램 ID
 	private Long cmpId;                   //이수정보 ID
 	private String stdNo;                 //학번
 	private String stdNm;                 //학생 이름
