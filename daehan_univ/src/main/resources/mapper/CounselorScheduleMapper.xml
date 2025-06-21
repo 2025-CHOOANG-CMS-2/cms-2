@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.dhuniv.counsel.mapper.CounselorScheduleMapper">
+
+    <select id="findReservationsByCounselorAndDate" resultType="kr.ac.dhuniv.counsel.dto.ReservationDetailDto">
+        <![CDATA[
+            SELECT
+                a.id          AS applyId,
+                s.std_nm      AS studentName,
+                s.std_no      AS studentId,
+                a.type_cd     AS counselingType,
+                a.method_cd   AS counselingMethod,
+                a.stat_cd     AS status,
+                a.aply_dttm   AS applyDateTime,
+                a.content
+            FROM
+                cnsl_aply a
+            JOIN
+                std_info s ON a.std_no = s.std_no
+            WHERE
+                a.empl_no = #{emplNo}
+                AND DATE(a.aply_dttm) = #{date}
+            ORDER BY
+                a.aply_dttm ASC
+        ]]>
+    </select>
+    
+    <select id="getMonthlyReservationStatus" resultType="kr.ac.dhuniv.counsel.dto.MonthlyReservationStatusDto">
+    <![CDATA[
+        SELECT
+            T.date,
+            T.status
+        FROM (
+            -- 1. 예약(cnsl_aply) 테이블에서 날짜별 상태 조회
+            SELECT
+                TO_CHAR(a.aply_dttm, 'YYYY-MM-DD') as "date",
+                a.stat_cd as "status"
+            FROM
+                cnsl_aply a
+            WHERE
+                a.empl_no = #{emplNo}
+                -- [수정] jdbcType=DATE를 추가하여 타입을 명확히 함
+                AND a.aply_dttm >= #{startDate, jdbcType=DATE}
+                AND a.aply_dttm < (#{endDate, jdbcType=DATE}::date + interval '1 day')
+            
+            UNION ALL
+            
+            -- 2. 예외일정(cnlr_schd) 테이블에서 날짜별 상태 조회
+            SELECT
+                TO_CHAR(s.day_cd, 'YYYY-MM-DD') as "date",
+                'EXCEPTION' as "status"
+            FROM
+                cnlr_schd s
+            WHERE
+                s.empl_no = #{emplNo}
+                -- [수정] jdbcType=DATE를 추가하여 타입을 명확히 함
+                AND s.day_cd BETWEEN #{startDate, jdbcType=DATE} AND #{endDate, jdbcType=DATE}
+        ) AS T
+    	]]>
+	</select>
+	
+</mapper>
