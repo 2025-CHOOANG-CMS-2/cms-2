@@ -1,11 +1,11 @@
-package kr.ac.dhuniv.mileage.dto;
+package kr.ac.dhuniv.mileage.dto.employee;
 
 import java.math.BigDecimal;
 
 import lombok.Data;
 
 @Data
-public class MileagePaymentRequest {
+public class MileagePaymentReqDTO {
     private Long stdId;
     private Long prgId;
     private Long cmpId;
