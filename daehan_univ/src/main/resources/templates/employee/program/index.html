@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,13 +22,13 @@
         font-family: "Segoe UI", sans-serif;
       }
 
-      /* 헤더 영역 */
+      /* 헤더 영역 (교직원용 포레스트 그린) */
       .header {
         position: fixed;
         top: 0;
         width: 100%;
         height: 60px;
-        background-color: #1a2a45;
+        background-color: #2d4f3a;
         color: white;
         z-index: 1040;
         display: flex;
@@ -58,7 +58,7 @@
         gap: 1rem;
       }
 
-      /* 사용자 정보 */
+      /* 사용자 정보 및 버튼 */
       .user-box {
         display: flex;
         align-items: center;
@@ -89,8 +89,8 @@
         top: 60px;
         left: 0;
         width: 240px;
-        height: calc(100vh - 60px);
-        background-color: #1a2a45;
+        height: 100%;
+        background-color: #2d4f3a;
         padding: 1rem 0;
         color: white;
         z-index: 1030;
@@ -98,12 +98,22 @@
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
       }
 
+      .sidebar-user-info {
+        display: none;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .sidebar-user-info div {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+
       /* 본문 */
       .main-content {
         margin-top: 60px;
         margin-left: 240px;
         padding: 1.5rem;
-        min-height: calc(100vh - 60px);
       }
 
       /* 메뉴 스타일 */
@@ -118,13 +128,57 @@
       }
 
       .nav-link:hover {
-        background-color: #223a5e;
+        background-color: #3b624d;
         color: #ffffff;
       }
 
       .nav-link.active {
-        background-color: #2b4d77;
+        background-color: #46775c;
         font-weight: bold;
+      }
+
+      .submenu {
+        background-color: #3b624d;
+      }
+
+      .submenu a {
+        padding-left: 2.5rem;
+        font-size: 0.95rem;
+      }
+
+      .has-submenu::after {
+        content: "\25BC";
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+
+      /* 반응형 대응 */
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -240px;
+          transition: left 0.3s ease;
+        }
+
+        .sidebar.show {
+          left: 0;
+        }
+
+        .main-content {
+          margin-left: 0;
+        }
+
+        .hamburger {
+          display: inline-block;
+          margin-right: 1rem;
+        }
+
+        .header-right {
+          display: none;
+        }
+
+        .sidebar-user-info {
+          display: block;
+        }
       }
 
       /* 페이지 헤더 */
@@ -628,6 +682,10 @@
         object-fit: contain;
       }
     </style>
+    <script th:inline="javascript">
+      const apiBaseUrl = /*[[ @{/api/programs} ]]*/ "/api/programs";
+      console.log("apiBaseUrl =", apiBaseUrl);
+    </script>
   </head>
   <body>
     <!-- 상단 헤더 -->
@@ -648,7 +706,7 @@
       </div>
       <div class="header-center">
         <img
-          src="../../static/images/logo-white.png"
+          th:src="@{/images/logo-white.png}"
           alt="logo"
           height="30"
           class="me-2"
@@ -671,25 +729,25 @@
     <!-- 좌측 사이드바 -->
     <aside class="sidebar" id="sidebar">
       <nav class="nav flex-column">
-        <a class="nav-link" href="/admin/dashboard">
+        <a class="nav-link" href="/employee/dashboard">
           <i class="bi bi-speedometer2 me-2"></i>대시보드
         </a>
-        <a class="nav-link" href="/admin/students">
+        <a class="nav-link" href="/employee/students">
           <i class="bi bi-people me-2"></i>학생 관리
         </a>
-        <a class="nav-link active" href="/admin/programs">
+        <a class="nav-link active" href="/employee/programs">
           <i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
         </a>
-        <a class="nav-link" href="/admin/competency">
+        <a class="nav-link" href="/employee/competency">
           <i class="bi bi-graph-up me-2"></i>역량 관리
         </a>
-        <a class="nav-link" href="/admin/counseling">
+        <a class="nav-link" href="/employee/counseling">
           <i class="bi bi-chat-dots me-2"></i>상담 관리
         </a>
-        <a class="nav-link" href="/admin/reports">
+        <a class="nav-link" href="/employee/reports">
           <i class="bi bi-file-text me-2"></i>보고서
         </a>
-        <a class="nav-link" href="/admin/settings">
+        <a class="nav-link" href="/employee/settings">
           <i class="bi bi-gear me-2"></i>시스템 설정
         </a>
       </nav>
@@ -720,7 +778,11 @@
               placeholder="프로그램명 검색"
               id="searchInput"
             />
-            <button class="btn btn-outline-secondary" type="button">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              onclick="searchPrograms()"
+            >
               <i class="bi bi-search"></i>
             </button>
           </div>
@@ -728,6 +790,7 @@
             class="form-select"
             style="max-width: 150px"
             id="statusFilter"
+            onchange="searchPrograms()"
           >
             <option value="">전체 상태</option>
             <option value="draft">임시저장</option>
@@ -739,6 +802,7 @@
             class="form-select"
             style="max-width: 150px"
             id="categoryFilter"
+            onchange="searchPrograms()"
           >
             <option value="">전체 카테고리</option>
             <option value="1">리더십</option>
@@ -757,8 +821,6 @@
           <thead>
             <tr>
               <th>번호</th>
-              <th>대표이미지</th>
-              <!-- 추가된 컬럼 -->
               <th>프로그램명</th>
               <th style="width: 100px">카테고리</th>
               <th style="width: 80px">정원</th>
@@ -777,12 +839,8 @@
 
       <!-- 페이지네이션 -->
       <div class="pagination-wrapper">
-        <div class="pagination">
-          <a href="#" class="page-btn">‹</a>
-          <a href="#" class="page-btn active">1</a>
-          <a href="#" class="page-btn">2</a>
-          <a href="#" class="page-btn">3</a>
-          <a href="#" class="page-btn">›</a>
+        <div class="pagination" id="paginationContainer">
+          <!-- 페이지네이션이 동적으로 생성됩니다 -->
         </div>
       </div>
     </main>
@@ -798,9 +856,6 @@
         </div>
         <div class="modal-body">
           <div class="detail-section">
-            <div class="detail-image-container">
-              <img id="detailProgramImage" src="" alt="프로그램 이미지" />
-            </div>
             <div class="form-section">
               <h4>기본 정보</h4>
               <div class="detail-grid">
@@ -823,7 +878,7 @@
               </div>
             </div>
             <div class="form-section">
-              <h4>기간 및 장소</h4>
+              <h4>기간</h4>
               <div class="detail-grid">
                 <div class="detail-item">
                   <span class="detail-label">신청기간</span>
@@ -833,34 +888,10 @@
                   <span class="detail-label">프로그램 기간</span>
                   <span class="detail-value" id="detailProgramPeriod"></span>
                 </div>
-                <div class="detail-item">
-                  <span class="detail-label">진행장소</span>
-                  <span class="detail-value" id="detailLocation"></span>
-                </div>
+                \
                 <div class="detail-item">
                   <span class="detail-label">수강정원</span>
                   <span class="detail-value" id="detailCapacity"></span>
-                </div>
-              </div>
-            </div>
-            <div class="form-section">
-              <h4>담당자 정보</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">담당자명</span>
-                  <span class="detail-value" id="detailManager"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">연락처</span>
-                  <span class="detail-value" id="detailContact">-</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">이메일</span>
-                  <span class="detail-value" id="detailEmail">-</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">소속부서</span>
-                  <span class="detail-value" id="detailDepartment">-</span>
                 </div>
               </div>
             </div>
@@ -895,35 +926,14 @@
           <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
         <div class="modal-body">
-          <!-- 이미지 업로드 영역 추가 -->
-          <div class="form-group">
-            <label for="programImage" class="form-label">프로그램 이미지</label>
-            <div class="image-upload-wrapper">
-              <div class="image-preview-container">
-                <img
-                  id="uploadPreview"
-                  src="/images/no-image.png"
-                  alt="이미지 미리보기"
-                />
-              </div>
-              <input
-                type="file"
-                id="programImage"
-                name="programImage"
-                class="form-control"
-                accept="image/*"
-                onchange="previewUploadImage(this)"
-              />
-            </div>
-          </div>
           <!-- 기존 폼 요소들 -->
           <form id="programForm">
             <div class="form-group">
-              <label class="form-label required">프로그램 ID</label>
+              <label class="form-label required">프로그램 코드</label>
               <input
                 type="text"
                 class="form-control"
-                id="prgId"
+                id="prgCode"
                 placeholder="PRG2024001"
                 maxlength="20"
                 required
@@ -1040,17 +1050,6 @@
 
             <div class="form-row">
               <div class="form-group">
-                <label class="form-label">진행 장소</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="location"
-                  placeholder="예: 학술관 101호"
-                  maxlength="100"
-                />
-              </div>
-
-              <div class="form-group">
                 <label class="form-label">담당자</label>
                 <input
                   type="text"
@@ -1074,100 +1073,7 @@
         </div>
       </div>
     </div>
-
     <script>
-      // 프로그램 데이터 (DB 테이블 구조에 맞춤)
-      const programs = [
-        {
-          id: 1,
-          prg_id: "PRG2024001",
-          prg_nm: "창의 아이디어 경진대회",
-          prg_desc:
-            "학업성취 향상 아이디어를 공모하는 사업으로 가장 좋은 아이디어를 발굴하는 프로그램",
-          max_cnt: 20,
-          mileage_score: 15,
-          location: "학술관 대강당",
-          manager: "김교수",
-          aply_bgng_ymd: "2024-11-01T09:00",
-          aply_end_ymd: "2024-12-20T23:59",
-          prg_st_dt: "2024-12-25T10:00",
-          prg_end_dt: "2025-01-25T17:00",
-          cci_id: 1,
-          categoryName: "리더십",
-          com_no: 1,
-          reg_dt: "2024-10-15T14:30",
-          upd_dt: "2024-10-15T14:30",
-          reg_user_id: "admin001",
-          upd_user_id: "admin001",
-        },
-        {
-          id: 2,
-          prg_id: "PRG2024002",
-          prg_nm: "글로벌 리더십 탐구",
-          prg_desc:
-            "다양한 문화권 사람들과의 의사소통 능력 향상을 위한 글로벌 리더십 발굴 프로그램",
-          max_cnt: 15,
-          mileage_score: 20,
-          location: "국제교육원",
-          manager: "이교수",
-          aply_bgng_ymd: "2024-10-15T09:00",
-          aply_end_ymd: "2024-12-15T23:59",
-          prg_st_dt: "2024-12-20T10:00",
-          prg_end_dt: "2025-02-05T17:00",
-          cci_id: 2,
-          categoryName: "글로벌",
-          com_no: 1,
-          reg_dt: "2024-09-20T11:20",
-          upd_dt: "2024-09-20T11:20",
-          reg_user_id: "admin001",
-          upd_user_id: "admin001",
-        },
-        {
-          id: 3,
-          prg_id: "PRG2024003",
-          prg_nm: "AI 역량개발 양성과정",
-          prg_desc:
-            "인공지능 기술 이해와 활용 능력을 기르는 미래 지향적 역량 개발 프로그램",
-          max_cnt: 12,
-          mileage_score: 25,
-          location: "AI연구센터",
-          manager: "박교수",
-          aply_bgng_ymd: "2024-10-01T09:00",
-          aply_end_ymd: "2024-12-10T23:59",
-          prg_st_dt: "2024-12-15T10:00",
-          prg_end_dt: "2025-02-15T17:00",
-          cci_id: 4,
-          categoryName: "AI역량",
-          com_no: 1,
-          reg_dt: "2024-09-15T09:45",
-          upd_dt: "2024-09-15T09:45",
-          reg_user_id: "admin002",
-          upd_user_id: "admin002",
-        },
-        {
-          id: 4,
-          prg_id: "PRG2025001",
-          prg_nm: "소통과 협업 프로젝트",
-          prg_desc:
-            "팀프로젝트 활동을 통해 혁신과 창의 협업의 기초 리더십을 함양하는 프로그램",
-          max_cnt: 25,
-          mileage_score: 12,
-          location: "창업보육센터",
-          manager: "최교수",
-          aply_bgng_ymd: "2025-01-10T09:00",
-          aply_end_ymd: "2025-02-10T23:59",
-          prg_st_dt: "2025-02-15T10:00",
-          prg_end_dt: "2025-04-15T17:00",
-          cci_id: 3,
-          categoryName: "전문성",
-          com_no: 1,
-          reg_dt: "2024-12-01T16:15",
-          upd_dt: "2024-12-01T16:15",
-          reg_user_id: "admin001",
-          upd_user_id: "admin001",
-        },
-      ];
-
       // DOM 요소들
       const programTableBody = document.getElementById("programTableBody");
       const programModal = document.getElementById("programModal");
@@ -1176,15 +1082,17 @@
       const searchInput = document.getElementById("searchInput");
       const statusFilter = document.getElementById("statusFilter");
       const categoryFilter = document.getElementById("categoryFilter");
-
       let editingProgram = null;
+      let programs = [];
+      let currentPage = 0;
+      let totalPages = 0;
 
       // 프로그램 상태 계산
       function getProgramStatus(program) {
         const now = new Date();
-        const applyStart = new Date(program.aply_bgng_ymd);
-        const applyEnd = new Date(program.aply_end_ymd);
-        const programEnd = new Date(program.prg_end_dt);
+        const applyStart = new Date(program.aplyBgngYmd);
+        const applyEnd = new Date(program.aplyEndYmd);
+        const programEnd = new Date(program.prgEndDt);
 
         if (now < applyStart) {
           return { status: "upcoming", text: "신청예정" };
@@ -1199,6 +1107,7 @@
 
       // 날짜 포맷팅
       function formatDate(dateString) {
+        if (!dateString) return "-";
         const date = new Date(dateString);
         return date
           .toLocaleDateString("ko-KR")
@@ -1208,6 +1117,7 @@
 
       // 날짜와 시간 포맷팅
       function formatDateTime(dateString) {
+        if (!dateString) return "-";
         const date = new Date(dateString);
         return date
           .toLocaleString("ko-KR")
@@ -1215,61 +1125,47 @@
           .replace(/\.$/, "");
       }
 
-      // 테이블 행 생성
+      // 테이블 행 생성 - 이미지 제거
       function createTableRow(program, index) {
+        // 안전성 체크
+        if (!program) {
+          return '<tr><td colspan="9" style="text-align:center;">데이터 오류</td></tr>';
+        }
+
         const status = getProgramStatus(program);
+        const categoryName = program.categoryName || "-";
+        const mileageScore =
+          program.mileageScore !== undefined ? program.mileageScore : "-";
 
         return `
           <tr>
-            <td>${index + 1}</td>
+            <td>${currentPage * 10 + index + 1}</td>
             <td>
-              <!-- 대표이미지 영역 -->
-              <div style="width: 60px; height: 60px; overflow: hidden; border-radius: 8px;">
-                <img
-                  src="https://via.placeholder.com/60"
-                  alt="대표이미지"
-                  style="width: 100%; height: 100%; object-fit: cover;"
-                />
-              </div>
-            </td>
-            <td>
-              <div style="font-weight: 600;">${program.prg_nm}</div>
-              <div style="font-size: 0.85rem; color: #6b7280;">${
-                program.prg_id
+              <div style="font-weight:600">${program.prgNm || ""}</div>
+              <div style="font-size:0.85rem;color:#6b7280">${
+                program.prgCode || ""
               }</div>
             </td>
+            <td><span class="category-badge">${categoryName}</span></td>
+            <td>${program.maxCnt || 0}명</td>
+            <td style="min-width:110px">${mileageScore} 점</td>
+            <td>${formatDate(program.aplyBgngYmd)}<br>~ ${formatDate(
+          program.aplyEndYmd
+        )}</td>
+            <td>${formatDate(program.prgStDt)}<br>~ ${formatDate(
+          program.prgEndDt
+        )}</td>
             <td>
-              <span class="category-badge">${program.categoryName}</span>
-            </td>
-            <td>${program.max_cnt}명</td>
-            <td>
-              <span style="font-weight: 600; color: #1a2a45;">${
-                program.mileage_score
-              }점</span>
-            </td>
-            <td>
-              <div style="font-size: 0.85rem;">
-                ${formatDate(program.aply_bgng_ymd)}<br>
-                ~ ${formatDate(program.aply_end_ymd)}
-              </div>
-            </td>
-            <td>
-              <div style="font-size: 0.85rem;">
-                ${formatDate(program.prg_st_dt)}<br>
-                ~ ${formatDate(program.prg_end_dt)}
-              </div>
-            </td>
-            <td>
-              <span class="status-badge status-${status.status}">${
-          status.text
-        }</span>
+              <span class="status-badge status-${status.status}">
+                ${status.text}
+              </span>
             </td>
             <td>
               <button class="btn-action btn-view" onclick="viewProgram(${
-                program.id
+                program.prgId
               })">상세</button>
               <button class="btn-action btn-edit" onclick="editProgram(${
-                program.id
+                program.prgId
               })">수정</button>
             </td>
           </tr>
@@ -1278,142 +1174,100 @@
 
       // 테이블 렌더링
       function renderTable() {
-        const filteredPrograms = filterPrograms();
-        programTableBody.innerHTML = filteredPrograms
-          .map((program, index) => createTableRow(program, index))
-          .join("");
+        console.log("Rendering table with programs:", programs);
+
+        if (!programs || programs.length === 0) {
+          programTableBody.innerHTML =
+            '<tr><td colspan="9" style="text-align:center; padding:2rem;">등록된 프로그램이 없습니다.</td></tr>';
+          return;
+        }
+
+        try {
+          const tableHTML = programs
+            .map((program, index) => createTableRow(program, index))
+            .join("");
+          programTableBody.innerHTML = tableHTML;
+        } catch (error) {
+          console.error("Table rendering error:", error);
+          programTableBody.innerHTML =
+            '<tr><td colspan="9" style="text-align:center; padding:2rem; color:red;">테이블 렌더링 오류</td></tr>';
+        }
       }
 
-      // 프로그램 필터링
-      function filterPrograms() {
-        return programs.filter((program) => {
-          const searchMatch =
-            searchInput.value === "" ||
-            program.prg_nm
-              .toLowerCase()
-              .includes(searchInput.value.toLowerCase()) ||
-            program.prg_id
-              .toLowerCase()
-              .includes(searchInput.value.toLowerCase());
+      // 페이지네이션 렌더링
+      function renderPagination() {
+        const paginationContainer = document.getElementById(
+          "paginationContainer"
+        );
+        let paginationHTML = "";
 
-          const statusMatch =
-            statusFilter.value === "" ||
-            getProgramStatus(program).status === statusFilter.value;
+        // 이전 페이지
+        if (currentPage > 0) {
+          paginationHTML += `<a href="#" class="page-btn" onclick="fetchPrograms(${
+            currentPage - 1
+          })">‹</a>`;
+        }
 
-          const categoryMatch =
-            categoryFilter.value === "" ||
-            program.cci_id.toString() === categoryFilter.value;
+        // 페이지 번호들
+        const startPage = Math.max(0, currentPage - 2);
+        const endPage = Math.min(totalPages - 1, currentPage + 2);
 
-          return searchMatch && statusMatch && categoryMatch;
-        });
+        for (let i = startPage; i <= endPage; i++) {
+          const activeClass = i === currentPage ? "active" : "";
+          paginationHTML += `<a href="#" class="page-btn ${activeClass}" onclick="fetchPrograms(${i})">${
+            i + 1
+          }</a>`;
+        }
+
+        // 다음 페이지
+        if (currentPage < totalPages - 1) {
+          paginationHTML += `<a href="#" class="page-btn" onclick="fetchPrograms(${
+            currentPage + 1
+          })">›</a>`;
+        }
+
+        paginationContainer.innerHTML = paginationHTML;
       }
 
-      // 프로그램 상세 보기
-      function viewProgram(id) {
-        const program = programs.find((p) => p.id === id);
+      // 프로그램 상세 보기 - 이미지 제거
+      function viewProgram(prgId) {
+        const program = programs.find((p) => p.prgId === prgId);
         if (program) {
-          document.getElementById("detailId").textContent = program.id;
-          document.getElementById("detailName").textContent = program.prg_nm;
+          document.getElementById("detailId").textContent = program.prgId;
+          document.getElementById("detailName").textContent =
+            program.prgNm || "-";
           document.getElementById("detailCategory").textContent =
-            program.categoryName;
-          document.getElementById(
-            "detailMileage"
-          ).textContent = `${program.mileage_score} 점`;
-          document.getElementById(
-            "detailCapacity"
-          ).textContent = `${program.max_cnt}명`;
+            program.categoryName || "-";
+          document.getElementById("detailMileage").textContent =
+            (program.mileageScore !== undefined ? program.mileageScore : "-") +
+            " 점";
+          document.getElementById("detailCapacity").textContent =
+            (program.maxCnt !== undefined ? program.maxCnt : "-") + "명";
           document.getElementById(
             "detailApplyPeriod"
-          ).textContent = `${formatDate(program.aply_bgng_ymd)} ~ ${formatDate(
-            program.aply_end_ymd
+          ).textContent = `${formatDate(program.aplyBgngYmd)} ~ ${formatDate(
+            program.aplyEndYmd
           )}`;
           document.getElementById(
             "detailProgramPeriod"
-          ).textContent = `${formatDate(program.prg_st_dt)} ~ ${formatDate(
-            program.prg_end_dt
+          ).textContent = `${formatDate(program.prgStDt)} ~ ${formatDate(
+            program.prgEndDt
           )}`;
           document.getElementById("detailLocation").textContent =
             program.location || "-";
-          document.getElementById("detailManager").textContent =
-            program.manager || "-";
-          document.getElementById("detailContact").textContent = "-";
-          document.getElementById("detailEmail").textContent = "-";
-          document.getElementById("detailDepartment").textContent = "-";
           document.getElementById("detailDescription").textContent =
-            program.prg_desc || "-";
-          document.getElementById("detailProgramImage").src =
-            program.image_url || "/images/no-image.png";
+            program.prgDesc || "-";
 
           detailModal.classList.add("show");
         }
       }
 
-      // 상세보기에서 수정하기로 전환하는 함수
-      function editFromDetail() {
-        const programId = document.getElementById("detailId").textContent;
-        const program = programs.find((p) => p.id === programId);
-
-        if (program) {
-          // 상세보기 모달 닫기
+      // 상세보기에서 수정하기로 전환
+      function editProgramFromDetail() {
+        const prgId = parseInt(document.getElementById("detailId").textContent);
+        if (!isNaN(prgId)) {
           closeDetailModal();
-
-          // 수정 모달의 title 변경
-          document.getElementById("modalTitle").textContent = "프로그램 수정";
-
-          // 수정 모달의 form 필드들에 데이터 채우기
-          document.getElementById("programName").value = program.prg_nm;
-          document.getElementById("category").value = program.category;
-          document.getElementById("mileage").value = program.mileage;
-          document.getElementById("capacity").value = program.capacity;
-          document.getElementById("startDate").value = program.aply_bgng_ymd;
-          document.getElementById("endDate").value = program.aply_end_ymd;
-          document.getElementById("prgStartDate").value = program.prg_bgng_ymd;
-          document.getElementById("prgEndDate").value = program.prg_end_ymd;
-          document.getElementById("location").value = program.location;
-          document.getElementById("description").value = program.description;
-          document.getElementById("managerName").value = program.manager_nm;
-          document.getElementById("managerContact").value = program.manager_tel;
-          document.getElementById("managerEmail").value = program.manager_email;
-          document.getElementById("department").value = program.dept_nm;
-
-          // 이미지 미리보기 설정
-          if (program.image_url) {
-            document.getElementById("uploadPreview").src = program.image_url;
-          }
-
-          // 수정 중인 프로그램 ID 저장
-          editingProgramId = program.id;
-
-          // 수정 모달 표시
-          const programModal = document.getElementById("programModal");
-          programModal.classList.add("show");
-        }
-      }
-
-      // 프로그램 수정 함수
-      function editProgram(id) {
-        const program = programs.find((p) => p.id === id);
-        if (program) {
-          // 수정 모달 폼에 데이터 설정
-          document.getElementById("programName").value = program.prg_nm;
-          document.getElementById("category").value = program.category_id;
-          document.getElementById("mileage").value = program.mileage;
-          document.getElementById("capacity").value = program.capacity;
-          document.getElementById("location").value = program.location;
-          // ... 나머지 필드들도 설정
-
-          // 이미지 미리보기 설정
-          document.getElementById("uploadPreview").src =
-            program.image_url || "/images/no-image.png";
-
-          // 수정 모달 제목 변경
-          document.getElementById("modalTitle").textContent = "프로그램 수정";
-
-          // 현재 수정중인 프로그램 ID 저장
-          editingProgramId = program.id;
-
-          // 수정 모달 표시
-          programModal.classList.add("show");
+          editProgram(prgId);
         }
       }
 
@@ -1431,40 +1285,48 @@
         document.body.style.overflow = "hidden";
       }
 
-      // 모달 열기 (수정)
-      function editProgram(id) {
-        editingProgram = programs.find((p) => p.id === id);
+      // 프로그램 수정 모달 열기
+      function editProgram(prgId) {
+        editingProgram = programs.find((p) => p.prgId === prgId);
+        if (!editingProgram) {
+          alert("프로그램을 찾을 수 없습니다.");
+          return;
+        }
+
         modalTitle.textContent = "프로그램 수정";
 
         // 폼에 데이터 채우기
-        document.getElementById("prgId").value = editingProgram.prg_id;
-        document.getElementById("prgNm").value = editingProgram.prg_nm;
-        document.getElementById("prgDesc").value =
-          editingProgram.prg_desc || "";
-        document.getElementById("cciId").value = editingProgram.cci_id;
-        document.getElementById("maxCnt").value = editingProgram.max_cnt;
+        document.getElementById("prgCode").value = editingProgram.prgCode || "";
+        document.getElementById("prgNm").value = editingProgram.prgNm || "";
+        document.getElementById("prgDesc").value = editingProgram.prgDesc || "";
+        document.getElementById("maxCnt").value = editingProgram.maxCnt || "";
         document.getElementById("mileageScore").value =
-          editingProgram.mileage_score;
+          editingProgram.mileageScore || "";
+        document.getElementById("aplyBgngYmd").value = formatDateTimeForInput(
+          editingProgram.aplyBgngYmd
+        );
+        document.getElementById("aplyEndYmd").value = formatDateTimeForInput(
+          editingProgram.aplyEndYmd
+        );
+        document.getElementById("prgStDt").value = formatDateTimeForInput(
+          editingProgram.prgStDt
+        );
+        document.getElementById("prgEndDt").value = formatDateTimeForInput(
+          editingProgram.prgEndDt
+        );
         document.getElementById("location").value =
           editingProgram.location || "";
         document.getElementById("manager").value = editingProgram.manager || "";
-        document.getElementById("aplyBgngYmd").value =
-          editingProgram.aply_bgng_ymd;
-        document.getElementById("aplyEndYmd").value =
-          editingProgram.aply_end_ymd;
-        document.getElementById("prgStDt").value = editingProgram.prg_st_dt;
-        document.getElementById("prgEndDt").value = editingProgram.prg_end_dt;
 
         programModal.classList.add("show");
         document.body.style.overflow = "hidden";
       }
 
-      function editProgramFromDetail() {
-        const id = parseInt(document.getElementById("detailId").textContent);
-        if (!isNaN(id)) {
-          closeDetailModal();
-          editProgram(id);
-        }
+      // datetime-local input을 위한 날짜 포맷팅
+      function formatDateTimeForInput(dateString) {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toISOString().slice(0, 16);
       }
 
       // 모달 닫기
@@ -1474,122 +1336,143 @@
         editingProgram = null;
       }
 
-      // 프로그램 저장
-      function saveProgram() {
+      // 프로그램 저장 (실제 API 호출)
+      async function saveProgram() {
         const formData = {
-          prg_id: document.getElementById("prgId").value,
-          prg_nm: document.getElementById("prgNm").value,
-          prg_desc: document.getElementById("prgDesc").value,
-          cci_id: parseInt(document.getElementById("cciId").value),
-          max_cnt: parseInt(document.getElementById("maxCnt").value),
-          mileage_score: parseInt(
-            document.getElementById("mileageScore").value
-          ),
-          location: document.getElementById("location").value,
-          manager: document.getElementById("manager").value,
-          aply_bgng_ymd: document.getElementById("aplyBgngYmd").value,
-          aply_end_ymd: document.getElementById("aplyEndYmd").value,
-          prg_st_dt: document.getElementById("prgStDt").value,
-          prg_end_dt: document.getElementById("prgEndDt").value,
+          prgCode: document.getElementById("prgCode").value.trim(),
+          prgNm: document.getElementById("prgNm").value.trim(),
+          prgDesc: document.getElementById("prgDesc").value.trim(),
+          maxCnt: parseInt(document.getElementById("maxCnt").value),
+          aplyBgngYmd: document.getElementById("aplyBgngYmd").value,
+          aplyEndYmd: document.getElementById("aplyEndYmd").value,
+          prgStDt: document.getElementById("prgStDt").value,
+          prgEndDt: document.getElementById("prgEndDt").value,
         };
 
         // 유효성 검사
         if (
-          !formData.prg_id ||
-          !formData.prg_nm ||
-          !formData.cci_id ||
-          !formData.max_cnt ||
-          !formData.mileage_score ||
-          !formData.aply_bgng_ymd ||
-          !formData.aply_end_ymd ||
-          !formData.prg_st_dt ||
-          !formData.prg_end_dt
+          !formData.prgCode ||
+          !formData.prgNm ||
+          !formData.maxCnt ||
+          !formData.aplyBgngYmd ||
+          !formData.aplyEndYmd ||
+          !formData.prgStDt ||
+          !formData.prgEndDt
         ) {
           alert("필수 항목을 모두 입력해주세요.");
           return;
         }
 
         // 날짜 유효성 검사
-        if (
-          new Date(formData.aply_bgng_ymd) >= new Date(formData.aply_end_ymd)
-        ) {
+        if (new Date(formData.aplyBgngYmd) >= new Date(formData.aplyEndYmd)) {
           alert("신청 시작일은 종료일보다 빨라야 합니다.");
           return;
         }
 
-        if (new Date(formData.prg_st_dt) >= new Date(formData.prg_end_dt)) {
+        if (new Date(formData.prgStDt) >= new Date(formData.prgEndDt)) {
           alert("프로그램 시작일은 종료일보다 빨라야 합니다.");
           return;
         }
 
-        // 카테고리명 매핑
-        const categoryNames = {
-          1: "리더십",
-          2: "글로벌",
-          3: "전문성",
-          4: "AI역량",
-          5: "창업",
-          6: "상담",
-        };
-
-        if (editingProgram) {
-          // 수정
-          const index = programs.findIndex((p) => p.id === editingProgram.id);
-          programs[index] = {
-            ...programs[index],
-            ...formData,
-            categoryName: categoryNames[formData.cci_id],
-            upd_dt: new Date().toISOString().slice(0, 19),
-            upd_user_id: "admin001",
-          };
-          alert("프로그램이 수정되었습니다.");
-        } else {
-          // 중복 ID 체크
-          if (programs.some((p) => p.prg_id === formData.prg_id)) {
-            alert("이미 존재하는 프로그램 ID입니다.");
-            return;
+        try {
+          let response;
+          if (editingProgram) {
+            // 수정
+            response = await fetch(`${apiBaseUrl}/${editingProgram.prgId}`, {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
+          } else {
+            // 새로 생성
+            response = await fetch(apiBaseUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(formData),
+            });
           }
 
-          // 추가
-          const newProgram = {
-            id: Math.max(...programs.map((p) => p.id)) + 1,
-            ...formData,
-            categoryName: categoryNames[formData.cci_id],
-            com_no: 1,
-            reg_dt: new Date().toISOString().slice(0, 19),
-            upd_dt: new Date().toISOString().slice(0, 19),
-            reg_user_id: "admin001",
-            upd_user_id: "admin001",
-          };
-          programs.push(newProgram);
-
-          alert("프로그램이 등록되었습니다.");
-        }
-
-        closeModal();
-        renderTable();
-      }
-
-      // 이미지 미리보기
-      function previewUploadImage(input) {
-        const file = input.files[0];
-        const previewContainer = document.getElementById("uploadPreview");
-
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewContainer.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        } else {
-          previewContainer.src = "/images/no-image.png";
+          if (response.ok) {
+            alert(
+              editingProgram
+                ? "프로그램이 수정되었습니다."
+                : "프로그램이 등록되었습니다."
+            );
+            closeModal();
+            fetchPrograms(currentPage); // 현재 페이지 새로고침
+          } else {
+            const error = await response.text();
+            alert("저장 중 오류가 발생했습니다: " + error);
+          }
+        } catch (error) {
+          console.error("Save error:", error);
+          alert("저장 중 오류가 발생했습니다.");
         }
       }
 
-      // 이벤트 리스너
-      searchInput.addEventListener("input", renderTable);
-      statusFilter.addEventListener("change", renderTable);
-      categoryFilter.addEventListener("change", renderTable);
+      // 실제 API에서 프로그램 목록 가져오기
+      async function fetchPrograms(
+        page = 0,
+        size = 10,
+        keyword = "",
+        categoryId = ""
+      ) {
+        try {
+          const params = new URLSearchParams({
+            page: page,
+            size: size,
+          });
+
+          if (keyword) params.append("keyword", keyword);
+          if (categoryId) params.append("categoryId", categoryId);
+
+          const url = `${apiBaseUrl}?${params.toString()}`;
+          console.log("▶︎ Fetching URL:", url);
+
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const json = await response.json();
+          console.log("API Response:", json);
+
+          // API 응답 구조 확인 및 안전한 데이터 추출
+          programs = Array.isArray(json.content) ? json.content : [];
+          currentPage = json.number || 0;
+          totalPages = json.totalPages || 0;
+
+          console.log("Processed programs:", programs);
+          console.log("Current page:", currentPage, "Total pages:", totalPages);
+
+          renderTable();
+          renderPagination();
+        } catch (error) {
+          console.error("Fetch error:", error);
+          alert("데이터를 불러오는 중 오류가 발생했습니다: " + error.message);
+          programs = []; // 빈 배열로 초기화
+          programTableBody.innerHTML =
+            '<tr><td colspan="9" style="text-align:center; padding:2rem; color:red;">데이터 로딩 실패</td></tr>';
+        }
+      }
+
+      // 검색 함수
+      function searchPrograms() {
+        const keyword = searchInput.value.trim();
+        const categoryId = categoryFilter.value;
+        fetchPrograms(0, 10, keyword, categoryId); // 검색 시 첫 페이지로 이동
+      }
+
+      // Enter 키로 검색
+      searchInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          searchPrograms();
+        }
+      });
 
       // 모달 오버레이 클릭 시 닫기
       programModal.addEventListener("click", (e) => {
@@ -1642,8 +1525,10 @@
       // 윈도우 리사이즈 이벤트
       window.addEventListener("resize", updateSidebarVisibility);
 
-      // 초기 렌더링
-      renderTable();
+      // 초기 로딩
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchPrograms(0, 10);
+      });
     </script>
   </body>
 </html>
