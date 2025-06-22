@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.repository;
 
+import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,8 @@ import java.util.List;
  * - 문항 데이터베이스 접근 레이어
  */
 public interface CoreCptQstRepository extends JpaRepository<CoreCptQst, Long> {
-
+    // 특정 역량 엔티티에 속한 문항만 조회
+    List<CoreCptQst> findByCoreCptInfo(CoreCptInfo info);
     /**
      * ✅ 하위 역량별 최대 문항 코드 조회
      *
@@ -46,4 +48,6 @@ public interface CoreCptQstRepository extends JpaRepository<CoreCptQst, Long> {
             @Param("keyword") String keyword,
             Pageable pageable
     );
+    // ✅ 특정 역량에 속한 문항 목록 조회 (문항 순서 기준)
+    List<CoreCptQst> findByCoreCptInfoOrderByQstOrdAsc(CoreCptInfo coreCptInfo);
 }

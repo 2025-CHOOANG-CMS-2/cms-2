@@ -1,3 +1,4 @@
+
 package kr.ac.dhuniv.counsel.controller;
 
 import org.springframework.http.ResponseEntity;
@@ -49,3 +50,4 @@ public class CounselStudentApiController {
         return ResponseEntity.ok().build();
     }
 }
+

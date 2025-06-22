@@ -1,3 +1,4 @@
+
 package kr.ac.dhuniv.counsel.controller;
 
 import java.util.List;
@@ -74,3 +75,4 @@ public class CounselApiController {
         return ResponseEntity.ok().build();
     }
 }
+

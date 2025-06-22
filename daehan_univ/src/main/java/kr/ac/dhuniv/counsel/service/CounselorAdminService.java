@@ -1,3 +1,5 @@
+
+
 package kr.ac.dhuniv.counsel.service;
 
 import java.util.List;
@@ -22,3 +24,5 @@ public interface CounselorAdminService {
 	
 	void updateCounselorStatus(String counselorId, boolean isActive);
 }
+
+

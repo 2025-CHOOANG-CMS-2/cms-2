@@ -38,6 +38,7 @@ public class StdInfo {
     @Column(name = "sch_yr", nullable = false)
     private Integer schoolYear; // 학년
 
+
     @Column(name = "entr_dt", nullable = false, updatable = false)
     private LocalDate entranceDate; // 입학일자
 
@@ -62,6 +63,7 @@ public class StdInfo {
 
     @Column(name = "use_yn", nullable = false, length = 1)
     private String useYn; // 학생 정보 자체의 사용 여부 (Y/N)
+
     
     @Column(name = "profile_image_url", length = 500) 
     private String profileImageUrl; // 프로필 이미지 URL

@@ -99,4 +99,5 @@ public class CoreCptInfoController {
         // ✅ 삭제 성공 시 204 반환
         return ResponseEntity.noContent().build();
     }
+
 }

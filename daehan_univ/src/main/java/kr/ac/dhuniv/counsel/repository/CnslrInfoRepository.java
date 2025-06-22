@@ -1,15 +1,19 @@
+
 package kr.ac.dhuniv.counsel.repository;
 
 import kr.ac.dhuniv.counsel.domain.CnslrInfo;
 import kr.ac.dhuniv.counsel.dto.CounselorListDto;
 import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+
 import java.util.List;
 import java.util.Optional;
+
 
 @Repository
 public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
@@ -69,3 +73,4 @@ public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
         List<Object[]> findActiveCounselorsByFilterNative(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
 
 }
+
