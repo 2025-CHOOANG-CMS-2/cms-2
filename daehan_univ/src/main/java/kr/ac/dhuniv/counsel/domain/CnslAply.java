@@ -44,4 +44,10 @@ public class CnslAply {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empl_no", referencedColumnName = "empl_no")
     private EmplInfo employee;
+
+    
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content; // 상담 신청 내용
+    
+
 }

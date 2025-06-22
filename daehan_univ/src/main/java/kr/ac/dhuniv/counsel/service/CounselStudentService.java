@@ -3,6 +3,8 @@ package kr.ac.dhuniv.counsel.service;
 
 import kr.ac.dhuniv.counsel.dto.AvailableSlotsDto;
 import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
+import kr.ac.dhuniv.counsel.dto.CreateReservationRequestDto;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -30,5 +32,11 @@ public interface CounselStudentService {
 
     Map<String, List<AvailableSlotsDto>> getAvailableSlotsForMonth(Integer year, Integer month, String counselingType, String counselorId);
     
-    // 여기에 나중에 상담 예약을 생성하는 createReservation 메소드도 추가할 것입니다.
-}*/
+
+    /**
+     * 학생이 상담 예약을 생성합니다.
+     * @param requestDto 예약 생성에 필요한 데이터
+     */
+    void createReservation(CreateReservationRequestDto requestDto);
+}
+

@@ -1,68 +1,76 @@
-/*
+
 package kr.ac.dhuniv.counsel.repository;
 
-import java.util.List;
-import java.util.Optional;
+import kr.ac.dhuniv.counsel.domain.CnslrInfo;
+import kr.ac.dhuniv.counsel.dto.CounselorListDto;
+import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import kr.ac.dhuniv.counsel.domain.CnslrInfo;
-import kr.ac.dhuniv.counsel.dto.CounselorListDto;
-import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
+
+import java.util.List;
+import java.util.Optional;
+
 
 @Repository
 public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
 
-    // [최종 수정된 쿼리 1: 목록 조회]
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorListDto(" +
-           "  ci.emplNo, " +
-           "  ei.emplNm, " +
-           "  ei.emplEmailAddr, " +
-           "  ei.emplTelno, " +
-           "  ci.cnslSpec, " +
-           "  CASE WHEN ci.isActive = true THEN 'active' ELSE 'inactive' END, " +
-           "  ci.intro, " + // [수정] intro 필드 추가
-           "  COUNT(DISTINCT cr.cnslRsltId), " +
-           "  COALESCE(AVG(cr.satisfactionScore), 0.0)" + 
-           ") " +
+    // [수정] 학생 페이지 필터링을 위한 단 하나의 최종 쿼리 메소드
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
            "FROM CnslrInfo ci " +
-           "JOIN EmplInfo ei ON ci.emplNo = ei.emplNo " +
-           "LEFT JOIN CnslAply ca ON ci.emplNo = ca.employee.emplNo " +
-           "LEFT JOIN CnslRslt cr ON ca.cnslAplyId = cr.counselingApplication.cnslAplyId " +
-           "GROUP BY ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, ci.cnslSpec, ci.isActive, ci.intro") // [수정] GROUP BY 에 intro 추가
-    List<CounselorListDto> findCounselorList();
-    
-    // [최종 수정된 쿼리 2: 상세 조회]
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorListDto(" +
-           "  ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, " +
-           "  ci.cnslSpec, CASE WHEN ci.isActive = true THEN 'active' ELSE 'inactive' END, " +
-           "  ci.intro, " + // [수정] intro 필드 추가
-           "  COUNT(DISTINCT cr.cnslRsltId), COALESCE(AVG(cr.satisfactionScore), 0.0)" +
-           ") " +
-           "FROM CnslrInfo ci " +
-           "JOIN EmplInfo ei ON ci.emplNo = ei.emplNo " +
-           "LEFT JOIN CnslAply ca ON ci.emplNo = ca.employee.emplNo " +
-           "LEFT JOIN CnslRslt cr ON ca.cnslAplyId = cr.counselingApplication.cnslAplyId " +
-           "WHERE ci.emplNo = :emplNo " +
-           "GROUP BY ci.emplNo, ei.emplNm, ei.emplEmailAddr, ei.emplTelno, ci.cnslSpec, ci.isActive, ci.intro") // [수정] GROUP BY 에 intro 추가
-    Optional<CounselorListDto> findCounselorDetailByEmplNo(@Param("emplNo") String emplNo);
+           "WHERE ci.isActive = true " +
+           "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
+           "AND (:counselorId = 'all' OR ci.employee.user.userId = :counselorId)")
+    List<CounselorSimpleDto> findSimpleActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
 
-    // 수정 기능을 위한 메소드
-    Optional<CnslrInfo> findByEmplNo(String emplNo);
+    // '전체'를 선택했을 때 사용할, 모든 활성 상담사를 조회하는 메소드
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
+           "FROM CnslrInfo ci WHERE ci.isActive = true")
+    List<CounselorSimpleDto> findAllSimpleActiveCounselors();
     
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
-            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
-            "WHERE ci.isActive = true AND ci.cnslSpec = :specialty")
-     List<CounselorSimpleDto> findActiveCounselorsBySpecialty(@Param("specialty") String specialty);
+    // 학생 페이지 상담사 필터링을 위한 JPQL 쿼리
+    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
+           "FROM CnslrInfo ci " +
+           "WHERE ci.isActive = true " +
+           "AND (:specialty = 'all' OR ci.cnslSpec = :specialty)")
+    List<CounselorSimpleDto> findSimpleActiveCounselorsBySpecialty(@Param("specialty") String specialty);
+
+    @Query(value =
+        "SELECT " +
+        "   e.empl_no as counselorId, e.empl_nm as name, e.empl_eml_addr as email, e.empl_telno as phone, " +
+        "   ci.cnsl_spec as specialty, CASE WHEN ci.is_active = true THEN 'active' ELSE 'inactive' END as status, ci.intro as intro, " +
+        "   (SELECT COUNT(*) FROM cnsl_aply ca WHERE ca.empl_no = e.empl_no) as consultationCount, " +
+        "   COALESCE((SELECT AVG(rs.satisf_score) FROM cnsl_rslt rs JOIN cnsl_aply ca ON rs.cnsl_aply_id = ca.cnsl_aply_id WHERE ca.empl_no = e.empl_no), 0.0) as averageRating " +
+        "FROM cnslr_info ci " +
+        "JOIN empl_info e ON ci.empl_no = e.empl_no " +
+        "WHERE e.empl_no = :userId",
+        nativeQuery = true)
+    Optional<Object[]> findCounselorDetailByUserIdNative(@Param("userId") String userId);
     
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.emplNo, e.emplNm) " +
-            "FROM CnslrInfo ci JOIN EmplInfo e ON ci.emplNo = e.emplNo " +
-            "WHERE ci.isActive = true " +
-            "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
-            "AND (:counselorId = 'all' OR ci.emplNo = :counselorId)")
-     List<CounselorSimpleDto> findActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
-    
-}*/
+    Optional<CnslrInfo> findByEmployee_User_UserId(String userId);
+
+    // 관리자 페이지 목록/필터 조회를 위한 네이티브 쿼리
+    @Query(value =
+            "SELECT " +
+            "   e.empl_no as counselorId, " +
+            "   e.empl_nm as name, " +
+            "   e.empl_eml_addr as email, " +
+            "   e.empl_telno as phone, " +
+            "   ci.cnsl_spec as specialty, " +
+            "   CASE WHEN ci.is_active = true THEN 'active' ELSE 'inactive' END as status, " +
+            "   ci.intro as intro, " +
+            "   (SELECT COUNT(*) FROM cnsl_aply ca WHERE ca.empl_no = e.empl_no) as consultationCount, " +
+            "   COALESCE((SELECT AVG(rs.satisf_score) FROM cnsl_rslt rs JOIN cnsl_aply ca ON rs.cnsl_aply_id = ca.cnsl_aply_id WHERE ca.empl_no = e.empl_no), 0.0) as averageRating " +
+            "FROM cnslr_info ci " +
+            "JOIN empl_info e ON ci.empl_no = e.empl_no " +
+            "WHERE ci.is_active = true " +
+            "AND (:specialty = 'all' OR ci.cnsl_spec = :specialty) " +
+            "AND (:counselorId = 'all' OR ci.empl_no = :counselorId) ",
+            nativeQuery = true)
+        List<Object[]> findActiveCounselorsByFilterNative(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
+
+}
+

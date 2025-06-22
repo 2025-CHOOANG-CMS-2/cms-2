@@ -259,35 +259,43 @@
             <button class="tab-btn active" data-tab="schedule-view"><i class="fas fa-calendar-alt"></i> 일정 및 예약 관리</button>
             <button class="tab-btn" data-tab="work-hours-setting"><i class="fas fa-clock"></i> 기본 근무시간 설정</button>
         </div>
+    </div>
 
-        <div class="tab-content active" id="schedule-view">
-            <div class="calendar-appointments-container">
-                <div class="calendar-container">
-                  <h3><i class="fas fa-calendar-alt"></i> 예약 현황 캘린더</h3>
-                  <div class="calendar-header">
-                    <button class="calendar-nav" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
-                    <h4 id="currentMonth">2025년 6월</h4>
-                    <button class="calendar-nav" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+    <div class="tab-content active" id="schedule-view">
+        <div class="calendar-appointments-container">
+            <div class="calendar-container">
+              <h3><i class="fas fa-calendar-alt"></i> 예약 현황 캘린더</h3>
+              
+              <div class="calendar-header">
+                <button class="calendar-nav" id="prevMonth"><i class="fas fa-chevron-left"></i></button>
+                <h4 id="currentMonth"></h4>
+                <button class="calendar-nav" id="nextMonth"><i class="fas fa-chevron-right"></i></button>
+              </div>
+
+              <div class="calendar-weekdays">
+                  <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+              </div>
+
+              <div class="calendar-grid" id="calendarGridForView">
                   </div>
-                  <div class="calendar-grid" id="calendarGridForView">
-                      </div>
-                  <div class="calendar-legend">
-                      <div class="legend-item"><span class="legend-color has-pending"></span><span>승인 대기</span></div>
-                      <div class="legend-item"><span class="legend-color has-approved"></span><span>예약 확정</span></div>
-                      <div class="legend-item"><span class="legend-color has-exception"></span><span>예외(휴무)</span></div>
-                  </div>
-                </div>
-                <div class="appointments-container">
-                  <div class="selected-date-appointments" id="selectedDateAppointments" style="display: none;">
-                      <h3><i class="fas fa-list-alt"></i> 선택된 날짜의 예약 현황</h3>
-                      <div class="appointment-list" id="dateAppointmentList"></div>
-                  </div>
-                  <div class="no-date-selected" id="noDateSelected">
-                      <div class="empty-state"><i class="fas fa-calendar-day"></i><p>캘린더에서 날짜를 선택해주세요.</p></div>
-                  </div>
-                </div>
+                  
+              <div class="calendar-legend">
+                  <div class="legend-item"><span class="legend-color has-pending"></span><span>승인 대기</span></div>
+                  <div class="legend-item"><span class="legend-color has-approved"></span><span>예약 확정</span></div>
+                  <div class="legend-item"><span class="legend-color has-exception"></span><span>예외(휴무)</span></div>
+              </div>
+            </div>
+            <div class="appointments-container">
+              <div class="selected-date-appointments" id="selectedDateAppointments" style="display: none;">
+                  <h3><i class="fas fa-list-alt"></i> 선택된 날짜의 예약 현황</h3>
+                  <div class="appointment-list" id="dateAppointmentList"></div>
+              </div>
+              <div class="no-date-selected" id="noDateSelected">
+                  <div class="empty-state"><i class="fas fa-calendar-day"></i><p>캘린더에서 날짜를 선택해주세요.</p></div>
+              </div>
             </div>
         </div>
+    </div>
 
         <div class="tab-content" id="work-hours-setting">
             <div class="two-column-layout">
@@ -336,6 +344,30 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="resultModalTitle">상담 결과 작성</h3>
+                <button class="modal-close" onclick="closeModal('resultModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="resultForm">
+                    <input type="hidden" id="resultApplyId">
+                    
+                    <div class="form-group">
+                        <label class="form-label">상담 내용 및 결과</label>
+                        <textarea id="resultContent" class="form-control" rows="10" placeholder="상담 내용을 요약하고, 결과를 입력해주세요..."></textarea>
+                    </div>
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeModal('resultModal')">취소</button>
+                <button type="button" class="btn btn-primary" onclick="saveResult()">결과 저장</button>
             </div>
         </div>
     </div>
