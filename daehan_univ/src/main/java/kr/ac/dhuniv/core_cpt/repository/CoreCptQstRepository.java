@@ -15,7 +15,8 @@ import java.util.List;
  * - 문항 데이터베이스 접근 레이어
  */
 public interface CoreCptQstRepository extends JpaRepository<CoreCptQst, Long> {
-
+    // 특정 역량 엔티티에 속한 문항만 조회
+    List<CoreCptQst> findByCoreCptInfo(CoreCptInfo info);
     /**
      * ✅ 하위 역량별 최대 문항 코드 조회
      *

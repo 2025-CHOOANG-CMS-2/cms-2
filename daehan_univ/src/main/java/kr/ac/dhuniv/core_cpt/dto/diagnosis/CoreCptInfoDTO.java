@@ -1,5 +1,6 @@
 package kr.ac.dhuniv.core_cpt.dto.diagnosis;
 
+import kr.ac.dhuniv.core_cpt.dto.qst.CoreCptQstListDTO;
 import lombok.*;
 
 import java.util.List;
@@ -19,6 +20,6 @@ public class CoreCptInfoDTO {
     private String cciNm;                // 역량명
     private String cciDesc;              // 역량 설명
     private String colorHex;             // 색상 코드
-    private List<CoreCptQstDTO> questions; // 역량에 속한 문항 목록
+    private List<CoreCptQstListDTO> questions;// 역량에 속한 문항 목록
     private List<CoreCptInfoDTO> children; // 하위 역량 목록 (재귀적 구조)
 }

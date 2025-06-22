@@ -1,34 +1,35 @@
 package kr.ac.dhuniv.core_cpt.dto.result;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import lombok.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * ✅ DiagnosisResultDTO
- * - 학생의 진단 결과 응답용 DTO
+ * 전체 진단 결과 DTO
  */
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class DiagnosisResultDTO {
-    private Long stdNo;                  // 학생 번호
-    private String userId;               // 학번 or 사번 (비즈니스 키)
-    private Integer totalScore;          // 총합 점수 (평균 또는 합산)
-    private LocalDateTime submittedAt;   // 제출일시
-    private List<CompetencyScore> competencies; // 핵심역량별 점수
+    /** 전체 종합 점수(0–100) */
+    private double totalScore;
+    /** 상위역량별 상세 결과 */
+    private List<CompetencyScoreDTO> details;
 
-    @Getter
-    @Setter
+    @Data
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class CompetencyScore {
-        private Long cciId;         // 핵심역량 ID
-        private String cciNm;       // 핵심역량명
-        private Integer score;      // 핵심역량 점수
+    public static class CompetencyScoreDTO {
+        private Long cciId;           // 상위역량 ID
+        private String cciNm;         // 역량명
+        private int questionCount;    // 해당역량(하위 포함) 문항수
+        private int sumScore;         // 문항별 합산 점수
+        private int maxScore;         // 문항별 최대 합산 점수
+        private double percentage;    // sumScore/maxScore * 100
+        private int weight;           // CoreCptInfo.weight (%)
     }
 }

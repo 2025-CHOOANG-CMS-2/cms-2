@@ -3,6 +3,7 @@ package kr.ac.dhuniv.core_cpt.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,5 +18,11 @@ public interface CoreCptInfoRepository extends JpaRepository<CoreCptInfo, Long>{
 
     // 상위 역량 (parent == null) 목록 조회
     List<CoreCptInfo> findByParentIsNullOrderByCciIdAsc();
+
+    // 상위(Parent=null)만 weight 오름차순으로 조회
+    List<CoreCptInfo> findByParentIsNullOrderByWeightAsc();
+
+    @Query("SELECT c FROM CoreCptInfo c WHERE c.parent IS NULL")
+    List<CoreCptInfo> findRootCompetencies();
 
 }
