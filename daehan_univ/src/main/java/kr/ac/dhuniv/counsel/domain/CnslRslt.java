@@ -1,9 +1,7 @@
 package kr.ac.dhuniv.counsel.domain;
 
-
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -36,7 +34,7 @@ public class CnslRslt {
     @Column(name = "rslt_cd", length = 10)
     private String resultCode;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne // CnslAply와 1:1 양방향 관계를 위해 수정
     @JoinColumn(name = "cnsl_aply_id", referencedColumnName = "cnsl_aply_id")
     private CnslAply counselingApplication;
 }

@@ -360,8 +360,8 @@ body {
 							</div>
 							<div class="col-md-3">
 								<label for="coreCompetency" class="form-label fw-bold">핵심역량</label>
-								<select class="form-select" id="coreCompetency"
-									name="coreCompetency">
+								<select class="form-select" id="competencyId"
+									name="competencyId">
 									<option value="">전체</option>
 									<th:block th:each="core : ${coreCompetencies}">
 										<option th:value="${core.id}" th:text="${core.name}"></option>
@@ -667,7 +667,6 @@ body {
         
         // DOMContentLoaded 이벤트 : HTML 문서의 DOM 트리가 완성되었을 때 발생
 		document.addEventListener("DOMContentLoaded", () => {
-		  console.log("테스트");
 		  searchCompletedPrograms();  // 페이지 열릴 때 한번 호출하여 초기 데이터 로딩
 		});
 
@@ -676,7 +675,7 @@ body {
 		  // 각 검색 필드 값 가져오기 (초기 데이터 로딩시에 각 값은 null 임)
 		  const startDate = document.getElementById("startDate").value;
 		  const endDate = document.getElementById("endDate").value;
-		  const coreCompetency = document.getElementById("coreCompetency").value;
+		  const competencyId = document.getElementById("competencyId").value;
 		  const programId = document.getElementById("programId").value;
 
 		  // 쿼리 파라미터 생성
@@ -684,7 +683,7 @@ body {
 
 		  if (startDate) params.append("startDate", startDate);
 		  if (endDate) params.append("endDate", endDate);
-		  if (coreCompetency) params.append("coreCompetency", coreCompetency);
+		  if (competencyId) params.append("competencyId", competencyId);
 		  if (programId) params.append("programId", programId);
 
 		  // API 호출 URL에 파라미터 붙이기
@@ -700,6 +699,7 @@ body {
 		    })
 		    .then(data => {
 		      renderCompletedPrograms(data);
+		      console.log(data);
 		      bindCheckboxEvents(); //동적으로 삽입된 체크박스에 이벤트 바인딩
 		    })
 		    .catch(error => {
@@ -749,7 +749,6 @@ body {
 		// 전체 선택 토글 함수
 		function toggleSelectAllPayment() {
 		  const selectAll = document.getElementById("selectAllPayment").checked;
-		  console.log("selectAll: " + selectAll);
 		  document.querySelectorAll(".payment-checkbox").forEach(cb => {
 		    cb.checked = selectAll;
 		  });
@@ -760,7 +759,6 @@ body {
 		  const allCheckboxes = Array.from(document.querySelectorAll(".payment-checkbox"));
 		  const selectAllCheckbox = document.getElementById("selectAllPayment");
 		  const allChecked = allCheckboxes.length > 0 && allCheckboxes.every(cb => cb.checked);
-		  console.log("allChecked: " + allChecked);
 		  selectAllCheckbox.checked = allChecked;
 		}
 
@@ -793,7 +791,7 @@ body {
 	      	const prgNm = tr.children[3].textContent;
 	      	const mileageInput = tr.querySelector("input[type='number']");
 	      	const mileageScore = parseFloat(mileageInput.value) || 0;
-	  
+
 	      	return { stdId, prgId, cmpId, mileageScore };
 	      });
 	      
@@ -814,8 +812,29 @@ body {
 	      	});
         }
 
+		//이수 내역 엑셀 다운로드 
         function exportToExcel() {
-            alert('엑셀 파일로 다운로드합니다.');
+       	  // 실제 테이블에서 데이터를 추출하여 복사본 테이블 생성
+       	  const table = document.querySelector(".payment-management-table");
+       	  const clone = table.cloneNode(true);
+
+       	  // input 값을 텍스트로 변환
+       	  const inputs = clone.querySelectorAll("input[type='number']");
+       	  inputs.forEach(input => {
+       	    const td = input.closest('td');
+       	    td.textContent = input.value;
+       	  });
+
+       	  const tableHTML = clone.outerHTML.replace(/ /g, '%20');
+       	  const filename = 'completed_programs.xls';
+       	  const dataType = 'application/vnd.ms-excel';
+       	  const downloadLink = document.createElement("a");
+
+       	  document.body.appendChild(downloadLink);
+       	  downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+       	  downloadLink.download = filename;
+       	  downloadLink.click();
+       	  document.body.removeChild(downloadLink);
         }
 
         // 지급 내역 관련 함수들

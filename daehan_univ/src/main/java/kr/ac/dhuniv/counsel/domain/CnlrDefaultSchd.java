@@ -1,51 +1,43 @@
 package kr.ac.dhuniv.counsel.domain;
 
-import java.time.LocalTime;
 import jakarta.persistence.*;
 import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import lombok.*;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "cnlr_default_schd") // 테이블 이름 예시
+@Table(name = "cnlr_default_schd")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CnlrDefaultSchd {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    // 월요일(1) ~ 일요일(7)을 저장
-    @Column(nullable = false)
-    private Integer dayOfWeek;
-
-    @Column
-    private LocalTime startTime;
-
-    @Column
-    private LocalTime endTime;
-
-    // 근무 여부 (체크박스)
-    @Column(nullable = false)
-    private Boolean isWorkingDay;
+    @Column(name = "cnlr_default_id")
+    private Long cnlrDefaultId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empl_no", referencedColumnName = "empl_no")
     private EmplInfo employee;
 
-    @Builder
-    public CnlrDefaultSchd(Integer dayOfWeek, LocalTime startTime, LocalTime endTime, Boolean isWorkingDay, EmplInfo employee) {
-        this.dayOfWeek = dayOfWeek;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.isWorkingDay = isWorkingDay;
-        this.employee = employee;
-    }
+    @Column(name = "day_of_week", nullable = false)
+    private Integer dayOfWeek;
 
-    // 정보 수정을 위한 메소드
-    public void update(LocalTime startTime, LocalTime endTime, Boolean isWorkingDay) {
+    @Column(name = "is_working_day", nullable = false)
+    private Boolean isWorkingDay;
+    
+    @Column(name = "start_time")
+    private LocalTime startTime;
+
+    @Column(name = "end_time")
+    private LocalTime endTime;
+
+    @Builder
+    public CnlrDefaultSchd(EmplInfo employee, Integer dayOfWeek, Boolean isWorkingDay, LocalTime startTime, LocalTime endTime) {
+        this.employee = employee;
+        this.dayOfWeek = dayOfWeek;
+        this.isWorkingDay = isWorkingDay;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.isWorkingDay = isWorkingDay;
     }
 }
