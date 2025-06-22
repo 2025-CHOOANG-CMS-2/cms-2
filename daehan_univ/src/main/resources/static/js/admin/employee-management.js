@@ -388,7 +388,7 @@ function showEmployeeDetail(employee) {
         <div class="detail-row">
           <div class="detail-item full-width">
             <div class="detail-label">등록 관리자 (User ID)</div>
-            <div class="detail-value">${employee.USER_ID2 || '정보 없음'}</div>
+            <div class="detail-value">${employee.CREATED_BY || '정보 없음'}</div>
           </div>
         </div>
       </div>
@@ -446,7 +446,7 @@ async function saveEmployee() {
         STAFF_EML_ADDR: document.getElementById("edit_email").value.trim(),
         STAFF_TELNO: document.getElementById("edit_phone").value.trim(),
         USE_YN: currentEditingEmployee.USE_YN, // 기존 값 유지
-        USER_ID2: "admin" // ⭐⭐ USER_ID2를 "admin"으로 하드코딩하여 전송 ⭐⭐
+        CREATED_BY: "admin" // ⭐⭐ CREATED_BY를 "admin"으로 하드코딩하여 전송 ⭐⭐
     };
 
     try {
@@ -534,7 +534,7 @@ async function addEmployee() {
         STAFF_EML_ADDR: document.getElementById("add_email").value.trim(),
         STAFF_TELNO: document.getElementById("add_phone").value.trim(),
         USE_YN: "Y", // 기본값 'Y'
-        USER_ID2: "admin" // USER_ID2를 "admin"으로 하드코딩하여 전송
+        CREATED_BY: "admin" // ⭐⭐ CREATED_BY를 "admin"으로 하드코딩하여 전송 ⭐⭐
         // 비밀번호는 사번/학번으로 자동 생성되므로 여기서 보내지 않습니다.
     };
 

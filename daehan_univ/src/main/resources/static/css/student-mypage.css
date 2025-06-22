@@ -85,7 +85,7 @@
             padding: 1rem 2rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             display: flex;
-            justify-content: between;
+            justify-content: space-between;
             align-items: center;
         }
 
@@ -150,8 +150,20 @@
         }
 
         .form-floating {
-            margin-bottom: 1rem;
+            margin-bottom: 1rem; /* 부트스트랩 기본값보다 좀 더 여유롭게 */
         }
+        /* 추가: 연속된 form-floating 요소 사이의 상단 마진 */
+        .form-floating + .form-floating,
+        .form-floating + .row,
+        .row + .form-floating {
+            margin-top: 1rem;
+        }
+        /* form-floating 내 select 및 input의 하단 여백 제거 (form-floating이 이미 마진을 가짐) */
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            margin-bottom: 0 !important;
+        }
+
 
         .form-control {
             border-radius: 10px;
@@ -175,7 +187,7 @@
             transform: translateY(-2px);
         }
 
-        .activity-item {
+        .activity-item { /* 활동 이력 아이템은 이제 사용되지 않지만, CSS 정의는 유지 */
             padding: 1rem;
             border-bottom: 1px solid #e9ecef;
             transition: background-color 0.2s ease;
@@ -227,6 +239,52 @@
         .strength-medium { background-color: var(--warning-color); }
         .strength-strong { background-color: var(--success-color); }
 
+        /* 탭 네비게이션 중앙 정렬 및 반반 정렬 */
+.nav-tabs {
+    display: flex;
+    justify-content: center;
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-item {
+    flex: 0 0 50%; /* 각각 너비 50%로 고정 */
+    text-align: center;
+}
+
+.nav-tabs .nav-link {
+    width: 100%; /* 각 탭이 부모(nav-item) 너비 꽉 채움 */
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 0.75rem 0.75rem 0 0;
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    color: #495057;
+    background-color: #f1f3f5;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: #e9f0ff;
+    color: var(--secondary-color);
+}
+
+.nav-tabs .nav-link.active {
+    color: var(--secondary-color);
+    background-color: #fff;
+    border-color: #dee2e6 #dee2e6 white;
+    border-bottom: 3px solid var(--secondary-color);
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 2px 6px rgba(52, 152, 219, 0.2);
+}
+
+.nav-tabs .nav-link .bi {
+    margin-right: 0.5rem;
+    font-size: 1.2rem;
+}
+
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -243,5 +301,32 @@
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                flex-direction: column; /* 모바일에서 탭을 세로로 정렬 */
+                justify-content: flex-start; /* 모바일에서도 왼쪽 정렬 */
+                border-bottom: none; /* 모바일에서는 하단 경계선 제거 */
+            }
+            .nav-tabs .nav-item {
+                width: 100%; /* 모바일에서는 탭이 전체 너비를 차지 */
+                margin-right: 0;
+                margin-bottom: 0.5rem; /* 세로 정렬 시 탭 간격 */
+            }
+            .nav-tabs .nav-link {
+                border-radius: 0.5rem; /* 모바일에서 전체 탭 둥글게 */
+                border: 1px solid #dee2e6; /* 모바일에서는 모든 테두리 다시 활성화 */
+                margin-right: 0; /* 모바일에서 간격 제거 */
+                margin-left: 0; /* 모바일에서 간격 제거 */
+            }
+            .nav-tabs .nav-item:last-child .nav-link {
+                border-right: 1px solid #dee2e6; /* 모바일에서 마지막 탭 오른쪽 테두리도 유지 */
+            }
+            .nav-tabs .nav-link.active {
+                border-bottom-color: var(--secondary-color); /* 활성 탭 하단 테두리 강조 */
+                border-right: 1px solid var(--secondary-color); /* 활성 탭 오른쪽 테두리도 강조 */
+            }
+            .nav-tabs .nav-link.active::after {
+                height: 0; /* 모바일에서는 하단 밑줄 효과 제거 */
             }
         }
