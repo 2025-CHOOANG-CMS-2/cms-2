@@ -1,4 +1,3 @@
-
 package kr.ac.dhuniv.counsel.service;
 
 import java.time.LocalTime;
@@ -130,4 +129,3 @@ public class CounselorAdminServiceImpl implements CounselorAdminService {
         );
     }
 }
-

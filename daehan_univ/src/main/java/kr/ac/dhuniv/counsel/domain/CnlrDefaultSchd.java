@@ -1,6 +1,5 @@
 package kr.ac.dhuniv.counsel.domain;
 
-
 import jakarta.persistence.*;
 import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import lombok.*;
@@ -8,13 +7,12 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "cnlr_default_schd")
-
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CnlrDefaultSchd {
 
     @Id
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cnlr_default_id")
     private Long cnlrDefaultId;
 
@@ -41,6 +39,5 @@ public class CnlrDefaultSchd {
         this.isWorkingDay = isWorkingDay;
         this.startTime = startTime;
         this.endTime = endTime;
-
     }
 }

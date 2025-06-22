@@ -1,11 +1,9 @@
 package kr.ac.dhuniv.counsel.domain;
 
 import jakarta.persistence.*;
-
 import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.*;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,10 +42,8 @@ public class CnslAply {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empl_no", referencedColumnName = "empl_no")
     private EmplInfo employee;
-
     
     @Column(name = "content", columnDefinition = "TEXT")
     private String content; // 상담 신청 내용
     
-
 }

@@ -26,7 +26,7 @@ public interface CounselStudentService {
      * @return Key: "YYYY-MM-DD", Value: 해당 날짜에 예약 가능한 시간 정보 리스트
      */
     Map<String, List<AvailableSlotsDto>> getAvailableSlotsForMonth(Integer year, Integer month, String counselingType, String counselorId);
-
+    
     /**
      * 학생이 상담 예약을 생성합니다.
      * @param requestDto 예약 생성에 필요한 데이터
