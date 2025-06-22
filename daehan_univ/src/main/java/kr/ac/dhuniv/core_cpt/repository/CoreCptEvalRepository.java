@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ✅ CoreCptEvalRepository
@@ -13,7 +14,13 @@ import java.util.List;
  */
 
 public interface CoreCptEvalRepository extends JpaRepository<CoreCptEval, Long> {
-
+    @Query("""
+    SELECT e.evalId FROM CoreCptEval e
+    WHERE e.student.stdId = :studentId
+    ORDER BY e.answerDate DESC
+    LIMIT 1
+    """)
+    Optional<Long> findLatestEvalIdByStudent(Long studentId);
     List<CoreCptEval> findByStudentStdId(Long stdNo);
     boolean existsByEvalCode(String evalCode);
 

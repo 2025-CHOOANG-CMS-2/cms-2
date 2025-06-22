@@ -9,17 +9,19 @@ import java.util.List;
 
 public interface CoreCptEvalAnswerRepository extends JpaRepository<CoreCptEvalAnswer, Long> {
     List<CoreCptEvalAnswer> findByEval_EvalCode(String evalCode);
+    /**
+     * ✅ 하위역량별 점수 합계 (각 하위역량의 문항 점수 합산)
+     */
     @Query("""
-    SELECT p.cciId, SUM(opt.score)
-    FROM CoreCptEvalAnswer a
-    JOIN a.question q
-    JOIN q.coreCptInfo c
-    JOIN c.parent p
-    JOIN a.selectedOption opt
-    WHERE a.eval.evalId = :evalId
-    GROUP BY p.cciId
-    """)
-    List<Object[]> sumScoreByCompetency(@Param("evalId") Long evalId);
+            SELECT c.cciId, SUM(opt.score)
+            FROM CoreCptEvalAnswer a
+            JOIN a.question q
+            JOIN q.coreCptInfo c
+            JOIN a.selectedOption opt
+            WHERE a.eval.evalId = :evalId
+            GROUP BY c.cciId
+            """)
+    List<Object[]> sumScoreBySubCompetency(@Param("evalId") Long evalId);
 
     @Query("SELECT q.coreCptInfo.cciId, AVG(opt.score) " +
             "FROM CoreCptEvalAnswer a " +
