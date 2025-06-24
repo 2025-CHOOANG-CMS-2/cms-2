@@ -38,20 +38,9 @@ public class CoreCptEval {
     @JoinColumn(name = "std_no", referencedColumnName = "std_no")
     private StdInfo student;
 
-    /** 문항(CoreCptQst) 매핑 */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "qst_id", referencedColumnName = "qst_id")
-    private CoreCptQst question;
-
-    /** 선택된 옵션(CoreCptOptionTemplate) 매핑 */
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "option_id", referencedColumnName = "option_id")
-    private CoreCptOptionTemplate selectedOption;
-
-    /** 선택지에 부여된 점수 */
-    @Column(name = "ans_score", nullable = false)
-    private Integer answerScore;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "upper_cci_id")
+    private CoreCptInfo upperCompetency;
     /**
      * insert 직전에 answerDate 필드에 현재 시각 자동 세팅
      */

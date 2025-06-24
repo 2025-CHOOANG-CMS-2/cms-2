@@ -6,6 +6,8 @@ import kr.ac.dhuniv.core_cpt.dto.diagnosis.DiagnosisDetailDTO;
 import kr.ac.dhuniv.core_cpt.dto.diagnosis.DiagnosisRequestDTO;
 import kr.ac.dhuniv.core_cpt.dto.diagnosis.DiagnosisResponseDTO;
 import kr.ac.dhuniv.core_cpt.dto.diagnosis.DiagnosisStatusResponseDTO;
+import kr.ac.dhuniv.core_cpt.dto.result.DiagnosisAnalysisResponseDTO;
+
 import kr.ac.dhuniv.core_cpt.repository.*;
 import kr.ac.dhuniv.std_info.domain.StdInfo;
 import lombok.RequiredArgsConstructor;
@@ -30,68 +32,65 @@ public class DiagnosisEvalService {
     private final CoreCptInfoRepository infoRepository;
 
     /**
-     * ✅ 진단 데이터 저장 및 점수 계산 결과 반환
+     * ✅ 상위 역량별 최신 진단 점수 분석 결과 반환
+     * @param studentNo 학번
+     * @return 분석 결과 리스트
      */
-    public DiagnosisResponseDTO saveDiagnosis(Long cciId, DiagnosisRequestDTO dto) {
-        StdInfo student = stdRepo.findByUserUserId(dto.getStudentUserId())
-                .orElseThrow(() -> new IllegalArgumentException("생학 정보를 찾을 수 없습니다."));
+    public List<DiagnosisAnalysisResponseDTO> getDiagnosisAnalysis(String studentNo) {
+        log.info("🔍 상위 역량별 최신 진단 점수 분석 시작 - studentNo: {}", studentNo);
+        List<Object[]> raw = answerRepo.findDiagnosisAnalysis(studentNo);
 
+        // 결과 매핑
+        List<DiagnosisAnalysisResponseDTO> result = raw.stream()
+                .map(row -> new DiagnosisAnalysisResponseDTO(
+                        (String) row[0],                      // upper_cci_nm
+                        ((Number) row[1]).intValue()          // total_score
+                ))
+                .collect(Collectors.toList());
+
+        log.info("✅ 분석 결과: {}", result);
+        return result;
+    }
+
+    public DiagnosisResponseDTO saveDiagnosis(Long cciId, DiagnosisRequestDTO dto) {
+        // 1️⃣ 학생 정보 조회
+        StdInfo student = stdRepo.findByUserUserId(dto.getStudentUserId())
+                .orElseThrow(() -> new IllegalArgumentException("학생 정보를 찾을 수 없습니다."));
+
+        // 2️⃣ 상위 역량 정보 조회
+        CoreCptInfo upperCci = infoRepository.findById(cciId)
+                .orElseThrow(() -> new IllegalArgumentException("상위역량 정보를 찾을 수 없습니다."));
+
+        // 3️⃣ CoreCptEval 생성 시 상위역량 ID 저장
         CoreCptEval eval = CoreCptEval.builder()
                 .answerDate(LocalDateTime.now())
                 .evalCode(UUID.randomUUID().toString().substring(0, 8))
                 .student(student)
+                .upperCompetency(upperCci)  // ✅ 상위역량 정보 연결
                 .build();
         evalRepository.save(eval);
 
+        // 4️⃣ 답변 저장
         dto.getAnswers().forEach((qstId, optId) -> {
             CoreCptOptionTemplate option = optRepo.findById(optId)
                     .orElseThrow(() -> new IllegalArgumentException("선택지 정보를 찾을 수 없습니다."));
+
             CoreCptEvalAnswer answer = CoreCptEvalAnswer.builder()
                     .eval(eval)
-                    .question(qstRepo.findById(qstId).orElseThrow())
+                    .question(qstRepo.findById(qstId).orElseThrow(() ->
+                            new IllegalArgumentException("문항 정보를 찾을 수 없습니다.")))
                     .selectedOption(option)
                     .answerScore(option.getScore())
                     .build();
+
             answerRepo.save(answer);
+            log.info("✅ 답변 저장 - QstId: {}, OptionId: {}, Score: {}", qstId, optId, option.getScore());
         });
 
-        return buildDiagnosisResult(eval.getEvalId(), student.getStdId());
-    }
+        // 5️⃣ 결과 빌드 (필요하면 cciId 전달)
+        ScoreResult result = buildResult(eval.getEvalId(), student.getStdId());
 
-    /**
-     * ✅ 진단 현황 조회 시: 진단 내업이 없어도 기본 값 반환
-     */
-    public DiagnosisStatusResponseDTO getLatestDiagnosis(Long studentId) {
-        Optional<Long> optionalEvalId = evalRepository.findLatestEvalIdByStudent(studentId);
-
-        // 진단 내업이 없으면 모든 역량을 0점으로 구성
-        if (optionalEvalId.isEmpty()) {
-            List<CoreCptInfo> upperList = infoRepository.findRootCompetencies();
-            List<DiagnosisDetailDTO> details = upperList.stream()
-                    .map(upper -> DiagnosisDetailDTO.builder()
-                            .competencyName(upper.getCciNm())
-                            .score(0)
-                            .avgScore(0)
-                            .build())
-                    .collect(Collectors.toList());
-
-            DiagnosisStatusResponseDTO empty = new DiagnosisStatusResponseDTO();
-            empty.setTotalScore(null);
-            empty.setLevelText(null);
-            empty.setLatestDate(null);
-            empty.setDetails(details);
-            return empty;
-        }
-
-        Long evalId = optionalEvalId.get();
-        return buildDiagnosisStatusResult(evalId, studentId);
-    }
-
-    /**
-     * ✅ 진단 제출 후 결과 DTO 생성
-     */
-    private DiagnosisResponseDTO buildDiagnosisResult(Long evalId, Long studentId) {
-        var result = calculateScores(evalId, studentId);
+        // 6️⃣ DTO 반환
         return DiagnosisResponseDTO.builder()
                 .evalCode(result.evalCode)
                 .totalScore(result.totalScore)
@@ -101,67 +100,101 @@ public class DiagnosisEvalService {
     }
 
     /**
-     * ✅ 진단 현황 결과 DTO 생성
+     * 각 상위역량 별 최신 진단 점수를 조회하고 응답 DTO로 변환
+     *
+     * @param studentId 학생 ID (사용 X, 확장용)
+     * @param studentNo 학생 번호 (std_no)
+     * @return DiagnosisStatusResponseDTO
      */
-    private DiagnosisStatusResponseDTO buildDiagnosisStatusResult(Long evalId, Long studentId) {
-        var result = calculateScores(evalId, studentId);
-        DiagnosisStatusResponseDTO dto = new DiagnosisStatusResponseDTO();
-        dto.setTotalScore(result.totalScore);
-        dto.setLevelText(result.levelText);
-        dto.setLatestDate(evalRepository.findLatestDate(studentId));
-        dto.setDetails(result.details);
-        return dto;
+    public DiagnosisStatusResponseDTO getLatestDiagnosisByLatestEval(Long studentId, String studentNo) {
+        // 최신 진단 데이터 쿼리 실행
+        List<Object[]> rows = evalRepository.findLatestScoreByUpperCompetency(studentNo);
+
+        List<DiagnosisDetailDTO> details = new ArrayList<>();  // 상세 역량 점수 리스트
+        double totalSum = 0;                                   // 종합 점수 합계
+
+        // 쿼리 결과를 DTO로 변환
+        for (Object[] row : rows) {
+            String competencyName = (String) row[1];          // 역량명
+            int score = ((Number) row[2]).intValue();         // 점수
+
+            // 상세 DTO 추가
+            details.add(DiagnosisDetailDTO.builder()
+                    .competencyName(competencyName)
+                    .score(score)
+                    .build());
+
+            totalSum += score;                                // 총점 합산
+        }
+
+        // 평균 점수 계산
+        int avgScore = details.isEmpty() ? 0 : (int) Math.round(totalSum / details.size());
+        String level = calculateLevelText(avgScore);          // 수준 텍스트 계산
+
+        // 최종 응답 객체 생성
+        return DiagnosisStatusResponseDTO.builder()
+                .totalScore(avgScore)
+                .levelText(level)
+                .details(details)
+                .latestDate(null)                             // 최신 진단일 필요 시 추가 쿼리 필요
+                .build();
     }
 
     /**
-     * ✅ 점수 공통 계산 (하위 → 상위역량 조립)
+     * 점수에 따른 수준 텍스트 반환
+     *
+     * @param score 평균 점수
+     * @return 수준 (매우 우수 / 우수 / 보통 / 개선 필요)
      */
-    private ScoreResult calculateScores(Long evalId, Long studentId) {
-        List<Object[]> rawScores = answerRepo.sumScoreBySubCompetency(evalId);
-        Map<Long, Integer> subScoreMap = rawScores.stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> ((Number) row[1]).intValue()
-                ));
-
-        Map<Long, Double> upperScoreMap = new HashMap<>();
-        List<CoreCptInfo> upperList = infoRepository.findRootCompetencies();
-
-        for (CoreCptInfo upper : upperList) {
-            double upperSum = 0.0;
-            for (CoreCptInfo sub : upper.getChildren()) {
-                int subRawScore = subScoreMap.getOrDefault(sub.getCciId(), 0);
-                double subScore100 = (subRawScore / 50.0) * 100.0;
-                upperSum += subScore100 * (sub.getWeight() / 100.0);
-            }
-            upperScoreMap.put(upper.getCciId(), upperSum);
-        }
-
-        List<DiagnosisDetailDTO> details = new ArrayList<>();
-        double totalSum = 0;
-        for (CoreCptInfo upper : upperList) {
-            double score = upperScoreMap.getOrDefault(upper.getCciId(), 0.0);
-            totalSum += score;
-            details.add(DiagnosisDetailDTO.builder()
-                    .competencyName(upper.getCciNm())
-                    .score((int) Math.round(score))
-                    .avgScore(0)
-                    .build());
-        }
-
-        int totalScore = (int) Math.round(totalSum / upperList.size());
-        String levelText = calculateLevelText(totalScore);
-        String evalCode = evalRepository.findById(evalId).map(CoreCptEval::getEvalCode).orElse("");
-
-        return new ScoreResult(totalScore, levelText, evalCode, details);
-    }
-
     private String calculateLevelText(int score) {
-        if (score >= 90) return "머우 우수";
+        if (score >= 90) return "매우 우수";
         if (score >= 80) return "우수";
         if (score >= 70) return "보통";
         return "개선 필요";
     }
+
+    private ScoreResult buildResult(Long evalId, Long studentId) {
+        List<Object[]> raw = answerRepo.sumScoreByUpperCompetency(evalId);
+        Map<Long, Integer> scoreMap = raw.stream()
+                .collect(Collectors.toMap(row -> ((Number) row[0]).longValue(), row -> ((Number) row[1]).intValue()));
+
+        List<CoreCptInfo> upperList = infoRepository.findRootCompetencies();
+        List<DiagnosisDetailDTO> details = new ArrayList<>();
+        double total = 0;
+        for (CoreCptInfo upper : upperList) {
+            int score = scoreMap.getOrDefault(upper.getCciId(), 0);
+            log.info("🔍 상위역량 점수 - {} (ID: {}): {}점", upper.getCciNm(), upper.getCciId(), score);
+            details.add(DiagnosisDetailDTO.builder()
+                    .competencyName(upper.getCciNm())
+                    .score(score)
+                    .avgScore(0)
+                    .build());
+            total += score;
+        }
+        int avgScore = (int) Math.round(total / upperList.size());
+        String level = calculateLevelText(avgScore);
+        String evalCode = evalRepository.findById(evalId).map(CoreCptEval::getEvalCode).orElse("");
+        log.info("✅ 총점: {}, 레벨: {}", avgScore, level);
+        return new ScoreResult(avgScore, level, evalCode, details);
+    }
+
+    private DiagnosisStatusResponseDTO buildEmptyStatus() {
+        List<CoreCptInfo> upperList = infoRepository.findRootCompetencies();
+        List<DiagnosisDetailDTO> details = upperList.stream()
+                .map(u -> DiagnosisDetailDTO.builder()
+                        .competencyName(u.getCciNm())
+                        .score(0)
+                        .avgScore(0)
+                        .build())
+                .collect(Collectors.toList());
+        DiagnosisStatusResponseDTO dto = new DiagnosisStatusResponseDTO();
+        dto.setTotalScore(null);
+        dto.setLevelText(null);
+        dto.setLatestDate(null);
+        dto.setDetails(details);
+        return dto;
+    }
+
 
     private static class ScoreResult {
         int totalScore;
@@ -174,6 +207,15 @@ public class DiagnosisEvalService {
             this.levelText = levelText;
             this.evalCode = evalCode;
             this.details = details;
+        }
+
+        DiagnosisStatusResponseDTO toStatus(LocalDate date) {
+            DiagnosisStatusResponseDTO dto = new DiagnosisStatusResponseDTO();
+            dto.setTotalScore(totalScore);
+            dto.setLevelText(levelText);
+            dto.setLatestDate(date);
+            dto.setDetails(details);
+            return dto;
         }
     }
 }
