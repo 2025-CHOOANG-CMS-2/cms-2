@@ -15,12 +15,12 @@ import java.util.Optional;
 public interface CnslrInfoRepository extends JpaRepository<CnslrInfo, Long> {
 
     // [수정] 학생 페이지 필터링을 위한 단 하나의 최종 쿼리 메소드
-    @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
-           "FROM CnslrInfo ci " +
-           "WHERE ci.isActive = true " +
-           "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
-           "AND (:counselorId = 'all' OR ci.employee.user.userId = :counselorId)")
-    List<CounselorSimpleDto> findSimpleActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
+	@Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +
+	           "FROM CnslrInfo ci " +
+	           "WHERE ci.isActive = true " +
+	           "AND (:specialty = 'all' OR ci.cnslSpec = :specialty) " +
+	           "AND (:counselorId = 'all' OR ci.employee.user.userId = :counselorId)")
+	List<CounselorSimpleDto> findSimpleActiveCounselorsByFilter(@Param("specialty") String specialty, @Param("counselorId") String counselorId);
 
     // '전체'를 선택했을 때 사용할, 모든 활성 상담사를 조회하는 메소드
     @Query("SELECT new kr.ac.dhuniv.counsel.dto.CounselorSimpleDto(ci.employee.user.userId, ci.employee.emplNm) " +

@@ -9,6 +9,7 @@ import java.time.LocalTime;
 @Entity
 @Table(name = "cnlr_schd")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CnlrSchd {
     @Id
