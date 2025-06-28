@@ -6,20 +6,34 @@ let answers = {};         // { qstId: optionId }
 let currentIndex = 0;     // 현재 문항 인덱스 (0부터)
 let timerInterval = null; // 타이머 setInterval ID
 let startTime = null;     // 진단 시작 시각 (timestamp)
-const STUDENT_ID = 34;  // TODO: 실제 로그인된 학생 ID로 교체 (템플릿 주입 또는 세션 기반)
-const studentNo=2025005001;
+let STUDENT_ID = null;     // 로그인된 사용자 userIdx (Long)
+let studentNo = null;      // 로그인된 사용자 userId (학번 문자열)
 let allPrograms = [];  // 전역에 추가
 // =======================
 // 페이지 로드 시 상위역량 옵션 및 최신 현황 불러오기
 // =======================
-window.addEventListener('DOMContentLoaded', () => {
-    loadCompetencyOptions();
-    loadDiagnosisResults(studentNo);
-    loadDiagnosisStatus(STUDENT_ID, studentNo);
-    loadRecommendedPrograms();
-    //loadDiagnosisAnalysis(studentNo);
+window.addEventListener('DOMContentLoaded', async () => {
+    await loadLoginUser();             // ✅ 로그인 사용자 정보 먼저 가져오기
+    loadCompetencyOptions();          // 역량 목록
+    loadDiagnosisResults(studentNo);  // 진단 결과(그래프/바/코멘트)
+    loadDiagnosisStatus(STUDENT_ID, studentNo);  // 진단 상태(최근 점수)
+    loadRecommendedPrograms();        // 추천 비교과 프로그램 목록
 });
+async function loadLoginUser() {
+    try {
+        const res = await fetch('/api/user/me/student');  // JWT 쿠키 기반 인증
+        if (!res.ok) throw new Error('로그인 사용자 정보 조회 실패');
 
+        const user = await res.json();
+        STUDENT_ID = user.userIdx;
+        studentNo = user.userId;
+
+        console.log("✅ 로그인 사용자 정보:", user);
+    } catch (err) {
+        alert('로그인 상태가 아닙니다. 다시 로그인해주세요.');
+        location.href = "/login";
+    }
+}
 async function loadCompetencyOptions() {
     try {
         const res = await fetch('/api/competencies/list');
