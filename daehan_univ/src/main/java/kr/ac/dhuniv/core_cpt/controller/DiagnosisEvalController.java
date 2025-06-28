@@ -49,9 +49,9 @@ public class DiagnosisEvalController {
 //     * @param studentNo 학번
 //     * @return 분석 결과 JSON
 //     */
-//    @GetMapping("/analysis/{studentNo}")
-//    public ResponseEntity<List<DiagnosisAnalysisResponseDTO>> getDiagnosisAnalysis(@PathVariable String studentNo) {
-//        List<DiagnosisAnalysisResponseDTO> result = evalService.getDiagnosisAnalysis(studentNo);
-//        return ResponseEntity.ok(result);
-//    }
+    @GetMapping("/analysis/{studentNo}")
+   public ResponseEntity<List<DiagnosisAnalysisResponseDTO>> getDiagnosisAnalysis(@PathVariable String studentNo) {
+        List<DiagnosisAnalysisResponseDTO> result = evalService.getDiagnosisAnalysis(studentNo);
+        return ResponseEntity.ok(result);
+  }
 }

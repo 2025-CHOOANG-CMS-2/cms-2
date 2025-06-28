@@ -13,4 +13,6 @@ import lombok.NoArgsConstructor;
 public class DiagnosisAnalysisResponseDTO {
     private String competencyName;  // 상위 역량 이름
     private int score;              // 점수
+    private String colorHex;        // 색상 추가
+    private String comment;         // 점수별 코멘트 추가
 }
