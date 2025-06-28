@@ -288,6 +288,9 @@
             position: relative;
             height: 300px;
             margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .radar-chart {
@@ -605,68 +608,12 @@
                         <div class="competency-level">우수 수준</div>
                         <p class="mt-3 mb-0">최근 진단일: 2024년 1월 15일</p>
                     </div>
-
-                    <!-- Competency Breakdown -->
-                    <div class="diagnosis-card">
-                        <h5 class="mb-4">
-                            <i class="bi bi-bar-chart me-2"></i>역량별 상세 점수
-                        </h5>
-                        
-                        <div class="competency-item">
-                            <div class="competency-name">
-                                <span><i class="bi bi-chat-dots me-2"></i>의사소통역량</span>
-                                <strong>88점</strong>
-                            </div>
-                            <div class="competency-progress">
-                                <div class="progress-bar-custom progress-communication" style="width: 88%"></div>
-                            </div>
-                            <small class="text-muted">전체 평균: 75점 (+13점)</small>
-                        </div>
-
-                        <div class="competency-item">
-                            <div class="competency-name">
-                                <span><i class="bi bi-lightbulb me-2"></i>창의역량</span>
-                                <strong>72점</strong>
-                            </div>
-                            <div class="competency-progress">
-                                <div class="progress-bar-custom progress-creativity" style="width: 72%"></div>
-                            </div>
-                            <small class="text-muted">전체 평균: 68점 (+4점)</small>
-                        </div>
-
-                        <div class="competency-item">
-                            <div class="competency-name">
-                                <span><i class="bi bi-people me-2"></i>리더십역량</span>
-                                <strong>91점</strong>
-                            </div>
-                            <div class="competency-progress">
-                                <div class="progress-bar-custom progress-leadership" style="width: 91%"></div>
-                            </div>
-                            <small class="text-muted">전체 평균: 70점 (+21점)</small>
-                        </div>
-
-                        <div class="competency-item">
-                            <div class="competency-name">
-                                <span><i class="bi bi-puzzle me-2"></i>문제해결역량</span>
-                                <strong>79점</strong>
-                            </div>
-                            <div class="competency-progress">
-                                <div class="progress-bar-custom progress-problem-solving" style="width: 79%"></div>
-                            </div>
-                            <small class="text-muted">전체 평균: 73점 (+6점)</small>
-                        </div>
-
-                        <div class="competency-item">
-                            <div class="competency-name">
-                                <span><i class="bi bi-person-hearts me-2"></i>팀워크역량</span>
-                                <strong>95점</strong>
-                            </div>
-                            <div class="competency-progress">
-                                <div class="progress-bar-custom progress-teamwork" style="width: 95%"></div>
-                            </div>
-                            <small class="text-muted">전체 평균: 77점 (+18점)</small>
-                        </div>
+                    <!-- Bar Score 출력 영역 -->
+                    <div class="diagnosis-card" id="barScoreContainer">
+                        <!-- JS에서 채움 -->
                     </div>
+                    <!-- Competency Breakdown -->
+
 
                     <!-- Quick Actions -->
                     <div class="row">
@@ -743,296 +690,216 @@
 
                 <!-- Result Tab -->
                 <div class="tab-pane fade" id="resultTab">
-                    <!-- Overall Result -->
-                    <div class="diagnosis-card">
-                        <div class="text-center mb-4">
-                            <h4 class="text-primary">진단 결과</h4>
-                            <div class="competency-score text-primary">85점</div>
-                            <p class="text-muted">전체 평균 대비 상위 15%</p>
+                    <div class="diagnosis-card text-center">
+
+
+
+                        <!-- Chart 중앙 정렬 -->
+                        <div class="chart-container d-flex justify-content-center" id="chartContainer">
+                            <canvas id="resultChart"></canvas>
                         </div>
+                        <!-- 진단결과 상세 항목 추가할 영역 -->
+                        <div id="diagnosisResultDetails" class="mt-4"></div>
 
-                        <!-- Radar Chart Placeholder -->
-                        <div class="chart-container">
-                            <div class="text-center">
-                                <div class="alert alert-info">
-                                    <i class="bi bi-info-circle me-2"></i>
-                                    실제 구현 시 Chart.js 등의 라이브러리를 사용하여 레이더 차트를 표시합니다.
-                                </div>
-                                <div style="height: 200px; background: #f8f9fa; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                    <span class="text-muted">역량별 레이더 차트 영역</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Detailed Analysis -->
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="diagnosis-card">
-                                <h5 class="mb-3">
-                                    <i class="bi bi-trophy text-success me-2"></i>강점 영역
-                                </h5>
-                                
-                                <div class="strength-item">
-                                    <h6 class="mb-2">팀워크역량 (95점)</h6>
-                                    <p class="mb-1 small">동료들과의 협력과 소통에 매우 뛰어난 능력을 보입니다.</p>
-                                    <small class="text-success">상위 5% 수준</small>
-                                </div>
-
-                                <div class="strength-item">
-                                    <h6 class="mb-2">리더십역량 (91점)</h6>
-                                    <p class="mb-1 small">팀을 이끌고 목표를 달성하는 능력이 우수합니다.</p>
-                                    <small class="text-success">상위 8% 수준</small>
-                                </div>
-
-                                <div class="strength-item">
-                                    <h6 class="mb-2">의사소통역량 (88점)</h6>
-                                    <p class="mb-1 small">명확하고 효과적인 의사소통 능력을 가지고 있습니다.</p>
-                                    <small class="text-success">상위 12% 수준</small>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-lg-6">
-                            <div class="diagnosis-card">
-                                <h5 class="mb-3">
-                                    <i class="bi bi-exclamation-triangle text-warning me-2"></i>개선 필요 영역
-                                </h5>
-                                
-                                <div class="weakness-item">
-                                    <h6 class="mb-2">창의역량 (72점)</h6>
-                                    <p class="mb-1 small">새로운 아이디어 발상과 창의적 사고력 향상이 필요합니다.</p>
-                                    <small class="text-warning">평균 수준</small>
-                                </div>
-
-                                <div class="weakness-item">
-                                    <h6 class="mb-2">문제해결역량 (79점)</h6>
-                                    <p class="mb-1 small">복잡한 문제 상황에서의 분석력과 해결 능력을 기를 필요가 있습니다.</p>
-                                    <small class="text-warning">평균 약간 상회</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Comparison with Previous Results -->
-                    <div class="diagnosis-card">
-                        <h5 class="mb-3">
-                            <i class="bi bi-graph-up me-2"></i>이전 결과와 비교
-                        </h5>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="competency-detail">
-                                    <h6>2023년 2학기 (6개월 전)</h6>
-                                    <div class="d-flex justify-content-between">
-                                        <span>종합 점수</span>
-                                        <span class="fw-bold">78점</span>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success">+7점 향상</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="competency-detail">
-                                    <h6>2023년 1학기 (1년 전)</h6>
-                                    <div class="d-flex justify-content-between">
-                                        <span>종합 점수</span>
-                                        <span class="fw-bold">71점</span>
-                                    </div>
-                                    <div class="mt-2">
-                                        <span class="badge bg-success">+14점 향상</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
+
 
                 <!-- Improvement Tab -->
                 <div class="tab-pane fade" id="improvementTab">
                     <!-- Personalized Recommendations -->
-                    <div class="diagnosis-card">
-                        <h5 class="mb-4">
-                            <i class="bi bi-lightbulb text-warning me-2"></i>맞춤형 개선 방안
-                        </h5>
+<!--                    <div class="diagnosis-card">-->
+<!--                        <h5 class="mb-4">-->
+<!--                            <i class="bi bi-lightbulb text-warning me-2"></i>맞춤형 개선 방안-->
+<!--                        </h5>-->
 
-                        <!-- Creativity Improvement -->
-                        <div class="improvement-card">
-                            <h6 class="mb-3">
-                                <i class="bi bi-palette me-2"></i>창의역량 향상 방안
-                            </h6>
-                            
-                            <div class="recommendation-item">
-                                <h6 class="mb-2">📚 추천 활동</h6>
-                                <ul class="mb-2">
-                                    <li>창의적 사고 워크숍 참여</li>
-                                    <li>디자인 씽킹 프로그램 수강</li>
-                                    <li>아이디어 경진대회 참가</li>
-                                </ul>
-                                <small class="text-muted">예상 개선 효과: +8~12점</small>
-                            </div>
+<!--                        &lt;!&ndash; Creativity Improvement &ndash;&gt;-->
+<!--                        <div class="improvement-card">-->
+<!--                            <h6 class="mb-3">-->
+<!--                                <i class="bi bi-palette me-2"></i>창의역량 향상 방안-->
+<!--                            </h6>-->
+<!--                            -->
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">📚 추천 활동</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>창의적 사고 워크숍 참여</li>-->
+<!--                                    <li>디자인 씽킹 프로그램 수강</li>-->
+<!--                                    <li>아이디어 경진대회 참가</li>-->
+<!--                                </ul>-->
+<!--                                <small class="text-muted">예상 개선 효과: +8~12점</small>-->
+<!--                            </div>-->
 
-                            <div class="recommendation-item">
-                                <h6 class="mb-2">📖 추천 도서</h6>
-                                <ul class="mb-2">
-                                    <li>"창의성을 지휘하라" - 에드 캣멀</li>
-                                    <li>"아이디어 불패의 법칙" - 매튜 시드</li>
-                                    <li>"창의적 사고의 기술" - 마이클 미칼코</li>
-                                </ul>
-                            </div>
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">📖 추천 도서</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>"창의성을 지휘하라" - 에드 캣멀</li>-->
+<!--                                    <li>"아이디어 불패의 법칙" - 매튜 시드</li>-->
+<!--                                    <li>"창의적 사고의 기술" - 마이클 미칼코</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
 
-                            <div class="recommendation-item">
-                                <h6 class="mb-2">🎯 실천 과제</h6>
-                                <ul class="mb-0">
-                                    <li>매일 새로운 아이디어 3개씩 기록하기</li>
-                                    <li>다른 분야의 사례를 내 전공에 적용해보기</li>
-                                    <li>브레인스토밍 기법 연습하기</li>
-                                </ul>
-                            </div>
-                        </div>
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🎯 실천 과제</h6>-->
+<!--                                <ul class="mb-0">-->
+<!--                                    <li>매일 새로운 아이디어 3개씩 기록하기</li>-->
+<!--                                    <li>다른 분야의 사례를 내 전공에 적용해보기</li>-->
+<!--                                    <li>브레인스토밍 기법 연습하기</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
-                        <!-- Problem Solving Improvement -->
-                        <div class="improvement-card">
-                            <h6 class="mb-3">
-                                <i class="bi bi-puzzle me-2"></i>문제해결역량 향상 방안
-                            </h6>
-                            
-                            <div class="recommendation-item">
-                                <h6 class="mb-2">🔧 추천 활동</h6>
-                                <ul class="mb-2">
-                                    <li>케이스 스터디 분석 프로그램</li>
-                                    <li>논리적 사고력 향상 세미나</li>
-                                    <li>프로젝트 기반 학습 참여</li>
-                                </ul>
-                                <small class="text-muted">예상 개선 효과: +6~10점</small>
-                            </div>
+<!--                        &lt;!&ndash; Problem Solving Improvement &ndash;&gt;-->
+<!--                        <div class="improvement-card">-->
+<!--                            <h6 class="mb-3">-->
+<!--                                <i class="bi bi-puzzle me-2"></i>문제해결역량 향상 방안-->
+<!--                            </h6>-->
+<!--                            -->
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🔧 추천 활동</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>케이스 스터디 분석 프로그램</li>-->
+<!--                                    <li>논리적 사고력 향상 세미나</li>-->
+<!--                                    <li>프로젝트 기반 학습 참여</li>-->
+<!--                                </ul>-->
+<!--                                <small class="text-muted">예상 개선 효과: +6~10점</small>-->
+<!--                            </div>-->
 
-                            <div class="recommendation-item">
-                                <h6 class="mb-2">🧠 사고 기법</h6>
-                                <ul class="mb-2">
-                                    <li>5Why 분석법 활용</li>
-                                    <li>SWOT 분석 연습</li>
-                                    <li>마인드맵 작성 습관화</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🧠 사고 기법</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>5Why 분석법 활용</li>-->
+<!--                                    <li>SWOT 분석 연습</li>-->
+<!--                                    <li>마인드맵 작성 습관화</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
                     <!-- Action Plan -->
-                    <div class="diagnosis-card">
-                        <h5 class="mb-4">
-                            <i class="bi bi-calendar-check me-2"></i>4주 실행 계획
-                        </h5>
+<!--                    <div class="diagnosis-card">-->
+<!--                        <h5 class="mb-4">-->
+<!--                            <i class="bi bi-calendar-check me-2"></i>4주 실행 계획-->
+<!--                        </h5>-->
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6 class="text-primary">1-2주차: 기초 다지기</h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle text-success me-2"></i>
-                                        창의적 사고 관련 도서 1권 읽기
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-check-circle text-success me-2"></i>
-                                        매일 아이디어 노트 작성하기
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-circle text-muted me-2"></i>
-                                        온라인 창의성 강의 수강
-                                    </li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-primary">3-4주차: 실전 적용</h6>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2">
-                                        <i class="bi bi-circle text-muted me-2"></i>
-                                        창의적 프로젝트 기획 및 실행
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-circle text-muted me-2"></i>
-                                        문제해결 사례 분석 3건
-                                    </li>
-                                    <li class="mb-2">
-                                        <i class="bi bi-circle text-muted me-2"></i>
-                                        동료들과 아이디어 공유 세션
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-6">-->
+<!--                                <h6 class="text-primary">1-2주차: 기초 다지기</h6>-->
+<!--                                <ul class="list-unstyled">-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-check-circle text-success me-2"></i>-->
+<!--                                        창의적 사고 관련 도서 1권 읽기-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-check-circle text-success me-2"></i>-->
+<!--                                        매일 아이디어 노트 작성하기-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        온라인 창의성 강의 수강-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                            <div class="col-md-6">-->
+<!--                                <h6 class="text-primary">3-4주차: 실전 적용</h6>-->
+<!--                                <ul class="list-unstyled">-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        창의적 프로젝트 기획 및 실행-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        문제해결 사례 분석 3건-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        동료들과 아이디어 공유 세션-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
 
-                        <div class="mt-4 text-center">
-                            <button class="btn btn-primary me-2" onclick="downloadActionPlan()">
-                                <i class="bi bi-download me-1"></i>실행 계획서 다운로드
-                            </button>
-                            <button class="btn btn-outline-primary" onclick="setReminder()">
-                                <i class="bi bi-bell me-1"></i>알림 설정
-                            </button>
-                        </div>
-                    </div>
+<!--                        <div class="mt-4 text-center">-->
+<!--                            <button class="btn btn-primary me-2" onclick="downloadActionPlan()">-->
+<!--                                <i class="bi bi-download me-1"></i>실행 계획서 다운로드-->
+<!--                            </button>-->
+<!--                            <button class="btn btn-outline-primary" onclick="setReminder()">-->
+<!--                                <i class="bi bi-bell me-1"></i>알림 설정-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
                     <!-- Related Programs -->
                     <div class="diagnosis-card">
                         <h5 class="mb-4">
                             <i class="bi bi-calendar-event me-2"></i>추천 비교과 프로그램
                         </h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <label for="cptFilter" class="form-label me-2 mb-0 fw-bold">
+                                상위역량:
+                            </label>
+                            <select id="cptFilter" class="form-select w-auto" onchange="filterProgramsByCpt()">
+                                <option value="">전체</option>
+                                <!-- JS에서 동적으로 상위역량 옵션 추가 -->
+                            </select>
+                        </div>
+                        <div class="row" id="programContainer">
+                            <!-- JS로 카드 생성 -->
+                        </div>
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">창의적 사고 워크숍</h6>-->
+<!--                                        <p class="card-text small">디자인 씽킹과 창의적 문제해결 기법을 배우는 집중 워크숍</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-primary">창의역량</span>-->
+<!--                                            <span class="badge bg-success">+150P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-02-15</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(1)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h6 class="card-title">창의적 사고 워크숍</h6>
-                                        <p class="card-text small">디자인 씽킹과 창의적 문제해결 기법을 배우는 집중 워크숍</p>
-                                        <div class="mb-2">
-                                            <span class="badge bg-primary">창의역량</span>
-                                            <span class="badge bg-success">+150P</span>
-                                        </div>
-                                        <small class="text-muted">신청 마감: 2024-02-15</small>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(1)">
-                                            신청하기
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">문제해결 챌린지</h6>-->
+<!--                                        <p class="card-text small">실제 기업 문제를 해결하는 프로젝트 기반 프로그램</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-warning">문제해결</span>-->
+<!--                                            <span class="badge bg-success">+200P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-02-20</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(2)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
 
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h6 class="card-title">문제해결 챌린지</h6>
-                                        <p class="card-text small">실제 기업 문제를 해결하는 프로젝트 기반 프로그램</p>
-                                        <div class="mb-2">
-                                            <span class="badge bg-warning">문제해결</span>
-                                            <span class="badge bg-success">+200P</span>
-                                        </div>
-                                        <small class="text-muted">신청 마감: 2024-02-20</small>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(2)">
-                                            신청하기
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h6 class="card-title">혁신 아이디어 경진대회</h6>
-                                        <p class="card-text small">창의적 아이디어로 사회 문제를 해결하는 경진대회</p>
-                                        <div class="mb-2">
-                                            <span class="badge bg-info">종합역량</span>
-                                            <span class="badge bg-success">+300P</span>
-                                        </div>
-                                        <small class="text-muted">신청 마감: 2024-03-01</small>
-                                    </div>
-                                    <div class="card-footer">
-                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(3)">
-                                            신청하기
-                                        </button>
-                                    </div>
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">혁신 아이디어 경진대회</h6>-->
+<!--                                        <p class="card-text small">창의적 아이디어로 사회 문제를 해결하는 경진대회</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-info">종합역량</span>-->
+<!--                                            <span class="badge bg-success">+300P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-03-01</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(3)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -1042,20 +909,21 @@
         </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-        <button class="action-btn btn-save" onclick="saveDiagnosis()" title="진단 저장">
-            <i class="bi bi-save"></i>
-        </button>
-        <button class="action-btn btn-reset" onclick="resetDiagnosis()" title="진단 초기화">
-            <i class="bi bi-arrow-clockwise"></i>
-        </button>
-        <button class="action-btn btn-help" onclick="showHelp()" title="도움말">
-            <i class="bi bi-question"></i>
-        </button>
-    </div>
+<!--    &lt;!&ndash; Action Buttons &ndash;&gt;-->
+<!--    <div class="action-buttons">-->
+<!--        <button class="action-btn btn-save" onclick="saveDiagnosis()" title="진단 저장">-->
+<!--            <i class="bi bi-save"></i>-->
+<!--        </button>-->
+<!--        <button class="action-btn btn-reset" onclick="resetDiagnosis()" title="진단 초기화">-->
+<!--            <i class="bi bi-arrow-clockwise"></i>-->
+<!--        </button>-->
+<!--        <button class="action-btn btn-help" onclick="showHelp()" title="도움말">-->
+<!--            <i class="bi bi-question"></i>-->
+<!--        </button>-->
+<!--    </div>-->
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/js/student/competency-diagnosis.js"></script>
     <script>
         // 페이지 로드 시 상위역량 옵션을 가져와 select 박스에 채워줍니다.
