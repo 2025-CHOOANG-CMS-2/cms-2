@@ -1,421 +1,565 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>역량진단 관리 - 교육 관리 시스템</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="/employee/css/admin-diagnosis-management.css" rel="stylesheet">
-       
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 교직원</title>
+    <!-- Bootstrap & Icons -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    />
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+            rel="stylesheet"
+    />
+    <style>
+        /* 공통 스타일 */
+        body {
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* 헤더 영역 (교직원용 포레스트 그린) */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #2d4f3a;
+            color: white;
+            z-index: 1040;
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .header-left {
+            flex: 1;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .header-center {
+            flex: 1;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 0.9rem;
+            gap: 1rem;
+        }
+
+        /* 사용자 정보 및 버튼 */
+        .user-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .user-info {
+            text-align: right;
+            line-height: 1.2;
+        }
+        .user-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        .user-btn:hover {
+            color: #ffc107;
+        }
+
+        /* 사이드바 */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 240px;
+            height: 100%;
+            background-color: #2d4f3a;
+            padding: 1rem 0;
+            color: white;
+            z-index: 1030;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-user-info {
+            display: none;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-user-info div {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* 본문 */
+        .main-content {
+            margin-top: 60px;
+            margin-left: 240px;
+            padding: 1.5rem;
+        }
+
+        /* 메뉴 스타일 */
+        .nav-link {
+            color: #e0e8f0;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            background-color: #3b624d;
+            color: #ffffff;
+        }
+        .nav-link.active {
+            background-color: #46775c;
+            font-weight: bold;
+        }
+        .submenu {
+            background-color: #3b624d;
+        }
+        .submenu a {
+            padding-left: 2.5rem;
+            font-size: 0.95rem;
+        }
+        .has-submenu::after {
+            content: "\25BC";
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        /* 햄버거 메뉴 (모바일) */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* 반응형 대응 */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -240px;
+                transition: left 0.3s ease;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .hamburger {
+                display: inline-block;
+                margin-right: 1rem;
+            }
+            .header-right {
+                display: none;
+            }
+            .sidebar-user-info {
+                display: block;
+            }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- 사이드바 -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4 class="text-white">
-                            <i class="fas fa-graduation-cap me-2"></i>
-                            관리자
-                        </h4>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-index.html">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                대시보드
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
-                                <i class="fas fa-users me-2"></i>
-                                사용자/조직 관리
-                                <i class="fas fa-chevron-down ms-auto"></i>
-                            </a>
-                            <div class="collapse" id="userManagement">
-                                <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-student-management.html">
-                                            <i class="fas fa-user-graduate me-2"></i>
-                                            학생 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-faculty-management.html">
-                                            <i class="fas fa-chalkboard-teacher me-2"></i>
-                                            교직원 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="../admin-department-management.html">
-                                            <i class="fas fa-building me-2"></i>
-                                            학과/부서 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-permission-management.html">
-                                            <i class="fas fa-key me-2"></i>
-                                            권한 관리
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="admin-diagnosis-management.html">
-                                <i class="fas fa-chart-line me-2"></i>
-                                역량진단 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-program-management.html">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                비교과 프로그램 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../admin-counseling-management.html">
-                                <i class="fas fa-comments me-2"></i>
-                                상담 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-mileage-management.html">
-                                <i class="fas fa-coins me-2"></i>
-                                마일리지 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../admin-notice-management.html">
-                                <i class="fas fa-bullhorn me-2"></i>
-                                공지사항 관리
-                            </a>
-                        </li>
-                    </ul>
+<!-- 헤더 -->
+<header class="header d-flex" th:fragment="e_header">
+    <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 교직원 포털
+    </div>
+    <div class="header-center">
+        <img
+                src="../../static/images/logo-white.png"
+                alt="logo"
+                height="30"
+                class="me-2"
+        />
+        대한대학교
+    </div>
+    <div class="header-right" id="user-info">
+        <div id="user-logged-in" class="user-box">
+            <div class="user-info">
+                <div><strong>김교직</strong> (STAFF001)</div>
+                <div class="small">학사운영팀</div>
+            </div>
+            <button class="user-btn" title="로그아웃">
+                <i class="bi bi-box-arrow-right"></i>
+            </button>
+        </div>
+        <div id="user-logged-out" class="user-box">
+            <button class="user-btn" title="로그인">
+                <i class="bi bi-box-arrow-in-right"></i> 로그인
+            </button>
+        </div>
+    </div>
+</header>
 
-                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="login.html">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                로그아웃
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+<!-- 사이드바 -->
+<aside class="sidebar" id="sidebar" th:fragment="e_sidebar">
+    <div class="sidebar-user-info">
+        <div><strong>김교직</strong> (STAFF001)</div>
+        <div>학사운영팀</div>
+        <div class="mt-2">
+            <button class="user-btn" title="로그아웃">
+                <i class="bi bi-box-arrow-right"></i> 로그아웃
+            </button>
+        </div>
+    </div>
+    <nav class="nav flex-column">
+        <a class="nav-link" href="/notice">공지사항관리</a>
 
-            <!-- 메인 콘텐츠 -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">
-                        <i class="fas fa-chart-line me-2"></i>
-                        역량진단 관리
-                    </h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <div class="btn-group me-2">
-                            <a href="/employees/core-empl-cpt" class="btn btn-outline-primary">
-                                <i class="fas fa-cogs me-2"></i>
-                                역량 항목 관리
-                            </a>
-                            <a href="/employees/question-management" class="btn btn-outline-primary">
-                                <i class="fas fa-question-circle me-2"></i>
-                                진단 문항 관리
-                            </a>
-                            <a href="/employees/core-diagnosis-result" class="btn btn-outline-primary">
-                                <i class="fas fa-chart-bar me-2"></i>
-                                진단 결과 열람
-                            </a>
-                        </div>
-                    </div>
-                </div>
+        <a class="nav-link has-submenu" href="#" data-menu="역량"
+        >핵심역량개발관리</a
+        >
+        <div class="submenu" id="submenu-역량" style="display: none">
+            <a class="nav-link" href="/competency/items">역량항목관리</a>
+            <a class="nav-link" href="/competency/questions">진단문항관리</a>
+            <a class="nav-link" href="/competency/diagnosis">진단검사현황</a>
+            <a class="nav-link" href="/competency/recommend">추천비교과관리</a>
+        </div>
 
-                <!-- 통계 카드 -->
-                <div class="row mb-4">
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5 class="card-title text-primary">전체 진단 수</h5>
-                                <h2 id="totalEvalCount"  class="text-primary">1,247</h2>
-                                <small class="text-muted" id="recentGrowth"></small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5 class="card-title text-success">평균 점수</h5>
-                                <h2 id="averageScore" class="text-success">72.5</h2>
+        <a class="nav-link has-submenu" href="#" data-menu="비교과"
+        >비교과프로그램관리</a
+        >
+        <div class="submenu" id="submenu-비교과" style="display: none">
+            <a class="nav-link" href="/program/manage">프로그램관리</a>
+            <a class="nav-link" href="/program/applications">프로그램신청관리</a>
+            <a class="nav-link" href="/program/activities">프로그램활동관리</a>
+        </div>
 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5 class="card-title text-warning">진단 문항</h5>
-                                <h2 id="questionCount" class="text-warning">45</h2>
-<!--                                <small class="text-muted">5개 역량 영역</small>-->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <h5 class="card-title text-info">미완료 학생</h5>
-                                <h2 id="incompleteStudentCount" class="text-info">324</h2>
-                                <small  id="incompleteRate" class="text-muted"></small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+            <a class="nav-link" href="/counseling/schedule">상담사일정등록</a>
+            <a class="nav-link" href="/counseling/reservations">상담예약관리</a>
+            <a class="nav-link" href="/counseling/results">상담결과관리</a>
+        </div>
 
-                <!-- 역량별 현황 -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-chart-pie me-2"></i>
-                            역량별 진단 현황
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="chart-container">
-                                    <!-- 역량별 평균 점수 차트 영역 -->
-                                    <div class="text-center">
-                                        <!--<div class="alert alert-info">
-                                            <i class="fas fa-info-circle me-2"></i>
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지"
+        >마일리지관리</a
+        >
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+            <a class="nav-link" href="/mileage/points">마일리지배점</a>
+            <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+            <a class="nav-link" href="/mileage/status">마일리지현황</a>
+        </div>
+    </nav>
+</aside>
 
-                                        </div>-->
-
-                                        <!-- ✅ 차트를 그릴 캔버스 -->
-                                        <canvas id="radarAvgChart" width="400" height="300"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- ✅ 여기만 유지하고 안의 카드들은 삭제 -->
-                            <div class="col-md-4" id="competencyBarContainer">
-                                <!-- JS가 여기다 렌더링함 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 최근 진단 결과 -->
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-history me-2"></i>
-                            최근 진단 결과
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="recentDiagnosisTable" class="table table-hover">
-                                <thead> <tr>
-                                    <th>학번</th>
-                                    <th>이름</th>
-                                    <th>학과</th>
-                                    <th>학년</th>
-                                    <th>진단일시</th>
-                                    <th>종합점수</th>
-                                    <th>상세보기</th>
-                                </tr></thead>
-                                <tbody></tbody> <!-- 여기에 JS로 추가됨 -->
-                            </table>
-                        </div>
-                        <div class="text-center mt-3">
-                            <a href="/employees/core-diagnosis-result" class="btn btn-outline-primary">
-                                <i class="fas fa-list me-2"></i>
-                                전체 결과 보기
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 진단 관리 바로가기 -->
-                <div class="row mt-4">
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-cogs text-primary" style="font-size: 3rem;"></i>
-                                <h5 class="mt-3 mb-3">역량 항목 관리</h5>
-                                <p class="text-muted mb-3">역량 항목을 추가, 수정, 삭제합니다</p>
-                                <a href="/employees/core-empl-cpt" class="btn btn-primary">
-                                    <i class="fas fa-arrow-right me-1"></i>
-                                    바로가기
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-question-circle text-success" style="font-size: 3rem;"></i>
-                                <h5 class="mt-3 mb-3">진단 문항 관리</h5>
-                                <p class="text-muted mb-3">진단 문항을 추가, 수정, 삭제합니다</p>
-                                <a href="/employees/question-management" class="btn btn-success">
-                                    <i class="fas fa-arrow-right me-1"></i>
-                                    바로가기
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card text-center">
-                            <div class="card-body">
-                                <i class="fas fa-chart-bar text-warning" style="font-size: 3rem;"></i>
-                                <h5 class="mt-3 mb-3">진단 결과 열람</h5>
-                                <p class="text-muted mb-3">학생들의 진단 결과를 확인합니다</p>
-                                <a href="/employees/core-diagnosis-result" class="btn btn-warning">
-                                    <i class="fas fa-arrow-right me-1"></i>
-                                    바로가기
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- 🧩 상세보기 모달 -->
-                <div class="modal fade" id="diagnosisDetailModal" tabindex="-1" aria-labelledby="diagnosisDetailLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="diagnosisDetailLabel">진단 상세 결과</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
-                            </div>
-                            <div class="modal-body">
-                                <table class="table table-bordered">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th>역량명</th>
-                                        <th>점수</th>
-                                        <th>진단일시</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody id="diagnosisDetailTableBody">
-                                    <!-- JS로 렌더링됨 -->
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+<!-- 본문 -->
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-chart-line me-2"></i>
+            역량진단 관리
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <a href="/employees/core-empl-cpt" class="btn btn-outline-primary">
+                    <i class="fas fa-cogs me-2"></i>
+                    역량 항목 관리
+                </a>
+                <a href="/employees/question-management" class="btn btn-outline-primary">
+                    <i class="fas fa-question-circle me-2"></i>
+                    진단 문항 관리
+                </a>
+                <a href="/employees/core-diagnosis-result" class="btn btn-outline-primary">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    진단 결과 열람
+                </a>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js CDN 삽입 (가급적 <body> 하단 또는 <head>에서) -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // 페이지 로드시 API 호출
-            fetch('/api/diagnosis/dashboard-summary')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('요약 통계 조회 실패');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // 응답 데이터 구조:
-                    // { totalEvalCount, averageScore, questionCount, incompleteStudentCount }
+    <!-- 통계 카드 -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">전체 진단 수</h5>
+                    <h2 id="totalEvalCount"  class="text-primary">1,247</h2>
+                    <small class="text-muted" id="recentGrowth"></small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">평균 점수</h5>
+                    <h2 id="averageScore" class="text-success">72.5</h2>
 
-                    // HTML 요소에 값 삽입
-                    document.getElementById('totalEvalCount').textContent = data.totalEvalCount.toLocaleString();
-                    document.getElementById('averageScore').textContent = data.averageScore.toFixed(1);
-                    document.getElementById('questionCount').textContent = data.questionCount;
-                    document.getElementById('incompleteStudentCount').textContent = data.incompleteStudentCount;
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">진단 문항</h5>
+                    <h2 id="questionCount" class="text-warning">45</h2>
+                    <!--                                <small class="text-muted">5개 역량 영역</small>-->
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">미완료 학생</h5>
+                    <h2 id="incompleteStudentCount" class="text-info">324</h2>
+                    <small  id="incompleteRate" class="text-muted"></small>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // 보조 텍스트 예시: 최근 증가량, 미완료 비율 등 (여기선 예시용 하드코딩)
-                   // document.getElementById('recentGrowth').textContent = "+156";
+    <!-- 역량별 현황 -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-chart-pie me-2"></i>
+                역량별 진단 현황
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="chart-container">
+                        <!-- 역량별 평균 점수 차트 영역 -->
+                        <div class="text-center">
+                            <!--<div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
 
-                    // 전체의 몇 %인지 간단 계산 (예시: 전체 학생 수 1247명 중 324명)
-                    //const incompleteRate = (data.incompleteStudentCount / data.totalEvalCount) * 100;
-                    //document.getElementById('incompleteRate').textContent = isNaN(incompleteRate) ? "-" : incompleteRate.toFixed(1);
-                })
-                .catch(error => {
-                    console.error('❌ 대시보드 요약 데이터 로딩 실패:', error);
-                });
-        });
+                            </div>-->
 
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/api/diagnosis/competency-avg')
-                .then(res => res.json())
-                .then(data => {
-                    if (!Array.isArray(data)) return;
+                            <!-- ✅ 차트를 그릴 캔버스 -->
+                            <canvas id="radarAvgChart" width="400" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
 
-                    // ✅ 데이터 분해
-                    const labels = data.map(item => item.upperCciName);
-                    const scores = data.map(item => item.avgScore);
-                    const colors = data.map(item => item.colorHex || '#999');
+                <!-- ✅ 여기만 유지하고 안의 카드들은 삭제 -->
+                <div class="col-md-4" id="competencyBarContainer">
+                    <!-- JS가 여기다 렌더링함 -->
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    // ✅ 레이더 차트 렌더링
-                    const ctx = document.getElementById('radarAvgChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'radar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: '역량 평균 점수',
-                                data: scores,
-                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                pointBackgroundColor: colors,
-                                pointBorderColor: '#fff',
-                                borderWidth: 2
-                            }]
+    <!-- 최근 진단 결과 -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="fas fa-history me-2"></i>
+                최근 진단 결과
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="recentDiagnosisTable" class="table table-hover">
+                    <thead> <tr>
+                        <th>학번</th>
+                        <th>이름</th>
+                        <th>학과</th>
+                        <th>학년</th>
+                        <th>진단일시</th>
+                        <th>종합점수</th>
+                        <th>상세보기</th>
+                    </tr></thead>
+                    <tbody></tbody> <!-- 여기에 JS로 추가됨 -->
+                </table>
+            </div>
+            <div class="text-center mt-3">
+                <a href="/employees/core-diagnosis-result" class="btn btn-outline-primary">
+                    <i class="fas fa-list me-2"></i>
+                    전체 결과 보기
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 진단 관리 바로가기 -->
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-cogs text-primary" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-3">역량 항목 관리</h5>
+                    <p class="text-muted mb-3">역량 항목을 추가, 수정, 삭제합니다</p>
+                    <a href="/employees/core-empl-cpt" class="btn btn-primary">
+                        <i class="fas fa-arrow-right me-1"></i>
+                        바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-question-circle text-success" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-3">진단 문항 관리</h5>
+                    <p class="text-muted mb-3">진단 문항을 추가, 수정, 삭제합니다</p>
+                    <a href="/employees/question-management" class="btn btn-success">
+                        <i class="fas fa-arrow-right me-1"></i>
+                        바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-chart-bar text-warning" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 mb-3">진단 결과 열람</h5>
+                    <p class="text-muted mb-3">학생들의 진단 결과를 확인합니다</p>
+                    <a href="/employees/core-diagnosis-result" class="btn btn-warning">
+                        <i class="fas fa-arrow-right me-1"></i>
+                        바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 🧩 상세보기 모달 -->
+    <div class="modal fade" id="diagnosisDetailModal" tabindex="-1" aria-labelledby="diagnosisDetailLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="diagnosisDetailLabel">진단 상세 결과</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                        <tr>
+                            <th>역량명</th>
+                            <th>점수</th>
+                            <th>진단일시</th>
+                        </tr>
+                        </thead>
+                        <tbody id="diagnosisDetailTableBody">
+                        <!-- JS로 렌더링됨 -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<!-- Chart.js CDN 삽입 (가급적 <body> 하단 또는 <head>에서) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 페이지 로드시 API 호출
+        fetch('/api/diagnosis/dashboard-summary')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('요약 통계 조회 실패');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 응답 데이터 구조:
+                // { totalEvalCount, averageScore, questionCount, incompleteStudentCount }
+
+                // HTML 요소에 값 삽입
+                document.getElementById('totalEvalCount').textContent = data.totalEvalCount.toLocaleString();
+                document.getElementById('averageScore').textContent = data.averageScore.toFixed(1);
+                document.getElementById('questionCount').textContent = data.questionCount;
+                document.getElementById('incompleteStudentCount').textContent = data.incompleteStudentCount;
+
+                // 보조 텍스트 예시: 최근 증가량, 미완료 비율 등 (여기선 예시용 하드코딩)
+                // document.getElementById('recentGrowth').textContent = "+156";
+
+                // 전체의 몇 %인지 간단 계산 (예시: 전체 학생 수 1247명 중 324명)
+                //const incompleteRate = (data.incompleteStudentCount / data.totalEvalCount) * 100;
+                //document.getElementById('incompleteRate').textContent = isNaN(incompleteRate) ? "-" : incompleteRate.toFixed(1);
+            })
+            .catch(error => {
+                console.error('❌ 대시보드 요약 데이터 로딩 실패:', error);
+            });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/diagnosis/competency-avg')
+            .then(res => res.json())
+            .then(data => {
+                if (!Array.isArray(data)) return;
+
+                // ✅ 데이터 분해
+                const labels = data.map(item => item.upperCciName);
+                const scores = data.map(item => item.avgScore);
+                const colors = data.map(item => item.colorHex || '#999');
+
+                // ✅ 레이더 차트 렌더링
+                const ctx = document.getElementById('radarAvgChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: '역량 평균 점수',
+                            data: scores,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            pointBackgroundColor: colors,
+                            pointBorderColor: '#fff',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            r: {
+                                angleLines: { display: true },
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                                ticks: { stepSize: 20 }
+                            }
                         },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                r: {
-                                    angleLines: { display: true },
-                                    suggestedMin: 0,
-                                    suggestedMax: 100,
-                                    ticks: { stepSize: 20 }
-                                }
-                            },
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top'
-                                }
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
                             }
                         }
-                    });
-
-                    // ✅ 우측 바 시각화 추가 호출
-                    renderCompetencyAverageBars(data);
-                })
-                .catch(err => {
-                    console.error('❌ 역량 평균 점수 불러오기 실패:', err);
+                    }
                 });
-        });
+
+                // ✅ 우측 바 시각화 추가 호출
+                renderCompetencyAverageBars(data);
+            })
+            .catch(err => {
+                console.error('❌ 역량 평균 점수 불러오기 실패:', err);
+            });
+    });
 
 
-        function renderCompetencyAverageBars(data) {
-            const container = document.getElementById('competencyBarContainer');
-            if (!container) return;
+    function renderCompetencyAverageBars(data) {
+        const container = document.getElementById('competencyBarContainer');
+        if (!container) return;
 
-            container.innerHTML = '';
+        container.innerHTML = '';
 
-            data.forEach(item => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'competency-card p-3 mb-3';
+        data.forEach(item => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'competency-card p-3 mb-3';
 
-                wrapper.style.borderLeft = `6px solid ${item.colorHex}`; // ✅ 왼쪽 바 색상 적용
+            wrapper.style.borderLeft = `6px solid ${item.colorHex}`; // ✅ 왼쪽 바 색상 적용
 
-                wrapper.innerHTML = `
+            wrapper.innerHTML = `
             <div class="d-flex justify-content-between">
                 <h6>${item.upperCciName}</h6>
                 <span class="fw-bold">${item.avgScore}점</span>
@@ -427,29 +571,29 @@
             </div>
         `;
 
-                container.appendChild(wrapper);
-            });
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            fetch('/api/diagnosis/recent') // ✅ 최근 진단 결과 API
-                .then(response => response.json())
-                .then(data => renderRecentDiagnosisTable(data))
-                .catch(error => {
-                    console.error('❌ 최근 진단 결과 불러오기 실패:', error);
-                });
+            container.appendChild(wrapper);
         });
+    }
 
-        function renderRecentDiagnosisTable(data) {
-            const tbody = document.querySelector('#recentDiagnosisTable tbody');
-            if (!tbody || !Array.isArray(data)) return;
+    document.addEventListener('DOMContentLoaded', function () {
+        fetch('/api/diagnosis/recent') // ✅ 최근 진단 결과 API
+            .then(response => response.json())
+            .then(data => renderRecentDiagnosisTable(data))
+            .catch(error => {
+                console.error('❌ 최근 진단 결과 불러오기 실패:', error);
+            });
+    });
 
-            tbody.innerHTML = ''; // 기존 내용 제거
+    function renderRecentDiagnosisTable(data) {
+        const tbody = document.querySelector('#recentDiagnosisTable tbody');
+        if (!tbody || !Array.isArray(data)) return;
 
-            data.forEach(item => {
-                const tr = document.createElement('tr');
+        tbody.innerHTML = ''; // 기존 내용 제거
 
-                tr.innerHTML = `
+        data.forEach(item => {
+            const tr = document.createElement('tr');
+
+            tr.innerHTML = `
             <td>${item.stdNo}</td>
             <td>${item.stdNm}</td>
             <td>${item.deptName || '-'}</td>
@@ -465,49 +609,75 @@
             </td>
             <td>
                 <button class="btn btn-sm btn-outline-primary" onclick="viewDiagnosisDetail('${item.stdNo}')">
-                    <i class="fas fa-eye"></i>
+                    <i class="fas fa-eye">보기</i>
                 </button>
             </td>
         `;
-                tbody.appendChild(tr);
-            });
-        }
+            tbody.appendChild(tr);
+        });
+    }
 
-        // ✅ 점수대에 따라 색상 반환
-        function getColorByScore(score) {
-            if (score >= 80) return '#198754';     // green
-            if (score >= 60) return '#0d6efd';     // blue
-            if (score >= 40) return '#ffc107';     // yellow
-            return '#dc3545';                      // red
-        }
+    // ✅ 점수대에 따라 색상 반환
+    function getColorByScore(score) {
+        if (score >= 80) return '#198754';     // green
+        if (score >= 60) return '#0d6efd';     // blue
+        if (score >= 40) return '#ffc107';     // yellow
+        return '#dc3545';                      // red
+    }
 
-        // ✅ 상세보기 이동
-        function viewDiagnosisDetail(stdNo) {
-            fetch(`/api/diagnosis/detail/${stdNo}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('diagnosisDetailTableBody');
-                    tbody.innerHTML = '';
+    // ✅ 상세보기 이동
+    function viewDiagnosisDetail(stdNo) {
+        fetch(`/api/diagnosis/detail/${stdNo}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.getElementById('diagnosisDetailTableBody');
+                tbody.innerHTML = '';
 
-                    data.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
+                data.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
           <td>${item.upperCciName}</td>
           <td>${item.score}점</td>
           <td>${item.answeredAt}</td>
         `;
-                        tbody.appendChild(tr);
-                    });
-
-                    const modal = new bootstrap.Modal(document.getElementById('diagnosisDetailModal'));
-                    modal.show();
-                })
-                .catch(err => {
-                    console.error('❌ 상세 결과 불러오기 실패:', err);
-                    alert('진단 결과를 불러오는 데 실패했습니다.');
+                    tbody.appendChild(tr);
                 });
-        }
 
-    </script>
+                const modal = new bootstrap.Modal(document.getElementById('diagnosisDetailModal'));
+                modal.show();
+            })
+            .catch(err => {
+                console.error('❌ 상세 결과 불러오기 실패:', err);
+                alert('진단 결과를 불러오는 데 실패했습니다.');
+            });
+    }
+
+</script>
+<!-- 스크립트 -->
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const hamburger = document.getElementById("hamburger");
+    hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
+
+    const menuLinks = document.querySelectorAll("[data-menu]");
+    menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+            e.preventDefault();
+            const key = menu.getAttribute("data-menu");
+            const submenu = document.getElementById(`submenu-${key}`);
+
+            document.querySelectorAll(".submenu").forEach((sm) => {
+                if (sm !== submenu) sm.style.display = "none";
+            });
+
+            if (submenu) {
+                submenu.style.display =
+                    submenu.style.display === "block" ? "none" : "block";
+            }
+        });
+    });
+</script>
 </body>
 </html>

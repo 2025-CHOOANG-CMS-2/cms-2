@@ -210,9 +210,15 @@ async function loadDiagnosisStatus(studentId, studentNo) {
         const data = await res.json();
 
         // 종합 점수와 수준 표시
-        document.getElementById("totalScore").textContent = data.totalScore !== null ? data.totalScore : "-";
-        document.querySelector(".competency-level").textContent = data.levelText !== null ? data.levelText + " 수준" : "진단 미완료";
-        document.querySelector(".competency-overview p").textContent = data.latestDate ? `최근 진단일: ${data.latestDate}` : "최근 진단일 정보 없음";
+        const scoreEl = document.getElementById("totalScore");
+        if (scoreEl) scoreEl.textContent = data.totalScore !== null ? data.totalScore : "-";
+
+        const levelEl = document.querySelector(".competency-level");
+        if (levelEl) levelEl.textContent = data.levelText ? data.levelText + " 수준" : "진단 미완료";
+
+        const dateEl = document.querySelector(".competency-overview p");
+        if (dateEl) dateEl.textContent = data.latestDate ? `최근 진단일: ${data.latestDate}` : "최근 진단일 정보 없음";
+
 
         // 상세 점수 표시
         const container = document.querySelector(".diagnosis-card");

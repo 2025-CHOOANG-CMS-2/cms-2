@@ -38,7 +38,7 @@ function loadCompetencyList() {
                 item.innerHTML = `
                     <div class="d-flex w-100 justify-content-between">
                         <h6 class="mb-1">${comp.cciNm}</h6>
-                        <small>${comp.questionCount ?? 0}문항</small>
+                        
                     </div>
                     <p class="mb-1">${comp.cciDesc}</p>
                 `;
@@ -113,10 +113,10 @@ function updateCompetencyDetails(comp) {
               <h6 class="mb-1">${child.cciNm} <small>(${child.weight}%)</small></h6>
               <div>
                 <button class="btn btn-sm btn-outline-primary me-1" onclick="editSubCompetency('${child.cciId}')">
-                  <i class="fas fa-edit"></i>
+                  <i class="fas fa-edit">수정</i>
                 </button>
                 <button class="btn btn-sm btn-outline-danger" onclick="deleteSubCompetency('${child.cciId}')">
-                  <i class="fas fa-trash"></i>
+                  <i class="fas fa-trash">삭제</i>
                 </button>
               </div>
             </div>
@@ -338,10 +338,10 @@ function loadComments(cciId) {
       </div>
       <div class="ms-2">
         <button class="btn btn-sm btn-outline-primary me-1" onclick="editComment(${c.id})">
-          <i class="fas fa-edit"></i>
+          수정</i>
         </button>
         <button class="btn btn-sm btn-outline-danger" onclick="deleteComment(${c.id})">
-          <i class="fas fa-trash"></i>
+          <i class="fas fa-trash">삭제</i>
         </button>
       </div>
     `;

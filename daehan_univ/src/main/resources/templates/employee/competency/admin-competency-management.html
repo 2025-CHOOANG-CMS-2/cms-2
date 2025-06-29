@@ -1,271 +1,468 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>역량 항목 관리 - 교육 관리 시스템</title>
-	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-	<link rel="stylesheet" href="/employee/css/admin-comepetency-management.css">
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>대한대학교 CMS 포털 - 교직원</title>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+	<!-- Bootstrap & Icons -->
+	<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+			rel="stylesheet"
+	/>
+	<link
+			href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+			rel="stylesheet"
+	/>
+	<style>
+		/* 공통 스타일 */
+		body {
+			background-color: #fafafa;
+			margin: 0;
+			padding: 0;
+			font-family: "Segoe UI", sans-serif;
+		}
+
+		/* 헤더 영역 (교직원용 포레스트 그린) */
+		.header {
+			position: fixed;
+			top: 0;
+			width: 100%;
+			height: 60px;
+			background-color: #2d4f3a;
+			color: white;
+			z-index: 1040;
+			display: flex;
+			align-items: center;
+			padding: 0 1rem;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		}
+		.header-left {
+			flex: 1;
+			font-weight: bold;
+			font-size: 1.1rem;
+		}
+		.header-center {
+			flex: 1;
+			text-align: center;
+			font-size: 1.2rem;
+		}
+		.header-right {
+			flex: 1;
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			font-size: 0.9rem;
+			gap: 1rem;
+		}
+
+		/* 사용자 정보 및 버튼 */
+		.user-box {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+		.user-info {
+			text-align: right;
+			line-height: 1.2;
+		}
+		.user-btn {
+			background: none;
+			border: none;
+			color: white;
+			font-size: 1.2rem;
+			padding: 0.25rem 0.5rem;
+			cursor: pointer;
+		}
+		.user-btn:hover {
+			color: #ffc107;
+		}
+
+		/* 사이드바 */
+		.sidebar {
+			position: fixed;
+			top: 60px;
+			left: 0;
+			width: 240px;
+			height: 100%;
+			background-color: #2d4f3a;
+			padding: 1rem 0;
+			color: white;
+			z-index: 1030;
+			overflow-y: auto;
+			box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+		}
+		.sidebar-user-info {
+			display: none;
+			padding: 1rem 1.5rem;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		}
+		.sidebar-user-info div {
+			font-size: 0.95rem;
+			line-height: 1.4;
+		}
+
+		/* 본문 */
+		.main-content {
+			margin-top: 60px;
+			margin-left: 240px;
+			padding: 1.5rem;
+		}
+
+		/* 메뉴 스타일 */
+		.nav-link {
+			color: #e0e8f0;
+			padding: 0.75rem 1.5rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			transition: background-color 0.2s, color 0.2s;
+			text-decoration: none;
+		}
+		.nav-link:hover {
+			background-color: #3b624d;
+			color: #ffffff;
+		}
+		.nav-link.active {
+			background-color: #46775c;
+			font-weight: bold;
+		}
+		.submenu {
+			background-color: #3b624d;
+		}
+		.submenu a {
+			padding-left: 2.5rem;
+			font-size: 0.95rem;
+		}
+		.has-submenu::after {
+			content: "\25BC";
+			font-size: 0.75rem;
+			margin-left: 0.5rem;
+		}
+
+		/* 햄버거 메뉴 (모바일) */
+		.hamburger {
+			display: none;
+			cursor: pointer;
+			font-size: 1.25rem;
+		}
+
+		/* 반응형 대응 */
+		@media (max-width: 768px) {
+			.sidebar {
+				left: -240px;
+				transition: left 0.3s ease;
+			}
+			.sidebar.show {
+				left: 0;
+			}
+			.main-content {
+				margin-left: 0;
+			}
+			.hamburger {
+				display: inline-block;
+				margin-right: 1rem;
+			}
+			.header-right {
+				display: none;
+			}
+			.sidebar-user-info {
+				display: block;
+			}
+		}
+	</style>
 </head>
 <body>
-<div class="container-fluid">
+<!-- 헤더 -->
+<header class="header d-flex" th:fragment="e_header">
+	<div class="header-left">
+		<span class="hamburger" id="hamburger">&#9776;</span> CMS 교직원 포털
+	</div>
+	<div class="header-center">
+		<img
+				src="../../static/images/logo-white.png"
+				alt="logo"
+				height="30"
+				class="me-2"
+		/>
+		대한대학교
+	</div>
+	<div class="header-right" id="user-info">
+		<div id="user-logged-in" class="user-box">
+			<div class="user-info">
+				<div><strong>김교직</strong> (STAFF001)</div>
+				<div class="small">학사운영팀</div>
+			</div>
+			<button class="user-btn" title="로그아웃">
+				<i class="bi bi-box-arrow-right"></i>
+			</button>
+		</div>
+		<div id="user-logged-out" class="user-box">
+			<button class="user-btn" title="로그인">
+				<i class="bi bi-box-arrow-in-right"></i> 로그인
+			</button>
+		</div>
+	</div>
+</header>
+
+<!-- 사이드바 -->
+<aside class="sidebar" id="sidebar" th:fragment="e_sidebar">
+	<div class="sidebar-user-info">
+		<div><strong>김교직</strong> (STAFF001)</div>
+		<div>학사운영팀</div>
+		<div class="mt-2">
+			<button class="user-btn" title="로그아웃">
+				<i class="bi bi-box-arrow-right"></i> 로그아웃
+			</button>
+		</div>
+	</div>
+	<nav class="nav flex-column">
+		<a class="nav-link" href="/notice">공지사항관리</a>
+
+		<a class="nav-link has-submenu" href="#" data-menu="역량"
+		>핵심역량개발관리</a
+		>
+		<div class="submenu" id="submenu-역량" style="display: none">
+			<a class="nav-link" href="/competency/items">역량항목관리</a>
+			<a class="nav-link" href="/competency/questions">진단문항관리</a>
+			<a class="nav-link" href="/competency/diagnosis">진단검사현황</a>
+			<a class="nav-link" href="/competency/recommend">추천비교과관리</a>
+		</div>
+
+		<a class="nav-link has-submenu" href="#" data-menu="비교과"
+		>비교과프로그램관리</a
+		>
+		<div class="submenu" id="submenu-비교과" style="display: none">
+			<a class="nav-link" href="/program/manage">프로그램관리</a>
+			<a class="nav-link" href="/program/applications">프로그램신청관리</a>
+			<a class="nav-link" href="/program/activities">프로그램활동관리</a>
+		</div>
+
+		<a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+		<div class="submenu" id="submenu-상담" style="display: none">
+			<a class="nav-link" href="/counseling/schedule">상담사일정등록</a>
+			<a class="nav-link" href="/counseling/reservations">상담예약관리</a>
+			<a class="nav-link" href="/counseling/results">상담결과관리</a>
+		</div>
+
+		<a class="nav-link has-submenu" href="#" data-menu="마일리지"
+		>마일리지관리</a
+		>
+		<div class="submenu" id="submenu-마일리지" style="display: none">
+			<a class="nav-link" href="/mileage/points">마일리지배점</a>
+			<a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+			<a class="nav-link" href="/mileage/status">마일리지현황</a>
+		</div>
+	</nav>
+</aside>
+
+<!-- 메인 콘텐츠 -->
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+	<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+		<h1 class="h2"><i class="fas fa-cogs me-2"></i> 역량 항목 관리</h1>
+		<div class="btn-toolbar mb-2 mb-md-0">
+			<div class="btn-group me-2">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompetencyModal">
+					<i class="fas fa-plus me-2"></i> 역량 항목 추가
+				</button>
+				<a href="/employees/core-diagnosis-cpt" class="btn btn-outline-secondary">
+					<i class="fas fa-arrow-left me-2"></i> 돌아가기
+				</a>
+			</div>
+		</div>
+	</div>
+
+	<!-- 역량 항목 목록 -->
 	<div class="row">
-		<!-- 사이드바 -->
-		<nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-			<div class="position-sticky pt-3">
-				<div class="text-center mb-4">
-					<h4 class="text-white">
-						<i class="fas fa-graduation-cap me-2"></i> 관리자
-					</h4>
+		<div class="col-md-4">
+			<div class="card">
+				<div class="card-header">
+					<h5 class="mb-0"><i class="fas fa-list me-2"></i> 역량 항목 목록</h5>
 				</div>
-
-				<ul class="nav flex-column">
-					<li class="nav-item"><a class="nav-link" href="admin-index.html"><i class="fas fa-tachometer-alt me-2"></i> 대시보드</a></li>
-					<li class="nav-item">
-						<a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
-							<i class="fas fa-users me-2"></i> 사용자/조직 관리 <i class="fas fa-chevron-down ms-auto"></i>
-						</a>
-						<div class="collapse" id="userManagement">
-							<ul class="nav flex-column ms-3">
-								<li class="nav-item"><a class="nav-link" href="admin-student-management.html"><i class="fas fa-user-graduate me-2"></i> 학생 관리</a></li>
-								<li class="nav-item"><a class="nav-link" href="admin-faculty-management.html"><i class="fas fa-chalkboard-teacher me-2"></i> 교직원 관리</a></li>
-								<li class="nav-item"><a class="nav-link" href="../admin-department-management.html"><i class="fas fa-building me-2"></i> 학과/부서 관리</a></li>
-								<li class="nav-item"><a class="nav-link" href="admin-permission-management.html"><i class="fas fa-key me-2"></i> 권한 관리</a></li>
-							</ul>
-						</div>
-					</li>
-					<li class="nav-item"><a class="nav-link active" href="admin-diagnosis-management.html"><i class="fas fa-chart-line me-2"></i> 역량진단 관리</a></li>
-					<li class="nav-item"><a class="nav-link" href="admin-program-management.html"><i class="fas fa-calendar-alt me-2"></i> 비교과 프로그램 관리</a></li>
-					<li class="nav-item"><a class="nav-link" href="../admin-counseling-management.html"><i class="fas fa-comments me-2"></i> 상담 관리</a></li>
-					<li class="nav-item"><a class="nav-link" href="admin-mileage-management.html"><i class="fas fa-coins me-2"></i> 마일리지 관리</a></li>
-					<li class="nav-item"><a class="nav-link" href="../admin-notice-management.html"><i class="fas fa-bullhorn me-2"></i> 공지사항 관리</a></li>
-				</ul>
-
-				<hr class="my-3" style="border-color: rgba(255, 255, 255, 0.3);">
-
-				<ul class="nav flex-column">
-					<li class="nav-item"><a class="nav-link" href="login.html"><i class="fas fa-sign-out-alt me-2"></i> 로그아웃</a></li>
-				</ul>
+				<div class="card-body">
+					<div class="list-group">
+						<!-- JS에서 동적으로 생성 -->
+					</div>
+				</div>
 			</div>
-		</nav>
+		</div>
 
-		<!-- 메인 콘텐츠 -->
-		<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-				<h1 class="h2"><i class="fas fa-cogs me-2"></i> 역량 항목 관리</h1>
-				<div class="btn-toolbar mb-2 mb-md-0">
-					<div class="btn-group me-2">
-						<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCompetencyModal">
-							<i class="fas fa-plus me-2"></i> 역량 항목 추가
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header d-flex justify-content-between align-items-center">
+					<h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> 역량 상세 정보</h5>
+					<div>
+						<button class="btn btn-sm btn-outline-primary me-2" onclick="editCompetency()">
+							<i class="fas fa-edit me-1"></i> 수정
 						</button>
-						<a href="/employees/core-diagnosis-cpt" class="btn btn-outline-secondary">
-							<i class="fas fa-arrow-left me-2"></i> 돌아가기
-						</a>
+						<button class="btn btn-sm btn-outline-danger" onclick="deleteCompetency()">
+							<i class="fas fa-trash me-1"></i> 삭제
+						</button>
 					</div>
 				</div>
-			</div>
-
-			<!-- 역량 항목 목록 -->
-			<div class="row">
-				<div class="col-md-4">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-list me-2"></i> 역량 항목 목록</h5>
+				<div class="card-body">
+					<div id="competencyDetails"></div>
+					<!-- ✅ 코멘트 구간 관리 -->
+					<div class="mt-4">
+						<h6 class="fw-bold">점수 구간별 코멘트</h6>
+						<div id="commentList" class="mb-2">
+							<!-- JS로 점수 구간 코멘트 동적 생성 -->
 						</div>
-						<div class="card-body">
-							<div class="list-group">
-								<!-- JS에서 동적으로 생성 -->
-							</div>
-						</div>
+						<button class="btn btn-sm btn-outline-primary" onclick="openCommentModal()">
+							<i class="fas fa-plus me-1"></i> 코멘트 추가
+						</button>
+						<button class="btn btn-sm btn-outline-secondary flex-fill" onclick="loadComments(selectedCompetency)">
+							<i class="fas fa-comments me-1"></i> 구간별 코멘트 관리
+						</button>
 					</div>
-				</div>
 
-				<div class="col-md-8">
-					<div class="card">
-						<div class="card-header d-flex justify-content-between align-items-center">
-							<h5 class="mb-0"><i class="fas fa-info-circle me-2"></i> 역량 상세 정보</h5>
-							<div>
-								<button class="btn btn-sm btn-outline-primary me-2" onclick="editCompetency()">
-									<i class="fas fa-edit me-1"></i> 수정
-								</button>
-								<button class="btn btn-sm btn-outline-danger" onclick="deleteCompetency()">
-									<i class="fas fa-trash me-1"></i> 삭제
-								</button>
-							</div>
-						</div>
-						<div class="card-body">
-							<div id="competencyDetails"></div>
-							<!-- ✅ 코멘트 구간 관리 -->
-							<div class="mt-4">
-								<h6 class="fw-bold">점수 구간별 코멘트</h6>
-								<div id="commentList" class="mb-2">
-									<!-- JS로 점수 구간 코멘트 동적 생성 -->
-								</div>
-								<button class="btn btn-sm btn-outline-primary" onclick="openCommentModal()">
-									<i class="fas fa-plus me-1"></i> 코멘트 추가
-								</button>
-								<button class="btn btn-sm btn-outline-secondary flex-fill" onclick="loadComments(selectedCompetency)">
-									<i class="fas fa-comments me-1"></i> 구간별 코멘트 관리
-								</button>
-							</div>
-
-						</div>
-					</div>
 				</div>
 			</div>
-		</main>
+		</div>
 	</div>
-</div>
-
-<!-- 역량 항목 추가 모달 -->
-<div class="modal fade" id="addCompetencyModal" tabindex="-1">
-	<div class="modal-dialog modal-lg">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title"><i class="fas fa-plus me-2"></i> 역량 항목 추가</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form id="addCompetencyForm">
-					<div class="row mb-3">
-						<div class="col-md-6">
-							<label for="competencyName" class="form-label">역량명 *</label>
-							<input type="text" class="form-control" id="competencyName" required>
+	<!-- 역량 항목 추가 모달 -->
+	<div class="modal fade" id="addCompetencyModal" tabindex="-1">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"><i class="fas fa-plus me-2"></i> 역량 항목 추가</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="addCompetencyForm">
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label for="competencyName" class="form-label">역량명 *</label>
+								<input type="text" class="form-control" id="competencyName" required>
+							</div>
+							<div class="col-md-6">
+								<!-- 코드 입력 필드 생략 -->
+							</div>
 						</div>
-						<div class="col-md-6">
-							<!-- 코드 입력 필드 생략 -->
+						<div class="mb-3">
+							<label for="competencyDescription" class="form-label">역량 설명 *</label>
+							<textarea class="form-control" id="competencyDescription" rows="3" required></textarea>
 						</div>
-					</div>
-					<div class="mb-3">
-						<label for="competencyDescription" class="form-label">역량 설명 *</label>
-						<textarea class="form-control" id="competencyDescription" rows="3" required></textarea>
-					</div>
-					<div class="row mb-3">
-						<div class="col-md-6">
-							<label for="competencyWeight" class="form-label">가중치 (%)</label>
-							<input type="number" class="form-control" id="competencyWeight" min="0" max="100" value="20">
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<label for="competencyWeight" class="form-label">가중치 (%)</label>
+								<input type="number" class="form-control" id="competencyWeight" min="0" max="100" value="20">
+							</div>
+							<div class="col-md-6">
+								<label for="competencyColor" class="form-label">표시 색상</label>
+								<input type="color" class="form-control color-picker" id="competencyColor" value="#3498db">
+							</div>
 						</div>
-						<div class="col-md-6">
-							<label for="competencyColor" class="form-label">표시 색상</label>
-							<input type="color" class="form-control color-picker" id="competencyColor" value="#3498db">
-						</div>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-primary" onclick="addCompetency()">
-					<i class="fas fa-save me-2"></i> 저장
-				</button>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-primary" onclick="addCompetency()">
+						<i class="fas fa-save me-2"></i> 저장
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<!-- ✅ 상위/하위 역량 수정 모달 -->
-<div class="modal fade" id="editCompetencyModal" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title"><i class="fas fa-edit me-2"></i> 역량 수정</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form id="editCompetencyForm">
-					<div class="mb-3">
-						<label for="editCompetencyName" class="form-label">역량명 *</label>
-						<input type="text" class="form-control" id="editCompetencyName" required>
-					</div>
-					<div class="mb-3">
-						<label for="editCompetencyDescription" class="form-label">역량 설명 *</label>
-						<textarea class="form-control" id="editCompetencyDescription" rows="3" required></textarea>
-					</div>
-					<div class="mb-3">
-						<label for="editCompetencyWeight" class="form-label">가중치 (%)</label>
-						<input type="number" class="form-control" id="editCompetencyWeight" min="0" max="100">
-					</div>
-					<div class="mb-3">
-						<label for="editCompetencyColor" class="form-label">표시 색상</label>
-						<input type="color" class="form-control" id="editCompetencyColor">
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-primary" onclick="saveEditedCompetency()">
-					<i class="fas fa-save me-1"></i> 저장
-				</button>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- 하위 역량 추가 모달 -->
-<div class="modal fade" id="addSubCompetencyModal" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title"><i class="fas fa-plus me-2"></i> 하위 역량 추가</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form id="addSubCompetencyForm">
-					<div class="mb-3">
-						<label for="subCompetencyName" class="form-label">하위 역량명 *</label>
-						<input type="text" class="form-control" id="subCompetencyName" required>
-					</div>
-					<div class="mb-3">
-						<label for="subCompetencyDescription" class="form-label">설명 *</label>
-						<textarea class="form-control" id="subCompetencyDescription" rows="3" required></textarea>
-					</div>
-					<div class="mb-3">
-						<label for="subCompetencyWeight" class="form-label">가중치 (%)</label>
-						<input type="number" class="form-control" id="subCompetencyWeight" min="0" max="100" value="33">
-						<small class="text-muted">상위 역량 내에서의 비중</small>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-primary" onclick="addSubCompetency()">
-					<i class="fas fa-save me-2"></i> 저장
-				</button>
+	<!-- ✅ 상위/하위 역량 수정 모달 -->
+	<div class="modal fade" id="editCompetencyModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"><i class="fas fa-edit me-2"></i> 역량 수정</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="editCompetencyForm">
+						<div class="mb-3">
+							<label for="editCompetencyName" class="form-label">역량명 *</label>
+							<input type="text" class="form-control" id="editCompetencyName" required>
+						</div>
+						<div class="mb-3">
+							<label for="editCompetencyDescription" class="form-label">역량 설명 *</label>
+							<textarea class="form-control" id="editCompetencyDescription" rows="3" required></textarea>
+						</div>
+						<div class="mb-3">
+							<label for="editCompetencyWeight" class="form-label">가중치 (%)</label>
+							<input type="number" class="form-control" id="editCompetencyWeight" min="0" max="100">
+						</div>
+						<div class="mb-3">
+							<label for="editCompetencyColor" class="form-label">표시 색상</label>
+							<input type="color" class="form-control" id="editCompetencyColor">
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-primary" onclick="saveEditedCompetency()">
+						<i class="fas fa-save me-1"></i> 저장
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<div class="modal fade" id="addCommentModal" tabindex="-1">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title"><i class="fas fa-comment me-2"></i> 점수 구간 코멘트 추가</h5>
-				<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-			</div>
-			<div class="modal-body">
-				<form id="addCommentForm">
-					<div class="mb-3">
-						<label for="minScore" class="form-label">최소 점수</label>
-						<input type="number" class="form-control" id="minScore" min="0" max="100" required>
-					</div>
-					<div class="mb-3">
-						<label for="maxScore" class="form-label">최대 점수</label>
-						<input type="number" class="form-control" id="maxScore" min="0" max="100" required>
-					</div>
-					<div class="mb-3">
-						<label for="commentContent" class="form-label">코멘트 내용</label>
-						<textarea class="form-control" id="commentContent" rows="3" required></textarea>
-					</div>
-				</form>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
-				<button type="button" class="btn btn-primary" onclick="addComment()">
-					<i class="fas fa-save me-1"></i> 저장
-				</button>
+	<!-- 하위 역량 추가 모달 -->
+	<div class="modal fade" id="addSubCompetencyModal" tabindex="-1">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title"><i class="fas fa-plus me-2"></i> 하위 역량 추가</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<form id="addSubCompetencyForm">
+						<div class="mb-3">
+							<label for="subCompetencyName" class="form-label">하위 역량명 *</label>
+							<input type="text" class="form-control" id="subCompetencyName" required>
+						</div>
+						<div class="mb-3">
+							<label for="subCompetencyDescription" class="form-label">설명 *</label>
+							<textarea class="form-control" id="subCompetencyDescription" rows="3" required></textarea>
+						</div>
+						<div class="mb-3">
+							<label for="subCompetencyWeight" class="form-label">가중치 (%)</label>
+							<input type="number" class="form-control" id="subCompetencyWeight" min="0" max="100" value="33">
+							<small class="text-muted">상위 역량 내에서의 비중</small>
+						</div>
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+					<button type="button" class="btn btn-primary" onclick="addSubCompetency()">
+						<i class="fas fa-save me-2"></i> 저장
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</main>
 <script src="/employee/js/admin-competency-management.js"></script>
+<!-- 스크립트 -->
+<script>
+	const sidebar = document.getElementById("sidebar");
+	const hamburger = document.getElementById("hamburger");
+	hamburger.addEventListener("click", () => {
+		sidebar.classList.toggle("show");
+	});
+
+	const menuLinks = document.querySelectorAll("[data-menu]");
+	menuLinks.forEach((menu) => {
+		menu.addEventListener("click", (e) => {
+			e.preventDefault();
+			const key = menu.getAttribute("data-menu");
+			const submenu = document.getElementById(`submenu-${key}`);
+
+			document.querySelectorAll(".submenu").forEach((sm) => {
+				if (sm !== submenu) sm.style.display = "none";
+			});
+
+			if (submenu) {
+				submenu.style.display =
+						submenu.style.display === "block" ? "none" : "block";
+			}
+		});
+	});
+</script>
 </body>
 </html>
