@@ -63,4 +63,6 @@ public class CreateReservationRequestDto {
     @NotBlank(message = "연락처를 입력해주세요.")
     @Pattern(regexp = "^\\d{10,11}$", message = "올바른 형식의 연락처를 입력해주세요.")
     private String phone;
+    
+    private Long originalApplyId;
 }

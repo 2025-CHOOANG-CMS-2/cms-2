@@ -21,4 +21,12 @@ public interface StdMileageTotalRepository extends JpaRepository<StdMileageTotal
 	
 	//해당학생(StdInfo 테이블 기준)의 마일리지 총점 정보
 	Optional<StdMileageTotal> findByStudent(StdInfo student);
+	
+	//재학생 기준 마일리지 보유 학생 수
+	@Query("SELECT COUNT(t.student) FROM StdMileageTotal t WHERE t.student.statusCode = 'ENROLL' AND t.totalMileageScore > 0")
+    long countActiveStudentsWithMileage();
+
+	//재학생 기준 학생의 평균 마일리지
+    @Query("SELECT COALESCE(AVG(t.totalMileageScore), 0) FROM StdMileageTotal t WHERE t.student.statusCode = 'ENROLL' AND t.totalMileageScore > 0")
+    double avgMileagePerActiveStudent();
 }

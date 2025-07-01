@@ -1,4 +1,4 @@
-package kr.ac.dhuniv.mileage.dto.employee;
+package kr.ac.dhuniv.mileage.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
