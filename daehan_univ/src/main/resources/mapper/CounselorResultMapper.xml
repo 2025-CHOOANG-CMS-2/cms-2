@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.dhuniv.counsel.mapper.CounselorResultMapper">
+
+    <!-- 반복되는 WHERE 조건을 재사용하기 위한 SQL 조각 -->
+    <sql id="counselingResultWhereClause">
+        <where>
+            e.empl_no = #{counselorId}
+            <if test="statuses != null and !statuses.isEmpty()">
+                AND a.stat_cd IN
+                <foreach item="status" collection="statuses" open="(" separator="," close=")">
+                    #{status}
+                </foreach>
+            </if>
+            <if test="type != null and type != 'all'">
+                AND a.type_cd = #{type}
+            </if>
+            <!-- TODO: 기간(period) 필터는 필요 시 여기에 추가합니다. -->
+        </where>
+    </sql>
+
+    <!-- 페이징 처리된 목록 조회 쿼리 -->
+    <select id="findByCounselorAndFilters" resultType="kr.ac.dhuniv.counsel.dto.CounselingResultItemDto">
+        SELECT
+            a.id AS applyId,
+            r.id AS resultId,
+            s.std_nm AS studentName,
+            s.std_no AS studentId,
+            s.scsbjt_cd AS studentMajor,
+            a.type_cd AS counselingType,
+            a.stat_cd AS status,
+            a.aply_dttm AS applyDateTime,
+            r.cnsl_cn AS resultContent,
+            r.satisf_score AS satisfactionScore
+        FROM
+            cnsl_aply a
+        JOIN empl_info e ON a.empl_no = e.empl_no
+        JOIN std_info s ON a.std_no = s.std_no
+        LEFT JOIN cnsl_rslt r ON a.cnsl_aply_id = r.cnsl_aply_id
+        LEFT JOIN com_info d ON s.scsbjt_cd = d.com_no
+        <include refid="counselingResultWhereClause"/>
+        ORDER BY a.aply_dttm DESC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 개수 조회 쿼리 -->
+    <select id="countByCounselorAndFilters" resultType="long">
+        SELECT COUNT(*)
+        FROM cnsl_aply a
+        JOIN empl_info e ON a.empl_no = e.empl_no
+        JOIN std_info s ON a.std_no = s.std_no
+        <include refid="counselingResultWhereClause"/>
+    </select>
+
+    <!-- '결과 수정' 시 필요한 상세 정보 조회 쿼리 -->
+    <select id="findDetailByResultId" resultType="kr.ac.dhuniv.counsel.dto.CounselingResultItemDto">
+        SELECT
+            a.id AS applyId,
+            r.id AS resultId,
+            r.cnsl_cn AS resultContent
+        FROM
+            cnsl_rslt r
+        JOIN
+            cnsl_aply a ON r.cnsl_aply_id = a.cnsl_aply_id
+        WHERE
+            r.id = #{resultId}
+    </select>
+
+</mapper>

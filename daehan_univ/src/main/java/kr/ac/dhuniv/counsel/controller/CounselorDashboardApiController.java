@@ -1,13 +1,20 @@
 package kr.ac.dhuniv.counsel.controller;
 
+import kr.ac.dhuniv.counsel.dto.CounselingHistoryDto;
+import kr.ac.dhuniv.counsel.dto.CounselingResultItemDto;
 import kr.ac.dhuniv.counsel.dto.MonthlyReservationStatusDto;
+import kr.ac.dhuniv.counsel.dto.PageDto;
 import kr.ac.dhuniv.counsel.dto.ReservationDetailDto;
 import kr.ac.dhuniv.counsel.dto.WriteResultRequestDto;
 import kr.ac.dhuniv.counsel.service.CounselorDashboardService;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import kr.ac.dhuniv.counsel.service.CounselStudentService;
 
 import jakarta.validation.Valid;
 
@@ -20,6 +27,7 @@ import java.util.List;
 public class CounselorDashboardApiController {
 
     private final CounselorDashboardService dashboardService;
+    private final CounselStudentService counselStudentService;
 
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationDetailDto>> getDailyReservations(
@@ -67,4 +75,11 @@ public class CounselorDashboardApiController {
         // 4. 성공 응답을 반환합니다.
         return ResponseEntity.ok().build();
     }
+    
+    @GetMapping("/results/{resultId}")
+    public ResponseEntity<CounselingHistoryDto> getCounselingResultDetail(@PathVariable Long resultId) {
+        CounselingHistoryDto resultDetail = counselStudentService.getCounselingResultDetail(resultId);
+        return ResponseEntity.ok(resultDetail);
+    }
+    
 }

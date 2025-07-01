@@ -14,4 +14,7 @@ public interface CnlrDefaultSchdRepository extends JpaRepository<CnlrDefaultSchd
     
     @Modifying
     void deleteByEmployee_User_UserId(String userId);
+    
+    // [추가] 특정 상담사의 모든 기본 스케줄을 조회하는 메소드
+    List<CnlrDefaultSchd> findByEmployee_User_UserId(String userId);
 }
