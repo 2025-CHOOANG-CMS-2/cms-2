@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -50,10 +51,10 @@ public class CounselStudentApiController {
     }
 
     @PostMapping("/reservations")
-    public ResponseEntity<Void> createReservation(@Valid @RequestBody CreateReservationRequestDto requestDto) {
-        // TODO: 로그인 기능 완성 후, 실제 로그인한 학생의 학번으로 교체해야 합니다.
-        // String loggedInStudentId = SecurityContextHolder.getContext().getAuthentication().getName();
-        // requestDto.setStdNo(loggedInStudentId); 
+    public ResponseEntity<Void> createReservation(@Valid @RequestBody CreateReservationRequestDto requestDto, Authentication authentication) {
+       //String loggedInStudentId = authentication.getName();
+    	String loggedInStudentId = "2025004001";
+        requestDto.setStdNo(loggedInStudentId); // DTO에 현재 로그인한 학생 ID 설정
         counselStudentService.createReservation(requestDto);
         return ResponseEntity.ok().build();
     }
@@ -64,10 +65,12 @@ public class CounselStudentApiController {
             @RequestParam(value = "status", defaultValue = "all") String status,
             @RequestParam(value = "type", defaultValue = "all") String type,
             // Pageable 파라미터를 추가하여 페이징 정보를 받습니다.
-            @PageableDefault(size = 10, sort = "applyDateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "applyDateTime", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication) {
         
         // TODO: 로그인 기능 완성 후, 실제 로그인한 학생의 학번으로 교체 필요
-        String studentId = "2025004001"; // 임시 테스트용 학생 ID
+        //String studentId = authentication.getName();
+    	String studentId = "2025004001";
         
         // 서비스 메소드에 pageable 객체를 그대로 전달합니다.
         PageDto<CounselingHistoryDto> pagedHistory = counselStudentService.getCounselingHistory(studentId, pageable, period, status, type);
@@ -77,10 +80,12 @@ public class CounselStudentApiController {
     @PatchMapping("/reservations/{applyId}/status")
     public ResponseEntity<Void> updateReservationStatus(
             @PathVariable("applyId") Long applyId,
-            @Valid @RequestBody UpdateReservationStatusDto statusDto) {
+            @Valid @RequestBody UpdateReservationStatusDto statusDto,
+            Authentication authentication) {
         
         // TODO: 로그인 기능 완성 후, 실제 로그인한 학생 ID로 교체 필요
-        String studentId = "2025004001"; 
+        //String studentId = authentication.getName();
+    	String studentId = "2025004001";
 
         counselStudentService.updateReservationStatus(studentId, applyId, statusDto.getStatus());
         return ResponseEntity.ok().build();
@@ -95,12 +100,15 @@ public class CounselStudentApiController {
     @PutMapping("/results/{resultId}/satisfaction")
     public ResponseEntity<Void> updateSatisfaction(
             @PathVariable("resultId") Long resultId,
-            @RequestBody SatisfactionRequestDto requestDto) {
-        
-        // TODO: 실제 서비스에서는 SecurityContext를 통해 로그인한 학생 ID를 가져와서
-        // 해당 학생이 이 상담의 소유주가 맞는지 확인하는 권한 검사 로직이 필요합니다.
-        
-        counselStudentService.updateSatisfactionScore(resultId, requestDto.getScore());
+            @RequestBody SatisfactionRequestDto requestDto,
+            Authentication authentication) {
+
+        //String studentId = authentication.getName();
+    	String studentId = "2025004001";
+
+        // 서비스 계층에 권한 검사 로직 위임 (더 나은 설계)
+        counselStudentService.updateSatisfactionScore(resultId, requestDto.getScore(), studentId);
+
         return ResponseEntity.ok().build();
     }
 }

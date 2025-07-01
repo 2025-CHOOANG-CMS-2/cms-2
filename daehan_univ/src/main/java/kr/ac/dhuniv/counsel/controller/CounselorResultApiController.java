@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,34 +40,44 @@ public class CounselorResultApiController {
             @RequestParam(value = "period", defaultValue = "all") String period,
             @RequestParam(value = "type", defaultValue = "all") String type,
             @RequestParam(value = "statuses") List<String> statuses, // JS에서 보낸 "APPROVED,COMPLETED"를 리스트로 받음
-            @PageableDefault(size = 10, sort = "applyDateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 10, sort = "applyDateTime", direction = Sort.Direction.DESC) Pageable pageable,
+            Authentication authentication) {
         
         // TODO: 로그인 기능 구현 후, 실제 로그인한 상담사 ID로 교체해야 합니다.
-        String counselorId = "2025110002"; // 임시 상담사 ID
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
 
         PageDto<CounselingResultItemDto> pagedResults = counselorService.getCounselingResults(counselorId, statuses, period, type, pageable);
         return ResponseEntity.ok(pagedResults);
     }
 
     @GetMapping("/results/{resultId}")
-    public ResponseEntity<CounselingResultItemDto> getCounselingResultDetail(@PathVariable("resultId") Long resultId) {
-        // TODO: 로그인 기능 구현 후, 실제 로그인한 상담사 ID로 권한 확인 로직 추가 필요
-        CounselingResultItemDto resultDetail = counselorService.getCounselingResultDetail(resultId);
+    public ResponseEntity<CounselingResultItemDto> getCounselingResultDetail(
+            @PathVariable("resultId") Long resultId, 
+            Authentication authentication) {
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
+        // 서비스 계층에서 권한 확인 로직 수행
+        CounselingResultItemDto resultDetail = counselorService.getCounselingResultDetailForCounselor(resultId, counselorId);
         return ResponseEntity.ok(resultDetail);
     }
     
     @PostMapping("/results")
-    public ResponseEntity<Void> writeCounselingResult(@Valid @RequestBody WriteResultRequestDto requestDto) {
+    public ResponseEntity<Void> writeCounselingResult(@Valid @RequestBody WriteResultRequestDto requestDto,
+    		Authentication authentication) {
         // TODO: 로그인 기능 구현 후, 실제 로그인한 상담사의 ID로 교체해야 합니다.
-        String counselorId = "2025110002"; 
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         counselorService.writeCounselingResult(counselorId, requestDto);
         return ResponseEntity.ok().build();
     }
     
     @PutMapping("/results/{resultId}")
     public ResponseEntity<Void> updateCounselingResult(@PathVariable("resultId") Long resultId,
-                                                       @Valid @RequestBody WriteResultRequestDto requestDto) {
-        String counselorId = "2025110002"; // TODO: 로그인 기능 구현 후, 실제 상담사 ID로 교체
+                                                       @Valid @RequestBody WriteResultRequestDto requestDto,
+                                                       Authentication authentication) {
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         counselorService.updateCounselingResult(resultId, requestDto, counselorId);
         return ResponseEntity.ok().build();
     }

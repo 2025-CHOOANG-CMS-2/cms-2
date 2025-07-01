@@ -7,6 +7,7 @@ import kr.ac.dhuniv.counsel.service.CounselorScheduleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -28,10 +29,11 @@ public class CounselorScheduleApiController {
     @GetMapping
     public ResponseEntity<CounselorScheduleDto> getMySchedule(
             @RequestParam("year") int year, 
-            @RequestParam("month") int month) {
+            @RequestParam("month") int month,
+            Authentication authentication) {
         
-        // TODO: 로그인 기능 구현 후, 실제 로그인한 상담사의 ID로 교체해야 합니다.
-        String counselorId = "STAFF001"; 
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         
         CounselorScheduleDto schedule = scheduleService.getCounselorSchedule(counselorId, year, month);
         return ResponseEntity.ok(schedule);
@@ -43,8 +45,10 @@ public class CounselorScheduleApiController {
      * 한 번에 업데이트하기 위해 호출됩니다.
      */
     @PutMapping("/default")
-    public ResponseEntity<Void> updateDefaultSchedules(@RequestBody List<DefaultScheduleDto> scheduleDtos) {
-        String counselorId = "2025110002"; // TODO: 실제 로그인한 상담사 ID로 교체
+    public ResponseEntity<Void> updateDefaultSchedules(@RequestBody List<DefaultScheduleDto> scheduleDtos,
+    		Authentication authentication) {
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         scheduleService.updateDefaultSchedules(counselorId, scheduleDtos);
         return ResponseEntity.ok().build();
     }
@@ -55,8 +59,10 @@ public class CounselorScheduleApiController {
      * 새로 저장(INSERT)하거나 이미 존재하면 수정(UPDATE)하기 위해 호출됩니다.
      */
     @PostMapping("/exception")
-    public ResponseEntity<Void> saveOrUpdateException(@RequestBody ScheduleExceptionDto exceptionDto) {
-        String counselorId = "2025110002"; // TODO: 실제 로그인한 상담사 ID로 교체
+    public ResponseEntity<Void> saveOrUpdateException(@RequestBody ScheduleExceptionDto exceptionDto,
+    		Authentication authentication) {
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         scheduleService.saveOrUpdateScheduleException(counselorId, exceptionDto);
         return ResponseEntity.ok().build();
     }
@@ -68,8 +74,10 @@ public class CounselorScheduleApiController {
      */
     @DeleteMapping("/exception/{date}")
     public ResponseEntity<Void> deleteException(
-            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        String counselorId = "2025110002"; // TODO: 실제 로그인한 상담사 ID로 교체
+            @PathVariable("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            Authentication authentication) {
+        //String counselorId = authentication.getName();
+    	String counselorId = "2025110002";
         scheduleService.deleteScheduleException(counselorId, date);
         return ResponseEntity.ok().build();
     }

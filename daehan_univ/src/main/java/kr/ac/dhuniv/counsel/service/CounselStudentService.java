@@ -43,5 +43,5 @@ public interface CounselStudentService {
     
     CounselingHistoryDto getCounselingResultDetail(Long resultId);
     
-    void updateSatisfactionScore(Long resultId, Double score);
+    void updateSatisfactionScore(Long resultId, Double score, String studentId);
 }
