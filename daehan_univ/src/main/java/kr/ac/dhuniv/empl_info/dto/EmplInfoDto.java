@@ -4,16 +4,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import lombok.Builder; // ⭐ 이 import 문을 추가합니다 ⭐
 
 import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder // ⭐ 이 어노테이션을 추가합니다 ⭐
 public class EmplInfoDto {
-
-    // @JsonProperty("EMPL_ID") // 필요하다면 ID도 추가할 수 있습니다.
-    // private Long EMPL_ID; // 엔티티의 ID와 매핑될 수 있음
 
     @JsonProperty("STAFF_NO")
     private String STAFF_NO;
@@ -41,6 +40,9 @@ public class EmplInfoDto {
 
     @JsonProperty("DADDR")
     private String DADDR;
+    
+    @JsonProperty("DEPT_NM")
+    private String DEPT_NM; // 부서 이름 필드
 
     @JsonProperty("STAFF_TELNO")
     private String STAFF_TELNO;
@@ -54,7 +56,6 @@ public class EmplInfoDto {
     @JsonProperty("CREATED_BY")
     private String CREATED_BY;
 
-    // --- 새로 추가되는 DTO 필드 ---
     @JsonProperty("PROFILE_IMAGE_URL")
     private String PROFILE_IMAGE_URL;
 }
