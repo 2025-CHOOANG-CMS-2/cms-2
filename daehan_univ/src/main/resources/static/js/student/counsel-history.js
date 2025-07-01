@@ -396,6 +396,10 @@ function modifyBooking(applyId) {
  * '채팅 시작' 버튼 클릭 시 호출되는 메인 함수
  * @param {string} applyId - 입장할 예약(채팅방) ID
  */
+/**
+ * '채팅 시작' 버튼 클릭 시 호출되는 메인 함수
+ * @param {string} applyId - 입장할 예약(채팅방) ID
+ */
 function startChatSession(applyId) {
     currentRoomId = applyId;
     
@@ -414,26 +418,40 @@ function startChatSession(applyId) {
         socket.disconnect();
     }
 
-    // Node.js 서버에 연결
+    // Node.js 서버에 연결 (공인 IP 사용)
     socket = io('http://210.178.108.186:3001');
 
     // --- 소켓 이벤트 리스너 등록 ---
+
+    // 1. 서버에 성공적으로 연결되었을 때
     socket.on('connect', () => {
         console.log('채팅 서버 연결 성공');
         messagesContainer.innerHTML = '';
         
-        // TODO: 이 객체는 각 파일(학생/상담사)에 맞게 수정해야 합니다.
         const currentUser = getUserInfoForChat();
         
+        // 채팅방 참여 이벤트 전송
         socket.emit('joinRoom', { roomId: currentRoomId, user: currentUser });
     });
 
+    // 2. [추가] 이전 대화 기록을 서버로부터 받았을 때
+    socket.on('loadHistory', (messages) => {
+        // 메시지 배열을 순회하며 화면에 추가합니다.
+        messages.forEach(message => {
+            addMessageToChat(message);
+        });
+        console.log(`이전 대화 ${messages.length}개를 화면에 표시했습니다.`);
+    });
+
+    // 3. 새로운 실시간 메시지를 받았을 때
     socket.on('receiveMessage', (message) => {
         addMessageToChat(message);
     });
 
+    // 4. 연결이 끊겼을 때
     socket.on('disconnect', () => console.log('채팅 서버 연결 종료'));
     
+    // 모달이 닫힐 때 소켓 연결을 해제하는 이벤트 리스너
     chatModalEl.addEventListener('hidden.bs.modal', () => {
         if(socket) socket.disconnect();
     }, { once: true });
