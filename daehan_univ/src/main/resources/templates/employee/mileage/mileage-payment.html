@@ -577,7 +577,7 @@ body {
 		  tbody.innerHTML = "";
 		  programs.forEach((p, idx) => {
 		    const row = `
-		      <tr onclick="selectProgram('${p.prgId}','${p.programName}','${p.completeDate}')">
+		      <tr onclick="selectProgram('${p.prgId}','${p.programName}','${p.completeDate}', 1)">
 		        <td>${idx + 1}</td>
 		        <td>${p.coreCompetency}</td>
 		        <td>${p.programName}</td>
@@ -592,13 +592,20 @@ body {
 
 		// 2. 특정 프로그램 선택 시 이수 학생 목록 조회
 		let currentPrgId = null;
+		let currentProgramName = null;
+		let currentCompleteDate = null;
 
-		function selectProgram(prgId, programName, completeDate) {
+		function selectProgram(prgId, programName, completeDate, showAlert) {
 		  currentPrgId = prgId;
+		  currentProgramName = programName;
+		  currentCompleteDate = completeDate;
+		  
 		  fetch(`/api/employee/mileage/unpaid-students?programId=${prgId}&completeDate=${completeDate}`)
 		    .then(res => res.json())
 		    .then(data => {
-		    	alert(`"${programName}" 이수자 명단을 조회합니다.`);
+		    	if(showAlert == 1){
+		    		alert(`"${programName}" 이수자 명단을 조회합니다.`);
+		    	}
 		    	renderStudentList(data)
 		    	
 		    	// 출력된 테이블 위치로 스크롤 이동
@@ -666,7 +673,7 @@ body {
 		    .then(res => {
 		      if (res.ok) {
 		        alert("일괄 지급 완료");
-		        selectProgram(cmpId, currentPrgId); // 재조회
+		        selectProgram(currentPrgId, currentProgramName, currentCompleteDate, 0); // 재조회
 		      } else {
 		        alert("지급 실패");
 		      }
@@ -701,7 +708,13 @@ body {
        	  fetch(`/api/employee/mileage/payment-history?${params}`)
        	    .then(res => res.json())
        	    .then(data => {
+       	      console.log(data);
+       	      console.log(data.content);
+       	      console.log("data.totalPages1: " + data.totalPages);
+       	      console.log("data.number1 : " + data.number);
        	      renderTable(data.content);
+       	      console.log("data.totalPages2: " + data.totalPages);
+       	      console.log("data.number2 : " + data.number);
        	      renderPagination(data.totalPages, data.number);
        	    })
        	    .catch(err => console.error('불러오기 실패:', err));
@@ -749,20 +762,20 @@ body {
        	        </div>
        	      </td>
        	    `;
-       	  tbody.appendChild(row);
-       	});
-
-       	  updateSelectAllCheckbox();
+       	    tbody.appendChild(row);
+       	  });
        	}
 
        	// 페이징 렌더링
        	function renderPagination(total, current) {
+       	  console.log("테스트1");
        	  totalPages = total;
        	  const container = document.querySelector(".pagination-custom");
+       	  console.log("테스트2");
        	  container.innerHTML = "";
-
-       	  const start = Math.floor(current / 5) * 5;
-       	  const end = Math.min(start + 5, total);
+       	  console.log("테스트3");
+       	  const start = Math.floor(current / pageSize) * pageSize;
+       	  const end = Math.min(start + pageSize, total);
 
        	  // 이전 버튼
        	  const prevBtn = document.createElement("button");

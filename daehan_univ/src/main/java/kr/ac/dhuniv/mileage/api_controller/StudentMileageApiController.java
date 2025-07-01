@@ -46,7 +46,7 @@ public class StudentMileageApiController {
       @RequestParam(name="competencyId", required = false) Long competencyId,
       @RequestParam(name="sort", defaultValue = "latest") String sort,
       @RequestParam(name="page", defaultValue = "0") int page,
-      @RequestParam(name="size", defaultValue = "1") int size
+      @RequestParam(name="size", defaultValue = "5") int size
     ) {
     	// LocalDateTime으로 변환
         LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;  //00:00:00

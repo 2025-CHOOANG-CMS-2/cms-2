@@ -196,7 +196,7 @@ public interface StdMileageHistRepository extends JpaRepository<StdMileageHist, 
     @Query("SELECT h FROM StdMileageHist h JOIN FETCH h.studentTotal WHERE h.mlgId IN :ids")
     List<StdMileageHist> findAllWithStudentTotalByIds(@Param("ids") List<Long> ids);
 
-    //mlgId의 숫자부분 중에서 가장 큰수 선택
+    //mlgCode의 숫자부분 중에서 가장 큰수 선택
     @Query("SELECT MAX(CAST(SUBSTRING(m.mlgCode, 4) AS int)) FROM StdMileageHist m")
     Integer findMaxMlgCodeNumber();
     

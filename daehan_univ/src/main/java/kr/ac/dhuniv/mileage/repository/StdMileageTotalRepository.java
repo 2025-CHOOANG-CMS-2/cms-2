@@ -29,4 +29,8 @@ public interface StdMileageTotalRepository extends JpaRepository<StdMileageTotal
 	//재학생 기준 학생의 평균 마일리지
     @Query("SELECT COALESCE(AVG(t.totalMileageScore), 0) FROM StdMileageTotal t WHERE t.student.statusCode = 'ENROLL' AND t.totalMileageScore > 0")
     double avgMileagePerActiveStudent();
+    
+    //totCode의 숫자부분 중에서 가장 큰수 선택
+    @Query("SELECT MAX(CAST(SUBSTRING(t.totCode, 4) AS int)) FROM StdMileageTotal t")
+    Integer findMaxTotCodeNumber();
 }
