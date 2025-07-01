@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마일리지 관리 - 교직원 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--secondary-color);
+        }
+
+        /* Statistics Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            opacity: 0.1;
+            transform: translate(20px, -20px);
+        }
+
+        .stat-card.primary::before {
+            background: var(--primary-color);
+        }
+
+        .stat-card.success::before {
+            background: var(--success-color);
+        }
+
+        .stat-card.warning::before {
+            background: var(--warning-color);
+        }
+
+        .stat-card.danger::before {
+            background: var(--danger-color);
+        }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-change {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Top Programs Table */
+        .top-programs-table {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .programs-table {
+            margin-bottom: 0;
+        }
+
+        .programs-table th {
+            background: linear-gradient(135deg, var(--success-color), #58d68d);
+            color: white;
+            border: none;
+            padding: 1rem 0.75rem;
+            font-weight: 600;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .programs-table th:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .programs-table th:last-child {
+            border-radius: 0 10px 0 0;
+        }
+
+        .programs-table td {
+            padding: 1rem 0.75rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .programs-table tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Recent Activities */
+        .recent-activities {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .activity-item:hover {
+            background-color: #f8f9fa;
+            border-left-color: var(--secondary-color);
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .activity-icon.success {
+            background: rgba(39, 174, 96, 0.1);
+            color: var(--success-color);
+        }
+
+        .activity-icon.warning {
+            background: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .activity-icon.primary {
+            background: rgba(52, 152, 219, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            color: #adb5bd;
+            font-size: 0.8rem;
+        }
+
+        .activity-points {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .points-positive {
+            color: var(--success-color);
+        }
+
+        .points-negative {
+            color: var(--danger-color);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .action-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+	<header th:replace="~{/employee/header.html :: common-head}"></header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item active text-white">대시보드</li>
+                        <li class="breadcrumb-item"><a href="/employee/mileage/payments" class="text-white-50">마일리지 지급관리</a></li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-star me-2"></i>마일리지 관리 현황</h1>
+                <p class="mb-0 mt-2">전체 마일리지 현황을 확인하고 관리하세요</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Main Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card primary">
+                    <div class="stat-icon text-primary">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <div class="stat-number text-primary" id="totalMileageIssued">125,450</div>
+                    <div class="stat-label">금학기 총 지급 마일리지</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-icon text-warning">
+                        <i class="bi bi-calendar-event"></i>
+                    </div>
+                    <div class="stat-number text-warning" id="activePrograms">42</div>
+                    <div class="stat-label">금학기 활성 프로그램 수</div>
+                </div>
+                
+                <div class="stat-card success">
+                    <div class="stat-icon text-success">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="stat-number text-success" id="studentsWithMileage">1,847</div>
+                    <div class="stat-label">마일리지 보유 학생 수</div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-icon text-danger">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="stat-number text-danger" id="avgMileagePerStudent">68</div>
+                    <div class="stat-label">학생당 평균 마일리지</div>
+                </div>
+            </div>
+
+            <!-- Top Programs -->
+            <div class="top-programs-table">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0">
+                        <i class="bi bi-trophy text-warning me-2"></i>금학기 마일리지 지급 상위 프로그램 TOP 5
+                    </h5>
+                    <button class="btn btn-outline-primary btn-sm" onclick="viewAllPrograms()">
+                        <i class="bi bi-eye me-1"></i>전체 보기
+                    </button>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover programs-table">
+                        <thead>
+                            <tr>
+                                <th width="10%">순위</th>
+                                <th width="40%">프로그램명</th>
+                                <th width="15%">핵심역량</th>
+                                <th width="15%">참여 학생 수</th>
+                                <th width="20%">총 지급 마일리지</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-warning text-dark fs-6">1</span>
+                                </td>
+                                <td class="text-start">글로벌 리더십 아카데미</td>
+                                <td>
+                                    <span class="badge bg-danger">리더십</span>
+                                </td>
+                                <td>156명</td>
+                                <td class="fw-bold text-success">31,200P</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary fs-6">2</span>
+                                </td>
+                                <td class="text-start">창의적 사고 워크숍</td>
+                                <td>
+                                    <span class="badge bg-primary">창의성</span>
+                                </td>
+                                <td>134명</td>
+                                <td class="fw-bold text-success">20,100P</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary fs-6">3</span>
+                                </td>
+                                <td class="text-start">지역사회 봉사활동</td>
+                                <td>
+                                    <span class="badge bg-success">봉사활동</span>
+                                </td>
+                                <td>89명</td>
+                                <td class="fw-bold text-success">17,800P</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary fs-6">4</span>
+                                </td>
+                                <td class="text-start">학술논문 발표대회</td>
+                                <td>
+                                    <span class="badge bg-warning">학술활동</span>
+                                </td>
+                                <td>45명</td>
+                                <td class="fw-bold text-success">13,500P</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary fs-6">5</span>
+                                </td>
+                                <td class="text-start">기업 인턴십 프로그램</td>
+                                <td>
+                                    <span class="badge bg-dark">진로개발</span>
+                                </td>
+                                <td>28명</td>
+                                <td class="fw-bold text-success">11,200P</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Recent Activities -->
+				<div class="col-lg-12">
+				  <div class="recent-activities">
+				    <div class="d-flex justify-content-between align-items-center mb-3">
+				      <h5 class="mb-0">
+				        <i class="bi bi-clock-history me-2"></i>최근 마일리지 지급 내역
+				      </h5>
+				      <button class="btn btn-outline-primary btn-sm" onclick="viewAllActivities()">
+				        <i class="bi bi-list me-1"></i>전체 내역
+				      </button>
+				    </div>
+				
+					<div class="table-responsive">
+					  <table class="table table-hover">
+					    <thead class="table-light">
+					      <tr>
+					        <th style="width: 5%;">번호</th>
+					        <th>지급일시</th>
+					        <th>지급유형</th>
+					        <th>지급대상 프로그램</th>
+					        <th>지급대상 학생</th>
+					        <th>지급한 총 마일리지</th>
+					      </tr>
+					    </thead>
+					    <tbody>
+					      <tr>
+					        <td>1</td>
+					        <td>2024년 1월 20일 14:30</td>
+					        <td>일괄지급</td>
+					        <td>글로벌 리더십 아카데미 등 1건</td>
+					        <td>23명</td>
+					        <td class="text-success fw-bold">+4,600P</td>
+					      </tr>
+					      <tr>
+					        <td>2</td>
+					        <td>2024년 1월 20일 11:15</td>
+					        <td>개별지급</td>
+					        <td>창의적 사고 워크숍</td>
+					        <td>김학생</td>
+					        <td class="text-success fw-bold">+150P</td>
+					      </tr>
+					      <tr>
+					        <td>3</td>
+					        <td>2024년 1월 19일 16:45</td>
+					        <td>프로그램보상</td>
+					        <td>지역사회 봉사활동</td>
+					        <td>15명</td>
+					        <td class="text-success fw-bold">+1,500P</td>
+					      </tr>
+					      <!-- 추가 행 예시 -->
+					      <tr>
+					        <td>4</td>
+					        <td>2024년 1월 18일 09:00</td>
+					        <td>개별지급</td>
+					        <td>학술논문 발표대회</td>
+					        <td>이학생</td>
+					        <td class="text-success fw-bold">+300P</td>
+					      </tr>
+					    </tbody>
+					  </table>
+					</div>
+
+				  </div>
+				</div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    
+ 	// 금학기 통계 데이터 가져와서 뿌리기
+    function loadStats() {
+      fetch('/api/employee/mileage/stats')
+        .then(response => response.json())
+        .then(data => {
+          // 숫자에 천 단위 구분 쉼표 적용 (예: 1234567 -> 1,234,567)
+          const formatNumber = (num) => num.toLocaleString();
+
+          document.getElementById('totalMileageIssued').textContent = formatNumber(data.totalMileageIssued);
+          document.getElementById('activePrograms').textContent = formatNumber(data.activePrograms);
+          document.getElementById('studentsWithMileage').textContent = formatNumber(data.studentsWithMileage);
+          document.getElementById('avgMileagePerStudent').textContent = data.avgMileagePerStudent.toFixed(1); // 소수점 1자리
+        })
+        .catch(console.error);
+    }
+
+    // 상위 5개 프로그램 데이터 가져와서 테이블에 뿌리기
+    function loadTopPrograms() {
+      fetch('/api/employee/mileage/top-programs')
+        .then(response => response.json())
+        .then(programs => {
+          const tbody = document.querySelector('.programs-table tbody');
+          tbody.innerHTML = ''; // 기존 내용 삭제
+
+          programs.forEach((program, index) => {
+            const rankBadgeClass = index === 0 ? 'bg-warning text-dark' : 'bg-secondary';
+            const coreCompetencyBadgeClass = getCoreCompetencyBadgeClass(program.coreCompetency);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><span class="badge ${rankBadgeClass} fs-6">${index + 1}</span></td>
+              <td class="text-start">${program.programName}</td>
+              <td><span class="badge ${coreCompetencyBadgeClass}">${program.coreCompetency}</span></td>
+              <td>${program.participatedCount.toLocaleString()}명</td>
+              <td class="fw-bold text-success">${formatMileage(program.totalMileage)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // 최근 마일리지 활동 10건 가져와서 테이블에 뿌리기
+    function loadRecentActivities() {
+      fetch('/api/employee/mileage/recent-activities')
+        .then(response => response.json())
+        .then(activities => {
+          const tbody = document.querySelector('.recent-activities table tbody');
+          tbody.innerHTML = ''; // 초기화
+
+          activities.forEach((act, index) => {
+            // 지급일시 포맷팅 (예: 2024년 1월 20일 14:30)
+            const date = new Date(act.date);
+            const formattedDate = `${date.getFullYear()}년 ${date.getMonth()+1}월 ${date.getDate()}일 ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+
+            // 지급대상 프로그램명, 학생명은 지급유형에 따라 다름
+            let programDisplay = '';
+            let studentDisplay = '';
+            if (act.paymentType === '일괄지급') {
+              programDisplay = `${act.programName} 등 ${act.programCount}건`;
+              studentDisplay = `${act.studentCount}명`;
+            } else {
+              programDisplay = act.programName;
+              studentDisplay = act.studentName;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${index + 1}</td>
+              <td>${formattedDate}</td>
+              <td>${act.paymentType}</td>
+              <td>${programDisplay}</td>
+              <td>${studentDisplay}</td>
+              <td class="text-success fw-bold">+${formatMileage(act.totalMileage)}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // 마일리지 숫자 포맷 (BigDecimal이 JSON으로 오면 string으로 올 수 있으니 Number 변환 후 처리)
+    function formatMileage(mileage) {
+      const num = Number(mileage);
+      return num.toLocaleString() + 'P';
+    }
+
+    // 핵심역량별 배지 클래스 반환 (임의 매핑)
+    function getCoreCompetencyBadgeClass(coreCompetency) {
+      switch(coreCompetency) {
+        case '리더십': return 'bg-danger';
+        case '창의성': return 'bg-primary';
+        case '봉사활동': return 'bg-success';
+        case '학술활동': return 'bg-warning';
+        case '진로개발': return 'bg-dark';
+        default: return 'bg-secondary';
+      }
+    }
+
+    // 페이지 로드 시 모든 데이터 로드
+    document.addEventListener('DOMContentLoaded', () => {
+      loadStats();
+      loadTopPrograms();
+      loadRecentActivities();
+    });
+    </script>
+</body>
+</html>

@@ -21,7 +21,8 @@ public class StdMileageHist {
     @Column(name = "mlg_id")
     private Long mlgId; // 자동 증가 PK
 
-    @Column(name = "mlg_code", length = 20, nullable = false, unique = true)
+    // unique(X) : 일괄지급이던 개발지급이던 코드 1개 생성
+    @Column(name = "mlg_code", length = 20, nullable = false)
     private String mlgCode; // 비즈니스 키
 
     @Column(name = "mlg_score", precision = 10, scale = 3)
@@ -32,6 +33,9 @@ public class StdMileageHist {
 
     @Column(name = "mlg_add_cd", length = 10)
     private String additionCode;
+   
+    @Column(name = "mlg_stat_cd", length = 10)
+    private String mlgStatCode;
 
     @ManyToOne(fetch = FetchType.LAZY)                              //여러건의 마일리지 이력이 한건의 이수정보와 매잉됨(N:1) VS 한건의 마일리지 이력이 한건의 이수정보와 매핑됨(1:1)
     @JoinColumn(name = "cmp_id", referencedColumnName = "cmp_id")
