@@ -445,6 +445,11 @@ body {
 	margin-right: 0.5rem;
 }
 
+/* 테이블 그룹 라인 진하게 */
+.group-border-top {
+    border-top: 2px solid #000 !important;
+}
+
 /* Responsive */
 @media ( max-width : 768px) {
 	.sidebar {
@@ -667,76 +672,61 @@ body {
 								<div class="date-range-section">
 									<div class="row">
 										<div class="col-6">
-											<input type="date" class="form-control" id="startDate"
-												value="2024-01-01">
+											<input type="date" class="form-control" id="startDate">
 										</div>
 										<div class="col-6">
-											<input type="date" class="form-control" id="endDate"
-												value="2024-01-31">
+											<input type="date" class="form-control" id="endDate">
 										</div>
 									</div>
 								</div>
 							</div>
-
-							<div class="col-md-3">
-								<label class="form-label fw-bold">정렬</label> <select
-									class="form-select" id="sortSelect"
-									onchange="sortMileageHistory()">
-									<option value="latest">최신순</option>
-									<option value="oldest">오래된순</option>
-									<option value="points-high">포인트 높은순</option>
-									<option value="points-low">포인트 낮은순</option>
-								</select>
-							</div>
-
-							<div class="col-md-3">
-								<label class="form-label fw-bold">표시 개수</label> <select
-									class="form-select" id="itemsPerPage"
-									onchange="changeItemsPerPage()">
-									<option value="10">10개씩</option>
-									<option value="20" selected>20개씩</option>
-									<option value="50">50개씩</option>
-								</select>
+							
+							<div class="col-md-2">
+								<label for="coreCompetency" class="form-label fw-bold">핵심역량</label>
+								<div class="date-range-section">
+									<select class="form-select" id="competencyId"
+										name="competencyId">
+										<option value="">전체</option>
+										<th:block th:each="core : ${coreCompetencies}">
+											<option th:value="${core.id}" th:text="${core.name}"></option>
+										</th:block>
+									</select>
+								</div>
 							</div>
 
 							<div class="col-md-2">
+								<label class="form-label fw-bold">정렬</label> 
+								<div class="date-range-section">
+									<select
+										class="form-select" id="sortSelect"
+										onchange="sortMileageHistory()">
+										<option value="latest">최신순</option>
+										<option value="oldest">오래된순</option>
+										<option value="points-high">포인트 높은순</option>
+										<option value="points-low">포인트 낮은순</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-md-2 ">
+								<label class="form-label fw-bold">표시 개수</label> 
+								<div class="date-range-section">
+									<select
+										class="form-select" id="itemsPerPage"
+										onchange="changeItemsPerPage()">
+										<option value="5" selected>>5개씩</option>
+										<option value="10">10개씩</option>
+										<option value="20">20개씩</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="col-md-2">
+								<div class="date-range-section">
 								<button class="btn btn-primary w-100" onclick="applyFilter()">
 									<i class="bi bi-search me-1"></i>조회
 								</button>
 							</div>
-						</div>
-
-						<div class="mt-3">
-							<label class="form-label fw-bold">카테고리</label>
-							<div class="filter-buttons">
-								<button class="filter-btn active" data-category="all"
-									onclick="filterByCategory('all')">
-									<i class="bi bi-grid me-1"></i>전체
-								</button>
-								<button class="filter-btn" data-category="earned"
-									onclick="filterByCategory('earned')">
-									<i class="bi bi-plus-circle me-1"></i>획득
-								</button>
-								<button class="filter-btn" data-category="used"
-									onclick="filterByCategory('used')">
-									<i class="bi bi-dash-circle me-1"></i>사용
-								</button>
-								<button class="filter-btn" data-category="leadership"
-									onclick="filterByCategory('leadership')">
-									<i class="bi bi-people me-1"></i>리더십
-								</button>
-								<button class="filter-btn" data-category="volunteer"
-									onclick="filterByCategory('volunteer')">
-									<i class="bi bi-heart me-1"></i>봉사
-								</button>
-								<button class="filter-btn" data-category="creativity"
-									onclick="filterByCategory('creativity')">
-									<i class="bi bi-lightbulb me-1"></i>창의성
-								</button>
-								<button class="filter-btn" data-category="academic"
-									onclick="filterByCategory('academic')">
-									<i class="bi bi-book me-1"></i>학술
-								</button>
 							</div>
 						</div>
 					</div>
@@ -758,118 +748,20 @@ body {
 							<table class="table table-hover history-table">
 								<thead>
 									<tr>
-										<th width="15%">날짜</th>
-										<th width="35%">내용</th>
-										<th width="15%">카테고리</th>
-										<th width="15%">포인트</th>
-										<th width="20%">비고</th>
+										<th width="15%">적립일자</th>
+										<th width="30%">이수 비교과프로그램</th>
+										<th width="25%">이수기간</th>
+										<th width="20%">관련 핵심역량</th>
+										<th width="10%">마일리지</th>
 									</tr>
 								</thead>
 								<tbody id="mileageHistoryList">
 									<tr data-category="leadership" data-type="earned">
-										<td>2024-01-20</td>
+										<td>2025-01-20</td>
 										<td>글로벌 리더십 아카데미 참여</td>
+										<td>2025-01-01 ~ 2025-01-15</td>
 										<td><span class="category-badge badge-leadership">리더십</span></td>
 										<td><span class="earned-points">+200P</span></td>
-										<td>프로그램 완료</td>
-									</tr>
-									<tr data-category="used" data-type="used">
-										<td>2024-01-18</td>
-										<td>도서 구매 (프로그래밍 서적)</td>
-										<td><span class="badge bg-secondary">사용</span></td>
-										<td><span class="used-points">-150P</span></td>
-										<td>마일리지 상점</td>
-									</tr>
-									<tr data-category="creativity" data-type="earned">
-										<td>2024-01-15</td>
-										<td>창의적 사고 워크숍 완료</td>
-										<td><span class="category-badge badge-creativity">창의성</span></td>
-										<td><span class="earned-points">+150P</span></td>
-										<td>프로그램 완료</td>
-									</tr>
-									<tr data-category="volunteer" data-type="earned">
-										<td>2024-01-12</td>
-										<td>지역 아동센터 학습 지도 (8시간)</td>
-										<td><span class="category-badge badge-volunteer">봉사활동</span></td>
-										<td><span class="earned-points">+160P</span></td>
-										<td>시간당 20P</td>
-									</tr>
-									<tr data-category="used" data-type="used">
-										<td>2024-01-10</td>
-										<td>카페테리아 식사권 구매</td>
-										<td><span class="badge bg-secondary">사용</span></td>
-										<td><span class="used-points">-100P</span></td>
-										<td>마일리지 상점</td>
-									</tr>
-									<tr data-category="academic" data-type="earned">
-										<td>2024-01-08</td>
-										<td>학술 세미나 참석</td>
-										<td><span class="category-badge badge-academic">학술활동</span></td>
-										<td><span class="earned-points">+80P</span></td>
-										<td>세미나 참석</td>
-									</tr>
-									<tr data-category="leadership" data-type="earned">
-										<td>2024-01-05</td>
-										<td>학생회 임원 활동</td>
-										<td><span class="category-badge badge-leadership">리더십</span></td>
-										<td><span class="earned-points">+100P</span></td>
-										<td>월별 활동비</td>
-									</tr>
-									<tr data-category="creativity" data-type="earned">
-										<td>2024-01-03</td>
-										<td>아이디어 경진대회 참여</td>
-										<td><span class="category-badge badge-creativity">창의성</span></td>
-										<td><span class="earned-points">+120P</span></td>
-										<td>참가상</td>
-									</tr>
-									<tr data-category="volunteer" data-type="earned">
-										<td>2023-12-28</td>
-										<td>연말 자선 바자회 참여</td>
-										<td><span class="category-badge badge-volunteer">봉사활동</span></td>
-										<td><span class="earned-points">+60P</span></td>
-										<td>3시간 참여</td>
-									</tr>
-									<tr data-category="academic" data-type="earned">
-										<td>2023-12-25</td>
-										<td>학술논문 발표</td>
-										<td><span class="category-badge badge-academic">학술활동</span></td>
-										<td><span class="earned-points">+300P</span></td>
-										<td>우수논문상</td>
-									</tr>
-									<tr data-category="used" data-type="used">
-										<td>2023-12-20</td>
-										<td>문화상품권 구매</td>
-										<td><span class="badge bg-secondary">사용</span></td>
-										<td><span class="used-points">-500P</span></td>
-										<td>5만원권</td>
-									</tr>
-									<tr data-category="leadership" data-type="earned">
-										<td>2023-12-15</td>
-										<td>신입생 멘토링 활동</td>
-										<td><span class="category-badge badge-leadership">리더십</span></td>
-										<td><span class="earned-points">+150P</span></td>
-										<td>멘토 활동 완료</td>
-									</tr>
-									<tr data-category="volunteer" data-type="earned">
-										<td>2023-12-10</td>
-										<td>환경정화 활동</td>
-										<td><span class="category-badge badge-volunteer">봉사활동</span></td>
-										<td><span class="earned-points">+40P</span></td>
-										<td>2시간 참여</td>
-									</tr>
-									<tr data-category="creativity" data-type="earned">
-										<td>2023-12-05</td>
-										<td>창업 아이디어 발표</td>
-										<td><span class="category-badge badge-creativity">창의성</span></td>
-										<td><span class="earned-points">+180P</span></td>
-										<td>우수상 수상</td>
-									</tr>
-									<tr data-category="academic" data-type="earned">
-										<td>2023-12-01</td>
-										<td>전공 관련 자격증 취득</td>
-										<td><span class="category-badge badge-academic">학술활동</span></td>
-										<td><span class="earned-points">+250P</span></td>
-										<td>정보처리기사</td>
 									</tr>
 								</tbody>
 							</table>
@@ -902,153 +794,55 @@ body {
 
 						<div class="alert alert-info">
 							<i class="bi bi-info-circle me-2"></i> <strong>안내사항:</strong>
-							마일리지는 프로그램 완료 후 자동으로 적립되며, 일부 프로그램은 참여도에 따라 차등 지급될 수 있습니다.
+							마일리지는 프로그램 완료 후 10일이내 지급되며, 일부 프로그램은 참여도에 따라 차등 지급될 수 있습니다.
 						</div>
 
 						<div class="table-responsive">
 							<table class="table table-hover point-table">
 								<thead>
 									<tr>
-										<th width="20%">카테고리</th>
-										<th width="35%">프로그램명</th>
-										<th width="15%">기본 배점</th>
-										<th width="15%">추가 배점</th>
-										<th width="15%">최대 배점</th>
+										<th width="30%">핵심역량</th>
+										<th width="40%">비교과 프로그램명</th>
+										<th width="30%">마일리지 기본점수</th>
 									</tr>
 								</thead>
 								<tbody>
-									<!-- 리더십 프로그램 -->
 									<tr>
 										<td rowspan="4" class="align-middle"><span
-											class="category-badge badge-leadership">리더십</span></td>
+											class="category-badge badge-leadership">리더십 역량</span></td>
 										<td>글로벌 리더십 아카데미</td>
 										<td class="fw-bold">200P</td>
-										<td>우수수료 +50P</td>
-										<td class="text-success fw-bold">250P</td>
 									</tr>
 									<tr>
 										<td>학생회 임원 활동</td>
 										<td class="fw-bold">100P</td>
-										<td>월별 지급</td>
-										<td class="text-success fw-bold">1,200P/년</td>
 									</tr>
 									<tr>
 										<td>신입생 멘토링</td>
 										<td class="fw-bold">150P</td>
-										<td>우수멘토 +30P</td>
-										<td class="text-success fw-bold">180P</td>
 									</tr>
 									<tr>
 										<td>팀 프로젝트 리더</td>
 										<td class="fw-bold">80P</td>
-										<td>성과우수 +20P</td>
-										<td class="text-success fw-bold">100P</td>
 									</tr>
 
-									<!-- 창의성 프로그램 -->
 									<tr>
 										<td rowspan="4" class="align-middle"><span
-											class="category-badge badge-creativity">창의성</span></td>
+											class="category-badge badge-creativity">의사소통 역량</span></td>
 										<td>창의적 사고 워크숍</td>
 										<td class="fw-bold">150P</td>
-										<td>우수작품 +30P</td>
-										<td class="text-success fw-bold">180P</td>
 									</tr>
 									<tr>
 										<td>아이디어 경진대회</td>
 										<td class="fw-bold">120P</td>
-										<td>수상 +50~200P</td>
-										<td class="text-success fw-bold">320P</td>
 									</tr>
 									<tr>
 										<td>창업 아이디어 발표</td>
 										<td class="fw-bold">100P</td>
-										<td>사업화 +100P</td>
-										<td class="text-success fw-bold">200P</td>
 									</tr>
 									<tr>
 										<td>메이커스페이스 활용</td>
 										<td class="fw-bold">50P</td>
-										<td>시간당 10P</td>
-										<td class="text-success fw-bold">200P/월</td>
-									</tr>
-
-									<!-- 봉사활동 -->
-									<tr>
-										<td rowspan="4" class="align-middle"><span
-											class="category-badge badge-volunteer">봉사활동</span></td>
-										<td>지역 아동센터 학습 지도</td>
-										<td class="fw-bold">20P/시간</td>
-										<td>장기참여 +10P</td>
-										<td class="text-success fw-bold">30P/시간</td>
-									</tr>
-									<tr>
-										<td>환경정화 활동</td>
-										<td class="fw-bold">20P/시간</td>
-										<td>-</td>
-										<td class="text-success fw-bold">20P/시간</td>
-									</tr>
-									<tr>
-										<td>자선 바자회 참여</td>
-										<td class="fw-bold">20P/시간</td>
-										<td>기획참여 +30P</td>
-										<td class="text-success fw-bold">50P/시간</td>
-									</tr>
-									<tr>
-										<td>해외 봉사활동</td>
-										<td class="fw-bold">500P</td>
-										<td>기간별 추가</td>
-										<td class="text-success fw-bold">1,000P</td>
-									</tr>
-
-									<!-- 학술활동 -->
-									<tr>
-										<td rowspan="4" class="align-middle"><span
-											class="category-badge badge-academic">학술활동</span></td>
-										<td>학술 세미나 참석</td>
-										<td class="fw-bold">80P</td>
-										<td>발표 +50P</td>
-										<td class="text-success fw-bold">130P</td>
-									</tr>
-									<tr>
-										<td>학술논문 발표</td>
-										<td class="fw-bold">300P</td>
-										<td>수상 +200P</td>
-										<td class="text-success fw-bold">500P</td>
-									</tr>
-									<tr>
-										<td>자격증 취득</td>
-										<td class="fw-bold">150P</td>
-										<td>난이도별 차등</td>
-										<td class="text-success fw-bold">300P</td>
-									</tr>
-									<tr>
-										<td>학술대회 참가</td>
-										<td class="fw-bold">200P</td>
-										<td>논문채택 +100P</td>
-										<td class="text-success fw-bold">300P</td>
-									</tr>
-
-									<!-- 진로개발 -->
-									<tr>
-										<td rowspan="3" class="align-middle"><span
-											class="category-badge badge-career">진로개발</span></td>
-										<td>기업 인턴십</td>
-										<td class="fw-bold">400P</td>
-										<td>우수평가 +100P</td>
-										<td class="text-success fw-bold">500P</td>
-									</tr>
-									<tr>
-										<td>진로 특강 참석</td>
-										<td class="fw-bold">50P</td>
-										<td>-</td>
-										<td class="text-success fw-bold">50P</td>
-									</tr>
-									<tr>
-										<td>취업 캠프 참여</td>
-										<td class="fw-bold">150P</td>
-										<td>수료 +30P</td>
-										<td class="text-success fw-bold">180P</td>
 									</tr>
 								</tbody>
 							</table>
@@ -1067,17 +861,13 @@ body {
 								<h6 class="text-primary">적립 기준</h6>
 								<ul class="list-unstyled">
 									<li class="mb-2"><i
-										class="bi bi-check-circle text-success me-2"></i> 프로그램 완료 후 자동
-										적립</li>
+										class="bi bi-check-circle text-success me-2"></i> 프로그램 이수 완료 후 10일내에 지급</li>
 									<li class="mb-2"><i
-										class="bi bi-check-circle text-success me-2"></i> 출석률 80% 이상 시
-										적립</li>
+										class="bi bi-check-circle text-success me-2"></i> 출석률 80% 이상 시 지급</li>
 									<li class="mb-2"><i
-										class="bi bi-check-circle text-success me-2"></i> 평가 결과에 따른 차등
-										지급</li>
+										class="bi bi-check-circle text-success me-2"></i> 평가 결과에 따라 미지급 가능</li>
 									<li class="mb-2"><i
-										class="bi bi-check-circle text-success me-2"></i> 중복 참여 시 50%
-										적립</li>
+										class="bi bi-check-circle text-success me-2"></i> 중복 참여 시 50%만 지급</li>
 								</ul>
 							</div>
 							<div class="col-md-6">
@@ -1109,11 +899,33 @@ body {
 	
 	<!-- Thymeleaf 에서 session 정보 활용 -->	
 	<script th:inline="javascript">
+	
+	// Thymeleaf 문법
+	/*<![CDATA[*/
+	var userId = /*[[${session.userId}]]*/ '';
+	/*]]>*/
+	
 	document.addEventListener("DOMContentLoaded", function () {
-		// Thymeleaf 문법
-		/*<![CDATA[*/
-		var userId = /*[[${session.userId}]]*/ '';
-		/*]]>*/
+	    // overviewTab 데이터 로딩
+	    loadOverviewData();
+	
+	    // 탭 전환 이벤트 감지
+	    document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
+	        tab.addEventListener('shown.bs.tab', function (event) {
+	            const targetTabId = event.target.getAttribute('href');
+	            if (targetTabId === '#overviewTab') {
+	                loadOverviewData();  // 다시 로딩할 수도 있음
+	            } else if (targetTabId === '#historyTab') {
+	                loadHistoryData();  // 적립 내역 조회
+	            }  else if (targetTabId === '#pointTableTab') {
+	                loadMileagePointsData(); // 마일리지 배점표 탭
+	            }
+	        });
+	    });
+	});
+	
+	// [overviewTab]
+	function loadOverviewData() {
 		fetch(`/api/student/mileage/overview/${userId}`)  // 백틱(`) 사용
 	        .then(response => response.json())
 	        .then(data => {
@@ -1161,7 +973,7 @@ body {
 	            });
 	        })
 	        .catch(error => console.error('API fetch error:', error));
-	});
+	}
 
 	// 숫자 포맷 (3자리 콤마)
 	function numberWithCommas(x) {
@@ -1183,210 +995,141 @@ body {
 	    return 'warning';
 	}
 	
-/*
-        // 현재 시간 표시
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleString('ko-KR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            document.getElementById('currentTime').textContent = timeString;
-        }
+    // 페이지 로드 시 검색일자 초기화 (1개월전 ~ 오늘)
+    window.addEventListener('load', function() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('endDate').value = today;
+        
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
+    });
+    
+    
+    // [historyTab]
+    // 전역변수 선언 및 초기화
+    let currentPage = 0, pageSize = 1, currentSort = 'latest';
 
-        setInterval(updateTime, 1000);
-        updateTime();
+    // 예시) GET /api/student/mileage/history?userId=2025004001&startDate=2025-06-01&endDate=2025-06-22
+    function loadHistoryData() {
+      const params = new URLSearchParams({
+        userId: userId,
+        page: currentPage,
+        size: pageSize,
+        sort: currentSort,
+        ...(document.getElementById('startDate').value && { startDate: document.getElementById('startDate').value }),
+        ...(document.getElementById('endDate').value && { endDate: document.getElementById('endDate').value }),
+        ...(document.getElementById('competencyId').value && { competencyId: document.getElementById('competencyId').value }),
+      });
 
-        // 사이드바 토글
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('show');
-        }
-
-        // 카테고리 필터링
-        function filterByCategory(category) {
-            // 필터 버튼 활성화 상태 변경
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelector(`[data-category="${category}"]`).classList.add('active');
-
-            // 마일리지 내역 필터링
-            const rows = document.querySelectorAll('#mileageHistoryList tr');
-            rows.forEach(row => {
-                const rowCategory = row.dataset.category;
-                const rowType = row.dataset.type;
-                
-                if (category === 'all' || 
-                    rowCategory === category || 
-                    rowType === category) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        }
-
-        // 기간 필터 적용
-        function applyFilter() {
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById('endDate').value;
-            
-            if (!startDate || !endDate) {
-                alert('시작일과 종료일을 모두 선택해주세요.');
-                return;
-            }
-            
-            if (new Date(startDate) > new Date(endDate)) {
-                alert('시작일이 종료일보다 늦을 수 없습니다.');
-                return;
-            }
-            
-            const rows = document.querySelectorAll('#mileageHistoryList tr');
-            rows.forEach(row => {
-                const rowDate = row.cells[0].textContent;
-                const date = new Date(rowDate);
-                const start = new Date(startDate);
-                const end = new Date(endDate);
-                
-                if (date >= start && date <= end) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-            
-            alert(`${startDate} ~ ${endDate} 기간의 내역을 조회했습니다.`);
-        }
-
-        // 정렬 기능
-        function sortMileageHistory() {
-            const sortBy = document.getElementById('sortSelect').value;
-            const tbody = document.getElementById('mileageHistoryList');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-
-            rows.sort((a, b) => {
-                switch(sortBy) {
-                    case 'latest':
-                        return new Date(b.cells[0].textContent) - new Date(a.cells[0].textContent);
-                    case 'oldest':
-                        return new Date(a.cells[0].textContent) - new Date(b.cells[0].textContent);
-                    case 'points-high':
-                        const pointsA = parseInt(a.cells[3].textContent.replace(/[^0-9]/g, ''));
-                        const pointsB = parseInt(b.cells[3].textContent.replace(/[^0-9]/g, ''));
-                        return pointsB - pointsA;
-                    case 'points-low':
-                        const pointsA2 = parseInt(a.cells[3].textContent.replace(/[^0-9]/g, ''));
-                        const pointsB2 = parseInt(b.cells[3].textContent.replace(/[^0-9]/g, ''));
-                        return pointsA2 - pointsB2;
-                    default:
-                        return 0;
-                }
-            });
-
-            // 정렬된 순서로 다시 배치
-            rows.forEach(row => tbody.appendChild(row));
-        }
-
-        // 페이지당 항목 수 변경
-        function changeItemsPerPage() {
-            const itemsPerPage = document.getElementById('itemsPerPage').value;
-            alert(`페이지당 ${itemsPerPage}개씩 표시하도록 설정되었습니다.`);
-        }
-
-        // 페이지 변경
-        function changePage(page) {
-            // 현재 활성 페이지 제거
-            document.querySelectorAll('.page-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            if (page === 'prev' || page === 'next') {
-                // 이전/다음 페이지 로직
-                alert(`${page === 'prev' ? '이전' : '다음'} 페이지로 이동합니다.`);
-            } else {
-                // 특정 페이지로 이동
-                document.querySelector(`[onclick="changePage(${page})"]`).classList.add('active');
-                alert(`${page}페이지로 이동합니다.`);
-            }
-        }
-
-        // 마일리지 내역서 다운로드
-        function downloadMileageReport() {
-            alert('마일리지 내역서를 PDF 파일로 다운로드합니다.');
-        }
-
-        // 마일리지 상점 이동
-        function goToMileageStore() {
-            alert('마일리지 상점 페이지로 이동합니다.');
-        }
-
-        // 프로그램 페이지 이동
-        function goToPrograms() {
-            window.location.href = 'extracurricular-programs.html';
-        }
-
-        // 마일리지 내역 내보내기
-        function exportMileageHistory() {
-            alert('마일리지 내역을 Excel 파일로 다운로드합니다.');
-        }
-
-        // 로그아웃
-        function logout() {
-            if (confirm('로그아웃 하시겠습니까?')) {
-                window.location.href = 'login.html';
-            }
-        }
-
-        // 페이지 로드 시 초기화
-        window.addEventListener('load', function() {
-            // 현재 날짜로 종료일 설정
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('endDate').value = today;
-            
-            // 한 달 전 날짜로 시작일 설정
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
+      fetch(`/api/student/mileage/history?${params}`)
+        .then(res => res.json())
+        .then(page => {
+          renderTable(page.content);
+          renderPagination(page.totalPages);
         });
+    }
 
-        // 사이드바 외부 클릭 시 닫기 (모바일)
-        document.addEventListener('click', function(event) {
-            const sidebar = document.getElementById('sidebar');
-            const isClickInsideSidebar = sidebar.contains(event.target);
-            const isToggleButton = event.target.closest('.btn-link');
-            
-            if (!isClickInsideSidebar && !isToggleButton && window.innerWidth <= 768) {
-                sidebar.classList.remove('show');
-            }
-        });
+    // 특정학생 마일리지 지급내역 화면 출력
+    function renderTable(items) {
+      const tbody = document.getElementById("mileageHistoryList");
+      tbody.innerHTML = "";
+      items.forEach(i => {
+        const row = `<tr>
+          <td>${i.date.substring(0,10)}</td>
+          <td>${i.programName}</td>
+          <td>${i.prgStartDate.substring(0,10)} ~ ${i.prgEndDate.substring(0,10)}</td>
+          <td><span class="category-badge">${i.competencyName}</span></td>
+          <td>${i.mileageScore}P</td>
+        </tr>`;
+        tbody.insertAdjacentHTML("beforeend", row);
+      });
+    }
 
-        // 마일리지 숫자 애니메이션
-        function animateNumber(element, target) {
-            let current = 0;
-            const increment = target / 50;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                element.textContent = Math.floor(current).toLocaleString();
-            }, 20);
-        }
+    // 페이지 번호 출력
+    function renderPagination(totalPages) {
+      const container = document.querySelector(".pagination-custom");
+      container.innerHTML = '';
+      for (let p = 0; p < totalPages; p++) {
+        container.insertAdjacentHTML('beforeend', `<button class="page-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p+1}</button>`);
+      }
+    }
 
-        // 페이지 로드 시 애니메이션 실행
-        document.addEventListener('DOMContentLoaded', function() {
-            const totalMileageElement = document.getElementById('totalMileage');
-            if (totalMileageElement) {
-                animateNumber(totalMileageElement, 1250);
-            }
-        });
-*/
+    // 페이지 이동
+    function goPage(p) {
+      currentPage = p;
+      loadHistoryData();
+    }
+    
+    // 기간 필터링 및 핵심역량 적용
+    function applyFilter() {
+      currentPage = 0;
+      loadHistoryData();
+    }
+
+    // 정렬 적용
+    function sortMileageHistory() {
+      currentSort = document.getElementById("sortSelect").value;
+      loadHistoryData();
+    }
+
+    // 표시개수 적용
+    function changeItemsPerPage() {
+      pageSize = parseInt(document.getElementById("itemsPerPage").value);
+      currentPage = 0;
+      loadHistoryData();
+    }
+	
+    // [마일리지 배점표]
+    function loadMileagePointsData() {
+        fetch('/api/student/mileage/mileage-points')
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('.point-table tbody');
+                tbody.innerHTML = '';  // 기존 내용 초기화
+
+                data.forEach(group => {
+                    const programCount = group.programs.length;
+
+                    group.programs.forEach((program, index) => {
+                        const tr = document.createElement('tr');
+
+                        // 첫 행에만 핵심역량 셀 추가
+                        if (index === 0) {
+                        	tr.classList.add('group-border-top');
+
+                            const tdCore = document.createElement('td');
+                            tdCore.setAttribute('rowspan', programCount);
+                            tdCore.classList.add('align-middle');
+
+                            const span = document.createElement('span');
+                            span.className = 'category-badge badge-leadership'; 
+                            span.textContent = group.coreCompetencyName;
+
+                            tdCore.appendChild(span);
+                            tr.appendChild(tdCore);
+                        }
+
+                        // 프로그램명
+                        const tdProgram = document.createElement('td');
+                        tdProgram.textContent = program.programName;
+
+                        // 점수
+                        const tdScore = document.createElement('td');
+                        tdScore.classList.add('fw-bold');
+                        tdScore.textContent = `${program.mileagescore}P`;
+
+                        tr.appendChild(tdProgram);
+                        tr.appendChild(tdScore);
+
+                        tbody.appendChild(tr);
+                    });
+                });
+            })
+            .catch(error => {
+                console.error('마일리지 데이터 로딩 실패:', error);
+            });
+    }
     </script>
 </body>
 </html>
