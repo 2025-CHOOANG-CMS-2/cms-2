@@ -2,7 +2,6 @@ package kr.ac.dhuniv.core_cpt.service;
 
 import jakarta.transaction.Transactional;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
-import kr.ac.dhuniv.core_cpt.domain.CoreCptQst;
 import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoDetailDTO;
 import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoListDTO;
 import kr.ac.dhuniv.core_cpt.dto.coreinfo.CoreCptInfoRequestDTO;
@@ -112,7 +111,7 @@ public class CoreCptInfoService {
      */
     public List<CoreCptInfoListDTO> getAllTopLevelCompetencies() {
         // parent가 null인 상위 역량 조회
-        List<CoreCptInfo> topList = repository.findByParentIsNull();
+        List<CoreCptInfo> topList = repository.findByParentIsNullOrderByCciIdAsc();
 
         // DTO 리스트 생성
         List<CoreCptInfoListDTO> result = new ArrayList<>();

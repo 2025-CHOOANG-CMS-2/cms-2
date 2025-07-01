@@ -2,13 +2,17 @@ package kr.ac.dhuniv.ncs.domain;
 
 import jakarta.persistence.*;
 import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
+import kr.ac.dhuniv.mileage.domain.NcsPrgMileage;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * NCS 비교과 프로그램 정보 엔티티
- * <p>
+ *
  * NCS_PRG_INFO 테이블 매핑
  */
 @Entity
@@ -32,19 +36,19 @@ public class NcsPrgInfo {
      * 핵심역량 정보 (외래키: CORE_CPT_INFO)
      */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cci_id")
+    @JoinColumn(name = "cci_id", foreignKey = @ForeignKey(name = "fk_prg_info_category"))
     private CoreCptInfo coreCpt;
 
     /**
      * 프로그램 고유코드 (비즈니스 키, 유니크)
      */
-    @Column(name = "prg_code", length = 20, unique = true)
+    @Column(name = "prg_code", length = 20, unique = true, nullable = false)
     private String prgCode;
 
     /**
      * 프로그램명
      */
-    @Column(name = "prg_nm", length = 100)
+    @Column(name = "prg_nm", length = 100, nullable = false)
     private String prgNm;
 
     /**
@@ -106,7 +110,19 @@ public class NcsPrgInfo {
      */
     @Column(name = "aply_end_ymd")
     private LocalDateTime aplyEndDate;
-    
-    @Column(name = "image_url")
+
+    /**
+     * 대표 이미지 URL
+     */
+    @Column(name = "image_url", length = 255)
     private String imageUrl;
+
+    @JsonProperty("categoryName")
+    public String getCategoryName() {
+        return (coreCpt != null ? coreCpt.getCciNm() : null);
+    }
+
+    @OneToOne(mappedBy = "program", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private NcsPrgMileage mileage;
 }

@@ -317,8 +317,7 @@ body {
 			<div class="container">
 				<nav aria-label="breadcrumb">
 					<ol class="breadcrumb text-white-50">
-						<li class="breadcrumb-item"><a href="staff-dashboard.html"
-							class="text-white-50">대시보드</a></li>
+						<li class="breadcrumb-item"><a href="/employee/mileage/dashboard" class="text-white-50">대시보드</a></li>
 						<li class="breadcrumb-item active text-white">마일리지 지급 관리</li>
 					</ol>
 				</nav>
@@ -345,91 +344,68 @@ body {
 			<div class="tab-content">
 				<!-- Program Payment Tab -->
 				<div class="tab-pane fade show active" id="programPaymentTab">
-					<div class="management-card">
-
-						<!-- 필터 영역 -->
-						<form id="paymentForm" class="row g-3 align-items-end mb-4">
-							<div class="col-md-3">
-								<label for="startDate" class="form-label fw-bold">운영 시작일</label>
-								<input type="date" class="form-control" id="startDate"
-									name="startDate">
-							</div>
-							<div class="col-md-3">
-								<label for="endDate" class="form-label fw-bold">운영 종료일</label> <input
-									type="date" class="form-control" id="endDate" name="endDate">
-							</div>
-							<div class="col-md-3">
-								<label for="coreCompetency" class="form-label fw-bold">핵심역량</label>
-								<select class="form-select" id="coreCompetency"
-									name="coreCompetency">
-									<option value="">전체</option>
-									<th:block th:each="core : ${coreCompetencies}">
-										<option th:value="${core.id}" th:text="${core.name}"></option>
-									</th:block>
-								</select>
-							</div>
-
-							<div class="col-md-3">
-								<label for="programId" class="form-label fw-bold">비교과
-									프로그램</label> <select class="form-select" id="programId"
-									name="programId">
-									<option value="">전체</option>
-									<th:block th:each="prg : ${ncsPrograms}">
-										<option th:value="${prg.id}" th:text="${prg.name}"></option>
-									</th:block>
-								</select>
-							</div>
-							<div class="col-md-12">
-								<button type="button" class="btn btn-primary"
-									onclick="searchCompletedPrograms()">
-									<i class="bi bi-search me-1"></i>검색
-								</button>
-							</div>
-						</form>
-
-						<!-- 결과 테이블 -->
-						<div class="table-responsive">
-							<table
-								class="table table-bordered table-hover payment-management-table">
-								<thead>
-									<tr>
-										<th><input type="checkbox" id="selectAllPayment"
-											onchange="toggleSelectAllPayment()"></th>
-										<th>학번</th>
-										<th>이름</th>
-										<th>프로그램명</th>
-										<th>핵심역량</th>
-										<th>이수일</th>
-										<th>지급 여부</th>
-										<th>마일리지</th>
-									</tr>
-								</thead>
-								<tbody id="completedProgramsTable">
-									<!-- 데이터가 여기에 동적으로 채워집니다 -->
-								</tbody>
-							</table>
-						</div>
-
-						<div class="d-flex justify-content-between mt-3">
-							<button type="button" class="btn btn-success"
-								onclick="processSelectedPayments()">
-								<i class="bi bi-credit-card me-1"></i>선택 지급
-							</button>
-							<button type="button" class="btn btn-secondary"
-								onclick="exportToExcel()">
-								<i class="bi bi-download me-1"></i>엑셀 다운로드
-							</button>
-						</div>
-					</div>
+				  <div class="management-card">
+				
+				    <!-- 프로그램 목록 테이블 -->
+				    <h5 class="fw-bold mb-3">[이수완료 & 미지급 프로그램 목록]</h5>
+				    <div class="table-responsive mb-4">
+				      <table class="table table-bordered table-hover">
+				        <thead>
+				          <tr>
+				            <th>번호</th>
+				            <th>핵심역량</th>
+				            <th>비교과 프로그램</th>
+				            <th>운영 시작일</th>
+				            <th>운영 종료일</th>
+				            <th>이수일자</th>
+				            <th>지급여부</th>
+				          </tr>
+				        </thead>
+				        <tbody id="programListTable">
+				          <!-- 데이터 동적 생성 -->
+				        </tbody>
+				      </table>
+				    </div>
+				
+				    <!-- 이수 학생 테이블 -->
+				    <h5 class="fw-bold mb-3">[선택 프로그램 이수 학생 명단]</h5>
+				    <div class="table-responsive completed-studens-table">
+				      <table class="table table-bordered table-hover">
+				        <thead>
+				          <tr>
+				            <th>학번</th>
+				            <th>이름</th>
+				            <th>핵심역량</th>
+				            <th>비교과 프로그램</th>
+				            <th>이수일자</th>
+				            <th>지급여부</th>
+				            <th>마일리지</th>
+				          </tr>
+				        </thead>
+				        <tbody id="studentListTable">
+				          <!-- 데이터 동적 생성 -->
+				        </tbody>
+				      </table>
+				    </div>
+				
+				    <!-- 일괄 지급 버튼 -->
+				    <div class="d-flex justify-content-between mt-3">
+				      <button type="button" class="btn btn-success" onclick="processAllPayments()">
+				        <i class="bi bi-credit-card me-1"></i>일괄 지급
+				      </button>
+				      <button type="button" class="btn btn-secondary" onclick="exportToExcel()">
+				        <i class="bi bi-download me-1"></i>엑셀 다운로드
+				      </button>
+				    </div>
+				  </div>
 				</div>
-
 				<!-- Payment History Tab -->
 				<div class="tab-pane fade" id="paymentHistoryTab">
 					<!-- Search and Filter -->
 					<div class="search-filter-section">
 						<div class="row g-3">
 							<div class="col-md-3">
-								<label class="form-label fw-bold">기간 검색</label>
+								<label class="form-label fw-bold">지급기간 검색</label>
 								<div class="row">
 									<div class="col-6">
 										<input type="date" class="form-control" id="historyStartDate"
@@ -441,38 +417,43 @@ body {
 									</div>
 								</div>
 							</div>
-
-							<div class="col-md-3">
-								<label class="form-label fw-bold">프로그램명</label> <input
-									type="text" class="form-control" placeholder="프로그램명 검색"
-									id="programNameSearch">
-							</div>
-
+							
 							<div class="col-md-2">
-								<label class="form-label fw-bold">카테고리</label> <select
-									class="form-select" id="historyCategory">
-									<option value="all">전체</option>
-									<option value="leadership">리더십</option>
-									<option value="creativity">창의성</option>
-									<option value="volunteer">봉사활동</option>
-									<option value="academic">학술활동</option>
-									<option value="career">진로개발</option>
+								<label for="coreCompetency" class="form-label fw-bold">핵심역량</label>
+								<select class="form-select" id="coreCptId"
+									name="competencyId">
+									<option value="">전체</option>
+									<th:block th:each="core : ${coreCompetencies}">
+										<option th:value="${core.id}" th:text="${core.name}"></option>
+									</th:block>
 								</select>
 							</div>
 
+							<div class="col-md-3">
+								<label for="programId" class="form-label fw-bold">비교과
+									프로그램</label> <select class="form-select" id="prgId"
+									name="programId">
+									<option value="">전체</option>
+									<th:block th:each="prg : ${ncsPrograms}">
+										<option th:value="${prg.id}" th:text="${prg.name}"></option>
+									</th:block>
+								</select>
+							</div>
+
+
 							<div class="col-md-2">
-								<label class="form-label fw-bold">상태</label> <select
+								<label class="form-label fw-bold">지급 상태</label> <select
 									class="form-select" id="paymentStatus">
-									<option value="all">전체</option>
-									<option value="completed">지급완료</option>
-									<option value="cancelled">취소됨</option>
+									<option value="">전체</option>
+									<option value="COM">지급완료</option>
+									<option value="CAN">취소됨</option>
 								</select>
 							</div>
 
 							<div class="col-md-2">
 								<label class="form-label fw-bold">&nbsp;</label>
 								<button class="btn btn-primary w-100"
-									onclick="searchPaymentHistory()">
+									onclick="applyFilter()">
 									<i class="bi bi-search me-1"></i>검색
 								</button>
 							</div>
@@ -505,13 +486,13 @@ body {
 											class="form-check-input" id="selectAllHistory"
 											onchange="toggleSelectAllHistory()"></th>
 										<th width="12%">지급일</th>
-										<th width="15%">학번</th>
-										<th width="10%">이름</th>
-										<th width="25%">프로그램명</th>
-										<th width="10%">카테고리</th>
-										<th width="8%">포인트</th>
-										<th width="8%">상태</th>
-										<th width="7%">작업</th>
+										<th width="12%">학번</th>
+										<th width="8%">이름</th>
+										<th width="13%">핵심역량</th>
+										<th width="22%">프로그램명</th>
+										<th width="9%">마일리지</th>
+										<th width="10%">지급상태</th>
+										<th width="9%">지급취소</th>
 									</tr>
 								</thead>
 								<tbody id="paymentHistoryList">
@@ -522,9 +503,9 @@ body {
 										<td>2024-01-20</td>
 										<td>2021001234</td>
 										<td>김학생</td>
-										<td class="text-start">글로벌 리더십 아카데미</td>
 										<td><span class="category-badge badge-leadership">리더십</span>
 										</td>
+										<td class="text-start">글로벌 리더십 아카데미</td>
 										<td class="fw-bold text-success">+200P</td>
 										<td><span class="status-badge status-completed">지급완료</span>
 										</td>
@@ -532,94 +513,6 @@ body {
 											<div class="action-buttons">
 												<button class="btn btn-outline-danger btn-action"
 													onclick="cancelPayment(1)">
-													<i class="bi bi-x"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td><input type="checkbox"
-											class="form-check-input history-checkbox" value="2">
-										</td>
-										<td>2024-01-20</td>
-										<td>2021001235</td>
-										<td>이학생</td>
-										<td class="text-start">글로벌 리더십 아카데미</td>
-										<td><span class="category-badge badge-leadership">리더십</span>
-										</td>
-										<td class="fw-bold text-success">+200P</td>
-										<td><span class="status-badge status-completed">지급완료</span>
-										</td>
-										<td>
-											<div class="action-buttons">
-												<button class="btn btn-outline-danger btn-action"
-													onclick="cancelPayment(2)">
-													<i class="bi bi-x"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td><input type="checkbox"
-											class="form-check-input history-checkbox" value="3">
-										</td>
-										<td>2024-01-19</td>
-										<td>2021001236</td>
-										<td>박학생</td>
-										<td class="text-start">창의적 사고 워크숍</td>
-										<td><span class="category-badge badge-creativity">창의성</span>
-										</td>
-										<td class="fw-bold text-success">+150P</td>
-										<td><span class="status-badge status-completed">지급완료</span>
-										</td>
-										<td>
-											<div class="action-buttons">
-												<button class="btn btn-outline-danger btn-action"
-													onclick="cancelPayment(3)">
-													<i class="bi bi-x"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td><input type="checkbox"
-											class="form-check-input history-checkbox" value="4">
-										</td>
-										<td>2024-01-18</td>
-										<td>2021001237</td>
-										<td>최학생</td>
-										<td class="text-start">지역사회 봉사활동</td>
-										<td><span class="category-badge badge-volunteer">봉사활동</span>
-										</td>
-										<td class="fw-bold text-danger">-160P</td>
-										<td><span class="status-badge status-cancelled">취소됨</span>
-										</td>
-										<td>
-											<div class="action-buttons">
-												<button class="btn btn-outline-secondary btn-action"
-													disabled>
-													<i class="bi bi-check"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-									<tr>
-										<td><input type="checkbox"
-											class="form-check-input history-checkbox" value="5">
-										</td>
-										<td>2024-01-17</td>
-										<td>2021001238</td>
-										<td>정학생</td>
-										<td class="text-start">학술논문 발표대회</td>
-										<td><span class="category-badge badge-academic">학술활동</span>
-										</td>
-										<td class="fw-bold text-success">+300P</td>
-										<td><span class="status-badge status-completed">지급완료</span>
-										</td>
-										<td>
-											<div class="action-buttons">
-												<button class="btn btn-outline-danger btn-action"
-													onclick="cancelPayment(5)">
 													<i class="bi bi-x"></i>
 												</button>
 											</div>
@@ -652,260 +545,383 @@ body {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-        // load 이벤트 : 페이지 내의 모든 리소스(이미지, 스타일시트, 프레임 등) 로딩이 완료된 후 발생, DOMContentLoaded 이벤트보다 나중에 실행됨
-        // 페이지 로드 시 검색일자 초기화 (1개월전 ~ 오늘)
-        window.addEventListener('load', function() {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('endDate').value = today;
-            document.getElementById('historyEndDate').value = today;
-            
-            const oneMonthAgo = new Date();
-            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-            document.getElementById('startDate').value = oneMonthAgo.toISOString().split('T')[0];
-            document.getElementById('historyStartDate').value = oneMonthAgo.toISOString().split('T')[0];
-        });
-        
-        // DOMContentLoaded 이벤트 : HTML 문서의 DOM 트리가 완성되었을 때 발생
-		document.addEventListener("DOMContentLoaded", () => {
-		  console.log("테스트");
-		  searchCompletedPrograms();  // 페이지 열릴 때 한번 호출하여 초기 데이터 로딩
-		});
 
-	    //페이지 로드시 또는 검색시 백앤드 API 호출
+    // 최초 실행 페이지 및 탭 전환시 페이지
+	document.addEventListener("DOMContentLoaded", function () {
+	    // programPaymentTab 데이터 로딩
+	    searchCompletedPrograms();
+	
+	    // 탭 전환 이벤트 감지
+	    document.querySelectorAll('a[data-bs-toggle="tab"]').forEach(tab => {
+	        tab.addEventListener('shown.bs.tab', function (event) {
+	            const targetTabId = event.target.getAttribute('href');
+	            if (targetTabId === '#programPaymentTab') {
+	            	searchCompletedPrograms();  // 다시 로딩할 수도 있음
+	            } else if (targetTabId === '#paymentHistoryTab') {
+	            	searchPaymentHistory();  // 적립 내역 조회
+	            } 
+	        });
+	    });
+	});
+
+		// 1. 이수완료 & 미지급 프로그램 목록 로딩
 		function searchCompletedPrograms() {
-		  // 각 검색 필드 값 가져오기 (초기 데이터 로딩시에 각 값은 null 임)
-		  const startDate = document.getElementById("startDate").value;
-		  const endDate = document.getElementById("endDate").value;
-		  const coreCompetency = document.getElementById("coreCompetency").value;
-		  const programId = document.getElementById("programId").value;
-
-		  // 쿼리 파라미터 생성
-		  const params = new URLSearchParams();
-
-		  if (startDate) params.append("startDate", startDate);
-		  if (endDate) params.append("endDate", endDate);
-		  if (coreCompetency) params.append("coreCompetency", coreCompetency);
-		  if (programId) params.append("programId", programId);
-
-		  // API 호출 URL에 파라미터 붙이기
-		  const url = "/api/employee/mileage/completed-students?" + params.toString();
-
-		  // fetch 호출
-		  fetch(url)
-		    .then(response => {
-		      if (!response.ok) {
-		        throw new Error("네트워크 응답 오류");
-		      }
-		      return response.json();
-		    })
-		    .then(data => {
-		      renderCompletedPrograms(data);
-		      bindCheckboxEvents(); //동적으로 삽입된 체크박스에 이벤트 바인딩
-		    })
-		    .catch(error => {
-		      alert("이수 데이터 불러오기 실패: " + error.message);
-		    });
+		  fetch("/api/employee/mileage/unpaid-programs")
+		    .then(res => res.json())
+		    .then(data => renderProgramList(data))
+		    .catch(err => alert("프로그램 목록 로딩 실패: " + err.message));
 		}
-		
-	    // API 응답자료(비교과 프로그램 이수내역) 화면에 노출
-		function renderCompletedPrograms(data) {
-		  const tbody = document.getElementById("completedProgramsTable");
-		  tbody.innerHTML = "";  // 초기화
 
-		  data.forEach((item, index) => {
-		    const mileageInput = item.status === "지급완료"
-		      ? `<input type="number" name="mileage_${index + 1}" class="form-control" value="${item.mileageScore}" min="0" disabled>`
-		      : `<input type="number" name="mileage_${index + 1}" class="form-control" value="${item.mileageScore}" min="0">`;
-
-		    const payStatus = item.status === "지급완료"
-		      ? `<span class="text-success">지급완료</span>`
-		      : `<span class="text-danger">미지급</span>`;
-
-		    const completeDate = item.completeDate ? item.completeDate.substring(0, 10) : "";
-
+		function renderProgramList(programs) {
+		  const tbody = document.getElementById("programListTable");
+		  tbody.innerHTML = "";
+		  programs.forEach((p, idx) => {
 		    const row = `
-		      <tr>
-		        <td>
-		          <input type="checkbox" name="selectedIds" value="${item.stdNo}" class="payment-checkbox">
-		          <!-- hidden fields -->
-		          <input type="hidden" name="stdId" value="${item.stdId}">
-		          <input type="hidden" name="prgId" value="${item.prgId}">
-		          <input type="hidden" name="cmpId" value="${item.cmpId}">
-		        </td>
-		        <td>${item.stdNo}</td>
-		        <td>${item.stdNm}</td>
-		        <td>${item.prgNm}</td>
-		        <td><span class="category-badge">${item.cciNm}</span></td>
-		        <td>${completeDate}</td>
-		        <td>${payStatus}</td>
-		        <td>${mileageInput}</td>
-		      </tr>
-		    `;
-
+		      <tr onclick="selectProgram('${p.prgId}','${p.programName}','${p.completeDate}')">
+		        <td>${idx + 1}</td>
+		        <td>${p.coreCompetency}</td>
+		        <td>${p.programName}</td>
+		        <td>${p.startDate.substring(0,10)}</td>
+		        <td>${p.endDate.substring(0,10)}</td>
+		        <td>${p.completeDate.substring(0,10)}</td>
+		        <td><span class="text-danger">미지급</span></td>
+		      </tr>`;
 		    tbody.insertAdjacentHTML("beforeend", row);
 		  });
 		}
 
-		// 전체 선택 토글 함수
-		function toggleSelectAllPayment() {
-		  const selectAll = document.getElementById("selectAllPayment").checked;
-		  console.log("selectAll: " + selectAll);
-		  document.querySelectorAll(".payment-checkbox").forEach(cb => {
-		    cb.checked = selectAll;
+		// 2. 특정 프로그램 선택 시 이수 학생 목록 조회
+		let currentPrgId = null;
+
+		function selectProgram(prgId, programName, completeDate) {
+		  currentPrgId = prgId;
+		  fetch(`/api/employee/mileage/unpaid-students?programId=${prgId}&completeDate=${completeDate}`)
+		    .then(res => res.json())
+		    .then(data => {
+		    	alert(`"${programName}" 이수자 명단을 조회합니다.`);
+		    	renderStudentList(data)
+		    	
+		    	// 출력된 테이블 위치로 스크롤 이동
+		        setTimeout(() => {
+		          const tableWrapper = document.querySelector(".completed-studens-table");
+		          if (tableWrapper) {
+		            tableWrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+		          }
+		        }, 100); // 데이터 렌더링 후 이동을 위해 약간의 지연 추가
+		    })
+		    .catch(err => alert("이수자 목록 조회 실패: " + err.message));
+		}
+
+		function renderStudentList(students) {
+		  const tbody = document.getElementById("studentListTable");
+		  tbody.innerHTML = "";
+		  
+		  if (students.length === 0) {
+		    const emptyRow = `
+		      <tr>
+		        <td colspan="7" class="text-center">이수자 명단이 없습니다.</td>
+		      </tr>`;
+		    tbody.insertAdjacentHTML("beforeend", emptyRow);
+		    return;
+		  }
+		  
+		  students.forEach((s) => {
+		    const row = `
+		      <tr>
+		        <td>${s.stdNo}</td>
+		        <td>${s.stdNm}</td>
+		        <td>${s.cciNm}</td>
+		        <td>${s.prgNm}</td>
+		        <td>${s.completeDate?.substring(0, 10)}</td>
+		        <td><span class="${s.status === '지급완료' ? 'text-success' : 'text-danger'}">${s.status}</span></td>
+		        <td><input type="number" class="form-control" value="${s.mileageScore}" ${s.status === '지급완료' ? 'disabled' : ''}></td>
+		        <input type="hidden" name="stdId" value="${s.stdId}">
+		        <input type="hidden" name="cmpId" value="${s.cmpId}">
+		      </tr>`;
+		    tbody.insertAdjacentHTML("beforeend", row);
 		  });
 		}
 
-		// 개별 체크박스 상태에 따라 전체 선택 체크박스 업데이트
-		function updateSelectAllCheckbox() {
-		  const allCheckboxes = Array.from(document.querySelectorAll(".payment-checkbox"));
-		  const selectAllCheckbox = document.getElementById("selectAllPayment");
-		  const allChecked = allCheckboxes.length > 0 && allCheckboxes.every(cb => cb.checked);
-		  console.log("allChecked: " + allChecked);
-		  selectAllCheckbox.checked = allChecked;
-		}
-
-		// 체크박스 이벤트 바인딩 함수 (fetch 후 실행)
-		function bindCheckboxEvents() {
-		  document.querySelectorAll(".payment-checkbox").forEach(cb => {
-		    cb.addEventListener("change", updateSelectAllCheckbox);
+		// 3. 일괄 지급 처리
+		function processAllPayments() {
+		  const rows = document.querySelectorAll("#studentListTable tr");
+		  // 첫 번째 행에서 cmpId 가져오기
+		  const cmpId = rows[0].querySelector("input[name='cmpId']").value;
+		  const payload = Array.from(rows).map(row => {
+		    return {
+		      stdId: row.querySelector("input[name='stdId']").value,
+		      prgId: currentPrgId,
+		      cmpId: row.querySelector("input[name='cmpId']").value,
+		      mileageScore: parseFloat(row.querySelector("input[type='number']").value)
+		    };
 		  });
+
+		  fetch("/api/employee/mileage/payment", {
+		    method: "POST",
+		    headers: {
+		      "Content-Type": "application/json"
+		    },
+		    body: JSON.stringify(payload)
+		  })
+		    .then(res => {
+		      if (res.ok) {
+		        alert("일괄 지급 완료");
+		        selectProgram(cmpId, currentPrgId); // 재조회
+		      } else {
+		        alert("지급 실패");
+		      }
+		    });
 		}
 
-		// 체크박스 선택된 자에게 마일리지 지급
-        function processSelectedPayments() {
-	      const selectedRows = [...document.querySelectorAll(".payment-checkbox:checked")];
-	      	if (selectedRows.length === 0) {
-	      	  alert("지급할 학생을 선택하세요2.");
-	      	  return;
-	      	}
-	
-	      const payload = selectedRows.map((checkbox, index) => {
-	    	const tr = checkbox.closest("tr");
-	    	
-	    	// hidden 필드
-	    	const stdId = tr.querySelector("input[name='stdId']").value;
-	    	const prgId = tr.querySelector("input[name='prgId']").value;
-	    	const cmpId = tr.querySelector("input[name='cmpId']").value;
+        // [paymentHistoryTab]
+        let currentPage = 0;
+		let pageSize = 5;
 
-	    	//일반 visible 데이터
-	      	const stdNo = tr.children[1].textContent;
-	      	const stdNm = tr.children[2].textContent;
-	      	const prgNm = tr.children[3].textContent;
-	      	const mileageInput = tr.querySelector("input[type='number']");
-	      	const mileageScore = parseFloat(mileageInput.value) || 0;
-	  
-	      	return { stdId, prgId, cmpId, mileageScore };
-	      });
-	      
-	      fetch("/api/employee/mileage/payment", {
-	      	method: "POST",
-	      	headers: {
-	      	  "Content-Type": "application/json",
-	      	},
-	      	body: JSON.stringify(payload),
-	      })
-	      	.then((res) => {
-	      	  if (res.ok) {
-	      	    alert("마일리지 지급 완료");
-	      	    location.reload(); // or refresh table
-	      	  } else {
-	      	    alert("지급 실패");
-	      	  }
-	      	});
-        }
-
-        function exportToExcel() {
-            alert('엑셀 파일로 다운로드합니다.');
-        }
-
-        // 지급 내역 관련 함수들
+        // 페이지 로드 시 검색일자 초기화 (1개월전 ~ 오늘)
+        window.addEventListener('load', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('historyEndDate').value = today;
+            
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            document.getElementById('historyStartDate').value = oneMonthAgo.toISOString().split('T')[0];
+        });
+        
         function searchPaymentHistory() {
-            const startDate = document.getElementById('historyStartDate').value;
-            const endDate = document.getElementById('historyEndDate').value;
-            const programName = document.getElementById('programNameSearch').value.toLowerCase();
-            const category = document.getElementById('historyCategory').value;
-            const status = document.getElementById('paymentStatus').value;
-            
-            alert(`검색 조건:\n기간: ${startDate} ~ ${endDate}\n프로그램: ${programName || '전체'}\n카테고리: ${category}\n상태: ${status}`);
-        }
-
-        function toggleSelectAllHistory() {
-            const selectAll = document.getElementById('selectAllHistory');
-            const checkboxes = document.querySelectorAll('.history-checkbox');
-            
-            checkboxes.forEach(checkbox => {
-                if (!checkbox.disabled) {
-                    checkbox.checked = selectAll.checked;
-                }
-            });
-        }
-
-        function cancelPayment(paymentId) {
-            if (confirm('선택한 마일리지 지급을 취소하시겠습니까?\n취소된 마일리지는 학생 계정에서 차감됩니다.')) {
-                alert(`지급 ID ${paymentId}의 마일리지가 취소되었습니다.`);
-                
-                const row = document.querySelector(`input[value="${paymentId}"]`).closest('tr');
-                const statusCell = row.cells[7];
-                const pointsCell = row.cells[6];
-                const actionCell = row.cells[8];
-                
-                statusCell.innerHTML = '<span class="status-badge status-cancelled">취소됨</span>';
-                pointsCell.innerHTML = pointsCell.innerHTML.replace('+', '-').replace('text-success', 'text-danger');
-                actionCell.innerHTML = '<div class="action-buttons"><button class="btn btn-outline-secondary btn-action" disabled><i class="bi bi-check"></i></button></div>';
-            }
-        }
-
-        function bulkCancel() {
-            const selectedItems = document.querySelectorAll('.history-checkbox:checked');
-            
-            if (selectedItems.length === 0) {
-                alert('취소할 항목을 선택해주세요.');
-                return;
-            }
-            
-            if (confirm(`선택한 ${selectedItems.length}개 항목의 마일리지 지급을 취소하시겠습니까?`)) {
-                selectedItems.forEach(checkbox => {
-                    const paymentId = checkbox.value;
-                    const row = checkbox.closest('tr');
-                    const statusCell = row.cells[7];
-                    const pointsCell = row.cells[6];
-                    const actionCell = row.cells[8];
-                    
-                    statusCell.innerHTML = '<span class="status-badge status-cancelled">취소됨</span>';
-                    pointsCell.innerHTML = pointsCell.innerHTML.replace('+', '-').replace('text-success', 'text-danger');
-                    actionCell.innerHTML = '<div class="action-buttons"><button class="btn btn-outline-secondary btn-action" disabled><i class="bi bi-check"></i></button></div>';
-                    checkbox.disabled = true;
-                    checkbox.checked = false;
-                });
-                
-                document.getElementById('selectAllHistory').checked = false;
-                alert(`${selectedItems.length}개 항목의 마일리지 지급이 취소되었습니다.`);
-            }
-        }
-
-        function exportPaymentHistory() {
-            alert('지급 내역을 Excel 파일로 다운로드합니다.');
-        }
-
-        function changePage(page) {
-            document.querySelectorAll('.page-btn').forEach(btn => {
-                btn.classList.remove('active');
+          const params = new URLSearchParams({
+              page: currentPage,
+              size: pageSize,
+              ...(document.getElementById('historyStartDate').value && { startDate: document.getElementById('historyStartDate').value }),
+              ...(document.getElementById('historyEndDate').value && { endDate: document.getElementById('historyEndDate').value }),
+              ...(document.getElementById('coreCptId').value && { competencyId: document.getElementById('coreCptId').value }),
+              ...(document.getElementById('prgId').value && { programId: document.getElementById('prgId').value }),
+              ...(document.getElementById('paymentStatus').value && { mlgStatCode: document.getElementById('paymentStatus').value }),
             });
 
-            if (page === 'prev' || page === 'next') {
-                alert(`${page === 'prev' ? '이전' : '다음'} 페이지로 이동합니다.`);
-            } else {
-                document.querySelector(`[onclick="changePage(${page})"]`).classList.add('active');
-                alert(`${page}페이지로 이동합니다.`);
-            }
+       	  fetch(`/api/employee/mileage/payment-history?${params}`)
+       	    .then(res => res.json())
+       	    .then(data => {
+       	      renderTable(data.content);
+       	      renderPagination(data.totalPages, data.number);
+       	    })
+       	    .catch(err => console.error('불러오기 실패:', err));
+       	}
+
+       	// 테이블 렌더링
+       	function renderTable(data) {
+       	  const tbody = document.getElementById("paymentHistoryList");
+       	  tbody.innerHTML = ""; // 기존 데이터 제거
+
+          data.forEach(item => {
+       	    const date = new Date(item.mileageDate).toISOString().split("T")[0];
+       	    const isCancelled = item.mlgStatCode !== "COM";  
+       	    const statusText = isCancelled ? "취소됨" : "지급완료";
+       	    const badgeClass = isCancelled ? "status-cancelled" : "status-completed";
+       	    const btnClass = isCancelled ? "btn-outline-secondary" : "btn-outline-danger";
+       	    const btnDisabled = isCancelled ? "disabled" : "";
+       	    const btnIcon   = isCancelled ? "bi bi-check"       : "bi bi-x";
+       	    const btnOnclick= isCancelled ? ""                   : `onclick="cancelPayment(${item.mlgId})"`;
+
+       	    const row = document.createElement("tr");
+       	    row.innerHTML = `
+       	      <td>
+       	        <input type="checkbox"
+       	               class="form-check-input history-checkbox"
+       	               onchange="toggleRowHighlight(this)"
+       	               value="${item.mlgId}"
+       	               ${isCancelled ? "disabled" : ""}  
+       	        >
+       	      </td>
+       	      <td>${date}</td>
+       	      <td>${item.studentNo}</td>
+       	      <td>${item.studentName}</td>
+       	      <td><span class="category-badge">${item.competencyName}</span></td>
+       	      <td class="text-start">${item.programName}</td>
+       	      <td class="fw-bold text-${isCancelled ? "secondary" : "success"}">
+       	        ${isCancelled ? "" : "+"}${item.mileageScore}P
+       	      </td>
+       	      <td><span class="status-badge ${badgeClass}">${statusText}</span></td>
+       	      <td>
+       	        <div class="action-buttons">
+       	          <button class="btn ${btnClass} btn-action" ${btnDisabled} ${btnOnclick}>
+       	            <i class="${btnIcon}"></i>
+       	          </button>
+       	        </div>
+       	      </td>
+       	    `;
+       	  tbody.appendChild(row);
+       	});
+
+       	  updateSelectAllCheckbox();
+       	}
+
+       	// 페이징 렌더링
+       	function renderPagination(total, current) {
+       	  totalPages = total;
+       	  const container = document.querySelector(".pagination-custom");
+       	  container.innerHTML = "";
+
+       	  const start = Math.floor(current / 5) * 5;
+       	  const end = Math.min(start + 5, total);
+
+       	  // 이전 버튼
+       	  const prevBtn = document.createElement("button");
+       	  prevBtn.className = "page-btn";
+       	  prevBtn.innerHTML = `<i class="bi bi-chevron-left"></i>`;
+       	  prevBtn.onclick = () => changePage(Math.max(0, current - 1));
+       	  container.appendChild(prevBtn);
+
+       	  // 페이지 번호
+       	  for (let i = start; i < end; i++) {
+       	    const btn = document.createElement("button");
+       	    btn.className = `page-btn ${i === current ? "active" : ""}`;
+       	    btn.innerText = i + 1;
+       	    btn.onclick = () => changePage(i);
+       	    container.appendChild(btn);
+       	  }
+
+       	  // 다음 버튼
+       	  const nextBtn = document.createElement("button");
+       	  nextBtn.className = "page-btn";
+       	  nextBtn.innerHTML = `<i class="bi bi-chevron-right"></i>`;
+       	  nextBtn.onclick = () => changePage(Math.min(total - 1, current + 1));
+       	  container.appendChild(nextBtn);
+       	}
+       	
+        // 기간 필터링 및 핵심역량 적용
+        function applyFilter() {
+          currentPage = 0;
+          searchPaymentHistory();
         }
 
-        function logout() {
-            if (confirm('로그아웃 하시겠습니까?')) {
-                window.location.href = 'login.html';
-            }
-        }
+       	// 페이지 변경 함수
+       	function changePage(page) {
+       	  currentPage = page;
+       	  searchPaymentHistory();
+       	}
 
+        // 전체 선택 체크박스 토글
+       	function toggleSelectAllHistory() {
+       	  const selectAll = document.getElementById("selectAllHistory");
+       	  const checked   = selectAll.checked;
+
+       	  // disabled 가 아닌 체크박스만 대상으로
+       	  document.querySelectorAll(".history-checkbox:not(:disabled)").forEach(cb => {
+       	    cb.checked = checked;
+       	    toggleRowHighlight(cb);
+       	  });
+       	}
+
+       	// 개별 체크박스 선택 시 행 하이라이트 및 전체선택 동기화
+       	function toggleRowHighlight(checkbox) {
+       	  const row = checkbox.closest("tr");
+       	  if (checkbox.checked) {
+       	    row.classList.add("table-active");
+       	  } else {
+       	    row.classList.remove("table-active");
+       	  }
+
+       	  // disabled 가 아닌 체크박스만 골라서 전체선택 체크 상태 동기화
+       	  const enabledBoxes = Array.from(document.querySelectorAll(".history-checkbox:not(:disabled)"));
+       	  const allChecked   = enabledBoxes.length > 0 && enabledBoxes.every(cb => cb.checked);
+       	  document.getElementById("selectAllHistory").checked = allChecked;
+       	}
+
+       	// 마일리지 지급 취소(단건)
+       	function cancelPayment(id) {
+       	  if (confirm("정말 취소하시겠습니까?")) {
+       	    // API 호출 예시 (POST or DELETE)
+       	    fetch(`/api/employee/mileage/cancel-payment/${id}`, { method: "POST" })
+	       	 .then(res => {
+	       	    if (!res.ok) throw new Error("실패");
+	       	    alert("지급이 취소되었습니다.");
+	       	    searchPaymentHistory(currentPage);
+	       	  })
+	       	  .catch(err => alert("취소 중 오류 발생"));
+       	  }
+       	}
+       	
+        // 마일리지 복수 선택 취소
+       	function bulkCancel() {
+       	  const checked = Array.from(document.querySelectorAll('.history-checkbox:checked'))
+       	                       .map(cb => cb.value);
+       	  if (checked.length === 0) {
+       	    alert("하나 이상 선택해주세요.");
+       	    return;
+       	  }
+       	  if (!confirm(`${checked.length}건을 정말 취소하시겠습니까?`)) return;
+       	  fetch(`/api/employee/mileage/cancel-payment`, {
+       	    method: "POST",
+       	    headers: { "Content-Type": "application/json" },
+       	    body: JSON.stringify(checked)
+       	  })
+       	  .then(res => {
+       	    if (!res.ok) throw new Error("실패");
+       	    alert("선택된 지급이 모두 취소되었습니다.");
+       	    searchPaymentHistory(currentPage);
+       	  })
+       	  .catch(err => alert("취소 중 오류 발생"));
+       	}
+        
+        // 마일리지 지급내역 데이터 다운로드
+       	// 현재 페이지가 아니라 전체 데이터를 뽑기 위해 size를 충분히 크게
+       	function exportPaymentHistory() {
+       	  const params = new URLSearchParams({
+       	    page: 0,
+       	    size: 10000, // 전체 건수를 충분히 커버할 값
+            ...(document.getElementById('historyStartDate').value && { startDate: document.getElementById('historyStartDate').value }),
+            ...(document.getElementById('historyEndDate').value && { endDate: document.getElementById('historyEndDate').value }),
+            ...(document.getElementById('coreCptId').value && { competencyId: document.getElementById('coreCptId').value }),
+            ...(document.getElementById('prgId').value && { programId: document.getElementById('prgId').value }),
+            ...(document.getElementById('paymentStatus').value && { mlgStatCode: document.getElementById('paymentStatus').value }),
+       	  });
+
+       	  fetch(`/api/employee/mileage/payment-history?${params}`)
+       	    .then(res => res.json())
+       	    .then(data => {
+       	      const rows = data.content;
+       	      if (!rows.length) {
+       	        alert('다운로드할 데이터가 없습니다.');
+       	        return;
+       	      }
+
+              // CSV 헤더
+       	      const header = ['지급일','학번','이름','핵심역량','프로그램명','마일리지','지급상태'];
+       	      // CSV 본문
+       	      const csvBody = rows.map(item => {
+       	        const date = new Date(item.mileageDate).toISOString().slice(0,10);
+       	        const stat = item.mlgStatCode === 'COM' ? '지급완료' : item.mlgStatCode === 'CAN' ? '취소됨' : '';
+       	        return [
+       	          date,
+       	          item.studentNo,
+       	          item.studentName,
+       	          item.competencyName,
+       	          item.programName,
+       	          item.mileageScore,
+       	          stat
+       	        ].map(field => `"${field}"`).join(',');
+       	      });
+
+       	      // 전체 CSV 문자열
+       	      const csvContent = [header.join(','), ...csvBody].join('\r\n');
+
+       	      // Blob 생성 및 다운로드 트리거
+       	      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+       	      const url = URL.createObjectURL(blob);
+       	      const a   = document.createElement('a');
+       	      a.href      = url;
+       	      a.download  = `payment_history_${new Date().toISOString().slice(0,10)}.csv`;
+       	      document.body.appendChild(a);
+       	      a.click();
+       	      document.body.removeChild(a);
+       	      URL.revokeObjectURL(url);
+       	    })
+       	    .catch(err => {
+       	      console.error('내역 다운로드 실패:', err);
+       	      alert('내역 다운로드 중 오류가 발생했습니다.');
+       	    });
+       	}
+        
     </script>
 </body>
 </html>

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class NcsPrgForMlgDto {
+public class NcsPrgForMlgDTO {
 	private Long id;
     private String name;
 }

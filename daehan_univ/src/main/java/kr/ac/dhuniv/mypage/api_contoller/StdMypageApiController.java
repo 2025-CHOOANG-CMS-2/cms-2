@@ -33,7 +33,7 @@ public class StdMypageApiController {
      * @return 조회된 StdInfoDto 객체 (JSON 형태)
      */
     @GetMapping("/{stdNo}")
-    public ResponseEntity<StdInfoDto> getStudentInfo(@PathVariable String stdNo) {
+    public ResponseEntity<StdInfoDto> getStudentInfo(@PathVariable(name="stdNo") String stdNo) {
         log.info("API: 학생 정보 조회 요청: {}", stdNo);
         // 서비스의 getStdInfoDtoByUserId 메서드 호출 (stdNo가 userId로 사용됨)
         Optional<StdInfoDto> stdInfoDto = stdMypageService.getStdInfoDtoByUserId(stdNo);

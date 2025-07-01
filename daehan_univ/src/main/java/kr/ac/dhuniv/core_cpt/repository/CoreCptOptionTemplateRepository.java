@@ -8,4 +8,5 @@ import java.util.List;
 public interface CoreCptOptionTemplateRepository extends JpaRepository<CoreCptOptionTemplate, Long> {
     // ord 기준 정렬된 선택지 반환
     List<CoreCptOptionTemplate> findAllByOrderByOrdAsc();
+    List<CoreCptOptionTemplate> findByOptionId(Long optionTemplateId);
 }
