@@ -5,6 +5,8 @@
 let currentPage = 0; // 현재 페이지 번호 (0부터 시작)
 let currentResultId = null; // 만족도 평가를 위해 현재 선택된 상담 결과 ID
 let currentRating = 0; // 현재 선택된 별점
+let socket = null;
+let currentRoomId = null;
 
 // =========================================================================
 // 별점 평가 관련 함수
@@ -90,7 +92,8 @@ async function saveSatisfactionScore() {
 document.addEventListener("DOMContentLoaded", () => {
     initializeEventListeners();
     fetchAndRenderHistory(currentPage);
-    initializeRatingSystem(); 
+    initializeRatingSystem();
+	setupChatEventListeners(); 
 });
 
 /**
@@ -237,13 +240,27 @@ function createHistoryItemHtml(item, activeTab) {
     const dateText = `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')} (${'일월화수목금토'[date.getDay()]}) ${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
 
     let actionButtons = '';
+    // '예약 현황' 탭일 때만 버튼 로직 처리
     if (activeTab === 'appointments') {
+        const now = new Date();
+        const counselTime = new Date(item.applyDateTime);
+
         if (item.status === 'APPROVED') {
-            actionButtons = `<button class="btn btn-primary btn-sm" onclick="startCounseling('${item.applyId}')"><i class="fas fa-comments"></i> 상담 시작</button>`;
-        }
-        if (item.status === 'PENDING' || item.status === 'APPROVED') {
-            actionButtons += `<button class="btn btn-outline btn-sm" onclick="modifyBooking('${item.applyId}')"><i class="fas fa-edit"></i> 예약 변경</button>
-                              <button class="btn btn-outline btn-sm" onclick="cancelBooking('${item.applyId}')"><i class="fas fa-times"></i> 예약 취소</button>`;
+            // [수정] '예약됨' 상태일 때, 시간에 따라 활성화/비활성화되는 채팅 버튼 추가
+            //const isCounselTime = now >= counselTime;
+			const isCounselTime = true;
+            const disabledAttr = isCounselTime ? '' : 'disabled';
+            const buttonClass = isCounselTime ? 'btn-primary' : 'btn-secondary';
+            const buttonTitle = isCounselTime ? '클릭하여 상담 시작' : '아직 상담 시작 시간이 아닙니다.';
+            
+            actionButtons = `<button class="btn ${buttonClass} btn-sm" onclick="startChatSession('${item.applyId}')" ${disabledAttr} title="${buttonTitle}">
+                                <i class="fas fa-comments"></i> 채팅 시작
+                             </button>`;
+
+        } else if (item.status === 'PENDING') {
+            // [수정] '승인대기' 상태일 때만 예약 변경/취소 버튼 표시
+            actionButtons = `<button class="btn btn-outline btn-sm" onclick="modifyBooking('${item.applyId}')"><i class="fas fa-edit"></i> 예약 변경</button>
+                             <button class="btn btn-outline btn-sm" onclick="cancelBooking('${item.applyId}')"><i class="fas fa-times"></i> 예약 취소</button>`;
         }
     } else { // 'results' 탭
         const itemJson = JSON.stringify(item).replace(/'/g, "\\'");
@@ -329,4 +346,173 @@ function showResultDetailModal(item) {
     }
     
     detailModal.show();
+}
+
+async function cancelBooking(applyId) { // async 키워드는 그대로 사용
+    if (!confirm("정말로 예약을 취소하시겠습니까?")) {
+        return;
+    }
+
+    try {
+        // [수정] 이미 존재하는 PATCH API 주소를 사용합니다.
+        const response = await fetch(`/api/counseling/reservations/${applyId}/status`, {
+            method: 'PATCH', // [수정] HTTP 메소드를 'PATCH'로 변경
+            headers: {
+                'Content-Type': 'application/json' // [추가] JSON 데이터를 보낸다고 명시
+            },
+            // [추가] 변경할 상태를 JSON 본문에 담아 전송합니다.
+            body: JSON.stringify({ status: 'CANCELED' }) 
+        });
+
+        if (!response.ok) {
+            // 서버에서 보낸 에러 메시지가 있다면 표시
+            const errorText = await response.text();
+            throw new Error(errorText || '예약 취소에 실패했습니다.');
+        }
+
+        alert('예약이 정상적으로 취소되었습니다.');
+        
+        // 목록을 새로고침하여 변경된 상태를 즉시 반영합니다.
+        fetchAndRenderHistory(currentPage);
+
+    } catch (error) {
+        console.error(error);
+        alert(error.message);
+    }
+}
+
+/**
+ * 예약 변경 기능을 처리하는 함수
+ * @param {string} applyId - 변경할 예약 ID
+ */
+function modifyBooking(applyId) {
+    if (confirm("기존 예약을 취소하고 예약을 변경하시겠습니까?")) {
+        // [수정] URL 파라미터 이름을 'mode=modify'와 'applyId'로 변경
+        window.location.href = `/counsel_book?mode=modify&applyId=${applyId}`;
+    }
+}
+
+/**
+ * '채팅 시작' 버튼 클릭 시 호출되는 메인 함수
+ * @param {string} applyId - 입장할 예약(채팅방) ID
+ */
+function startChatSession(applyId) {
+    currentRoomId = applyId;
+    
+    const chatModalEl = document.getElementById('chatModal');
+    const chatModalInstance = new bootstrap.Modal(chatModalEl, {
+        backdrop: 'static',
+        keyboard: false
+    });
+    
+    const messagesContainer = document.getElementById('chat-messages');
+    messagesContainer.innerHTML = '<div class="text-center text-muted small p-2">서버에 연결 중입니다...</div>';
+    
+    chatModalInstance.show();
+
+    if(socket) {
+        socket.disconnect();
+    }
+
+    // Node.js 서버에 연결
+    socket = io('http://210.178.108.186:3001');
+
+    // --- 소켓 이벤트 리스너 등록 ---
+    socket.on('connect', () => {
+        console.log('채팅 서버 연결 성공');
+        messagesContainer.innerHTML = '';
+        
+        // TODO: 이 객체는 각 파일(학생/상담사)에 맞게 수정해야 합니다.
+        const currentUser = getUserInfoForChat();
+        
+        socket.emit('joinRoom', { roomId: currentRoomId, user: currentUser });
+    });
+
+    socket.on('receiveMessage', (message) => {
+        addMessageToChat(message);
+    });
+
+    socket.on('disconnect', () => console.log('채팅 서버 연결 종료'));
+    
+    chatModalEl.addEventListener('hidden.bs.modal', () => {
+        if(socket) socket.disconnect();
+    }, { once: true });
+}
+
+/**
+ * 메시지를 화면에 추가하는 함수 (좌/우 정렬 포함)
+ * @param {object} message - { senderId, senderName, text }
+ */
+function addMessageToChat(message) {
+    const messagesContainer = document.getElementById('chat-messages');
+    const currentUserId = getUserInfoForChat().id; // 현재 사용자 ID 가져오기
+
+    const messageRow = document.createElement('div');
+    messageRow.classList.add('message-row');
+
+    if (message.senderId === currentUserId) {
+        messageRow.classList.add('self');
+    } else {
+        messageRow.classList.add('other');
+    }
+
+    if (message.senderId === 'system') {
+        messageRow.classList.add('system');
+        messageRow.innerHTML = `<div class="text-center text-muted small">${message.text}</div>`;
+    } else {
+        messageRow.innerHTML = `
+            <div class="message-bubble">
+                <strong>${message.senderName}</strong>
+                <p class="mb-0" style="white-space: pre-wrap;">${message.text}</p>
+            </div>
+        `;
+    }
+    
+    messagesContainer.appendChild(messageRow);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+/**
+ * 메시지 전송 버튼/엔터키 이벤트에 연결될 함수
+ */
+function sendMessage() {
+    const chatInput = document.getElementById('chat-input');
+    const messageText = chatInput.value.trim();
+
+    if (messageText && socket) {
+        const currentUser = getUserInfoForChat();
+
+        const messageData = {
+            roomId: currentRoomId,
+            senderId: currentUser.id,
+            senderName: currentUser.name,
+            text: messageText
+        };
+        
+        socket.emit('sendMessage', messageData);
+        addMessageToChat({ ...messageData, senderName: '나' }); // 내 화면에는 '나'로 표시
+        chatInput.value = '';
+        chatInput.focus();
+    }
+}
+
+/**
+ * 채팅 관련 UI 이벤트 리스너를 설정하는 함수
+ */
+function setupChatEventListeners() {
+    document.getElementById('chat-send-btn').addEventListener('click', sendMessage);
+    document.getElementById('chat-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+}
+
+function getUserInfoForChat() {
+    // TODO: 실제 로그인한 학생 정보로 대체해야 합니다.
+    return {
+        id: '2025004001',
+        name: '학생'
+    };
 }

@@ -28,5 +28,5 @@ public interface CounselorService {
      */
     void updateCounselingResult(Long resultId, WriteResultRequestDto requestDto, String counselorId);
     
-    
+    CounselingResultItemDto getCounselingResultDetailForCounselor(Long resultId, String counselorId);
 }

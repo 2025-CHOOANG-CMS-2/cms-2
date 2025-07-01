@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -259,16 +260,27 @@ public class CounselStudentServiceImpl implements CounselStudentService {
     
     @Override
     @Transactional
-    public void updateSatisfactionScore(Long resultId, Double score) {
+    public void updateSatisfactionScore(Long resultId, Double score, String studentId) {
         if (score < 1 || score > 5) {
             throw new IllegalArgumentException("점수는 1점에서 5점 사이여야 합니다.");
         }
 
-        // [수정] 올바른 리포지토리 메소드 이름으로 호출합니다.
         CnslRslt cnslRslt = cnslRsltRepository.findById(resultId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 상담 결과를 찾을 수 없습니다: " + resultId));
 
-        // 만족도 점수를 업데이트합니다.
+        CnslAply cnslAply = cnslRslt.getCounselingApplication();
+
+        if (cnslAply == null) {
+            throw new IllegalStateException("상담 결과에 연결된 신청 정보가 없습니다.");
+        }
+
+        // [최종 수정된 권한 검사]
+        // 경로: 상담신청 -> 학생정보 -> 유저정보 -> 유저ID(학번)
+        if (!cnslAply.getStudent().getUser().getUserId().equals(studentId)) {
+            throw new AccessDeniedException("만족도를 수정할 권한이 없습니다.");
+        }
+
+        // 모든 검증을 통과한 경우에만 데이터를 수정합니다.
         cnslRslt.setSatisfactionScore(new BigDecimal(score));
     }
 }
