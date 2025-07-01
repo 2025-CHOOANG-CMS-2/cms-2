@@ -289,6 +289,8 @@ public class AdminEmpService {
 
         return convertToDto(updatedEntity);
     }
+    
+    
 
     /**
      * 특정 사번의 교직원을 삭제합니다.
