@@ -1,0 +1,413 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    padding-top: 60px; /* 헤더 높이만큼 상단 여백 추가 */
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f8f9fa; /* 전체 배경색 */
+    display: flex; /* Flexbox 레이아웃 적용 */
+    min-height: 100vh; /* 최소 높이를 뷰포트 높이로 설정 */
+    flex-direction: column; /* 기본적으로 컬럼 방향으로 배치 */
+}
+
+/* 헤더 스타일 */
+.header {
+    position: fixed; /* 헤더 고정 */
+    top: 0;
+    width: 100%;
+    height: 60px; /* 헤더 높이 */
+    background-color: #5a1e2c; /* 헤더 배경색 */
+    color: white;
+    z-index: 1040; /* 다른 요소 위에 표시 */
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+    flex: 1;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.header-center {
+    flex: 1;
+    text-align: center;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.header-right {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-size: 0.9rem;
+    gap: 1rem;
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.user-info {
+    text-align: right;
+    line-height: 1.2;
+}
+
+.user-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+}
+
+.user-btn:hover {
+    color: #ffc107;
+}
+
+/* 사이드바 스타일 */
+.sidebar {
+    position: fixed; /* 사이드바 고정 */
+    top: 60px; /* 헤더 아래에 위치 (헤더 높이만큼) */
+    left: 0;
+    width: 240px;
+    height: calc(100vh - 60px); /* 뷰포트 높이 - 헤더 높이 */
+    background-color: #5a1e2c; /* 사이드바 배경색 */
+    padding: 1rem 0;
+    color: white;
+    z-index: 1030;
+    overflow-y: auto; /* 내용이 넘칠 경우 스크롤 */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: left 0.3s ease; /* 슬라이드 애니메이션 */
+}
+
+.sidebar-user-info {
+    display: none; /* 모바일에서만 보이도록 기본은 숨김 */
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user-info div {
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* 메인 콘텐츠 스타일 */
+/* body를 flex로 설정했으므로, main-content가 사이드바 옆에 오도록 조정 */
+.main-content {
+    margin-top: 60px; /* 헤더 높이만큼 상단 여백 (body padding-top과 함께 고려) */
+    margin-left: 240px; /* 사이드바 너비만큼 좌측 여백 */
+    padding: 1.5rem; /* 기존 패딩 값 */
+    padding-left: 2rem !important; /* 왼쪽 여백 문제를 해결하기 위해 명시적으로 강제 적용 */
+    flex-grow: 1; /* 남은 공간을 채우도록 성장 */
+    width: calc(100% - 240px); /* 전체 너비에서 사이드바 너비 제외 */
+    box-sizing: border-box; /* 패딩, 보더가 너비에 포함되도록 */
+}
+
+/* 네비게이션 링크 스타일 (사이드바 메뉴) */
+.nav-link {
+    color: #e0e8f0;
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.2s, color 0.2s;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background-color: #732836;
+    color: #ffffff;
+}
+
+.nav-link.active {
+    background-color: #8a3d4a;
+    font-weight: bold;
+}
+
+.submenu {
+    background-color: #732836;
+}
+
+.submenu a {
+    padding-left: 2.5rem;
+    font-size: 0.95rem;
+}
+
+.has-submenu::after {
+    content: "\25BC"; /* 아래 화살표 유니코드 */
+    font-size: 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.hamburger {
+    display: none; /* 기본적으로 숨김, 모바일에서만 보이도록 */
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+/* 통계 카드 */
+.statistics-card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.statistics-card .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 0.8;
+}
+
+.statistics-card .display-6 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.statistics-card .card-text small {
+    opacity: 0.9;
+}
+
+/* 필터 섹션 */
+.filter-section {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+/* 테이블 */
+.notice-table th, .notice-table td {
+    vertical-align: middle;
+}
+
+.notice-table th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+    color: #333;
+}
+
+.notice-table a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.notice-table a:hover {
+    text-decoration: underline;
+}
+
+/* 카테고리 관리 탭 항목 */
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.category-item:last-child {
+    border-bottom: none;
+}
+
+.category-item .badge {
+    min-width: 30px;
+    text-align: center;
+}
+
+/* 모달 공통 스타일 */
+.modal-dialog {
+    max-width: 600px;
+}
+
+.modal-content {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #5a1e2c 0%, #732836 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1rem 1.5rem;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.modal-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.btn-close {
+    background: none;
+    border: none;
+    color: white;
+    opacity: 0.8;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    background: #fafafa;
+}
+
+.modal-footer {
+    border-top: 1px solid #e9ecef;
+    padding: 1rem 1.5rem;
+    background: white;
+    display: flex;
+    justify-content: flex-end; /* 버튼을 오른쪽으로 정렬 */
+    align-items: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+/* 폼 라벨 */
+.form-label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+/* 상세 보기 모달 내 세부 정보 레이아웃 */
+.detail-row {
+    display: flex;
+    flex-wrap: wrap; /* 작은 화면에서 줄바꿈 */
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+.detail-row:last-of-type {
+    border-bottom: none;
+}
+.detail-item {
+    flex: 1; /* 기본적으로 공간을 나눠 가짐 */
+    min-width: 250px; /* 너무 줄어들지 않도록 최소 너비 설정 */
+    padding: 0.5rem 0;
+}
+.detail-label {
+    font-weight: bold;
+    color: #5a1e2c;
+    margin-bottom: 0.25rem;
+}
+.detail-value {
+    color: #333;
+}
+.detail-value a {
+    color: #007bff;
+    text-decoration: none;
+}
+.detail-value a:hover {
+    text-decoration: underline;
+}
+
+/* 탭 메뉴 스타일 (새로 추가 및 수정) */
+.nav-tabs {
+    border-bottom: 2px solid #dee2e6; /* 탭 하단 경계선 강조 */
+    display: flex; /* Flexbox 적용 */
+    width: 100%; /* 전체 너비 사용 */
+    margin-bottom: 1.5rem; /* 탭과 콘텐츠 사이 간격 추가 */
+}
+
+.nav-item {
+    flex-grow: 1; /* 남은 공간을 균등하게 분배하여 꽉 차 보이게 함 */
+    text-align: center; /* 탭 텍스트 중앙 정렬 */
+}
+
+.nav-tabs .nav-link { /* Bootstrap 기본 nav-link와 충돌 방지 위해 명확하게 지정 */
+    color: #495057; /* 기본 텍스트 색상 (약간 어둡게 하여 대비 개선) */
+    border: 1px solid transparent; /* 기본 보더 투명하게 */
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+    padding: 0.75rem 1rem; /* 패딩 유지 */
+    display: block; /* 링크 전체 클릭 영역 확보 */
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+    white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 */
+}
+
+.nav-tabs .nav-link:hover:not(.active) {
+    color: #5a1e2c; /* 호버 시 색상 변경 (헤더/사이드바 색상과 맞춰 통일감 부여) */
+    border-color: #e9ecef #e9ecef #dee2e6; /* 호버 시 보더 색상 변경 */
+    background-color: #e9ecef; /* 호버 시 배경색 변경 */
+}
+
+.nav-tabs .nav-link.active {
+    color: #5a1e2c; /* 활성 탭 텍스트 색상 (강조) */
+    background-color: #ffffff; /* 활성 탭 배경색 (흰색으로 명확하게) */
+    border-color: #dee2e6 #dee2e6 #fff; /* 활성 탭 하단 경계선 제거 효과로 선택된 탭 강조 */
+    font-weight: bold; /* 활성 탭 글자 두껍게 */
+}
+
+/* 탭 콘텐츠 상단 패딩 추가 (시각적 분리) */
+.tab-content {
+    padding-top: 1rem;
+}
+
+
+/* 미디어 쿼리 (모바일 반응형) */
+@media (max-width: 768px) {
+    .sidebar {
+        left: -240px; /* 사이드바를 화면 밖으로 숨김 */
+    }
+    .sidebar.show {
+        left: 0; /* 사이드바를 보이게 함 */
+    }
+    .main-content {
+        margin-left: 0; /* 사이드바가 사라지면 좌측 여백 제거 */
+        width: 100%; /* 전체 너비 사용 */
+        padding-left: 1.5rem !important; /* 모바일에서도 패딩 확보 */
+    }
+    .hamburger {
+        display: inline-block; /* 햄버거 메뉴 아이콘 표시 */
+        margin-right: 1rem;
+    }
+    .header-right {
+        display: none; /* 모바일에서는 사용자 정보 숨김 */
+    }
+    .sidebar-user-info {
+        display: block; /* 모바일 사이드바에 사용자 정보 표시 */
+    }
+    .header-center {
+        flex: 2; /* 중앙 로고/제목이 더 많은 공간 차지 */
+        justify-content: flex-start;
+    }
+    .header-center img {
+        display: none; /* 모바일에서 로고 숨김 */
+    }
+    .detail-item {
+        flex: 100%; /* 모바일에서는 항목당 전체 너비 사용 */
+        min-width: auto;
+    }
+
+    /* 모바일 탭 메뉴 조정 */
+    .nav-tabs {
+        flex-direction: column; /* 세로로 쌓이도록 변경 */
+        border-bottom: none; /* 하단 경계선 제거 */
+    }
+    .nav-item {
+        width: 100%; /* 전체 너비 사용 */
+    }
+    .nav-tabs .nav-link {
+        border-bottom: 1px solid #dee2e6; /* 각 탭 사이에 경계선 추가 */
+        border-radius: 0; /* 모바일에서는 둥근 모서리 제거 */
+    }
+    .nav-tabs .nav-link.active {
+        border-bottom: 1px solid #dee2e6; /* 활성 탭 하단 경계선 유지 */
+        border-left: 3px solid #5a1e2c; /* 활성 탭 왼쪽 강조선 */
+        background-color: #f5f5f5; /* 활성 탭 배경색 변경 */
+    }
+}

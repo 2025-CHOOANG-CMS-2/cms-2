@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.ac.dhuniv.counsel.mapper.CounselingHistoryMapper">
+
+    <select id="findByStudentIdAndFilters" resultType="kr.ac.dhuniv.counsel.dto.CounselingHistoryDto">
+    SELECT
+        a.id AS applyId,
+        a.cnsl_aply_id AS cnslAplyId,
+        e.empl_nm AS counselorName,
+        a.type_cd AS counselingType,
+        a.method_cd AS counselingMethod,
+        a.stat_cd AS status,
+        a.aply_dttm AS applyDateTime,
+        a.content,
+        r.id AS resultId,
+        r.cnsl_cn AS resultContent,
+        r.satisf_score AS satisfactionScore,
+        r.cnsl_dttm AS counselingDateTime
+    FROM
+        cnsl_aply a
+    LEFT JOIN
+        empl_info e ON a.empl_no = e.empl_no
+    LEFT JOIN
+        cnsl_rslt r ON a.cnsl_aply_id = r.cnsl_aply_id
+    WHERE
+        a.std_no = #{stdNo}
+    <if test="startDate != null">
+        AND a.aply_dttm >= #{startDate}
+    </if>
+    <if test="status != null">
+        <choose>
+            <when test="status == 'all'">
+                AND a.stat_cd IN ('PENDING', 'APPROVED')
+            </when>
+            <otherwise>
+                AND a.stat_cd = #{status}
+            </otherwise>
+        </choose>
+    </if>
+    <if test="type != null and type != 'all'">
+        AND a.type_cd = #{type}
+    </if>
+    ORDER BY
+        a.aply_dttm ASC
+	</select>
+
+    <select id="countByStudentIdAndFilters" resultType="long">
+        SELECT
+            COUNT(*)
+        FROM
+            cnsl_aply a
+        JOIN
+            empl_info e ON a.empl_no = e.empl_no
+        LEFT JOIN
+            cnsl_rslt r ON a.cnsl_aply_id = r.cnsl_aply_id
+        <where>
+	    a.std_no = #{stdNo}
+	    <if test="startDate != null">
+	        AND a.aply_dttm >= #{startDate}
+	    </if>
+	    <if test="status != null">
+	        <choose>
+	            <when test="status == 'all'">
+	                AND a.stat_cd IN ('PENDING', 'APPROVED')
+	            </when>
+	            <otherwise>
+	                AND a.stat_cd = #{status}
+	            </otherwise>
+	        </choose>
+	    </if>
+	    <if test="type != null and type != 'all'">
+	        AND a.type_cd = #{type}
+	    </if>
+		</where>
+    </select>
+    
+    <select id="findByResultId" parameterType="long" resultType="kr.ac.dhuniv.counsel.dto.CounselingHistoryDto">
+    SELECT
+        a.id                  AS applyId,
+        c.id                  AS resultId,
+        e.empl_nm             AS counselorName,
+        a.type_cd             AS counselingType,
+        c.cnsl_cn             AS resultContent,
+        c.cnsl_dttm           AS counselingDateTime,
+        a.aply_dttm           AS applyDateTime
+    FROM
+        cnsl_aply a
+    LEFT JOIN
+        empl_info e ON a.empl_no = e.empl_no
+    LEFT JOIN
+        cnsl_rslt c ON a.cnsl_aply_id = c.cnsl_aply_id
+    WHERE
+        c.id = #{resultId}
+	</select>
+
+</mapper>

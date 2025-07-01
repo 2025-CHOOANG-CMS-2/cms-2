@@ -46,4 +46,7 @@ public class CnslAply {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content; // 상담 신청 내용
     
+    @Column(name = "method_cd", length = 10)
+    private String methodCode;
+    
 }

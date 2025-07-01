@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생역량진단 - 교육 관리 시스템</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(135deg, var(--primary-color), #34495e);
+            color: white;
+            z-index: 1000;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 0;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .nav-link.active {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .nav-link i {
+            margin-right: 0.75rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        /* Diagnosis Cards */
+        .diagnosis-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            transition: transform 0.3s ease;
+        }
+
+        .diagnosis-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .competency-overview {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .competency-score {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .competency-level {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Progress Bars */
+        .competency-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .competency-name {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .competency-progress {
+            height: 12px;
+            border-radius: 6px;
+            background-color: #e9ecef;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-custom {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.8s ease;
+            position: relative;
+        }
+
+        .progress-communication { background: linear-gradient(90deg, #3498db, #5dade2); }
+        .progress-creativity { background: linear-gradient(90deg, #9b59b6, #bb8fce); }
+        .progress-leadership { background: linear-gradient(90deg, #e74c3c, #ec7063); }
+        .progress-problem-solving { background: linear-gradient(90deg, #f39c12, #f7dc6f); }
+        .progress-teamwork { background: linear-gradient(90deg, #27ae60, #58d68d); }
+
+        /* Question Cards */
+        .question-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .question-number {
+            background: var(--secondary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .answer-options {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .answer-option {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .answer-option:hover {
+            border-color: var(--secondary-color);
+            background-color: #f8f9fa;
+        }
+
+        .answer-option.selected {
+            border-color: var(--secondary-color);
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .answer-option input[type="radio"] {
+            margin-right: 0.75rem;
+        }
+
+        /* Progress Indicator */
+        .progress-indicator {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            position: sticky;
+            top: 1rem;
+            z-index: 100;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .step.completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .step.current {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 2px;
+            background: #e9ecef;
+            margin: 0 0.5rem;
+        }
+
+        .step-line.completed {
+            background: var(--success-color);
+        }
+
+        /* Result Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .radar-chart {
+            width: 100%;
+            height: 100%;
+        }
+
+        .competency-detail {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .improvement-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .recommendation-item {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .strength-item {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .weakness-item {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .btn-save {
+            background: var(--success-color);
+        }
+
+        .btn-reset {
+            background: var(--danger-color);
+        }
+
+        .btn-help {
+            background: var(--warning-color);
+        }
+
+        /* Timer */
+        .timer-display {
+            background: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+
+            .action-buttons {
+                bottom: 1rem;
+                right: 1rem;
+            }
+
+            .competency-score {
+                font-size: 2rem;
+            }
+        }
+
+        /* Tab Navigation Styles */
+        .nav-tabs {
+            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: 2px solid transparent;
+            border-radius: 10px 10px 0 0;
+            color: var(--primary-color);
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            margin-right: 0.25rem;
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+            opacity: 1;
+        }
+
+        .nav-tabs .nav-link:hover {
+            border-color: var(--secondary-color);
+            background-color: #e3f2fd;
+            color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--secondary-color), #5dade2);
+            color: white;
+            border-color: var(--secondary-color);
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-tabs .nav-link i {
+            margin-right: 0.5rem;
+        }
+
+        /* Tab Content */
+        .tab-content {
+            background: transparent;
+            padding: 0;
+        }
+
+        .tab-pane {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="sidebar-brand">
+                <i class="bi bi-mortarboard-fill me-2"></i>
+                교육 관리 시스템
+            </a>
+        </div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item">
+                <a href="../index.html" class="nav-link">
+                    <i class="bi bi-house"></i>
+                    메인화면
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mypage.html" class="nav-link">
+                    <i class="bi bi-person"></i>
+                    마이페이지
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="../notice.html" class="nav-link">
+                    <i class="bi bi-megaphone"></i>
+                    공지사항
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="competency-diagnosis.html" class="nav-link active">
+                    <i class="bi bi-clipboard-data"></i>
+                    학생역량진단
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="extracurricular-programs.html" class="nav-link">
+                    <i class="bi bi-calendar-event"></i>
+                    비교과 프로그램
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="counseling.html" class="nav-link">
+                    <i class="bi bi-chat-dots"></i>
+                    상담관리
+                </a>
+            </div>
+            
+            <div class="nav-item">
+                <a href="mileage.html" class="nav-link">
+                    <i class="bi bi-star"></i>
+                    마일리지 조회
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
+                    <i class="bi bi-list"></i>
+                </button>
+                <div>
+                    <i class="bi bi-clock me-1"></i>
+                    <span id="currentTime"></span>
+                </div>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="timer-display" id="timerDisplay" style="display: none;">
+                    <i class="bi bi-stopwatch"></i>
+                    <span id="timerText">00:00</span>
+                </div>
+                
+                <div class="text-end">
+                    <div class="fw-medium">김학생</div>
+                    <small class="text-muted">컴퓨터공학과 3학년</small>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-link" data-bs-toggle="dropdown">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="mypage.html">마이페이지</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">로그아웃</a></li>
+                    </ul>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb text-white-50">
+                        <li class="breadcrumb-item"><a href="../index.html" class="text-white-50">홈</a></li>
+                        <li class="breadcrumb-item active text-white">학생역량진단</li>
+                    </ol>
+                </nav>
+                <h1 class="mb-0"><i class="bi bi-clipboard-data me-2"></i>학생역량진단</h1>
+                <p class="mb-0 mt-2">나의 핵심역량을 진단하고 개선 방안을 확인하세요</p>
+            </div>
+        </div>
+
+        <div class="container">
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="diagnosisTabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#overviewTab">
+                        <i class="bi bi-graph-up me-1"></i>진단 현황
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#testTab">
+                        <i class="bi bi-clipboard-check me-1"></i>진단 테스트
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#resultTab">
+                        <i class="bi bi-bar-chart me-1"></i>결과 분석
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#improvementTab">
+                        <i class="bi bi-lightbulb me-1"></i>개선 방안
+                    </a>
+                </li>
+            </ul>
+
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overviewTab">
+                    <!-- Current Status -->
+                    <div class="competency-overview">
+                        <h3 class="mb-3">나의 종합 역량 점수</h3>
+                        <div class="competency-score" id="totalScore">85</div>
+                        <div class="competency-level">우수 수준</div>
+                        <p class="mt-3 mb-0">최근 진단일: 2024년 1월 15일</p>
+                    </div>
+                    <!-- Bar Score 출력 영역 -->
+                    <div class="diagnosis-card" id="barScoreContainer">
+                        <!-- JS에서 채움 -->
+                    </div>
+                    <!-- Competency Breakdown -->
+
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="diagnosis-card text-center">
+                                <i class="bi bi-clipboard-check text-primary" style="font-size: 3rem;"></i>
+                                <h5 class="mt-3 mb-3">새로운 진단 시작</h5>
+                                <p class="text-muted mb-3">최신 역량 상태를 확인해보세요</p>
+                                <button class="btn btn-primary" onclick="startNewDiagnosis()">
+                                    <i class="bi bi-play me-1"></i>진단 시작
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="diagnosis-card text-center">
+                                <i class="bi bi-graph-up text-success" style="font-size: 3rem;"></i>
+                                <h5 class="mt-3 mb-3">진단 이력 보기</h5>
+                                <p class="text-muted mb-3">과거 진단 결과와 비교해보세요</p>
+                                <button class="btn btn-success" onclick="viewHistory()">
+                                    <i class="bi bi-clock-history me-1"></i>이력 보기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Tab -->
+                <div class="tab-pane fade" id="testTab">
+                    <!-- 상위 역량 선택 UI -->
+                    <div class="mb-3">
+                        <label for="competencySelect" class="form-label">상위 역량을 선택하세요</label>
+                        <div class="input-group">
+                            <select id="competencySelect" class="form-select">
+                                <option value="">상위 역량 로드 중...</option>
+                                <!-- 실제로는 서버에서 상위역량 목록을 동적으로 채우는 게 좋음 -->
+                            </select>
+                            <button class="btn btn-primary" onclick="loadCompetencyQuestions()">
+                                <i class="bi bi-play-fill me-1"></i>시험 시작
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Progress Indicator -->
+                    <div class="progress-indicator">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">진단 진행률</h6>
+                            <span class="text-muted"><span id="currentQuestion">1</span> / <span id="totalQuestions">25</span></span>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" id="progressBar" style="width: 4%"></div>
+                        </div>
+                        <div class="mt-2 text-center">
+                            <small class="text-muted">예상 소요시간: 15-20분</small>
+                        </div>
+                    </div>
+
+                    <!-- Question Container -->
+                    <div id="questionContainer">
+
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                            <i class="bi bi-chevron-left me-1"></i>이전
+                        </button>
+                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                            다음 <i class="bi bi-chevron-right ms-1"></i>
+                        </button>
+                        <button class="btn btn-success" id="submitBtn" onclick="submitDiagnosis()" style="display: none;">
+                            <i class="bi bi-check-circle me-1"></i>진단 완료
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Result Tab -->
+                <div class="tab-pane fade" id="resultTab">
+                    <div class="diagnosis-card text-center">
+
+
+
+                        <!-- Chart 중앙 정렬 -->
+                        <div class="chart-container d-flex justify-content-center" id="chartContainer">
+                            <canvas id="resultChart"></canvas>
+                        </div>
+                        <!-- 진단결과 상세 항목 추가할 영역 -->
+                        <div id="diagnosisResultDetails" class="mt-4"></div>
+
+                    </div>
+                </div>
+
+
+                <!-- Improvement Tab -->
+                <div class="tab-pane fade" id="improvementTab">
+                    <!-- Personalized Recommendations -->
+<!--                    <div class="diagnosis-card">-->
+<!--                        <h5 class="mb-4">-->
+<!--                            <i class="bi bi-lightbulb text-warning me-2"></i>맞춤형 개선 방안-->
+<!--                        </h5>-->
+
+<!--                        &lt;!&ndash; Creativity Improvement &ndash;&gt;-->
+<!--                        <div class="improvement-card">-->
+<!--                            <h6 class="mb-3">-->
+<!--                                <i class="bi bi-palette me-2"></i>창의역량 향상 방안-->
+<!--                            </h6>-->
+<!--                            -->
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">📚 추천 활동</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>창의적 사고 워크숍 참여</li>-->
+<!--                                    <li>디자인 씽킹 프로그램 수강</li>-->
+<!--                                    <li>아이디어 경진대회 참가</li>-->
+<!--                                </ul>-->
+<!--                                <small class="text-muted">예상 개선 효과: +8~12점</small>-->
+<!--                            </div>-->
+
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">📖 추천 도서</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>"창의성을 지휘하라" - 에드 캣멀</li>-->
+<!--                                    <li>"아이디어 불패의 법칙" - 매튜 시드</li>-->
+<!--                                    <li>"창의적 사고의 기술" - 마이클 미칼코</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🎯 실천 과제</h6>-->
+<!--                                <ul class="mb-0">-->
+<!--                                    <li>매일 새로운 아이디어 3개씩 기록하기</li>-->
+<!--                                    <li>다른 분야의 사례를 내 전공에 적용해보기</li>-->
+<!--                                    <li>브레인스토밍 기법 연습하기</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        &lt;!&ndash; Problem Solving Improvement &ndash;&gt;-->
+<!--                        <div class="improvement-card">-->
+<!--                            <h6 class="mb-3">-->
+<!--                                <i class="bi bi-puzzle me-2"></i>문제해결역량 향상 방안-->
+<!--                            </h6>-->
+<!--                            -->
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🔧 추천 활동</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>케이스 스터디 분석 프로그램</li>-->
+<!--                                    <li>논리적 사고력 향상 세미나</li>-->
+<!--                                    <li>프로젝트 기반 학습 참여</li>-->
+<!--                                </ul>-->
+<!--                                <small class="text-muted">예상 개선 효과: +6~10점</small>-->
+<!--                            </div>-->
+
+<!--                            <div class="recommendation-item">-->
+<!--                                <h6 class="mb-2">🧠 사고 기법</h6>-->
+<!--                                <ul class="mb-2">-->
+<!--                                    <li>5Why 분석법 활용</li>-->
+<!--                                    <li>SWOT 분석 연습</li>-->
+<!--                                    <li>마인드맵 작성 습관화</li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                    <!-- Action Plan -->
+<!--                    <div class="diagnosis-card">-->
+<!--                        <h5 class="mb-4">-->
+<!--                            <i class="bi bi-calendar-check me-2"></i>4주 실행 계획-->
+<!--                        </h5>-->
+
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-6">-->
+<!--                                <h6 class="text-primary">1-2주차: 기초 다지기</h6>-->
+<!--                                <ul class="list-unstyled">-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-check-circle text-success me-2"></i>-->
+<!--                                        창의적 사고 관련 도서 1권 읽기-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-check-circle text-success me-2"></i>-->
+<!--                                        매일 아이디어 노트 작성하기-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        온라인 창의성 강의 수강-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                            <div class="col-md-6">-->
+<!--                                <h6 class="text-primary">3-4주차: 실전 적용</h6>-->
+<!--                                <ul class="list-unstyled">-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        창의적 프로젝트 기획 및 실행-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        문제해결 사례 분석 3건-->
+<!--                                    </li>-->
+<!--                                    <li class="mb-2">-->
+<!--                                        <i class="bi bi-circle text-muted me-2"></i>-->
+<!--                                        동료들과 아이디어 공유 세션-->
+<!--                                    </li>-->
+<!--                                </ul>-->
+<!--                            </div>-->
+<!--                        </div>-->
+
+<!--                        <div class="mt-4 text-center">-->
+<!--                            <button class="btn btn-primary me-2" onclick="downloadActionPlan()">-->
+<!--                                <i class="bi bi-download me-1"></i>실행 계획서 다운로드-->
+<!--                            </button>-->
+<!--                            <button class="btn btn-outline-primary" onclick="setReminder()">-->
+<!--                                <i class="bi bi-bell me-1"></i>알림 설정-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+                    <!-- Related Programs -->
+                    <div class="diagnosis-card">
+                        <h5 class="mb-4">
+                            <i class="bi bi-calendar-event me-2"></i>추천 비교과 프로그램
+                        </h5>
+                        <div class="d-flex align-items-center mb-3">
+                            <label for="cptFilter" class="form-label me-2 mb-0 fw-bold">
+                                상위역량:
+                            </label>
+                            <select id="cptFilter" class="form-select w-auto" onchange="filterProgramsByCpt()">
+                                <option value="">전체</option>
+                                <!-- JS에서 동적으로 상위역량 옵션 추가 -->
+                            </select>
+                        </div>
+                        <div class="row" id="programContainer">
+                            <!-- JS로 카드 생성 -->
+                        </div>
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">창의적 사고 워크숍</h6>-->
+<!--                                        <p class="card-text small">디자인 씽킹과 창의적 문제해결 기법을 배우는 집중 워크숍</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-primary">창의역량</span>-->
+<!--                                            <span class="badge bg-success">+150P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-02-15</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(1)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">문제해결 챌린지</h6>-->
+<!--                                        <p class="card-text small">실제 기업 문제를 해결하는 프로젝트 기반 프로그램</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-warning">문제해결</span>-->
+<!--                                            <span class="badge bg-success">+200P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-02-20</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(2)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
+
+<!--                            <div class="col-md-4">-->
+<!--                                <div class="card h-100">-->
+<!--                                    <div class="card-body">-->
+<!--                                        <h6 class="card-title">혁신 아이디어 경진대회</h6>-->
+<!--                                        <p class="card-text small">창의적 아이디어로 사회 문제를 해결하는 경진대회</p>-->
+<!--                                        <div class="mb-2">-->
+<!--                                            <span class="badge bg-info">종합역량</span>-->
+<!--                                            <span class="badge bg-success">+300P</span>-->
+<!--                                        </div>-->
+<!--                                        <small class="text-muted">신청 마감: 2024-03-01</small>-->
+<!--                                    </div>-->
+<!--                                    <div class="card-footer">-->
+<!--                                        <button class="btn btn-sm btn-outline-primary w-100" onclick="applyProgram(3)">-->
+<!--                                            신청하기-->
+<!--                                        </button>-->
+<!--                                    </div>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    &lt;!&ndash; Action Buttons &ndash;&gt;-->
+<!--    <div class="action-buttons">-->
+<!--        <button class="action-btn btn-save" onclick="saveDiagnosis()" title="진단 저장">-->
+<!--            <i class="bi bi-save"></i>-->
+<!--        </button>-->
+<!--        <button class="action-btn btn-reset" onclick="resetDiagnosis()" title="진단 초기화">-->
+<!--            <i class="bi bi-arrow-clockwise"></i>-->
+<!--        </button>-->
+<!--        <button class="action-btn btn-help" onclick="showHelp()" title="도움말">-->
+<!--            <i class="bi bi-question"></i>-->
+<!--        </button>-->
+<!--    </div>-->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/js/student/competency-diagnosis.js"></script>
+    <script>
+        // 페이지 로드 시 상위역량 옵션을 가져와 select 박스에 채워줍니다.
+        window.addEventListener('load', () => {
+            loadCompetencyOptions();
+        });
+    </script>
+</body>
+</html>

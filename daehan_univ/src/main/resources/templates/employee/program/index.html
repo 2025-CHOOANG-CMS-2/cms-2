@@ -22,13 +22,13 @@
         font-family: "Segoe UI", sans-serif;
       }
 
-      /* 헤더 영역 (교직원용 포레스트 그린) */
+      /* 헤더 영역 */
       .header {
         position: fixed;
         top: 0;
         width: 100%;
         height: 60px;
-        background-color: #2d4f3a;
+        background-color: #1a2a45;
         color: white;
         z-index: 1040;
         display: flex;
@@ -58,7 +58,7 @@
         gap: 1rem;
       }
 
-      /* 사용자 정보 및 버튼 */
+      /* 사용자 정보 */
       .user-box {
         display: flex;
         align-items: center;
@@ -89,8 +89,8 @@
         top: 60px;
         left: 0;
         width: 240px;
-        height: 100%;
-        background-color: #2d4f3a;
+        height: calc(100vh - 60px);
+        background-color: #1a2a45;
         padding: 1rem 0;
         color: white;
         z-index: 1030;
@@ -98,22 +98,12 @@
         box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
       }
 
-      .sidebar-user-info {
-        display: none;
-        padding: 1rem 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .sidebar-user-info div {
-        font-size: 0.95rem;
-        line-height: 1.4;
-      }
-
       /* 본문 */
       .main-content {
         margin-top: 60px;
         margin-left: 240px;
         padding: 1.5rem;
+        min-height: calc(100vh - 60px);
       }
 
       /* 메뉴 스타일 */
@@ -128,57 +118,13 @@
       }
 
       .nav-link:hover {
-        background-color: #3b624d;
+        background-color: #223a5e;
         color: #ffffff;
       }
 
       .nav-link.active {
-        background-color: #46775c;
+        background-color: #2b4d77;
         font-weight: bold;
-      }
-
-      .submenu {
-        background-color: #3b624d;
-      }
-
-      .submenu a {
-        padding-left: 2.5rem;
-        font-size: 0.95rem;
-      }
-
-      .has-submenu::after {
-        content: "\25BC";
-        font-size: 0.75rem;
-        margin-left: 0.5rem;
-      }
-
-      /* 반응형 대응 */
-      @media (max-width: 768px) {
-        .sidebar {
-          left: -240px;
-          transition: left 0.3s ease;
-        }
-
-        .sidebar.show {
-          left: 0;
-        }
-
-        .main-content {
-          margin-left: 0;
-        }
-
-        .hamburger {
-          display: inline-block;
-          margin-right: 1rem;
-        }
-
-        .header-right {
-          display: none;
-        }
-
-        .sidebar-user-info {
-          display: block;
-        }
       }
 
       /* 페이지 헤더 */
@@ -270,6 +216,7 @@
       .table tbody tr:hover {
         background: #f9fafb;
       }
+
       /* 상태 배지 */
       .status-badge {
         padding: 0.25rem 0.75rem;
@@ -559,7 +506,7 @@
       }
 
       .detail-full {
-        grid-column: 1 / -1;
+        grid-column: 1/-1;
       }
 
       /* 페이지네이션 */
@@ -604,39 +551,31 @@
           left: -240px;
           transition: left 0.3s ease;
         }
-
         .sidebar.show {
           left: 0;
         }
-
         .main-content {
           margin-left: 0;
         }
-
         .page-header {
           flex-direction: column;
           align-items: flex-start;
           gap: 1rem;
         }
-
         .search-controls {
           flex-direction: column;
           align-items: stretch;
         }
-
         .table-container {
           overflow-x: auto;
         }
-
         .form-row,
         .form-row-3 {
           grid-template-columns: 1fr;
         }
-
         .detail-grid {
           grid-template-columns: 1fr;
         }
-
         .modal-content {
           margin: 0;
           max-height: 100vh;
@@ -644,48 +583,7 @@
           height: 100vh;
         }
       }
-
-      .image-upload-wrapper {
-        margin-bottom: 20px;
-      }
-
-      .image-preview-container {
-        width: 200px;
-        height: 200px;
-        border: 2px dashed #ddd;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-      }
-
-      .image-preview-container img {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
-      }
-
-      .detail-image-container {
-        width: 100%;
-        max-height: 300px;
-        margin-bottom: 20px;
-        display: flex;
-        justify-content: center;
-        overflow: hidden;
-        border-radius: 8px;
-      }
-
-      .detail-image-container img {
-        max-width: 100%;
-        height: auto;
-        object-fit: contain;
-      }
     </style>
-    <script th:inline="javascript">
-      const apiBaseUrl = /*[[ @{/api/programs} ]]*/ "/api/programs";
-      console.log("apiBaseUrl =", apiBaseUrl);
-    </script>
   </head>
   <body>
     <!-- 상단 헤더 -->
@@ -706,7 +604,7 @@
       </div>
       <div class="header-center">
         <img
-          th:src="@{/images/logo-white.png}"
+          src="../../static/images/logo-white.png"
           alt="logo"
           height="30"
           class="me-2"
@@ -729,27 +627,27 @@
     <!-- 좌측 사이드바 -->
     <aside class="sidebar" id="sidebar">
       <nav class="nav flex-column">
-        <a class="nav-link" href="/employee/dashboard">
-          <i class="bi bi-speedometer2 me-2"></i>대시보드
+        <a class="nav-link" href="/admin/dashboard"
+          ><i class="bi bi-speedometer2 me-2"></i>대시보드
         </a>
-        <a class="nav-link" href="/employee/students">
-          <i class="bi bi-people me-2"></i>학생 관리
+        <a class="nav-link" href="/admin/students"
+          ><i class="bi bi-people me-2"></i>학생 관리</a
+        >
+        <a class="nav-link active" href="/admin/programs"
+          ><i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
         </a>
-        <a class="nav-link active" href="/employee/programs">
-          <i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
-        </a>
-        <a class="nav-link" href="/employee/competency">
-          <i class="bi bi-graph-up me-2"></i>역량 관리
-        </a>
-        <a class="nav-link" href="/employee/counseling">
-          <i class="bi bi-chat-dots me-2"></i>상담 관리
-        </a>
-        <a class="nav-link" href="/employee/reports">
-          <i class="bi bi-file-text me-2"></i>보고서
-        </a>
-        <a class="nav-link" href="/employee/settings">
-          <i class="bi bi-gear me-2"></i>시스템 설정
-        </a>
+        <a class="nav-link" href="/admin/competency"
+          ><i class="bi bi-graph-up me-2"></i>역량 관리</a
+        >
+        <a class="nav-link" href="/admin/counseling"
+          ><i class="bi bi-chat-dots me-2"></i>상담 관리</a
+        >
+        <a class="nav-link" href="/admin/reports"
+          ><i class="bi bi-file-text me-2"></i>보고서</a
+        >
+        <a class="nav-link" href="/admin/settings"
+          ><i class="bi bi-gear me-2"></i>시스템 설정</a
+        >
       </nav>
     </aside>
 
@@ -778,11 +676,7 @@
               placeholder="프로그램명 검색"
               id="searchInput"
             />
-            <button
-              class="btn btn-outline-secondary"
-              type="button"
-              onclick="searchPrograms()"
-            >
+            <button class="btn btn-outline-secondary" type="button">
               <i class="bi bi-search"></i>
             </button>
           </div>
@@ -790,7 +684,6 @@
             class="form-select"
             style="max-width: 150px"
             id="statusFilter"
-            onchange="searchPrograms()"
           >
             <option value="">전체 상태</option>
             <option value="draft">임시저장</option>
@@ -802,16 +695,15 @@
             class="form-select"
             style="max-width: 150px"
             id="categoryFilter"
-            onchange="searchPrograms()"
           >
             <option value="">전체 카테고리</option>
-            <option value="1">의사소통역량</option>
-            <option value="2">창의역량</option>
-            <option value="3">문제해결역량</option>
-            <option value="4">리더십역량</option>
-            <option value="5">팀워크역량</option>
-            <option value="6">자기관리역량</option>
-            <option value="7">정보활용역량</option>
+            <option value="7">의사소통역량</option>
+            <option value="8">창의역량</option>
+            <option value="9">문제해결역량</option>
+            <option value="10">리더십역량</option>
+            <option value="11">팀워크역량</option>
+            <option value="12">자기관리역량</option>
+            <option value="13">정보활용역량</option>
           </select>
         </div>
       </div>
@@ -821,29 +713,115 @@
         <table class="table">
           <thead>
             <tr>
-              <th>번호</th>
+              <th style="width: 60px">번호</th>
               <th>프로그램명</th>
-              <th style="width: 150px">카테고리</th>
-              <!-- 기존 100px → 150px -->
-              <th style="width: 80px">정원</th>
-              <th style="width: 100px">마일리지</th>
+              <th style="width: 100px">카테고리</th>
+              <th style="width: 65px">정원</th>
+              <th style="width: 95px">마일리지</th>
               <th style="width: 120px">신청기간</th>
               <th style="width: 120px">운영기간</th>
-              <th style="width: 140px">상태</th>
-              <!-- 기존 100px → 140px -->
-              <th style="width: 120px">관리</th>
+              <th style="width: 110px">상태</th>
+              <th style="width: 80px">관리</th>
             </tr>
           </thead>
-          <tbody id="programTableBody">
-            <!-- 테이블 데이터가 여기에 동적으로 생성됩니다 -->
+          <tbody>
+            <tr th:each="program, iterStat : ${list}">
+              <td th:text="${iterStat.index + 1}">1</td>
+              <td>
+                <div style="font-weight: 600" th:text="${program.prgNm}"></div>
+                <div
+                  style="font-size: 0.85rem; color: #6b7280"
+                  th:text="${program.prgCode}"
+                ></div>
+              </td>
+              <td>
+                <span
+                  class="category-badge"
+                  th:text="${program.categoryName}"
+                ></span>
+              </td>
+              <td th:text="${program.maxCnt} + '명'"></td>
+              <td>
+                <span
+                  style="font-weight: 600; color: #1a2a45"
+                  th:text="${program.mileageScoreInt} + '점'"
+                ></span>
+              </td>
+              <td>
+                <div style="font-size: 0.85rem">
+                  <span
+                    th:text="${program.aplyBgngYmd != null? #temporals.format(program.aplyBgngYmd, 'yyyy-MM-dd'): ''}"
+                  ></span>
+                  <br />
+                  ~
+                  <span
+                    th:text="${program.aplyEndYmd != null? #temporals.format(program.aplyEndYmd,   'yyyy-MM-dd'): ''}"
+                  ></span>
+                </div>
+              </td>
+              <td>
+                <div style="font-size: 0.85rem">
+                  <span
+                    th:text="${program.prgStDt   != null? #temporals.format(program.prgStDt,    'yyyy-MM-dd'): ''}"
+                  ></span>
+                  <br />
+                  ~
+                  <span
+                    th:text="${program.prgEndDt   != null? #temporals.format(program.prgEndDt,    'yyyy-MM-dd'): ''}"
+                  ></span>
+                </div>
+              </td>
+              <td>
+                <span
+                  class="status-badge"
+                  th:classappend="' status-' + ${program.status}"
+                  th:text="${program.statusText}"
+                >
+                </span>
+              </td>
+              <td>
+                <!-- 상세: 링크 대신 data-id 달고 버튼으로 -->
+                <button
+                  type="button"
+                  class="btn-action btn-view"
+                  th:attr="data-id=${program.prgId}"
+                  onclick="openDetailModal(this.dataset.id)"
+                >
+                  상세
+                </button>
+
+                <!-- 수정: 모달을 띄우는 JS 함수로 변경 -->
+                <button
+                  type="button"
+                  class="btn-action btn-edit"
+                  th:attr="data-id=${program.prgId}"
+                  onclick="openEditModal(this.dataset.id)"
+                >
+                  수정
+                </button>
+
+                <!-- 삭제는 그대로 POST 폼 -->
+                <form th:action="@{/employee/programs/{id}/delete(id=${program.prgId})}"
+                      method="post" style="display:inline">
+                  <button type="submit" class="btn-action btn-delete"
+                          onclick="return confirm('정말 삭제하시겠습니까?')">
+                    삭제
+                  </button>
+                </form>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
       <!-- 페이지네이션 -->
       <div class="pagination-wrapper">
-        <div class="pagination" id="paginationContainer">
-          <!-- 페이지네이션이 동적으로 생성됩니다 -->
+        <div class="pagination">
+          <a href="#" class="page-btn">‹</a>
+          <a href="#" class="page-btn active">1</a>
+          <a href="#" class="page-btn">2</a>
+          <a href="#" class="page-btn">3</a>
+          <a href="#" class="page-btn">›</a>
         </div>
       </div>
     </main>
@@ -852,57 +830,14 @@
     <div class="modal-overlay" id="detailModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title">프로그램 상세정보</h3>
-          <button class="modal-close" onclick="closeDetailModal()">
-            &times;
-          </button>
+          <h2 class="modal-title">프로그램 상세 정보</h2>
+          <button class="modal-close" onclick="closeDetailModal()">×</button>
         </div>
-        <div class="modal-body">
-          <div class="detail-section">
-            <div class="form-section">
-              <h4>기본 정보</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">프로그램 ID</span>
-                  <span class="detail-value" id="detailId"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">프로그램명</span>
-                  <span class="detail-value" id="detailName"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">카테고리</span>
-                  <span class="detail-value" id="detailCategory"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">마일리지</span>
-                  <span class="detail-value" id="detailMileage"></span>
-                </div>
-              </div>
-            </div>
-            <div class="form-section">
-              <h4>기간 정보</h4>
-              <div class="detail-grid">
-                <div class="detail-item">
-                  <span class="detail-label">신청기간</span>
-                  <span class="detail-value" id="detailApplyPeriod"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">프로그램 기간</span>
-                  <span class="detail-value" id="detailProgramPeriod"></span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">수강정원</span>
-                  <span class="detail-value" id="detailCapacity"></span>
-                </div>
-              </div>
-            </div>
-            <div class="detail-full">
-              <span class="detail-label">프로그램 설명</span>
-              <div class="detail-value" id="detailDescription"></div>
-            </div>
-          </div>
+
+        <div class="modal-body" id="detailModalBody">
+          <!-- 상세 정보가 여기에 동적으로 생성됩니다 -->
         </div>
+
         <div class="modal-actions">
           <button
             class="btn-modal btn-modal-secondary"
@@ -912,7 +847,7 @@
           </button>
           <button
             class="btn-modal btn-modal-primary"
-            onclick="editProgramFromDetail()"
+            onclick="editFromDetail()"
           >
             수정하기
           </button>
@@ -924,18 +859,18 @@
     <div class="modal-overlay" id="programModal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title" id="modalTitle">프로그램 등록</h3>
-          <button class="modal-close" onclick="closeModal()">&times;</button>
+          <h2 class="modal-title" id="modalTitle">프로그램 등록</h2>
+          <button class="modal-close" onclick="closeModal()">×</button>
         </div>
+
         <div class="modal-body">
-          <!-- 기존 폼 요소들 -->
           <form id="programForm">
             <div class="form-group">
-              <label class="form-label required">프로그램 코드</label>
+              <label class="form-label required">프로그램 ID</label>
               <input
                 type="text"
                 class="form-control"
-                id="prgCode"
+                id="prgId"
                 placeholder="PRG2024001"
                 maxlength="20"
                 required
@@ -970,12 +905,13 @@
                 <label class="form-label required">카테고리</label>
                 <select class="form-control" id="cciId" required>
                   <option value="">카테고리 선택</option>
-                  <option value="1">리더십</option>
-                  <option value="2">글로벌</option>
-                  <option value="3">전문성</option>
-                  <option value="4">AI역량</option>
-                  <option value="5">창업</option>
-                  <option value="6">상담</option>
+                  <option value="7">의사소통역량</option>
+                  <option value="8">창의역량</option>
+                  <option value="9">문제해결역량</option>
+                  <option value="10">리더십역량</option>
+                  <option value="11">팀워크역량</option>
+                  <option value="12">자기관리역량</option>
+                  <option value="13">정보활용역량</option>
                 </select>
               </div>
 
@@ -1049,17 +985,6 @@
                 />
               </div>
             </div>
-
-            <div class="form-group">
-              <label class="form-label">담당자</label>
-              <input
-                type="text"
-                class="form-control"
-                id="manager"
-                placeholder="예: 김교수"
-                maxlength="50"
-              />
-            </div>
           </form>
         </div>
 
@@ -1074,458 +999,408 @@
       </div>
     </div>
 
-    <script>
-      // DOM 요소들
-      const programTableBody = document.getElementById("programTableBody");
-      const programModal = document.getElementById("programModal");
-      const detailModal = document.getElementById("detailModal");
-      const modalTitle = document.getElementById("modalTitle");
-      const searchInput = document.getElementById("searchInput");
-      const statusFilter = document.getElementById("statusFilter");
-      const categoryFilter = document.getElementById("categoryFilter");
-      let editingProgram = null;
-      let programs = [];
-      let currentPage = 0;
-      let totalPages = 0;
+<script>
+// 모달 엘리먼트
+const detailModal = document.getElementById("detailModal");
+const programModal = document.getElementById("programModal");
 
-      // 프로그램 상태 계산
-      function getProgramStatus(program) {
-        const now = new Date();
-        const applyStart = new Date(program.aplyBgngYmd);
-        const applyEnd = new Date(program.aplyEndYmd);
-        const programEnd = new Date(program.prgEndDt);
+// 현재 보고 있는 or 수정할 프로그램 ID
+let currentProgramId = null;
 
-        if (now < applyStart) {
-          return { status: "upcoming", text: "신청예정" };
-        } else if (now >= applyStart && now <= applyEnd) {
-          return { status: "active", text: "신청가능" };
-        } else if (now > programEnd) {
-          return { status: "ended", text: "종료" };
-        } else {
-          return { status: "active", text: "진행중" };
-        }
+// 현재 로그인한 사용자 정보 저장용
+let currentUser = null;
+
+// 헤더에서 사용자 정보 추출 (백업)
+function extractUserFromHeader() {
+  const userInfoDiv = document.querySelector('.user-info div:first-child');
+  
+  if (userInfoDiv) {
+    const fullText = userInfoDiv.textContent; // "김교수 (staff001)"
+    
+    // 이름 추출 (strong 태그 안의 내용)
+    const nameElement = userInfoDiv.querySelector('strong');
+    const userName = nameElement ? nameElement.textContent : "";
+    
+    // 사번 추출 (괄호 안의 내용)
+    const idMatch = fullText.match(/\(([^)]+)\)/);
+    const userId = idMatch ? idMatch[1] : "unknown";
+    
+    currentUser = {
+      emplNm: userName, // "김교수"
+      emplId: userId    // "staff001"
+    };
+    console.log("헤더에서 추출한 사용자 정보:", currentUser);
+  } else {
+    console.error("헤더에서 사용자 정보를 찾을 수 없습니다.");
+  }
+}
+
+// 페이지 로드 시 사용자 정보 가져오기
+async function loadCurrentUser() {
+  try {
+    // 현재는 헤더에서 직접 추출 (API 없음)
+    extractUserFromHeader();
+  } catch (error) {
+    console.error("사용자 정보를 불러올 수 없습니다:", error);
+    extractUserFromHeader();
+  }
+}
+
+// 페이지 로드 시 실행
+document.addEventListener("DOMContentLoaded", async function() {
+  await loadCurrentUser();
+  
+  // URL 파라미터에서 에러 메시지 확인
+  const urlParams = new URLSearchParams(window.location.search);
+  const error = urlParams.get('error');
+  const success = urlParams.get('success');
+  
+  if (error === 'constraint') {
+    alert('이 프로그램은 다른 데이터와 연관되어 있어 삭제할 수 없습니다.');
+  } else if (error === 'unknown') {
+    alert('프로그램 삭제 중 오류가 발생했습니다.');
+  } else if (success === 'deleted') {
+    alert('프로그램이 성공적으로 삭제되었습니다.');
+  }
+});
+
+// 사번을 이름으로 변환하는 함수 (작성자/수정자만 처리)
+const getUserName = (userId) => {
+  if (!userId) return '미지정';
+  
+  // 현재 사용자와 일치하면 이름 반환
+  if (currentUser && currentUser.emplId === userId) {
+    return currentUser.emplNm;
+  }
+  
+  // 헤더의 사용자 정보와 일치하면 이름 반환 (백업)
+  const headerUserInfo = document.querySelector('.user-info div:first-child');
+  if (headerUserInfo) {
+    const headerText = headerUserInfo.textContent;
+    const headerIdMatch = headerText.match(/\(([^)]+)\)/);
+    if (headerIdMatch && headerIdMatch[1] === userId) {
+      const headerNameElement = headerUserInfo.querySelector('strong');
+      if (headerNameElement) {
+        return headerNameElement.textContent;
       }
+    }
+  }
+  
+  // 일치하지 않으면 사번 그대로 표시
+  return userId;
+};
 
-      // 날짜 포맷팅
-      function formatDate(dateString) {
-        if (!dateString) return "-";
-        const date = new Date(dateString);
-        return date
-          .toLocaleDateString("ko-KR")
-          .replace(/\. /g, ".")
-          .replace(/\.$/, "");
-      }
+// --- 1) 상세보기 모달 열기 (AJAX로 DTO 가져오기) ---
+async function openDetailModal(prgId) {
+  currentProgramId = prgId;
+  const res = await fetch(`/employee/programs/${prgId}/json`);
+  if (!res.ok) {
+    alert("상세 정보를 불러오던 중 오류가 발생했습니다.");
+    return;
+  }
+  const p = await res.json();
+  
+  // 날짜-시간 포맷 유틸
+  const fmt = ds => new Date(ds)
+    .toLocaleString("ko-KR")
+    .replace(/\. /g, ".")
+    .replace(/\.$/, "");
 
-      // 날짜와 시간 포맷팅
-      function formatDateTime(dateString) {
-        if (!dateString) return "-";
-        const date = new Date(dateString);
-        return date
-          .toLocaleString("ko-KR")
-          .replace(/\. /g, ".")
-          .replace(/\.$/, "");
-      }
+  // 담당자 정보는 표시하지 않도록 수정
+  document.getElementById("detailModalBody").innerHTML = `
+    <div class="detail-section">
+      <h3>기본 정보</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">프로그램 ID</div>
+          <div class="detail-value">${p.prgId || ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">프로그램명</div>
+          <div class="detail-value">${p.prgNm || ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">카테고리</div>
+          <div class="detail-value">${p.categoryName || ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">정원</div>
+          <div class="detail-value">${p.maxCnt || 0}명</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">마일리지</div>
+          <div class="detail-value">${Math.floor(p.mileageScore || 0)}점</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">상태</div>
+          <div class="detail-value">${p.statusText || ''}</div>
+        </div>
+      </div>
+      ${p.prgDesc ? `
+      <div class="detail-item detail-full" style="margin-top: 1rem;">
+        <div class="detail-label">프로그램 설명</div>
+        <div class="detail-value">${p.prgDesc}</div>
+      </div>
+      ` : ''}
+    </div>
+    <div class="detail-section">
+      <h3>일정 정보</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">신청기간</div>
+          <div class="detail-value">${p.aplyBgngYmd ? fmt(p.aplyBgngYmd) : ''} ~ ${p.aplyEndYmd ? fmt(p.aplyEndYmd) : ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">운영기간</div>
+          <div class="detail-value">${p.prgStDt ? fmt(p.prgStDt) : ''} ~ ${p.prgEndDt ? fmt(p.prgEndDt) : ''}</div>
+        </div>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>등록 정보</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">등록일시</div>
+          <div class="detail-value">${p.regDt ? fmt(p.regDt) : ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">등록자</div>
+          <div class="detail-value">${getUserName(p.regUserId)}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">수정일시</div>
+          <div class="detail-value">${p.updDt ? fmt(p.updDt) : ''}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">수정자</div>
+          <div class="detail-value">${getUserName(p.updUserId)}</div>
+        </div>
+      </div>
+    </div>
+  `;
 
-      // 테이블 행 생성
-      function createTableRow(program, index) {
-        // 안전성 체크
-        if (!program) {
-          return '<tr><td colspan="9" style="text-align:center;">데이터 오류</td></tr>';
-        }
+  detailModal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
 
-        const status = getProgramStatus(program);
-        const categoryName = program.categoryName || "-";
-        const mileageScore =
-          program.mileageScore !== undefined ? program.mileageScore : "-";
+function closeDetailModal() {
+  detailModal.classList.remove("show");
+  document.body.style.overflow = "auto";
+  currentProgramId = null;
+}
 
-        return `
-          <tr>
-            <td>${currentPage * 10 + index + 1}</td>
-            <td>
-              <div style="font-weight:600">${program.prgNm || ""}</div>
-              <div style="font-size:0.85rem;color:#6b7280">${
-                program.prgCode || ""
-              }</div>
-            </td>
-            <td><span class="category-badge">${categoryName}</span></td>
-            <td>${program.maxCnt || 0}명</td>
-            <td style="min-width:110px">${mileageScore} 점</td>
-            <td>${formatDate(program.aplyBgngYmd)}<br>~ ${formatDate(
-          program.aplyEndYmd
-        )}</td>
-            <td>${formatDate(program.prgStDt)}<br>~ ${formatDate(
-          program.prgEndDt
-        )}</td>
-            <td>
-              <span class="status-badge status-${status.status}">
-                ${status.text}
-              </span>
-            </td>
-            <td>
-              <button class="btn-action btn-view" onclick="viewProgram(${
-                program.prgId
-              })">상세</button>
-              <button class="btn-action btn-edit" onclick="editProgram(${
-                program.prgId
-              })">수정</button>
-            </td>
-          </tr>
-        `;
-      }
+// 상세 모달에서 수정 버튼 클릭 시, 수정 모달로 전환
+function editFromDetail() {
+  if (!currentProgramId) return;
+  openEditModal(currentProgramId);
+  closeDetailModal();
+}
 
-      // 테이블 렌더링
-      function renderTable() {
-        console.log("Rendering table with programs:", programs);
+// --- 2) 신규/수정 모달 열기 & 닫기 ---
+function openAddModal() {
+  document.getElementById("modalTitle").textContent = "프로그램 등록";
+  document.getElementById("programForm").reset();
+  
+  // 프로그램 ID 필드 숨기고 required 제거 (자동 생성)
+  const prgIdField = document.getElementById("prgId");
+  const prgIdGroup = prgIdField.closest('.form-group');
+  if (prgIdGroup) prgIdGroup.style.display = "none";
+  prgIdField.removeAttribute('required');
+  
+  programModal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
 
-        if (!programs || programs.length === 0) {
-          programTableBody.innerHTML =
-            '<tr><td colspan="9" style="text-align:center; padding:2rem;">등록된 프로그램이 없습니다.</td></tr>';
-          return;
-        }
+async function openEditModal(prgId) {
+  document.getElementById("modalTitle").textContent = "프로그램 수정";
+  
+  const res = await fetch(`/employee/programs/${prgId}/json`);
+  if (!res.ok) {
+    alert("수정할 정보를 불러오던 중 오류가 발생했습니다.");
+    return;
+  }
+  const p = await res.json();
+  
+  // 수정 시에는 prgId를 저장해둠
+  currentProgramId = prgId;
+  
+  // 프로그램 ID 필드 표시하되 읽기 전용으로 설정
+  const prgIdField = document.getElementById("prgId");
+  const prgIdGroup = prgIdField.closest('.form-group');
+  if (prgIdGroup) prgIdGroup.style.display = "block";
+  
+  prgIdField.readOnly = true;
+  prgIdField.style.backgroundColor = "#f3f4f6";
+  prgIdField.style.cursor = "not-allowed";
+  prgIdField.setAttribute('required', ''); // 수정 시에는 required 유지
+  
+  // 폼 필드에 값 세팅
+  document.getElementById("prgId").value = p.prgId || "";
+  document.getElementById("prgNm").value = p.prgNm || "";
+  document.getElementById("prgDesc").value = p.prgDesc || "";
+  document.getElementById("cciId").value = p.cciId || "";
+  document.getElementById("maxCnt").value = p.maxCnt || "";
+  document.getElementById("mileageScore").value = Math.floor(p.mileageScore || 0);
+  document.getElementById("aplyBgngYmd").value = p.aplyBgngYmd || "";
+  document.getElementById("aplyEndYmd").value = p.aplyEndYmd || "";
+  document.getElementById("prgStDt").value = p.prgStDt || "";
+  document.getElementById("prgEndDt").value = p.prgEndDt || "";
 
-        try {
-          const tableHTML = programs
-            .map((program, index) => createTableRow(program, index))
-            .join("");
-          programTableBody.innerHTML = tableHTML;
-        } catch (error) {
-          console.error("Table rendering error:", error);
-          programTableBody.innerHTML =
-            '<tr><td colspan="9" style="text-align:center; padding:2rem; color:red;">테이블 렌더링 오류</td></tr>';
-        }
-      }
+  programModal.classList.add("show");
+  document.body.style.overflow = "hidden";
+}
 
-      // 페이지네이션 렌더링
-      function renderPagination() {
-        const paginationContainer = document.getElementById(
-          "paginationContainer"
-        );
-        let paginationHTML = "";
+function closeModal() {
+  programModal.classList.remove("show");
+  document.body.style.overflow = "auto";
+  currentProgramId = null; // 초기화
+  
+  // 프로그램 ID 필드 원상복구
+  const prgIdField = document.getElementById("prgId");
+  const prgIdGroup = prgIdField.closest('.form-group');
+  if (prgIdGroup) prgIdGroup.style.display = "block";
+  
+  prgIdField.readOnly = false;
+  prgIdField.style.backgroundColor = "";
+  prgIdField.style.cursor = "";
+  prgIdField.setAttribute('required', ''); // required 복구
+}
 
-        // 이전 페이지
-        if (currentPage > 0) {
-          paginationHTML += `<a href="#" class="page-btn" onclick="fetchPrograms(${
-            currentPage - 1
-          })">‹</a>`;
-        }
+// --- 3) 실제 저장 기능 구현 ---
+async function saveProgram() {
+  const form = document.getElementById("programForm");
+  if (!form.checkValidity()) {
+    alert("필수 항목을 모두 입력해주세요.");
+    form.reportValidity(); // 어떤 필드가 문제인지 표시
+    return;
+  }
+  
+  // 신규/수정 구분 (currentProgramId로 판단)
+  const isEdit = currentProgramId !== null;
+  
+  // 폼 데이터 수집
+  const formData = {
+    prgNm: document.getElementById("prgNm").value,
+    prgDesc: document.getElementById("prgDesc").value,
+    cciId: parseInt(document.getElementById("cciId").value),
+    maxCnt: parseInt(document.getElementById("maxCnt").value),
+    mileageScore: parseFloat(document.getElementById("mileageScore").value),
+    aplyBgngYmd: document.getElementById("aplyBgngYmd").value,
+    aplyEndYmd: document.getElementById("aplyEndYmd").value,
+    prgStDt: document.getElementById("prgStDt").value,
+    prgEndDt: document.getElementById("prgEndDt").value
+  };
+  
+  // 수정 시에만 prgId 추가
+  if (isEdit) {
+    formData.prgId = currentProgramId;
+  }
+  
+  // 사용자 정보 추가 (토큰 방식이므로 프론트에서 직접 설정)
+  if (currentUser && currentUser.emplId) {
+    if (!isEdit) {
+      // 신규 등록 시
+      formData.manager = currentUser.emplId;      // 담당자
+      formData.regUserId = currentUser.emplId;    // 등록자
+    } else {
+      // 수정 시
+      formData.updUserId = currentUser.emplId;    // 수정자
+    }
+  }
+  
+  console.log("저장할 데이터:", formData);
+  
+  // URL 설정
+  let url, method;
+  if (isEdit) {
+    url = `/employee/programs/${currentProgramId}?action=update`;
+    method = 'POST';
+  } else {
+    url = `/employee/programs`;
+    method = 'POST';
+  }
+  
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData)
+    });
+    
+    const result = await response.json().catch(() => ({ success: false, message: '서버 응답을 파싱할 수 없습니다.' }));
+    
+    if (response.ok && result.success !== false) {
+      alert(isEdit ? "프로그램이 수정되었습니다." : "프로그램이 등록되었습니다.");
+      closeModal();
+      location.reload();
+    } else {
+      alert(`오류가 발생했습니다: ${result.message || '알 수 없는 오류'}`);
+    }
+  } catch (error) {
+    console.error('저장 중 오류:', error);
+    alert("저장 중 오류가 발생했습니다.");
+  }
+}
 
-        // 페이지 번호들
-        const startPage = Math.max(0, currentPage - 2);
-        const endPage = Math.min(totalPages - 1, currentPage + 2);
+// --- 4) 반응형 햄버거 메뉴 ---
+document.addEventListener("DOMContentLoaded", function() {
+  const hamburger = document.getElementById("hamburger");
+  const sidebar = document.getElementById("sidebar");
+  
+  // 화면 크기에 따라 햄버거 메뉴 표시/숨김
+  function checkScreenSize() {
+    if (window.innerWidth <= 768) {
+      hamburger.style.display = "inline";
+    } else {
+      hamburger.style.display = "none";
+      sidebar.classList.remove("show");
+    }
+  }
+  
+  // 햄버거 메뉴 클릭 이벤트
+  hamburger.addEventListener("click", function() {
+    sidebar.classList.toggle("show");
+  });
+  
+  // 화면 크기 변경 감지
+  window.addEventListener("resize", checkScreenSize);
+  checkScreenSize(); // 초기 실행
+});
 
-        for (let i = startPage; i <= endPage; i++) {
-          const activeClass = i === currentPage ? "active" : "";
-          paginationHTML += `<a href="#" class="page-btn ${activeClass}" onclick="fetchPrograms(${i})">${
-            i + 1
-          }</a>`;
-        }
+// --- 5) 이벤트 바인딩 ---
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (detailModal.classList.contains("show")) closeDetailModal();
+    else if (programModal.classList.contains("show")) closeModal();
+  }
+});
 
-        // 다음 페이지
-        if (currentPage < totalPages - 1) {
-          paginationHTML += `<a href="#" class="page-btn" onclick="fetchPrograms(${
-            currentPage + 1
-          })">›</a>`;
-        }
+detailModal.addEventListener("click", e => {
+  if (e.target === detailModal) closeDetailModal();
+});
 
-        paginationContainer.innerHTML = paginationHTML;
-      }
+programModal.addEventListener("click", e => {
+  if (e.target === programModal) closeModal();
+});
 
-      // 프로그램 상세 보기
-      function viewProgram(prgId) {
-        const program = programs.find((p) => p.prgId === prgId);
-        if (program) {
-          document.getElementById("detailId").textContent = program.prgId;
-          document.getElementById("detailName").textContent =
-            program.prgNm || "-";
-          document.getElementById("detailCategory").textContent =
-            program.categoryName || "-";
-          document.getElementById("detailMileage").textContent =
-            (program.mileageScore !== undefined ? program.mileageScore : "-") +
-            " 점";
-          document.getElementById("detailCapacity").textContent =
-            (program.maxCnt !== undefined ? program.maxCnt : "-") + "명";
-          document.getElementById(
-            "detailApplyPeriod"
-          ).textContent = `${formatDate(program.aplyBgngYmd)} ~ ${formatDate(
-            program.aplyEndYmd
-          )}`;
-          document.getElementById(
-            "detailProgramPeriod"
-          ).textContent = `${formatDate(program.prgStDt)} ~ ${formatDate(
-            program.prgEndDt
-          )}`;
-          document.getElementById("detailDescription").textContent =
-            program.prgDesc || "-";
+// --- 6) 검색 및 필터 기능 ---
+document.getElementById("searchInput").addEventListener("input", function() {
+  // 검색 로직 구현
+  console.log("검색어:", this.value);
+});
 
-          detailModal.classList.add("show");
-        }
-      }
+document.getElementById("statusFilter").addEventListener("change", function() {
+  // 상태 필터 로직 구현
+  console.log("선택된 상태:", this.value);
+});
 
-      // 상세보기에서 수정하기로 전환
-      function editProgramFromDetail() {
-        const prgId = parseInt(document.getElementById("detailId").textContent);
-        if (!isNaN(prgId)) {
-          closeDetailModal();
-          editProgram(prgId);
-        }
-      }
+document.getElementById("categoryFilter").addEventListener("change", function() {
+  // 카테고리 필터 로직 구현
+  console.log("선택된 카테고리:", this.value);
+});
+</script>
 
-      // 상세 모달 닫기
-      function closeDetailModal() {
-        detailModal.classList.remove("show");
-      }
-
-      // 모달 열기 (새 프로그램)
-      function openAddModal() {
-        editingProgram = null;
-        modalTitle.textContent = "프로그램 등록";
-        document.getElementById("programForm").reset();
-        programModal.classList.add("show");
-        document.body.style.overflow = "hidden";
-      }
-
-      // 프로그램 수정 모달 열기
-      function editProgram(prgId) {
-        editingProgram = programs.find((p) => p.prgId === prgId);
-        if (!editingProgram) {
-          alert("프로그램을 찾을 수 없습니다.");
-          return;
-        }
-
-        modalTitle.textContent = "프로그램 수정";
-
-        // 폼에 데이터 채우기
-        document.getElementById("prgCode").value = editingProgram.prgCode || "";
-        document.getElementById("prgNm").value = editingProgram.prgNm || "";
-        document.getElementById("prgDesc").value = editingProgram.prgDesc || "";
-        document.getElementById("maxCnt").value = editingProgram.maxCnt || "";
-        document.getElementById("mileageScore").value =
-          editingProgram.mileageScore || "";
-        document.getElementById("aplyBgngYmd").value = formatDateTimeForInput(
-          editingProgram.aplyBgngYmd
-        );
-        document.getElementById("aplyEndYmd").value = formatDateTimeForInput(
-          editingProgram.aplyEndYmd
-        );
-        document.getElementById("prgStDt").value = formatDateTimeForInput(
-          editingProgram.prgStDt
-        );
-        document.getElementById("prgEndDt").value = formatDateTimeForInput(
-          editingProgram.prgEndDt
-        );
-        document.getElementById("manager").value = editingProgram.manager || "";
-
-        programModal.classList.add("show");
-        document.body.style.overflow = "hidden";
-      }
-
-      // datetime-local input을 위한 날짜 포맷팅
-      function formatDateTimeForInput(dateString) {
-        if (!dateString) return "";
-        const date = new Date(dateString);
-        return date.toISOString().slice(0, 16);
-      }
-
-      // 모달 닫기
-      function closeModal() {
-        programModal.classList.remove("show");
-        document.body.style.overflow = "auto";
-        editingProgram = null;
-      }
-
-      // 프로그램 저장 (실제 API 호출)
-      async function saveProgram() {
-        const formData = {
-          prgCode: document.getElementById("prgCode").value.trim(),
-          prgNm: document.getElementById("prgNm").value.trim(),
-          prgDesc: document.getElementById("prgDesc").value.trim(),
-          maxCnt: parseInt(document.getElementById("maxCnt").value),
-          aplyBgngYmd: document.getElementById("aplyBgngYmd").value,
-          aplyEndYmd: document.getElementById("aplyEndYmd").value,
-          prgStDt: document.getElementById("prgStDt").value,
-          prgEndDt: document.getElementById("prgEndDt").value,
-        };
-
-        // 유효성 검사
-        if (
-          !formData.prgCode ||
-          !formData.prgNm ||
-          !formData.maxCnt ||
-          !formData.aplyBgngYmd ||
-          !formData.aplyEndYmd ||
-          !formData.prgStDt ||
-          !formData.prgEndDt
-        ) {
-          alert("필수 항목을 모두 입력해주세요.");
-          return;
-        }
-
-        // 날짜 유효성 검사
-        if (new Date(formData.aplyBgngYmd) >= new Date(formData.aplyEndYmd)) {
-          alert("신청 시작일은 종료일보다 빨라야 합니다.");
-          return;
-        }
-
-        if (new Date(formData.prgStDt) >= new Date(formData.prgEndDt)) {
-          alert("프로그램 시작일은 종료일보다 빨라야 합니다.");
-          return;
-        }
-
-        try {
-          let response;
-          if (editingProgram) {
-            // 수정
-            response = await fetch(`${apiBaseUrl}/${editingProgram.prgId}`, {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(formData),
-            });
-          } else {
-            // 새로 생성
-            response = await fetch(apiBaseUrl, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(formData),
-            });
-          }
-
-          if (response.ok) {
-            alert(
-              editingProgram
-                ? "프로그램이 수정되었습니다."
-                : "프로그램이 등록되었습니다."
-            );
-            closeModal();
-            fetchPrograms(currentPage); // 현재 페이지 새로고침
-          } else {
-            const error = await response.text();
-            alert("저장 중 오류가 발생했습니다: " + error);
-          }
-        } catch (error) {
-          console.error("Save error:", error);
-          alert("저장 중 오류가 발생했습니다.");
-        }
-      }
-
-      // 실제 API에서 프로그램 목록 가져오기
-      async function fetchPrograms(
-        page = 0,
-        size = 10,
-        keyword = "",
-        categoryId = ""
-      ) {
-        try {
-          const params = new URLSearchParams({
-            page: page,
-            size: size,
-          });
-
-          if (keyword) params.append("keyword", keyword);
-          if (categoryId) params.append("categoryId", categoryId);
-
-          const url = `${apiBaseUrl}?${params.toString()}`;
-          console.log("▶︎ Fetching URL:", url);
-
-          const response = await fetch(url);
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-
-          const json = await response.json();
-          console.log("API Response:", json);
-
-          // API 응답 구조 확인 및 안전한 데이터 추출
-          programs = Array.isArray(json.content) ? json.content : [];
-          currentPage = json.number || 0;
-          totalPages = json.totalPages || 0;
-
-          console.log("Processed programs:", programs);
-          console.log("Current page:", currentPage, "Total pages:", totalPages);
-
-          renderTable();
-          renderPagination();
-        } catch (error) {
-          console.error("Fetch error:", error);
-          alert("데이터를 불러오는 중 오류가 발생했습니다: " + error.message);
-          programs = []; // 빈 배열로 초기화
-          programTableBody.innerHTML =
-            '<tr><td colspan="9" style="text-align:center; padding:2rem; color:red;">데이터 로딩 실패</td></tr>';
-        }
-      }
-
-      // 검색 함수
-      function searchPrograms() {
-        const keyword = searchInput.value.trim();
-        const categoryId = categoryFilter.value;
-        fetchPrograms(0, 10, keyword, categoryId); // 검색 시 첫 페이지로 이동
-      }
-
-      // Enter 키로 검색
-      searchInput.addEventListener("keypress", function (e) {
-        if (e.key === "Enter") {
-          searchPrograms();
-        }
-      });
-
-      // 모달 오버레이 클릭 시 닫기
-      programModal.addEventListener("click", (e) => {
-        if (e.target === programModal) {
-          closeModal();
-        }
-      });
-
-      detailModal.addEventListener("click", (e) => {
-        if (e.target === detailModal) {
-          closeDetailModal();
-        }
-      });
-
-      // ESC 키로 모달 닫기
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-          if (detailModal.classList.contains("show")) {
-            closeDetailModal();
-          } else if (programModal.classList.contains("show")) {
-            closeModal();
-          }
-        }
-      });
-
-      // 사이드바 토글 (모바일)
-      const hamburger = document.getElementById("hamburger");
-      const sidebar = document.getElementById("sidebar");
-
-      function updateSidebarVisibility() {
-        if (window.innerWidth <= 768) {
-          hamburger.style.display = "inline-block";
-          sidebar.style.left = "-240px";
-          document.querySelector(".main-content").style.marginLeft = "0";
-        } else {
-          hamburger.style.display = "none";
-          sidebar.style.left = "0";
-          sidebar.classList.remove("show");
-          document.querySelector(".main-content").style.marginLeft = "240px";
-        }
-      }
-
-      // 초기 사이드바 설정
-      updateSidebarVisibility();
-
-      hamburger.addEventListener("click", () => {
-        sidebar.classList.toggle("show");
-      });
-
-      // 윈도우 리사이즈 이벤트
-      window.addEventListener("resize", updateSidebarVisibility);
-
-      // 초기 로딩
-      document.addEventListener("DOMContentLoaded", function () {
-        fetchPrograms(0, 10);
-      });
-    </script>
   </body>
 </html>

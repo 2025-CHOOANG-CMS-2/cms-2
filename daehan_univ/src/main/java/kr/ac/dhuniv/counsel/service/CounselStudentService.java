@@ -1,12 +1,16 @@
 package kr.ac.dhuniv.counsel.service;
 
 import kr.ac.dhuniv.counsel.dto.AvailableSlotsDto;
+import kr.ac.dhuniv.counsel.dto.CounselingHistoryDto;
 import kr.ac.dhuniv.counsel.dto.CounselorSimpleDto;
 import kr.ac.dhuniv.counsel.dto.CreateReservationRequestDto;
+import kr.ac.dhuniv.counsel.dto.PageDto;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+
+import org.springframework.data.domain.Pageable;
 
 public interface CounselStudentService {
 
@@ -32,4 +36,12 @@ public interface CounselStudentService {
      * @param requestDto 예약 생성에 필요한 데이터
      */
     void createReservation(CreateReservationRequestDto requestDto);
+    
+    PageDto<CounselingHistoryDto> getCounselingHistory(String studentId, Pageable pageable, String period, String status, String type);
+    
+    void updateReservationStatus(String studentId, Long applyId, String newStatus);
+    
+    CounselingHistoryDto getCounselingResultDetail(Long resultId);
+    
+    void updateSatisfactionScore(Long resultId, Double score, String studentId);
 }

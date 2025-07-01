@@ -1,7 +1,10 @@
 package kr.ac.dhuniv.core_cpt.repository;
 
 import kr.ac.dhuniv.core_cpt.domain.CoreCptCommentTemplate;
+import kr.ac.dhuniv.core_cpt.domain.CoreCptInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,4 +21,17 @@ public interface CoreCptCommentTemplateRepository extends JpaRepository<CoreCptC
     List<CoreCptCommentTemplate> findByCoreCpt_CciIdOrderByMinScoreAsc(Long cciId);
     // 특정 상위 역량의 코멘트 목록 조회
     List<CoreCptCommentTemplate> findByCoreCpt_CciId(Long cciId);
+
+    // CoreCptCommentTemplateRepository
+    Optional<CoreCptCommentTemplate> findTopByCoreCptAndMinScoreLessThanEqualOrderByMinScoreDesc(CoreCptInfo info, Integer score);
+    /**
+     * ✅ 상위역량 ID + 점수에 맞는 코멘트 단건 조회
+     */
+    @Query(value =
+            "SELECT content FROM core_cpt_comment_template " +
+                    "WHERE core_cpt_info_id = :cciId " +
+                    "AND :score BETWEEN min_score AND max_score " +
+                    "LIMIT 1",
+            nativeQuery = true)
+    String findCommentByScore(@Param("cciId") Long cciId, @Param("score") Integer score);
 }

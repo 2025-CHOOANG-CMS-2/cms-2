@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +7,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
     <link th:href="@{/css/counsel.css}" rel="stylesheet">
 
     <style>
@@ -27,10 +25,69 @@
         .submenu a { padding-left: 2.5rem; }
         .has-submenu::after { content: "\25BC"; font-size: 0.75rem; margin-left: 0.5rem; }
         @media (max-width: 768px) { .main-content { margin-left: 0; } }
+        
+        /* 만족도 평가 별점 스타일 */
+        .star-rating .fa-star {
+            color: #e2e8f0; /* 비활성 별 (회색) */
+            cursor: pointer;
+            padding: 0 0.25rem;
+            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+	    }
+	    .star-rating:hover .fa-star {
+	        color: #f6e05e; /* 호버 시 전체 별 노란색 */
+	    }
+	    .star-rating .fa-star:hover ~ .fa-star {
+	        color: #e2e8f0; /* 호버된 별 뒤쪽은 다시 회색으로 */
+	    }
+	    .star-rating .fa-star.selected,
+	    .star-rating .fa-star.readonly {
+	        color: #f6e05e; /* 선택된 별 */
+	    }
+	    .star-rating.readonly .fa-star {
+	        cursor: default;
+	    }
+	    
+	    .chat-messages {
+    display: flex;
+    flex-direction: column; /* 메시지를 세로로 쌓음 */
+    padding: 10px;
+    height: 400px; /* 실제 높이에 맞게 조절 */
+    overflow-y: auto; /* 메시지가 많아지면 스크롤 생성 */
+}
+
+	/* 개별 메시지 한 줄 (아이콘 + 말풍선) */
+	.message-row {
+	    display: flex;
+	    margin-bottom: 10px;
+	}
+	
+	/* 메시지 말풍선 기본 스타일 */
+	.message-bubble {
+	    padding: 8px 12px;
+	    border-radius: 18px;
+	    max-width: 70%;
+	}
+	
+	/* 상대방 메시지 (왼쪽 정렬) */
+	.message-row.other {
+	    justify-content: flex-start; /* 왼쪽 정렬 */
+	}
+	.message-row.other .message-bubble {
+	    background-color: #f1f0f0; /* 회색 배경 */
+	    border-top-left-radius: 4px;
+	}
+	
+	/* 나의 메시지 (오른쪽 정렬) */
+	.message-row.self {
+	    justify-content: flex-end; /* 오른쪽 정렬 */
+	}
+	.message-row.self .message-bubble {
+	    background-color: #dcf8c6; /* 연두색 배경 */
+	    border-top-right-radius: 4px;
+	}
     </style>
 </head>
 <body>
-   <body>
     <header class="header d-flex">
         <div class="header-left">
             <span class="hamburger" id="hamburger">&#9776;</span> CMS 학생포털
@@ -39,18 +96,16 @@
             <img th:src="@{/images/logo-white.png}" alt="logo" height="30" class="me-2" /> 대한대학교
         </div>
         <div class="header-right" id="user-info">
-            </div>
+        </div>
     </header>
 
     <aside class="sidebar" id="sidebar">
         <nav class="nav flex-column">
             <a class="nav-link" href="/notice">공지사항</a>
             <a class="nav-link has-submenu" href="#" data-menu="역량">핵심역량개발</a>
-            <div class="submenu" id="submenu-역량" style="display: none">
-                </div>
+            <div class="submenu" id="submenu-역량" style="display: none"></div>
             <a class="nav-link has-submenu" href="#" data-menu="비교과">비교과프로그램</a>
-            <div class="submenu" id="submenu-비교과" style="display: none">
-                </div>
+            <div class="submenu" id="submenu-비교과" style="display: none"></div>
             <a class="nav-link has-submenu" href="#" data-menu="상담">상담센터</a>
             <div class="submenu" id="submenu-상담" style="display: block">
                 <a class="nav-link" href="/counseling/reservation">상담 예약</a>
@@ -61,271 +116,162 @@
         </nav>
     </aside>
 
-        <!-- 메인 컨텐츠 -->
-        <main class="main-content">
-            <!-- 헤더 -->
+    <main class="main-content">
+        <div class="content-header">
+            <h1><i class="fas fa-history"></i> 상담 조회/결과</h1>
+        </div>
 
-            <!-- 탭 네비게이션 -->
-            <div class="tab-navigation">
-                <div class="tab-buttons">
-                    <button class="tab-btn active" data-tab="appointments">
-                        <i class="fas fa-calendar-check"></i> 예약 현황
-                    </button>
-                    <button class="tab-btn" data-tab="results">
-                        <i class="fas fa-file-medical-alt"></i> 상담 결과
-                    </button>
-                </div>
+        <div class="tab-navigation">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="appointments"><i class="fas fa-calendar-check"></i> 예약 현황</button>
+                <button class="tab-btn" data-tab="results"><i class="fas fa-file-medical-alt"></i> 상담 결과</button>
+            </div>
+        </div>
 
-                <!-- 예약 현황 탭 -->
-                <div class="tab-content active" id="appointments">
-                    <!-- 필터 섹션 -->
-                    <div class="filter-section">
-                        <div class="history-filters">
-                            <div class="filter-group">
-                                <label>기간:</label>
-                                <select class="filter-select" id="periodFilter">
-                                    <option value="all">전체</option>
-                                    <option value="week">최근 1주일</option>
-                                    <option value="month">최근 1개월</option>
-                                    <option value="quarter">최근 3개월</option>
-                                    <option value="year">최근 1년</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>상태:</label>
-                                <select class="filter-select" id="statusFilter">
-                                    <option value="all">전체</option>
-                                    <option value="scheduled">예약됨</option>
-                                    <option value="completed">완료</option>
-                                    <option value="cancelled">취소</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>상담 유형:</label>
-                                <select class="filter-select" id="typeFilter">
-                                    <option value="all">전체</option>
-                                    <option value="career">진로 상담</option>
-                                    <option value="academic">학업 상담</option>
-                                    <option value="psychological">심리 상담</option>
-                                    <option value="employment">취업 상담</option>
-                                </select>
-                            </div>
-                        </div>
+        <div class="tab-content active" id="appointments">
+            <div class="filter-section">
+                <div class="history-filters">
+                    <div class="filter-group">
+                        <label>기간:</label>
+                        <select class="filter-select" id="periodFilter">
+                            <option value="all">전체</option>
+                            <option value="week">최근 1주일</option>
+                            <option value="month">최근 1개월</option>
+                        </select>
                     </div>
-
-                    <!-- 예약 목록 -->
-                    <div class="history-list">
-                        <!-- 오늘 예약된 상담 (상담 시작 버튼 활성화) -->
-                        <div class="history-item" data-status="scheduled" data-id="1">
-                            <div class="history-header">
-                                <div class="history-date">2025.06.09 (월) 19:15</div>
-                                <div class="history-status status-scheduled">예약됨</div>
-                            </div>
-                            <div class="history-details">
-                                <div class="detail-item">
-                                    <i class="fas fa-user-md"></i><span>상담사: 김상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-tag"></i><span>유형: 진로 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-video"></i><span>방식: 화상 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-clock"></i><span>예상시간: 50분</span>
-                                </div>
-                            </div>
-                            <div class="history-summary">
-                                <h4>진로 방향성에 대한 고민</h4>
-                                <p>컴퓨터공학과 3학년으로서 졸업 후 진로에 대해 고민이 많습니다. 개발자로 취업할지, 대학원 진학을 할지 결정하기 어려워 상담을 요청드립니다.</p>
-                            </div>
-                            <div class="history-actions">
-                                <button class="btn btn-primary btn-sm start-counseling-btn" data-id="1">
-                                    <i class="fas fa-comments"></i> 상담 시작
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="modifyBooking('1')">
-                                    <i class="fas fa-edit"></i> 예약 변경
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="cancelBooking('1')">
-                                    <i class="fas fa-times"></i> 예약 취소
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 미래 예약된 상담 (상담 시작 버튼 비활성화) -->
-                        <div class="history-item" data-status="scheduled" data-id="2">
-                            <div class="history-header">
-                                <div class="history-date">2025.06.20 (금) 10:00</div>
-                                <div class="history-status status-scheduled">예약됨</div>
-                            </div>
-                            <div class="history-details">
-                                <div class="detail-item">
-                                    <i class="fas fa-user-md"></i><span>상담사: 이상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-tag"></i><span>유형: 학업 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-phone"></i><span>방식: 전화 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-clock"></i><span>예상시간: 40분</span>
-                                </div>
-                            </div>
-                            <div class="history-summary">
-                                <h4>학업 성취도 향상 방안</h4>
-                                <p>현재 학점이 낮아서 고민입니다. 효과적인 학습 방법과 시간 관리에 대해 조언을 구하고 싶습니다.</p>
-                            </div>
-                            <div class="history-actions">
-                                <button class="btn btn-primary btn-sm start-counseling-btn" data-id="2" disabled>
-                                    <i class="fas fa-comments"></i> 상담 시작
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="modifyBooking('2')">
-                                    <i class="fas fa-edit"></i> 예약 변경
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="cancelBooking('2')">
-                                    <i class="fas fa-times"></i> 예약 취소
-                                </button>
-                            </div>
-                        </div>
+                    <div class="filter-group">
+                        <label>상태:</label>
+                        <select class="filter-select" id="statusFilter">
+                            <option value="all">전체</option>
+                            <option value="PENDING">승인대기</option>
+                            <option value="APPROVED">예약됨</option>
+                            <option value="CANCELED">예약취소</option>
+                        </select>
                     </div>
-                </div>
-
-                <!-- 상담 결과 탭 -->
-                <div class="tab-content" id="results">
-                    <!-- 필터 섹션 -->
-                    <div class="filter-section">
-                        <div class="history-filters">
-                            <div class="filter-group">
-                                <label>기간:</label>
-                                <select class="filter-select" id="resultsPeriodFilter">
-                                    <option value="all">전체</option>
-                                    <option value="week">최근 1주일</option>
-                                    <option value="month">최근 1개월</option>
-                                    <option value="quarter">최근 3개월</option>
-                                    <option value="year">최근 1년</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label>상담 유형:</label>
-                                <select class="filter-select" id="resultsTypeFilter">
-                                    <option value="all">전체</option>
-                                    <option value="career">진로 상담</option>
-                                    <option value="academic">학업 상담</option>
-                                    <option value="psychological">심리 상담</option>
-                                    <option value="employment">취업 상담</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 상담 결과 목록 -->
-                    <div class="history-list">
-                        <div class="history-item" data-status="completed" data-id="3">
-                            <div class="history-header">
-                                <div class="history-date">2025.01.15 (월) 14:00</div>
-                                <div class="history-status status-completed">완료</div>
-                            </div>
-                            <div class="history-details">
-                                <div class="detail-item">
-                                    <i class="fas fa-user-md"></i><span>상담사: 김상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-tag"></i><span>유형: 진로 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-video"></i><span>방식: 화상 상담</span>
-                                </div>
-                                <div class="detail-item">
-                                    <i class="fas fa-clock"></i><span>소요시간: 50분</span>
-                                </div>
-                            </div>
-                            <div class="history-summary">
-                                <h4>진로 방향성에 대한 고민</h4>
-                                <p>컴퓨터공학과 3학년으로서 졸업 후 진로에 대해 고민이 많습니다. 개발자로 취업할지, 대학원 진학을 할지 결정하기 어려워 상담을 요청드립니다.</p>
-                            </div>
-                            <div class="history-actions">
-                                <button class="btn btn-outline btn-sm" onclick="viewCounselingDetail('3')">
-                                    <i class="fas fa-eye"></i> 상세보기
-                                </button>
-                                <button class="btn btn-outline btn-sm" onclick="downloadReport('3')">
-                                    <i class="fas fa-download"></i> 결과 PDF 다운로드
-                                </button>
-                                <button class="btn btn-primary btn-sm" onclick="rebookCounseling('3')">
-                                    <i class="fas fa-calendar-plus"></i> 재예약
-                                </button>
-                            </div>
-                        </div>
+                    <div class="filter-group">
+                        <label>상담 유형:</label>
+                        <select class="filter-select" id="typeFilter">
+                            <option value="all">전체</option>
+                            <option value="진로 상담">진로 상담</option>
+                            <option value="학업 상담">학업 상담</option>
+                            <option value="심리 상담">심리 상담</option>
+                            <option value="취업 상담">취업 상담</option>
+                        </select>
                     </div>
                 </div>
             </div>
-        </main>
-    </div>
+            <div class="history-list"></div>
+            <div class="pagination-container"></div>
+        </div>
 
-    <!-- 플로팅 채팅 버튼 (기본적으로 숨겨져 있음) -->
-    <div class="floating-chat-btn" id="floatingChatBtn" style="display: none;">
-        <i class="fas fa-comments"></i>
-        <div class="chat-badge" id="chatBadge" style="display: none;">1</div>
-    </div>
-
-    <!-- 중앙 채팅 모달 -->
-    <div class="counseling-chat-modal" id="counselingChatModal">
-        <div class="counseling-chat-container">
-            <div class="chat-header">
-                <div class="chat-title">
-                    <i class="fas fa-comments"></i>
-                    <span id="chatCounselorName">상담사와 채팅</span>
-                </div>
-                <div class="chat-header-actions">
-                    <button class="chat-minimize-btn" id="chatMinimizeBtn" title="최소화">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button class="chat-close-btn" id="chatCloseBtn" title="종료">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div class="tab-content" id="results">
+            <div class="filter-section">
+                <div class="history-filters">
+                    <div class="filter-group">
+                        <label>기간:</label>
+                        <select class="filter-select" id="resultsPeriodFilter">
+                            <option value="all">전체</option>
+                            <option value="week">최근 1주일</option>
+                            <option value="month">최근 1개월</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>상담 유형:</label>
+                        <select class="filter-select" id="resultsTypeFilter">
+                            <option value="all">전체</option>
+                            <option value="진로 상담">진로 상담</option>
+                            <option value="학업 상담">학업 상담</option>
+                            <option value="심리 상담">심리 상담</option>
+                            <option value="취업 상담">취업 상담</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-            <div class="chat-messages" id="chatMessages">
-                <!-- 메시지들이 여기에 표시됩니다 -->
-            </div>
-            <div class="chat-input">
-                <textarea class="chat-input-field" id="messageInput" placeholder="메시지를 입력하세요..." rows="2"></textarea>
-                <button class="chat-send-btn" id="sendBtn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+            <div class="history-list"></div>
+            <div class="pagination-container"></div>
+        </div>
+    </main>
+
+    <!-- [수정] 중복된 모달을 제거하고, 올바른 버전 하나만 남깁니다. -->
+    <div class="modal fade" id="resultDetailModal" tabindex="-1" aria-labelledby="resultDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resultDetailModalLabel"><i class="fas fa-clipboard-check"></i> 상담 결과 상세</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- 로딩 스피너 -->
+                    <div id="modal-loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+    
+                    <!-- 모달 콘텐츠 영역 -->
+                    <div id="modal-content-area" style="display: none;">
+                        <div class="row mb-3">
+                            <div class="col-md-6"><strong><i class="fas fa-user-md"></i> 상담사:</strong> <span id="modal-counselorName"></span></div>
+                            <div class="col-md-6"><strong><i class="fas fa-calendar-alt"></i> 상담일:</strong> <span id="modal-counselDate"></span></div>
+                        </div>
+                        <div class="mb-3"><strong><i class="fas fa-tag"></i> 상담 유형:</strong> <span id="modal-counselingType"></span></div>
+                        <hr>
+                        <div class="counsel-content-box mt-3">
+                            <h6 class="font-weight-bold"><i class="fas fa-commenting"></i> 상담 내용:</h6>
+                            <p id="modal-counselingContent" class="p-3 bg-light rounded" style="white-space: pre-wrap; min-height: 100px;"></p>
+                        </div>
+    
+                        <!-- 만족도 평가 섹션 -->
+                        <div id="satisfaction-section" class="mt-4 pt-4 border-top" style="display: none;">
+                            <h5 class="font-weight-bold text-center mb-3">상담은 만족스러우셨나요?</h5>
+                            <!-- 별점 입력 영역 -->
+                            <div id="rating-input-area">
+                                <div class="star-rating d-flex justify-content-center h4">
+                                    <i class="fas fa-star" data-value="1"></i>
+                                    <i class="fas fa-star" data-value="2"></i>
+                                    <i class="fas fa-star" data-value="3"></i>
+                                    <i class="fas fa-star" data-value="4"></i>
+                                    <i class="fas fa-star" data-value="5"></i>
+                                </div>
+                                <div class="text-end mt-3">
+                                    <button id="save-rating-btn" class="btn btn-primary"><i class="fas fa-save"></i> 평점 제출</button>
+                                </div>
+                            </div>
+                            <!-- 평점 제출 후 표시 영역 -->
+                            <div id="rating-display-area" style="display: none;">
+                                <p class="text-center text-muted">소중한 피드백 감사합니다!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 모바일 채팅 바텀시트 -->
-    <div class="mobile-chat-overlay" id="mobileChatOverlay">
-        <div class="mobile-chat-sheet" id="mobileChatSheet">
-            <div class="chat-handle"></div>
-            <div class="chat-header">
-                <div class="chat-title">
-                    <i class="fas fa-comments"></i>
-                    <span id="mobileChatCounselorName">상담사와 채팅</span>
-                </div>
-                <button class="chat-close-btn" id="mobileChatCloseBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="chat-messages" id="mobileChatMessages">
-                <!-- 메시지들이 여기에 표시됩니다 -->
-            </div>
-            <div class="chat-input">
-                <textarea class="chat-input-field" id="mobileMessageInput" placeholder="메시지를 입력하세요..." rows="2"></textarea>
-                <button class="chat-send-btn" id="mobileSendBtn">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 알림 -->
-    <div class="notification" id="notification"></div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script th:src="@{/js/student/counsel-history.js}"></script>
-    <script th:src="@{/js/employee/counseling-chat.js}"></script>
+    <div class="modal fade" id="chatModal" tabindex="-1" aria-labelledby="chatModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chatModalLabel"><i class="fas fa-comments"></i> 실시간 상담</h5>
+                <button type="button" id="chat-close-btn" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="chat-modal-body">
+                <div id="chat-messages" style="height: 400px; overflow-y: auto; border: 1px solid #eee; padding: 10px; margin-bottom: 10px; display: flex; flex-direction: column;">
+                    <div class="text-center text-muted small p-2">상담사와의 연결을 기다리고 있습니다...</div>
+                </div>
+            </div>
+            <div class="modal-footer d-flex">
+                <input type="text" id="chat-input" class="form-control" placeholder="메시지를 입력하세요...">
+                <button type="button" id="chat-send-btn" class="btn btn-primary flex-shrink-0">전송</button>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
