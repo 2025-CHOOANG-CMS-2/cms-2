@@ -26,11 +26,17 @@ public class NcsController {
     public String index(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "prgNm", required = false) String prgNm,
+            @RequestParam(name = "status", required = false) String status,
+            @RequestParam(name = "cciId", required = false) String cciId,
             Model model
     ) {
         Map<String, Object> params = new HashMap<>();
         params.put("page", page);
         params.put("size", size);
+        params.put("prgNm", prgNm);
+        params.put("status", status);
+        params.put("cciId", cciId);
         
         // 서비스에서 목록과 전체 개수가 담긴 Map을 받음
         Map<String, Object> result = service.getList(params);
@@ -48,6 +54,9 @@ public class NcsController {
         model.addAttribute("totalPages", totalPages);
         model.addAttribute("startPage", startPage);
         model.addAttribute("endPage", endPage);
+        model.addAttribute("prgNm", prgNm);
+        model.addAttribute("status", status);
+        model.addAttribute("cciId", cciId);
         
         return "employee/program/index"; // 뷰 경로 수정: index.html에 맞게
     }

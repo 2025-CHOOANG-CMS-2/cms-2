@@ -4,7 +4,6 @@
          "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="kr.ac.dhuniv.ncs.mapper.NcsPrgInfoMapper">
 
-  <!-- 결과 매핑: dto 필드와 컬럼 매핑 -->
   <resultMap id="ProgramResult" type="kr.ac.dhuniv.ncs.dto.ProgramDto">
     <id     property="prgId"        column="prg_id"/>
     <result property="prgCode"      column="prg_code"/>
@@ -25,7 +24,38 @@
     <result property="mileageScore" column="mlg_score"/>
   </resultMap>
 
-  <!-- 목록 조회 (조인 + 페이징) -->
+  <sql id="commonWhere">
+    <where>
+      <if test="prgNm != null and prgNm != ''">
+        AND pi.prg_nm LIKE CONCAT('%', #{prgNm}, '%')
+      </if>
+      
+      <if test="cciId != null and cciId != ''">
+        AND pi.cci_id = CAST(#{cciId} AS INTEGER)
+      </if>
+
+      <if test="status != null and status != ''">
+        <choose>
+          <when test="status == 'upcoming'">
+            AND pi.aply_bgng_ymd &gt; now()
+          </when>
+          <when test="status == 'active'">
+            AND now() BETWEEN pi.aply_bgng_ymd AND pi.aply_end_ymd
+          </when>
+          <when test="status == 'ended'">
+            AND pi.prg_end_dt &lt; now()
+          </when>
+        </choose>
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectListCount" resultType="int" parameterType="map">
+    SELECT
+      COUNT(*)
+    FROM public.ncs_prg_info pi
+    <include refid="commonWhere"/> </select>
+  
   <select id="selectList" resultMap="ProgramResult" parameterType="map">
     SELECT
       pi.*,
@@ -34,30 +64,12 @@
     FROM public.ncs_prg_info pi
     LEFT JOIN core_cpt_info        ci ON pi.cci_id       = ci.cci_id
     LEFT JOIN public.ncs_prg_mileage pm ON pi.prg_id       = pm.prg_id
-    <where>
-      <if test="prgCode != null"> AND pi.prg_code = #{prgCode} </if>
-      <if test="cciId    != null"> AND pi.cci_id    = #{cciId}    </if>
-    </where>
-    ORDER BY pi.prg_id DESC
+    <include refid="commonWhere"/> ORDER BY pi.prg_id DESC
     <if test="offset != null and size != null">
       LIMIT #{size} OFFSET #{offset}
     </if>
   </select>
-  
-   <select id="selectListCount" resultType="int" parameterType="map">
-    SELECT
-      COUNT(*)
-    FROM public.ncs_prg_info pi
-    LEFT JOIN core_cpt_info        ci ON pi.cci_id = ci.cci_id
-    LEFT JOIN public.ncs_prg_mileage pm ON pi.prg_id = pm.prg_id
-    <where>
-      <if test="prgCode != null"> AND pi.prg_code = #{prgCode} </if>
-      <if test="cciId    != null"> AND pi.cci_id    = #{cciId}    </if>
-    </where>
-  </select>
-  
 
-  <!-- 단건 조회 -->
   <select id="selectOne" resultMap="ProgramResult" parameterType="long">
     SELECT
       pi.*,
@@ -69,19 +81,16 @@
     WHERE pi.prg_id = #{prgId}
   </select>
   
-  <!-- 다음 프로그램 ID 조회 -->
   <select id="getNextPrgId" resultType="long">
     SELECT COALESCE(MAX(prg_id), 0) + 1 FROM public.ncs_prg_info
   </select>
 
-  <!-- 다음 마일리지 코드 조회 -->
   <select id="getNextMileageCode" resultType="string">
     SELECT 'MLG' || LPAD((COALESCE(MAX(CAST(SUBSTRING(prg_mlg_code, 4) AS INTEGER)), 0) + 1)::TEXT, 7, '0')
     FROM public.ncs_prg_mileage 
     WHERE prg_mlg_code LIKE 'MLG%'
   </select>
 
-  <!-- 프로그램 등록 -->
   <insert id="insertProgram" parameterType="kr.ac.dhuniv.ncs.dto.ProgramDto">
     INSERT INTO public.ncs_prg_info
       (prg_id, prg_code, prg_nm, prg_desc, max_cnt,
@@ -95,7 +104,6 @@
        #{imageUrl}, #{cciId}, now(), #{regUserId})
   </insert>
 
-  <!-- 마일리지 등록 -->
   <insert id="insertProgramMileage" parameterType="kr.ac.dhuniv.ncs.dto.ProgramDto">
     INSERT INTO public.ncs_prg_mileage
       (prg_id, mlg_score, prg_mlg_code, reg_dt, reg_user_id)
@@ -103,7 +111,6 @@
       (#{prgId}, #{mileageScore}, #{mileageCode}, now(), #{regUserId})
   </insert>
 
-  <!-- 수정 -->
   <update id="updateProgram" parameterType="kr.ac.dhuniv.ncs.dto.ProgramDto">
     UPDATE public.ncs_prg_info
        SET prg_code      = #{prgCode},
@@ -121,7 +128,6 @@
      WHERE prg_id = #{prgId}
   </update>
 
-  <!-- 마일리지 수정 -->
   <update id="updateProgramMileage" parameterType="kr.ac.dhuniv.ncs.dto.ProgramDto">
     UPDATE public.ncs_prg_mileage
        SET mlg_score    = #{mileageScore},
@@ -130,12 +136,10 @@
      WHERE prg_id = #{prgId}
   </update>
 
-  <!-- 마일리지 삭제 -->
   <delete id="deleteProgramMileage" parameterType="long">
     DELETE FROM public.ncs_prg_mileage WHERE prg_id = #{prgId}
   </delete>
 
-  <!-- 프로그램 삭제 -->
   <delete id="deleteProgram" parameterType="long">
     DELETE FROM public.ncs_prg_info WHERE prg_id = #{prgId}
   </delete>

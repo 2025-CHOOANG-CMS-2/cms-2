@@ -672,45 +672,42 @@
       </div>
 
       <!-- 검색 및 필터 -->
-      <div class="filter-section">
+      <form class="filter-section" method="GET" th:action="@{/employees/programs}">
         <div class="search-controls">
           <div class="input-group" style="max-width: 300px">
             <input
               type="text"
               class="form-control"
               placeholder="프로그램명 검색"
-              id="searchInput"
-            />
-            <button class="btn btn-outline-secondary" type="button">
+              name="prgNm" th:value="${prgNm}" />
+            <button class="btn btn-outline-secondary" type="submit">
               <i class="bi bi-search"></i>
             </button>
           </div>
           <select
             class="form-select"
             style="max-width: 150px"
-            id="statusFilter"
-          >
+            name="status" onchange="this.form.submit()" >
             <option value="">전체 상태</option>
-            <option value="upcoming">신청예정</option>
-            <option value="active">신청가능</option>
-            <option value="ended">종료</option>
+            <option value="upcoming" th:selected="${status == 'upcoming'}">신청예정</option>
+            <option value="active"   th:selected="${status == 'active'}">신청가능</option>
+            <option value="ended"    th:selected="${status == 'ended'}">종료</option>
           </select>
           <select
             class="form-select"
             style="max-width: 150px"
-            id="categoryFilter"
-          >
+            name="cciId" onchange="this.form.submit()" >
             <option value="">전체 카테고리</option>
-            <option value="7">의사소통역량</option>
-            <option value="8">창의역량</option>
-            <option value="9">문제해결역량</option>
-            <option value="10">리더십역량</option>
-            <option value="11">팀워크역량</option>
-            <option value="12">자기관리역량</option>
-            <option value="13">정보활용역량</option>
+            <option value="7"  th:selected="${cciId == '7'}">의사소통역량</option>
+            <option value="8"  th:selected="${cciId == '8'}">창의역량</option>
+            <option value="9"  th:selected="${cciId == '9'}">문제해결역량</option>
+            <option value="10" th:selected="${cciId == '10'}">리더십역량</option>
+            <option value="11" th:selected="${cciId == '11'}">팀워크역량</option>
+            <option value="12" th:selected="${cciId == '12'}">자기관리역량</option>
+            <option value="13" th:selected="${cciId == '13'}">정보활용역량</option>
           </select>
         </div>
-      </div>
+      </form>
 
       <!-- 프로그램 테이블 -->
       <div class="table-container">
