@@ -43,6 +43,19 @@
       LIMIT #{size} OFFSET #{offset}
     </if>
   </select>
+  
+   <select id="selectListCount" resultType="int" parameterType="map">
+    SELECT
+      COUNT(*)
+    FROM public.ncs_prg_info pi
+    LEFT JOIN core_cpt_info        ci ON pi.cci_id = ci.cci_id
+    LEFT JOIN public.ncs_prg_mileage pm ON pi.prg_id = pm.prg_id
+    <where>
+      <if test="prgCode != null"> AND pi.prg_code = #{prgCode} </if>
+      <if test="cciId    != null"> AND pi.cci_id    = #{cciId}    </if>
+    </where>
+  </select>
+  
 
   <!-- 단건 조회 -->
   <select id="selectOne" resultMap="ProgramResult" parameterType="long">

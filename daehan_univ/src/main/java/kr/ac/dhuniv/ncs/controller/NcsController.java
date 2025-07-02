@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/employee/programs")
+@RequestMapping("/employees/programs")
 public class NcsController {
     private final NcsPrgInfoService service;
 
@@ -31,9 +31,25 @@ public class NcsController {
         Map<String, Object> params = new HashMap<>();
         params.put("page", page);
         params.put("size", size);
-        List<ProgramDto> list = service.getList(params);
+        
+        // 서비스에서 목록과 전체 개수가 담긴 Map을 받음
+        Map<String, Object> result = service.getList(params);
+        List<ProgramDto> list = (List<ProgramDto>) result.get("list");
+        int totalCount = (int) result.get("totalCount");
+
+        // 페이징 계산
+        int totalPages = (totalCount + size - 1) / size;
+        int pageNavigationSize = 5; // 한 번에 보여줄 페이지 번호 개수
+        int startPage = ((page - 1) / pageNavigationSize) * pageNavigationSize + 1;
+        int endPage = Math.min(startPage + pageNavigationSize - 1, totalPages);
+        
         model.addAttribute("list", list);
-        return "employee/program/index";
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+        
+        return "employee/program/index"; // 뷰 경로 수정: index.html에 맞게
     }
 
     /** 신규 등록 폼 */

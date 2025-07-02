@@ -583,6 +583,11 @@
           height: 100vh;
         }
       }
+      
+      .page-btn.disabled {
+		    pointer-events: none;
+		    opacity: 0.6;
+		}
     </style>
   </head>
   <body>
@@ -686,7 +691,6 @@
             id="statusFilter"
           >
             <option value="">전체 상태</option>
-            <option value="draft">임시저장</option>
             <option value="upcoming">신청예정</option>
             <option value="active">신청가능</option>
             <option value="ended">종료</option>
@@ -715,7 +719,7 @@
             <tr>
               <th style="width: 60px">번호</th>
               <th>프로그램명</th>
-              <th style="width: 100px">카테고리</th>
+              <th style="width: 140px">카테고리</th>
               <th style="width: 65px">정원</th>
               <th style="width: 95px">마일리지</th>
               <th style="width: 120px">신청기간</th>
@@ -815,13 +819,22 @@
       </div>
 
       <!-- 페이지네이션 -->
-      <div class="pagination-wrapper">
+      <div class="pagination-wrapper" th:if="${totalPages > 1}">
         <div class="pagination">
-          <a href="#" class="page-btn">‹</a>
-          <a href="#" class="page-btn active">1</a>
-          <a href="#" class="page-btn">2</a>
-          <a href="#" class="page-btn">3</a>
-          <a href="#" class="page-btn">›</a>
+          <a th:href="@{/employees/programs(page=${currentPage - 1})}"
+             class="page-btn"
+             th:classappend="${currentPage == 1} ? 'disabled' : ''">‹</a>
+
+          <a th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+             th:href="@{/employees/programs(page=${pageNumber})}"
+             th:text="${pageNumber}"
+             class="page-btn"
+             th:classappend="${pageNumber == currentPage} ? 'active' : ''">
+          </a>
+
+          <a th:href="@{/employees/programs(page=${currentPage + 1})}"
+             class="page-btn"
+             th:classappend="${currentPage == totalPages} ? 'disabled' : ''">›</a>
         </div>
       </div>
     </main>
