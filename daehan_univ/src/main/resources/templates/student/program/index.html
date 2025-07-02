@@ -644,7 +644,7 @@
         </div>
         <a class="nav-link has-submenu active" href="#" data-menu="비교과">비교과프로그램</a>
         <div class="submenu" id="submenu-비교과" style="display: block">
-          <a class="nav-link active" th:href="@{/students/programs/list}">프로그램 목록</a>
+          <a class="nav-link active" th:href="@{/students/programs}">프로그램 목록</a>
           <a class="nav-link" href="#">프로그램 참여 현황</a>
         </div>
         <a class="nav-link has-submenu" href="#" data-menu="상담">상담센터</a>
@@ -667,7 +667,7 @@
       </div>
 
       <div class="filter-section">
-        <form th:action="@{/students/programs/list}" method="get">
+        <form th:action="@{/students/programs}" method="get">
           <div class="search-controls">
             <div class="input-group" style="max-width: 300px">
               <input type="text" class="form-control" placeholder="프로그램명 검색" name="prgNm" th:value="${prgNm}" />
@@ -741,13 +741,13 @@
           <nav aria-label="Page navigation">
               <ul class="pagination justify-content-center">
                   <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                      <a class="page-link" th:href="@{/students/programs/list(page=${currentPage - 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">‹</a>
+                      <a class="page-link" th:href="@{/students/programs(page=${currentPage - 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">‹</a>
                   </li>
                   <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}" th:classappend="${pageNumber == currentPage} ? 'active'">
-                      <a class="page-link" th:href="@{/students/programs/list(page=${pageNumber}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}" th:text="${pageNumber}"></a>
+                      <a class="page-link" th:href="@{/students/programs(page=${pageNumber}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}" th:text="${pageNumber}"></a>
                   </li>
                   <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                      <a class="page-link" th:href="@{/students/programs/list(page=${currentPage + 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">›</a>
+                      <a class="page-link" th:href="@{/students/programs(page=${currentPage + 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">›</a>
                   </li>
               </ul>
           </nav>
@@ -800,6 +800,10 @@
                 const key = menu.getAttribute("data-menu");
                 const submenu = document.getElementById(`submenu-${key}`);
                 if (submenu) {
+                    // 모든 서브메뉴를 닫고 현재 클릭한 메뉴의 부모가 아닌 경우에만
+                    document.querySelectorAll(".submenu").forEach(sm => {
+                        if(sm !== submenu) sm.style.display = 'none';
+                    });
                     submenu.style.display = submenu.style.display === "block" ? "none" : "block";
                 }
             });

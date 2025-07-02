@@ -30,7 +30,7 @@ public class StdNcsController {
      * @param model 뷰에 전달할 데이터
      * @return 뷰 이름
      */
-    @GetMapping
+    @GetMapping // "/list"를 제거하여 /students/programs 경로와 매핑
     public String programList(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "9") int size,
