@@ -247,7 +247,7 @@ function filterCounselors() {
         const showByStatus = statusFilter === "all" || status === statusFilter;
         const showBySpecialty = specialtyFilter === "all" || specialty === specialty;
 
-        card.style.display = showBySearch && showByStatus && showBySpecialty ? "flex" : "none";
+        card.style.display = showBySearch && showByStatus && showBySpecialty ? "" : "none";
     });
 }
 
