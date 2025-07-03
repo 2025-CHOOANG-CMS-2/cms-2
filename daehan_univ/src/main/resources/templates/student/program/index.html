@@ -730,7 +730,7 @@
             </div>
             <div class="program-actions">
                 <button class="btn-detail" th:data-id="${p.prgId}">상세보기</button>
-                <button class="btn-apply" th:disabled="${p.status != 'active'}">
+                <button class="btn-apply" th:data-id="${p.prgId}" th:disabled="${p.status != 'active'}">
                     <span th:text="${p.status == 'active' ? '신청하기' : p.statusText}"></span>
                 </button>
             </div>
@@ -778,117 +778,195 @@
         </div>
       </div>
     </div>
-
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        // 상세보기 버튼에 이벤트 리스너 추가
-        document.querySelectorAll('.btn-detail').forEach(button => {
-            button.addEventListener('click', (e) => {
-                const programId = e.target.dataset.id;
-                openModal(programId);
-            });
-        });
+  document.addEventListener('DOMContentLoaded', () => {
+    // 현재 로그인한 학생 정보를 담을 변수
+    let currentUser = null;
 
-        // 사이드바 및 서브메뉴 토글 로직
-        const sidebar = document.getElementById("sidebar");
-        const hamburger = document.getElementById("hamburger");
-        hamburger.addEventListener("click", () => sidebar.classList.toggle("show"));
+    // 모달 엘리먼트
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalApplyBtn = document.getElementById('modalApplyBtn');
+    let currentProgramId = null;
 
-        document.querySelectorAll("[data-menu]").forEach(menu => {
-            menu.addEventListener("click", (e) => {
-                e.preventDefault();
-                const key = menu.getAttribute("data-menu");
-                const submenu = document.getElementById(`submenu-${key}`);
-                if (submenu) {
-                    // 모든 서브메뉴를 닫고 현재 클릭한 메뉴의 부모가 아닌 경우에만
-                    document.querySelectorAll(".submenu").forEach(sm => {
-                        if(sm !== submenu) sm.style.display = 'none';
-                    });
-                    submenu.style.display = submenu.style.display === "block" ? "none" : "block";
-                }
-            });
-        });
+    /**
+     * 페이지 로드 시 실행될 초기화 함수
+     */
+    async function initializePage() {
+      await loadCurrentUser(); // 비동기 함수이므로 await로 호출
+      
+      // 사용자 정보 로드가 완료된 후 이벤트 리스너 설정
+      setupEventListeners();
+    }
 
-        const modalOverlay = document.getElementById('modalOverlay');
-        const modalClose = document.getElementById('modalClose');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        const modalApplyBtn = document.getElementById('modalApplyBtn');
-        let currentProgramId = null;
+    /**
+     * API를 호출하여 현재 로그인한 사용자 정보를 가져와 currentUser 변수에 저장
+     */
+  // 페이지 로드 시 API를 호출하여 사용자 정보를 가져오는 함수
+     async function loadCurrentUser() {
+       try {
+         const response = await fetch('/api/user/me/student');
+         if (!response.ok) throw new Error('로그인 필요');
+         currentUser = await response.json();
+         console.log("API로부터 받은 사용자 정보:", currentUser);
+       } catch (error) {
+         alert('로그인이 필요합니다.');
+         location.href = "/login";
+       }
+     }
+     loadCurrentUser();
+    /**
+     * 모든 이벤트 리스너를 설정하는 함수
+     */
+    function setupEventListeners() {
+      // 이벤트 위임을 사용하여 모든 버튼 클릭을 한 곳에서 처리
+      document.body.addEventListener('click', function(e) {
+          const detailButton = e.target.closest('.btn-detail');
+          if (detailButton) {
+              openModal(detailButton.dataset.id);
+              return;
+          }
 
-        function openModal(programId) {
-            if (!programId) return;
-            currentProgramId = programId;
-
-            fetch(`/students/programs/${programId}/json`)
-                .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
-                .then(program => {
-                    updateModalContent(program);
-                    modalOverlay.classList.add('show');
-                    document.body.style.overflow = 'hidden';
-                })
-                .catch(error => console.error('Error fetching program details:', error));
-        }
-
-        function updateModalContent(program) {
-            document.getElementById('modalTitle').textContent = program.prgNm;
-
-            document.getElementById('modalDetailHeader').innerHTML = `
-              <div class="program-detail-info">
-                <h3 class="program-detail-title">${program.prgNm}</h3>
-                <span class="program-detail-category">${program.categoryName}</span>
-              </div>
-              <div class="d-day-badge ${program.status === 'ended' ? 'closed' : ''}">${program.statusText}</div>
-            `;
-
-            document.getElementById('modalBasicInfo').innerHTML = `
-              <div class="detail-card primary">
-                <div class="detail-card-label">모집인원</div>
-                <div class="detail-card-value">${program.maxCnt}명</div>
-              </div>
-              <div class="detail-card warning">
-                <div class="detail-card-label">신청기간</div>
-                <div class="detail-card-value">${formatDate(program.aplyBgngYmd)} ~ ${formatDate(program.aplyEndYmd)}</div>
-              </div>
-              <div class="detail-card danger">
-                <div class="detail-card-label">운영기간</div>
-                <div class="detail-card-value">${formatDate(program.prgStDt)} ~ ${formatDate(program.prgEndDt)}</div>
-              </div>
-            `;
-            
-            document.getElementById('modalDescription').textContent = program.prgDesc;
-
-            const isApplicable = program.status === 'active';
-            modalApplyBtn.textContent = isApplicable ? '신청하기' : '신청마감';
-            modalApplyBtn.disabled = !isApplicable;
-        }
-
-        function closeModal() {
-            modalOverlay.classList.remove('show');
-            document.body.style.overflow = 'auto';
-            currentProgramId = null;
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
-        }
-
-        modalClose.addEventListener("click", closeModal);
-        modalCloseBtn.addEventListener("click", closeModal);
-        modalApplyBtn.addEventListener("click", () => {
-             if (currentProgramId) {
-                 alert('프로그램 신청 기능은 여기에 구현됩니다.');
-                 closeModal();
-             }
-        });
-        modalOverlay.addEventListener("click", (e) => {
-            if (e.target === modalOverlay) closeModal();
-        });
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && modalOverlay.classList.contains("show")) closeModal();
-        });
+          const applyButton = e.target.closest('.btn-apply');
+          if (applyButton && !applyButton.disabled) {
+              handleApply(applyButton.dataset.id);
+              return;
+          }
       });
-    </script>
+
+      modalApplyBtn.addEventListener("click", () => {
+           if (currentProgramId) handleApply(currentProgramId);
+      });
+      modalClose.addEventListener("click", closeModal);
+      modalCloseBtn.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modalOverlay.classList.contains("show")) closeModal(); });
+
+      const hamburger = document.getElementById("hamburger");
+      hamburger.addEventListener("click", () => document.getElementById("sidebar").classList.toggle("show"));
+
+      document.querySelectorAll("[data-menu]").forEach(menu => {
+          menu.addEventListener("click", (e) => {
+              e.preventDefault();
+              const submenu = document.getElementById(`submenu-${menu.dataset.menu}`);
+              if (submenu) {
+                  const isVisible = submenu.style.display === "block";
+                  document.querySelectorAll(".submenu").forEach(sm => sm.style.display = 'none');
+                  submenu.style.display = isVisible ? "none" : "block";
+              }
+          });
+      });
+    }
+
+    /**
+     * 신청 처리 함수
+     * @param {string} programId 
+     */
+     function handleApply(programId) {
+    	    if (!currentUser || !currentUser.stdId) { // stdId가 있는지 확인
+    	        alert("학생 정보가 올바르지 않습니다. 다시 로그인해주세요.");
+    	        return;
+    	    }
+
+    	    if (!confirm("프로그램을 신청하시겠습니까?")) {
+    	        return;
+    	    }
+
+    	    // ▼▼▼ [핵심] userIdx 대신 stdId를 보내도록 수정 ▼▼▼
+    	    const payload = {
+    	        stdId: currentUser.stdId 
+    	    };
+
+    	    fetch(`/students/programs/${programId}/apply`, {
+    	        method: 'POST',
+    	        headers: {
+    	            'Content-Type': 'application/json',
+    	        },
+    	        credentials: 'same-origin',
+    	        body: JSON.stringify(payload) 
+    	    })
+         .then(response => response.json())
+         .then(data => {
+             alert(data.message);
+             if (data.success) {
+                 window.location.reload();
+             }
+         })
+         .catch(error => {
+             console.error('Apply Error:', error);
+             alert('신청 중 오류가 발생했습니다.');
+         });
+     }
+
+    /**
+     * 모달 열기 함수
+     * @param {string} programId 
+     */
+    function openModal(programId) {
+        if (!programId) return;
+        currentProgramId = programId;
+
+        fetch(`/students/programs/${programId}/json`)
+            .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
+            .then(program => {
+                updateModalContent(program);
+                modalOverlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(error => console.error('Error fetching program details:', error));
+    }
+
+    /**
+     * 모달 내용 업데이트 함수
+     * @param {object} program 
+     */
+    function updateModalContent(program) {
+        document.getElementById('modalTitle').textContent = program.prgNm;
+        document.getElementById('modalDetailHeader').innerHTML = `
+          <div class="program-detail-info">
+            <h3 class="program-detail-title">${program.prgNm}</h3>
+            <span class="program-detail-category">${program.categoryName}</span>
+          </div>
+          <div class="d-day-badge ${program.status === 'ended' ? 'closed' : ''}">${program.statusText}</div>`;
+        document.getElementById('modalBasicInfo').innerHTML = `
+          <div class="detail-card primary">
+            <div class="detail-card-label">모집인원</div>
+            <div class="detail-card-value">${program.maxCnt}명</div>
+          </div>
+          <div class="detail-card warning">
+            <div class="detail-card-label">신청기간</div>
+            <div class="detail-card-value">${formatDate(program.aplyBgngYmd)} ~ ${formatDate(program.aplyEndYmd)}</div>
+          </div>
+          <div class="detail-card danger">
+            <div class="detail-card-label">운영기간</div>
+            <div class="detail-card-value">${formatDate(program.prgStDt)} ~ ${formatDate(program.prgEndDt)}</div>
+          </div>`;
+        document.getElementById('modalDescription').textContent = program.prgDesc;
+        
+        const isApplicable = program.status === 'active';
+        modalApplyBtn.textContent = isApplicable ? '신청하기' : '신청마감';
+        modalApplyBtn.disabled = !isApplicable;
+    }
+
+    /** 모달 닫기 함수 */
+    function closeModal() {
+        modalOverlay.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        currentProgramId = null;
+    }
+
+    /** 날짜 포맷팅 유틸리티 */
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    }
+
+    // --- 페이지 초기화 실행 ---
+    initializePage();
+
+  });
+</script>
   </body>
 </html>

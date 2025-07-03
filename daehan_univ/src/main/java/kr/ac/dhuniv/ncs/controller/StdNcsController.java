@@ -1,8 +1,10 @@
 package kr.ac.dhuniv.ncs.controller;
 
 import kr.ac.dhuniv.ncs.dto.ProgramDto;
+import kr.ac.dhuniv.ncs.service.NcsPrgAplyService;
 import kr.ac.dhuniv.ncs.service.NcsPrgInfoService;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -11,26 +13,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Controller
-@RequestMapping("students/programs") // 학생용 프로그램 기본 경로
+@RequestMapping("students/programs")
 public class StdNcsController {
 
     private final NcsPrgInfoService ncsPrgInfoService;
+    private final NcsPrgAplyService ncsPrgAplyService;
 
-    public StdNcsController(NcsPrgInfoService ncsPrgInfoService) {
+    public StdNcsController(NcsPrgInfoService ncsPrgInfoService, NcsPrgAplyService ncsPrgAplyService) {
         this.ncsPrgInfoService = ncsPrgInfoService;
+        this.ncsPrgAplyService = ncsPrgAplyService;
     }
 
     /**
      * 학생용 프로그램 목록 페이지
-     * @param page 현재 페이지 번호
-     * @param size 페이지 당 게시물 수
-     * @param prgNm 검색할 프로그램명
-     * @param status 필터링할 상태
-     * @param cciId 필터링할 카테고리 ID
-     * @param model 뷰에 전달할 데이터
-     * @return 뷰 이름
      */
-    @GetMapping // "/list"를 제거하여 /students/programs 경로와 매핑
+    @GetMapping
     public String programList(
             @RequestParam(name = "page", defaultValue = "1") int page,
             @RequestParam(name = "size", defaultValue = "9") int size,
@@ -46,17 +43,14 @@ public class StdNcsController {
         params.put("status", status);
         params.put("cciId", cciId);
 
-        // 서비스 계층을 호출하여 데이터 조회
         Map<String, Object> result = ncsPrgInfoService.getList(params);
 
-        // 페이징 계산
         int totalCount = (int) result.get("totalCount");
         int totalPages = (totalCount + size - 1) / size;
         int pageNavigationSize = 5;
         int startPage = ((page - 1) / pageNavigationSize) * pageNavigationSize + 1;
         int endPage = Math.min(startPage + pageNavigationSize - 1, totalPages);
 
-        // 뷰에 데이터 전달
         model.addAttribute("list", result.get("list"));
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", totalPages);
@@ -71,12 +65,46 @@ public class StdNcsController {
 
     /**
      * 상세보기 모달을 위한 프로그램 단건 조회 API (JSON)
-     * @param prgId 조회할 프로그램 ID
-     * @return ProgramDto 객체
      */
     @GetMapping(value = "/{prgId}/json", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public ProgramDto getProgramJson(@PathVariable("prgId") Long prgId) {
         return ncsPrgInfoService.getOne(prgId);
+    }
+
+    /**
+     * 프로그램 신청 처리 API
+     * @param prgId 신청할 프로그램 ID
+     * @param payload 프론트엔드에서 전송한 학생 ID가 담긴 데이터
+     * @return 처리 결과
+     */
+    @PostMapping("/{prgId}/apply")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> applyProgram(
+            @PathVariable("prgId") Long prgId,
+            @RequestBody Map<String, Object> payload
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            // ▼▼▼ [핵심] userIdx 대신 stdId를 받도록 수정 ▼▼▼
+            Object stdIdObj = payload.get("stdId");
+            
+            if (stdIdObj == null) {
+                throw new IllegalArgumentException("학생 ID(stdId)가 전송되지 않았습니다.");
+            }
+            
+            Long studentId = Long.parseLong(stdIdObj.toString());
+
+            ncsPrgAplyService.applyForProgram(prgId, studentId);
+            
+            response.put("success", true);
+            response.put("message", "프로그램 신청이 완료되었습니다.");
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 }
