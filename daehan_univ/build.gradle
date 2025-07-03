@@ -61,6 +61,8 @@ dependencies {
 	//websocket
 	implementation 'org.springframework.security:spring-security-messaging'
 	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+	
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
 repositories {

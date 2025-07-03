@@ -1,1542 +1,971 @@
 <!DOCTYPE html>
-    <html lang="ko">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>대한대학교 CMS 포털 - 비교과 프로그램</title>
-        <!-- Bootstrap & Icons -->
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-        />
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-          rel="stylesheet"
-        />
-        <style>
-          /* 공통 스타일 */
-          body {
-            background-color: #fafafa;
-            margin: 0;
-            padding: 0;
-            font-family: "Segoe UI", sans-serif;
-          }
-
-          /* 헤더 영역 */
-          .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            height: 60px;
-            background-color: #1a2a45;
-            color: white;
-            z-index: 1040;
-            display: flex;
-            align-items: center;
-            padding: 0 1rem;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-          }
-          .header-left {
-            flex: 1;
-            font-weight: bold;
-            font-size: 1.1rem;
-          }
-          .header-center {
-            flex: 1;
-            text-align: center;
-            font-size: 1.2rem;
-          }
-          .header-right {
-            flex: 1;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            font-size: 0.9rem;
-            gap: 1rem;
-          }
-
-          /* 사용자 정보 및 버튼 */
-          .user-box {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-          }
-          .user-info {
-            text-align: right;
-            line-height: 1.2;
-          }
-          .user-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            padding: 0.25rem 0.5rem;
-            cursor: pointer;
-          }
-          .user-btn:hover {
-            color: #ffc107;
-          }
-
-          /* 사이드바 */
-          .sidebar {
-            position: fixed;
-            top: 60px;
-            left: 0;
-            width: 240px;
-            height: 100%;
-            background-color: #1a2a45;
-            padding: 1rem 0;
-            color: white;
-            z-index: 1030;
-            overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-          }
-          .sidebar-user-info {
-            display: none;
-            padding: 1rem 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-          }
-          .sidebar-user-info div {
-            font-size: 0.95rem;
-            line-height: 1.4;
-          }
-
-          /* 본문 */
-          .main-content {
-            margin-top: 60px;
-            margin-left: 240px;
-            padding: 1.5rem;
-          }
-
-          /* 메뉴 스타일 */
-          .nav-link {
-            color: #e0e8f0;
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s, color 0.2s;
-            text-decoration: none;
-          }
-          .nav-link:hover {
-            background-color: #223a5e;
-            color: #ffffff;
-          }
-          .nav-link.active {
-            background-color: #2b4d77;
-            font-weight: bold;
-          }
-          .submenu {
-            background-color: #223a5e;
-          }
-          .submenu a {
-            padding-left: 2.5rem;
-            font-size: 0.95rem;
-          }
-          .has-submenu::after {
-            content: "\25BC";
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
-          }
-
-          /* 햄버거 메뉴 (모바일) */
-          .hamburger {
-            display: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-          }
-
-          /* 비교과 프로그램 스타일 */
-          .page-header {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-          }
-
-          .page-title {
-            color: #1a2a45;
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin: 0;
-          }
-
-          .page-subtitle {
-            color: #666;
-            font-size: 0.95rem;
-            margin-top: 0.5rem;
-          }
-
-          .filter-section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-bottom: 2rem;
-          }
-
-          .filter-tabs {
-            border-bottom: 1px solid #e9ecef;
-            margin-bottom: 1rem;
-          }
-
-          .filter-tab {
-            background: none;
-            border: none;
-            padding: 0.75rem 1rem;
-            color: #666;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-          }
-
-          .filter-tab.active {
-            color: #1a2a45;
-            border-bottom-color: #1a2a45;
-            font-weight: 600;
-          }
-
-          .search-controls {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-            flex-wrap: wrap;
-          }
-
-          .program-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
-            gap: 1.5rem;
-          }
-
-          .program-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
-            border-left: 4px solid transparent;
-          }
-
-          .program-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-          }
-
-          .program-card.leadership {
-            border-left-color: #8b5cf6;
-          }
-
-          .program-card.global {
-            border-left-color: #3b82f6;
-          }
-
-          .program-card.specialty {
-            border-left-color: #10b981;
-          }
-
-          .program-card.ai {
-            border-left-color: #f59e0b;
-          }
-
-          .program-card.startup {
-            border-left-color: #ef4444;
-          }
-
-          .program-card.counseling {
-            border-left-color: #ec4899;
-          }
-
-          .program-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1rem;
-          }
-
-          .program-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-          }
-
-          .program-icon.leadership {
-            background: #8b5cf6;
-          }
-          .program-icon.global {
-            background: #3b82f6;
-          }
-          .program-icon.specialty {
-            background: #10b981;
-          }
-          .program-icon.ai {
-            background: #f59e0b;
-          }
-          .program-icon.startup {
-            background: #ef4444;
-          }
-          .program-icon.counseling {
-            background: #ec4899;
-          }
-
-          .program-info {
-            flex: 1;
-          }
-
-          .program-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a2a45;
-            margin: 0 0 0.25rem 0;
-          }
-
-          .program-category {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: #f3f4f6;
-            color: #6b7280;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: 500;
-          }
-
-          .d-day-badge {
-            background: #ef4444;
-            color: white;
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            flex-shrink: 0;
-          }
-
-          .d-day-badge.today {
-            background: #f59e0b;
-          }
-
-          .d-day-badge.closed {
-            background: #6b7280;
-          }
-
-          .program-description {
-            color: #6b7280;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            margin: 1rem 0;
-          }
-
-          .program-details {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            margin: 1rem 0;
-          }
-
-          .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.85rem;
-          }
-
-          .detail-icon {
-            color: #9ca3af;
-            font-size: 0.9rem;
-            width: 16px;
-          }
-
-          .detail-text {
-            color: #374151;
-          }
-
-          .program-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-          }
-
-          .btn-detail {
-            flex: 1;
-            padding: 0.5rem 1rem;
-            border: 1px solid #d1d5db;
-            background: white;
-            color: #374151;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-          }
-
-          .btn-detail:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-          }
-
-          .btn-apply {
-            flex: 1;
-            padding: 0.5rem 1rem;
-            border: none;
-            background: #1a2a45;
-            color: white;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.2s;
-          }
-
-          .btn-apply:hover {
-            background: #0f172a;
-          }
-
-          .btn-apply:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-          }
-
-          /* 모달 스타일 */
-          .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem;
-          }
-
-          .modal-overlay.show {
-            display: flex;
-          }
-
-          .modal-content {
-            background: white;
-            border-radius: 12px;
-            max-width: 600px;
-            width: 100%;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-            animation: modalSlideIn 0.3s ease-out;
-          }
-
-          @keyframes modalSlideIn {
-            from {
-              opacity: 0;
-              transform: translateY(-20px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-
-          .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
-          }
-
-          .modal-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #1a2a45;
-            margin: 0;
-          }
-
-          .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: #6b7280;
-            cursor: pointer;
-            padding: 0.25rem;
-            border-radius: 4px;
-            transition: background-color 0.2s;
-          }
-
-          .modal-close:hover {
-            background: #f3f4f6;
-          }
-
-          .modal-body {
-            padding: 1.5rem;
-          }
-
-          .program-detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            background: #f9fafb;
-            border-radius: 8px;
-          }
-
-          .program-detail-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 1.8rem;
-            flex-shrink: 0;
-          }
-
-          .program-detail-info {
-            flex: 1;
-          }
-
-          .program-detail-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1a2a45;
-            margin: 0 0 0.5rem 0;
-          }
-
-          .program-detail-category {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            background: white;
-            color: #6b7280;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            border: 1px solid #e5e7eb;
-          }
-
-          .detail-section {
-            margin-bottom: 2rem;
-          }
-
-          .detail-section-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1a2a45;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-          }
-
-          .detail-section-icon {
-            color: #6b7280;
-          }
-
-          .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-            margin-bottom: 1rem;
-          }
-
-          .detail-card {
-            background: #f9fafb;
-            padding: 1rem;
-            border-radius: 8px;
-            border-left: 3px solid #e5e7eb;
-          }
-
-          .detail-card.primary {
-            border-left-color: #3b82f6;
-          }
-
-          .detail-card.success {
-            border-left-color: #10b981;
-          }
-
-          .detail-card.warning {
-            border-left-color: #f59e0b;
-          }
-
-          .detail-card.danger {
-            border-left-color: #ef4444;
-          }
-
-          .detail-card-label {
-            font-size: 0.85rem;
-            color: #6b7280;
-            margin-bottom: 0.25rem;
-            font-weight: 500;
-          }
-
-          .detail-card-value {
-            font-size: 1rem;
-            color: #1a2a45;
-            font-weight: 600;
-          }
-
-          .program-description-full {
-            color: #374151;
-            line-height: 1.6;
-            font-size: 0.95rem;
-          }
-
-          .requirement-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-          }
-
-          .requirement-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            background: #f9fafb;
-            border-radius: 6px;
-          }
-
-          .requirement-icon {
-            color: #10b981;
-            margin-top: 0.1rem;
-            flex-shrink: 0;
-          }
-
-          .schedule-timeline {
-            position: relative;
-            padding-left: 2rem;
-          }
-
-          .schedule-timeline::before {
-            content: "";
-            position: absolute;
-            left: 0.75rem;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background: #e5e7eb;
-          }
-
-          .timeline-item {
-            position: relative;
-            margin-bottom: 1.5rem;
-          }
-
-          .timeline-item::before {
-            content: "";
-            position: absolute;
-            left: -1.875rem;
-            top: 0.25rem;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #3b82f6;
-          }
-
-          .timeline-date {
-            font-size: 0.85rem;
-            color: #6b7280;
-            font-weight: 500;
-          }
-
-          .timeline-content {
-            font-size: 0.95rem;
-            color: #374151;
-            margin-top: 0.25rem;
-          }
-
-          .modal-actions {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
-          }
-
-          .btn-modal {
-            flex: 1;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-          }
-
-          .btn-modal-secondary {
-            background: white;
-            color: #374151;
-            border: 1px solid #d1d5db;
-          }
-
-          .btn-modal-secondary:hover {
-            background: #f9fafb;
-          }
-
-          .btn-modal-primary {
-            background: #1a2a45;
-            color: white;
-          }
-
-          .btn-modal-primary:hover {
-            background: #0f172a;
-          }
-
-          .btn-modal-primary:disabled {
-            background: #9ca3af;
-            cursor: not-allowed;
-          }
-
-          /* 반응형 */
-          @media (max-width: 768px) {
-            .modal-content {
-              margin: 0;
-              max-height: 100vh;
-              border-radius: 0;
-            }
-
-            .detail-grid {
-              grid-template-columns: 1fr;
-            }
-
-            .modal-actions {
-              flex-direction: column;
-            }
-          }
-
-          /* 반응형 대응 */
-          @media (max-width: 768px) {
-            .sidebar {
-              left: -240px;
-              transition: left 0.3s ease;
-            }
-            .sidebar.show {
-              left: 0;
-            }
-            .main-content {
-              margin-left: 0;
-            }
-            .hamburger {
-              display: inline-block;
-              margin-right: 1rem;
-            }
-            .header-right {
-              display: none;
-            }
-            .sidebar-user-info {
-              display: block;
-            }
-
-            .program-grid {
-              grid-template-columns: 1fr;
-            }
-
-            .search-controls {
-              flex-direction: column;
-              align-items: stretch;
-            }
-
-            .program-header {
-              flex-direction: column;
-              align-items: flex-start;
-            }
-
-            .d-day-badge {
-              align-self: flex-end;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <!-- 상단 헤더 -->
-        <header class="header d-flex">
-          <div class="header-left">
-            <span class="hamburger" id="hamburger">&#9776;</span> CMS 학생포털
-          </div>
-          <div class="header-center">
-            <img
-              src="../../static/images/logo-white.png"
-              alt="logo"
-              height="30"
-              class="me-2"
-            />
-            대한대학교
-          </div>
-          <div class="header-right" id="user-info">
-            <!-- 로그인 상태 -->
-            <div id="user-logged-in" class="user-box">
-              <div class="user-info">
-                <div><strong>홍길동</strong> (20231234)</div>
-                <div class="small">컴퓨터공학과 3학년</div>
-              </div>
-              <button class="user-btn" title="로그아웃">
-                <i class="bi bi-box-arrow-right"></i>
-              </button>
-            </div>
-            <!-- 비로그인 상태 -->
-            <div id="user-logged-out" class="user-box" style="display: none">
-              <button class="user-btn" title="로그인">
-                <i class="bi bi-box-arrow-in-right"></i> 로그인
-              </button>
-            </div>
-          </div>
-        </header>
-
-        <!-- 좌측 사이드바 -->
-        <aside class="sidebar" id="sidebar">
-          <!-- 모바일에서 사용자 정보 표시 -->
-          <div class="sidebar-user-info">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 비교과 프로그램</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+    <style>
+      /* 공통 스타일 */
+      body {
+        background-color: #fafafa;
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", sans-serif;
+      }
+
+      /* 헤더 영역 */
+      .header {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 60px;
+        background-color: #1a2a45;
+        color: white;
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .header-left {
+        flex: 1;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+      .header-center {
+        flex: 1;
+        text-align: center;
+        font-size: 1.2rem;
+      }
+      .header-right {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: 0.9rem;
+        gap: 1rem;
+      }
+
+      /* 사용자 정보 및 버튼 */
+      .user-box {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .user-info {
+        text-align: right;
+        line-height: 1.2;
+      }
+      .user-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        padding: 0.25rem 0.5rem;
+        cursor: pointer;
+      }
+      .user-btn:hover {
+        color: #ffc107;
+      }
+
+      /* 사이드바 */
+      .sidebar {
+        position: fixed;
+        top: 60px;
+        left: 0;
+        width: 240px;
+        height: 100%;
+        background-color: #1a2a45;
+        padding: 1rem 0;
+        color: white;
+        z-index: 1030;
+        overflow-y: auto;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .sidebar-user-info {
+        display: none;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .sidebar-user-info div {
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+
+      /* 본문 */
+      .main-content {
+        margin-top: 60px;
+        margin-left: 240px;
+        padding: 1.5rem;
+      }
+
+      /* 메뉴 스타일 */
+      .nav-link {
+        color: #e0e8f0;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: background-color 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+      .nav-link:hover {
+        background-color: #223a5e;
+        color: #ffffff;
+      }
+      .nav-link.active {
+        background-color: #2b4d77;
+        font-weight: bold;
+      }
+      .submenu {
+        background-color: #223a5e;
+      }
+      .submenu a {
+        padding-left: 2.5rem;
+        font-size: 0.95rem;
+      }
+      .has-submenu::after {
+        content: "\25BC";
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+      }
+
+      /* 햄버거 메뉴 (모바일) */
+      .hamburger {
+        display: none;
+        cursor: pointer;
+        font-size: 1.25rem;
+      }
+
+      /* 비교과 프로그램 스타일 */
+      .page-header {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+
+      .page-title {
+        color: #1a2a45;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .page-subtitle {
+        color: #666;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+      }
+
+      .filter-section {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 2rem;
+      }
+      
+      .search-controls {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .program-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 1.5rem;
+      }
+
+      .program-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-left: 4px solid #6b7280; /* 기본 회색 테두리 */
+      }
+
+      .program-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      }
+      
+      .program-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .program-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        background: #6b7280; /* 기본 회색 아이콘 배경 */
+      }
+
+      .program-info {
+        flex: 1;
+      }
+
+      .program-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a2a45;
+        margin: 0 0 0.25rem 0;
+      }
+
+      .program-category {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: #f3f4f6;
+        color: #6b7280;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        font-weight: 500;
+      }
+
+      .d-day-badge {
+        background: #10b981; /* 신청가능 기본 색상 */
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        flex-shrink: 0;
+      }
+
+      .d-day-badge.today { /* 신청예정 */
+        background: #f59e0b;
+      }
+
+      .d-day-badge.closed { /* 종료 */
+        background: #6b7280;
+      }
+
+      .program-description {
+        color: #6b7280;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin: 1rem 0;
+      }
+
+      .program-details {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0;
+      }
+
+      .detail-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+      }
+
+      .detail-icon {
+        color: #9ca3af;
+        font-size: 0.9rem;
+        width: 16px;
+      }
+
+      .detail-text {
+        color: #374151;
+      }
+
+      .program-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .btn-detail {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        color: #374151;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-detail:hover {
+        background: #f9fafb;
+        border-color: #9ca3af;
+      }
+
+      .btn-apply {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: none;
+        background: #1a2a45;
+        color: white;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-apply:hover {
+        background: #0f172a;
+      }
+
+      .btn-apply:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* 모달 스타일 */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+      }
+
+      .modal-overlay.show {
+        display: flex;
+      }
+
+      .modal-content {
+        background: white;
+        border-radius: 12px;
+        max-width: 600px;
+        width: 100%;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        animation: modalSlideIn 0.3s ease-out;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1a2a45;
+        margin: 0;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #6b7280;
+        cursor: pointer;
+        padding: 0.25rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+
+      .modal-close:hover {
+        background: #f3f4f6;
+      }
+
+      .modal-body {
+        padding: 1.5rem;
+      }
+
+      .program-detail-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 8px;
+      }
+      
+      .program-detail-info {
+        flex: 1;
+      }
+
+      .program-detail-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1a2a45;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .program-detail-category {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: white;
+        color: #6b7280;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        border: 1px solid #e5e7eb;
+      }
+
+      .detail-section {
+        margin-bottom: 2rem;
+      }
+
+      .detail-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #1a2a45;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .detail-section-icon {
+        color: #6b7280;
+      }
+
+      .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+
+      .detail-card {
+        background: #f9fafb;
+        padding: 1rem;
+        border-radius: 8px;
+        border-left: 3px solid #e5e7eb;
+      }
+
+      .detail-card.primary {
+        border-left-color: #3b82f6;
+      }
+      
+      .detail-card.warning {
+        border-left-color: #f59e0b;
+      }
+
+      .detail-card.danger {
+        border-left-color: #ef4444;
+      }
+
+      .detail-card-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+      }
+
+      .detail-card-value {
+        font-size: 1rem;
+        color: #1a2a45;
+        font-weight: 600;
+      }
+
+      .program-description-full {
+        color: #374151;
+        line-height: 1.6;
+        font-size: 0.95rem;
+      }
+      
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-top: 1px solid #e5e7eb;
+        background: #f9fafb;
+      }
+
+      .btn-modal {
+        flex: 1;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-modal-secondary {
+        background: white;
+        color: #374151;
+        border: 1px solid #d1d5db;
+      }
+
+      .btn-modal-secondary:hover {
+        background: #f9fafb;
+      }
+
+      .btn-modal-primary {
+        background: #1a2a45;
+        color: white;
+      }
+
+      .btn-modal-primary:hover {
+        background: #0f172a;
+      }
+
+      .btn-modal-primary:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* 반응형 */
+      @media (max-width: 768px) {
+        .modal-content {
+          margin: 0;
+          max-height: 100vh;
+          border-radius: 0;
+        }
+
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .modal-actions {
+          flex-direction: column;
+        }
+      }
+
+      /* 반응형 대응 */
+      @media (max-width: 768px) {
+        .sidebar {
+          left: -240px;
+          transition: left 0.3s ease;
+        }
+        .sidebar.show {
+          left: 0;
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .hamburger {
+          display: inline-block;
+          margin-right: 1rem;
+        }
+        .header-right {
+          display: none;
+        }
+        .sidebar-user-info {
+          display: block;
+        }
+
+        .program-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .search-controls {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .program-header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .d-day-badge {
+          align-self: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="header d-flex">
+      <div class="header-left">
+        <span class="hamburger" id="hamburger">&#9776;</span> CMS 학생포털
+      </div>
+      <div class="header-center">
+        대한대학교
+      </div>
+      <div class="header-right" id="user-info">
+        <div id="user-logged-in" class="user-box">
+          <div class="user-info">
             <div><strong>홍길동</strong> (20231234)</div>
-            <div>컴퓨터공학과 3학년</div>
-            <div class="mt-2">
-              <button class="user-btn" title="로그아웃">
-                <i class="bi bi-box-arrow-right"></i> 로그아웃
-              </button>
-            </div>
+            <div class="small">컴퓨터공학과 3학년</div>
           </div>
-          <!-- 메뉴 항목 -->
-          <nav class="nav flex-column">
-            <a class="nav-link" href="/notice">공지사항</a>
-            <a class="nav-link has-submenu" href="/competency" data-menu="역량"
-              >핵심역량개발</a
-            >
-            <div class="submenu" id="submenu-역량" style="display: none">
-              <a class="nav-link" href="/competency/test">진단검사</a>
-              <a class="nav-link" href="/competency/history">진단결과이력</a>
-            </div>
-            <a
-              class="nav-link has-submenu active"
-              href="/program"
-              data-menu="비교과"
-              >비교과프로그램</a
-            >
-            <div class="submenu" id="submenu-비교과" style="display: block">
-              <a class="nav-link active" href="/program/list">프로그램 목록</a>
-              <a class="nav-link" href="/program/status">프로그램 참여 현황</a>
-            </div>
-            <a class="nav-link has-submenu" href="/counseling" data-menu="상담"
-              >상담센터</a
-            >
-            <div class="submenu" id="submenu-상담" style="display: none">
-              <a class="nav-link" href="/counseling/reservation">상담 예약</a>
-              <a class="nav-link" href="/counseling/applications"
-                >상담 신청 내역</a
-              >
-              <a class="nav-link" href="/counseling/results">상담결과</a>
-            </div>
-            <a class="nav-link" href="/mileage">마일리지</a>
-            <a class="nav-link" href="/mypage">마이페이지</a>
-          </nav>
-        </aside>
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </header>
 
-        <!-- 본문 영역 -->
-        <main class="main-content">
-          <!-- 페이지 헤더 -->
-          <div class="page-header">
-            <h1 class="page-title">핵심 역량 프로그램</h1>
-            <p class="page-subtitle">
-              미래 인재가 되기 위한 다양한 역량 개발 프로그램을 운영하고
-              있습니다.
-            </p>
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-user-info">
+        <div><strong>홍길동</strong> (20231234)</div>
+        <div>컴퓨터공학과 3학년</div>
+        <div class="mt-2">
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i> 로그아웃
+          </button>
+        </div>
+      </div>
+      <nav class="nav flex-column">
+        <a class="nav-link" href="#">공지사항</a>
+        <a class="nav-link has-submenu" href="#" data-menu="역량">핵심역량개발</a>
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="#">진단검사</a>
+          <a class="nav-link" href="#">진단결과이력</a>
+        </div>
+        <a class="nav-link has-submenu active" href="#" data-menu="비교과">비교과프로그램</a>
+        <div class="submenu" id="submenu-비교과" style="display: block">
+          <a class="nav-link active" th:href="@{/students/programs}">프로그램 목록</a>
+          <a class="nav-link" href="#">프로그램 참여 현황</a>
+        </div>
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담센터</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+          <a class="nav-link" href="#">상담 예약</a>
+          <a class="nav-link" href="#">상담 신청 내역</a>
+          <a class="nav-link" href="#">상담결과</a>
+        </div>
+        <a class="nav-link" href="#">마일리지</a>
+        <a class="nav-link" href="#">마이페이지</a>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <div class="page-header">
+        <h1 class="page-title">핵심 역량 프로그램</h1>
+        <p class="page-subtitle">
+          미래 인재가 되기 위한 다양한 역량 개발 프로그램을 운영하고 있습니다.
+        </p>
+      </div>
+
+      <div class="filter-section">
+        <form th:action="@{/students/programs}" method="get">
+          <div class="search-controls">
+            <div class="input-group" style="max-width: 300px">
+              <input type="text" class="form-control" placeholder="프로그램명 검색" name="prgNm" th:value="${prgNm}" />
+              <button class="btn btn-outline-secondary" type="submit">
+                <i class="bi bi-search"></i>
+              </button>
+            </div>
+            <select class="form-select" style="max-width: 150px" name="status" onchange="this.form.submit()">
+              <option value="">전체 상태</option>
+              <option value="upcoming" th:selected="${status == 'upcoming'}">신청예정</option>
+              <option value="active" th:selected="${status == 'active'}">신청가능</option>
+              <option value="ended" th:selected="${status == 'ended'}">종료</option>
+            </select>
+            <select class="form-select" style="max-width: 150px" name="cciId" onchange="this.form.submit()">
+              <option value="">전체 카테고리</option>
+              <option value="7" th:selected="${cciId == '7'}">의사소통역량</option>
+              <option value="8" th:selected="${cciId == '8'}">창의역량</option>
+              <option value="9" th:selected="${cciId == '9'}">문제해결역량</option>
+              <option value="10" th:selected="${cciId == '10'}">리더십역량</option>
+              <option value="11" th:selected="${cciId == '11'}">팀워크역량</option>
+              <option value="12" th:selected="${cciId == '12'}">자기관리역량</option>
+              <option value="13" th:selected="${cciId == '13'}">정보활용역량</option>
+            </select>
           </div>
+        </form>
+      </div>
 
-          <!-- 필터 섹션 -->
-          <div class="filter-section">
-            <div class="filter-tabs">
-              <button class="filter-tab active" data-category="all">
-                전체
-              </button>
-              <button class="filter-tab" data-category="leadership">
-                리더십
-              </button>
-              <button class="filter-tab" data-category="global">글로벌</button>
-              <button class="filter-tab" data-category="specialty">
-                전문성
-              </button>
-              <button class="filter-tab" data-category="ai">AI역량</button>
-              <button class="filter-tab" data-category="startup">창업</button>
-              <button class="filter-tab" data-category="counseling">
-                상담
-              </button>
+      <div class="program-grid" id="programGrid">
+        <div th:if="${list.isEmpty()}" class="text-center w-100 py-5">
+            <p class="text-muted">조회된 프로그램이 없습니다.</p>
+        </div>
+        <div th:each="p : ${list}" class="program-card">
+            <div class="program-header">
+                <div style="display: flex; align-items: flex-start; gap: 1rem; flex: 1;">
+                    <div class="program-icon">
+                        <i class="bi bi-star"></i>
+                    </div>
+                    <div class="program-info">
+                        <h3 class="program-title" th:text="${p.prgNm}">프로그램 제목</h3>
+                        <span class="program-category" th:text="${p.categoryName}">카테고리명</span>
+                    </div>
+                </div>
+                <div class="d-day-badge" th:text="${p.statusText}"
+                     th:classappend="${p.status == 'upcoming' ? 'today' : (p.status == 'ended' ? 'closed' : '')}"></div>
             </div>
-
-            <div class="search-controls">
-              <div class="input-group" style="max-width: 300px">
-                <input
-                  type="text"
-                  class="form-control"
-                  placeholder="프로그램 검색"
-                  id="searchInput"
-                />
-                <button class="btn btn-outline-secondary" type="button">
-                  <i class="bi bi-search"></i>
+            <p class="program-description" th:text="${p.prgDesc}">프로그램에 대한 간략한 설명이 여기에 표시됩니다.</p>
+            <div class="program-details">
+                <div class="detail-item">
+                    <i class="bi bi-people detail-icon"></i>
+                    <span class="detail-text" th:text="'모집인원: ' + ${p.maxCnt} + '명'"></span>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-calendar-check detail-icon"></i>
+                    <span class="detail-text" th:text="'신청기간: ' + ${#temporals.format(p.aplyBgngYmd, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(p.aplyEndYmd, 'yyyy.MM.dd')}"></span>
+                </div>
+                <div class="detail-item">
+                    <i class="bi bi-calendar-event detail-icon"></i>
+                    <span class="detail-text" th:text="'운영기간: ' + ${#temporals.format(p.prgStDt, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(p.prgEndDt, 'yyyy.MM.dd')}"></span>
+                </div>
+            </div>
+            <div class="program-actions">
+                <button class="btn-detail" th:data-id="${p.prgId}">상세보기</button>
+                <button class="btn-apply" th:data-id="${p.prgId}" th:disabled="${p.status != 'active'}">
+                    <span th:text="${p.status == 'active' ? '신청하기' : p.statusText}"></span>
                 </button>
-              </div>
-              <select
-                class="form-select"
-                style="max-width: 150px"
-                id="sortSelect"
-              >
-                <option value="recent">최신순</option>
-                <option value="popular">인기순</option>
-                <option value="deadline">마감일순</option>
-              </select>
-              <select
-                class="form-select"
-                style="max-width: 120px"
-                id="statusSelect"
-              >
-                <option value="all">모든 상태</option>
-                <option value="open">신청가능</option>
-                <option value="closed">마감</option>
-              </select>
             </div>
+        </div>
+      </div>
+
+      <div class="pagination-wrapper mt-4" th:if="${totalPages > 1}">
+          <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                  <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                      <a class="page-link" th:href="@{/students/programs(page=${currentPage - 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">‹</a>
+                  </li>
+                  <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}" th:classappend="${pageNumber == currentPage} ? 'active'">
+                      <a class="page-link" th:href="@{/students/programs(page=${pageNumber}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}" th:text="${pageNumber}"></a>
+                  </li>
+                  <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                      <a class="page-link" th:href="@{/students/programs(page=${currentPage + 1}, prgNm=${prgNm}, status=${status}, cciId=${cciId})}">›</a>
+                  </li>
+              </ul>
+          </nav>
+      </div>
+
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitle">프로그램 상세정보</h2>
+          <button class="modal-close" id="modalClose">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="program-detail-header" id="modalDetailHeader"></div>
+          <div class="detail-section">
+            <h3 class="detail-section-title"><i class="bi bi-info-circle detail-section-icon"></i> 기본 정보</h3>
+            <div class="detail-grid" id="modalBasicInfo"></div>
           </div>
-
-          <!-- 프로그램 그리드 -->
-          <div class="program-grid" id="programGrid">
-            <!-- 프로그램 카드들이 여기에 동적으로 생성됩니다 -->
-          </div>
-        </main>
-
-        <!-- 상세보기 모달 -->
-        <div class="modal-overlay" id="modalOverlay">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h2 class="modal-title" id="modalTitle">프로그램 상세정보</h2>
-              <button class="modal-close" id="modalClose">×</button>
-            </div>
-
-            <div class="modal-body">
-              <div class="program-detail-header" id="modalDetailHeader">
-                <!-- 프로그램 헤더 정보가 여기에 동적으로 생성됩니다 -->
-              </div>
-
-              <!-- 기본 정보 -->
-              <div class="detail-section">
-                <h3 class="detail-section-title">
-                  <i class="bi bi-info-circle detail-section-icon"></i>
-                  기본 정보
-                </h3>
-                <div class="detail-grid" id="modalBasicInfo">
-                  <!-- 기본 정보가 여기에 동적으로 생성됩니다 -->
-                </div>
-              </div>
-
-              <!-- 프로그램 설명 -->
-              <div class="detail-section">
-                <h3 class="detail-section-title">
-                  <i class="bi bi-file-text detail-section-icon"></i>
-                  프로그램 소개
-                </h3>
-                <div class="program-description-full" id="modalDescription">
-                  <!-- 프로그램 설명이 여기에 표시됩니다 -->
-                </div>
-              </div>
-
-              <!-- 신청 자격 및 요건 -->
-              <div class="detail-section">
-                <h3 class="detail-section-title">
-                  <i class="bi bi-person-check detail-section-icon"></i>
-                  신청 자격 및 요건
-                </h3>
-                <ul class="requirement-list" id="modalRequirements">
-                  <!-- 신청 요건이 여기에 동적으로 생성됩니다 -->
-                </ul>
-              </div>
-
-              <!-- 일정 -->
-              <div class="detail-section">
-                <h3 class="detail-section-title">
-                  <i class="bi bi-calendar3 detail-section-icon"></i>
-                  프로그램 일정
-                </h3>
-                <div class="schedule-timeline" id="modalSchedule">
-                  <!-- 일정이 여기에 동적으로 생성됩니다 -->
-                </div>
-              </div>
-            </div>
-
-            <div class="modal-actions">
-              <button class="btn-modal btn-modal-secondary" id="modalCloseBtn">
-                닫기
-              </button>
-              <button class="btn-modal btn-modal-primary" id="modalApplyBtn">
-                신청하기
-              </button>
-            </div>
+          <div class="detail-section">
+            <h3 class="detail-section-title"><i class="bi bi-file-text detail-section-icon"></i> 프로그램 소개</h3>
+            <div class="program-description-full" id="modalDescription"></div>
           </div>
         </div>
+        <div class="modal-actions">
+          <button class="btn-modal btn-modal-secondary" id="modalCloseBtn">닫기</button>
+          <button class="btn-modal btn-modal-primary" id="modalApplyBtn">신청하기</button>
+        </div>
+      </div>
+    </div>
+    <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // 현재 로그인한 학생 정보를 담을 변수
+    let currentUser = null;
 
-        <!-- 프로그램 데이터 및 스크립트 -->
-        <script>
-          // 프로그램 데이터
-          const programs = [
-            {
-              id: 1,
-              title: "창의 아이디어 경진대회",
-              category: "leadership",
-              categoryName: "리더십",
-              description:
-                "학업성취 향상 아이디어를 공모하는 사업으로 가장 좋은 아이디어를 발굴하는 프로그램",
-              fullDescription:
-                "본 프로그램은 학생들의 창의적 사고력과 문제해결 능력을 기르기 위해 기획된 경진대회입니다. 학업성취 향상에 도움이 되는 혁신적인 아이디어를 발굴하고, 이를 통해 대학 전체의 학습 환경을 개선하고자 합니다. 참가자들은 팀을 구성하여 아이디어를 기획하고 발표하며, 우수한 아이디어는 실제 대학 정책에 반영될 수 있는 기회를 제공합니다.",
-              participants: "4명",
-              applicationPeriod: "2024.11.01 ~ 2024.12.20",
-              operationPeriod: "2024.12.25 ~ 2025.01.25",
-              applicationDeadline: "2024.12.20",
-              location: "학생회관",
-              status: "open",
-              requirements: [
-                "재학생 누구나 신청 가능",
-                "팀 단위 참가 (2-4명)",
-                "학업성취 관련 아이디어 필수",
-                "최종 발표 참석 필수",
-              ],
-              schedule: [
-                {
-                  date: "2024.12.25",
-                  content: "참가자 오리엔테이션 및 팀 빌딩",
-                },
-                { date: "2025.01.05", content: "중간 점검 및 멘토링" },
-                { date: "2025.01.20", content: "최종 발표회 및 시상식" },
-                { date: "2025.01.25", content: "프로그램 수료 및 피드백" },
-              ],
-            },
-            {
-              id: 2,
-              title: "글로벌 리더십 탐구",
-              category: "global",
-              categoryName: "글로벌",
-              description:
-                "다양한 문화권 사람들과의 의사소통 능력 향상을 위한 글로벌 리더십 발굴 프로그램",
-              fullDescription:
-                "글로벌 시대에 필요한 리더십 역량을 개발하기 위한 종합적인 프로그램입니다. 다문화 이해, 국제적 소통 능력, 글로벌 마인드셋을 기르며, 실제 국제교류 활동을 통해 실무 경험을 쌓을 수 있습니다. 해외 대학생들과의 온라인 교류, 문화 프로젝트, 글로벌 이슈 토론 등 다양한 활동으로 구성되어 있습니다.",
-              participants: "12명",
-              applicationPeriod: "2024.10.15 ~ 2024.12.15",
-              operationPeriod: "2024.12.20 ~ 2025.02.05",
-              applicationDeadline: "2024.12.15",
-              location: "국제관",
-              status: "open",
-              requirements: [
-                "영어 중급 이상 수준",
-                "글로벌 이슈에 관심이 있는 학생",
-                "적극적인 참여 의지",
-                "전체 프로그램 참석 가능자",
-              ],
-              schedule: [
-                { date: "2024.12.20", content: "글로벌 리더십 이론 교육" },
-                { date: "2025.01.10", content: "해외 대학생과 온라인 교류" },
-                { date: "2025.01.25", content: "문화 프로젝트 발표" },
-                { date: "2025.02.05", content: "글로벌 리더십 인증서 수여" },
-              ],
-            },
-            {
-              id: 3,
-              title: "소통과 협업 프로젝트",
-              category: "specialty",
-              categoryName: "전문성",
-              description:
-                "팀프로젝트 활동을 통해 혁신과 창의 협업의 기초 리더십을 함양하는 프로그램",
-              fullDescription:
-                "현대 사회에서 가장 중요한 역량 중 하나인 협업 능력을 체계적으로 기를 수 있는 프로그램입니다. 다양한 전공의 학생들이 팀을 이루어 실제 문제를 해결하는 프로젝트를 수행하며, 효과적인 소통 방법과 협업 스킬을 학습합니다. 디자인 씽킹, 애자일 방법론 등 최신 협업 도구와 기법을 실무에 적용해볼 수 있습니다.",
-              participants: "8명",
-              applicationPeriod: "2024.11.10 ~ 2024.12.22",
-              operationPeriod: "2025.01.05 ~ 2025.02.15",
-              applicationDeadline: "2024.12.22",
-              location: "학생활동센터",
-              status: "open",
-              requirements: [
-                "다양한 전공 학생들과 협업 의지",
-                "프로젝트 완수 능력",
-                "주 2회 정기 모임 참석 필수",
-                "최종 결과물 제출 필수",
-              ],
-              schedule: [
-                {
-                  date: "2025.01.05",
-                  content: "팀 구성 및 프로젝트 주제 선정",
-                },
-                { date: "2025.01.20", content: "중간 발표 및 피드백" },
-                { date: "2025.02.10", content: "최종 결과물 발표" },
-                { date: "2025.02.15", content: "성과 평가 및 수료식" },
-              ],
-            },
-            {
-              id: 4,
-              title: "AI 역량개발 양성과정",
-              category: "ai",
-              categoryName: "AI역량",
-              description:
-                "인공지능 기술 이해와 활용 능력을 기르는 미래 지향적 역량 개발 프로그램",
-              fullDescription:
-                "4차 산업혁명 시대의 핵심 기술인 인공지능에 대한 이해와 활용 능력을 기르는 전문 과정입니다. AI 기초 이론부터 실무 활용까지 단계별로 학습하며, 다양한 AI 도구를 활용한 프로젝트를 수행합니다. 머신러닝, 딥러닝의 기본 개념과 ChatGPT, 이미지 생성 AI 등 최신 AI 기술의 실무 활용법을 배웁니다.",
-              participants: "10명",
-              applicationPeriod: "2024.10.01 ~ 2024.12.10",
-              operationPeriod: "2024.12.15 ~ 2025.02.15",
-              applicationDeadline: "2024.12.10",
-              location: "IT센터",
-              status: "closed",
-              requirements: [
-                "기본적인 컴퓨터 활용 능력",
-                "프로그래밍 경험 우대 (필수 아님)",
-                "AI 기술에 대한 관심과 열정",
-                "전체 과정 수강 가능자",
-              ],
-              schedule: [
-                { date: "2024.12.15", content: "AI 기초 이론 및 개념 학습" },
-                { date: "2025.01.05", content: "AI 도구 실습 및 활용" },
-                { date: "2025.01.25", content: "개인 프로젝트 진행" },
-                { date: "2025.02.15", content: "프로젝트 발표 및 수료식" },
-              ],
-            },
-            {
-              id: 5,
-              title: "국제문화교류 중심봉사",
-              category: "global",
-              categoryName: "글로벌",
-              description:
-                "국제 문화를 통해 봉사 활동을 하고 글로벌 시민의식을 함양하는 봉사활동 프로그램",
-              fullDescription:
-                "지역사회의 외국인 주민들과 함께하는 의미있는 봉사활동 프로그램입니다. 한국어 교육, 문화 체험, 생활 적응 지원 등을 통해 상호 문화 이해를 증진하고 글로벌 시민의식을 함양합니다. 참가자들은 외국어 실력 향상과 동시에 다문화에 대한 이해를 깊게 할 수 있으며, 국제적 감각을 기를 수 있습니다.",
-              participants: "15명",
-              applicationPeriod: "2024.12.01 ~ 2025.01.15",
-              operationPeriod: "2025.01.20 ~ 2025.03.10",
-              applicationDeadline: "2025.01.15",
-              location: "국제관",
-              status: "open",
-              requirements: [
-                "외국어 소통 가능자 (영어, 중국어 등)",
-                "봉사활동에 대한 진정성",
-                "문화적 차이에 대한 이해와 포용력",
-                "주 1회 이상 봉사활동 참여 가능",
-              ],
-              schedule: [
-                { date: "2025.01.20", content: "봉사활동 오리엔테이션" },
-                { date: "2025.02.05", content: "한국어 교육 봉사 시작" },
-                { date: "2025.02.25", content: "문화교류 행사 개최" },
-                { date: "2025.03.10", content: "봉사활동 성과 발표회" },
-              ],
-            },
-            {
-              id: 6,
-              title: "사회봉사 리더십 프로그램",
-              category: "counseling",
-              categoryName: "상담",
-              description:
-                "사회봉사를 통해 공동체 의식과 상호 지원을 통한 리더십을 배양하는 프로그램",
-              fullDescription:
-                "지역사회의 다양한 사회문제를 파악하고 이를 해결하기 위한 봉사활동을 기획하고 실행하는 리더십 프로그램입니다. 참가자들은 팀을 구성하여 지역사회의 실제 문제를 발굴하고, 이를 해결하기 위한 봉사활동을 직접 기획하고 실행합니다. 이 과정에서 리더십, 기획력, 실행력을 동시에 기를 수 있습니다.",
-              participants: "6명",
-              applicationPeriod: "2024.11.15 ~ 2024.12.30",
-              operationPeriod: "2025.01.10 ~ 2025.02.10",
-              applicationDeadline: "2024.12.30",
-              location: "지역사회",
-              status: "open",
-              requirements: [
-                "사회문제에 대한 관심과 해결 의지",
-                "팀 리더십 및 협업 능력",
-                "봉사활동 기획 및 실행 가능자",
-                "지역사회 방문 활동 가능자",
-              ],
-              schedule: [
-                {
-                  date: "2025.01.10",
-                  content: "사회문제 분석 및 봉사계획 수립",
-                },
-                { date: "2025.01.20", content: "봉사활동 실행 및 모니터링" },
-                { date: "2025.02.05", content: "성과 평가 및 개선방안 도출" },
-                { date: "2025.02.10", content: "최종 보고서 제출 및 수료식" },
-              ],
-            },
-          ];
+    // 모달 엘리먼트
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalClose = document.getElementById('modalClose');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const modalApplyBtn = document.getElementById('modalApplyBtn');
+    let currentProgramId = null;
 
-          // DOM 요소들
-          const programGrid = document.getElementById("programGrid");
-          const filterTabs = document.querySelectorAll(".filter-tab");
-          const searchInput = document.getElementById("searchInput");
-          const sortSelect = document.getElementById("sortSelect");
-          const statusSelect = document.getElementById("statusSelect");
+    /**
+     * 페이지 로드 시 실행될 초기화 함수
+     */
+    async function initializePage() {
+      await loadCurrentUser(); // 비동기 함수이므로 await로 호출
+      
+      // 사용자 정보 로드가 완료된 후 이벤트 리스너 설정
+      setupEventListeners();
+    }
 
-          let currentCategory = "all";
-          let currentSort = "recent";
-          let currentStatus = "all";
-
-          // D-day 계산 함수
-          function calculateDDay(deadline) {
-            // 현재 날짜를 2024년 12월 13일로 설정 (시연용)
-            const today = new Date("2024-12-13");
-            const deadlineDate = new Date(deadline);
-            const diffTime = deadlineDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays < 0) {
-              return { text: "마감", class: "closed" };
-            } else if (diffDays === 0) {
-              return { text: "D-DAY", class: "today" };
-            } else {
-              return { text: `D-${diffDays}`, class: "" };
-            }
+    /**
+     * API를 호출하여 현재 로그인한 사용자 정보를 가져와 currentUser 변수에 저장
+     */
+  // 페이지 로드 시 API를 호출하여 사용자 정보를 가져오는 함수
+     async function loadCurrentUser() {
+       try {
+         const response = await fetch('/api/user/me/student');
+         if (!response.ok) throw new Error('로그인 필요');
+         currentUser = await response.json();
+         console.log("API로부터 받은 사용자 정보:", currentUser);
+       } catch (error) {
+         alert('로그인이 필요합니다.');
+         location.href = "/login";
+       }
+     }
+     loadCurrentUser();
+    /**
+     * 모든 이벤트 리스너를 설정하는 함수
+     */
+    function setupEventListeners() {
+      // 이벤트 위임을 사용하여 모든 버튼 클릭을 한 곳에서 처리
+      document.body.addEventListener('click', function(e) {
+          const detailButton = e.target.closest('.btn-detail');
+          if (detailButton) {
+              openModal(detailButton.dataset.id);
+              return;
           }
 
-          // 프로그램 카드 생성 함수
-          function createProgramCard(program) {
-            const dDay = calculateDDay(program.applicationDeadline);
-            const isApplicable =
-              program.status === "open" && dDay.class !== "closed";
-
-            return `
-          <div class="program-card ${program.category}">
-            <div class="program-header">
-              <div style="display: flex; align-items: flex-start; gap: 1rem; flex: 1;">
-                <div class="program-icon ${program.category}">
-                  <i class="bi ${getIconByCategory(program.category)}"></i>
-                </div>
-                <div class="program-info">
-                  <h3 class="program-title">${program.title}</h3>
-                  <span class="program-category">${program.categoryName}</span>
-                </div>
-              </div>
-              <div class="d-day-badge ${dDay.class}">${dDay.text}</div>
-            </div>
-            
-            <p class="program-description">${program.description}</p>
-            
-            <div class="program-details">
-              <div class="detail-item">
-                <i class="bi bi-people detail-icon"></i>
-                <span class="detail-text">모집인원: ${
-                  program.participants
-                }</span>
-              </div>
-              <div class="detail-item">
-                <i class="bi bi-calendar-check detail-icon"></i>
-                <span class="detail-text">신청기간: ${
-                  program.applicationPeriod
-                }</span>
-              </div>
-              <div class="detail-item">
-                <i class="bi bi-calendar-event detail-icon"></i>
-                <span class="detail-text">운영기간: ${
-                  program.operationPeriod
-                }</span>
-              </div>
-              <div class="detail-item">
-                <i class="bi bi-geo-alt detail-icon"></i>
-                <span class="detail-text">장소: ${program.location}</span>
-              </div>
-            </div>
-
-            <div class="program-actions">
-              <button class="btn-detail">상세보기</button>
-              <button class="btn-apply" ${!isApplicable ? "disabled" : ""}>
-                ${isApplicable ? "신청하기" : "신청마감"}
-              </button>
-            </div>
-          </div>
-        `;
+          const applyButton = e.target.closest('.btn-apply');
+          if (applyButton && !applyButton.disabled) {
+              handleApply(applyButton.dataset.id);
+              return;
           }
+      });
 
-          // 카테고리별 아이콘 반환
-          function getIconByCategory(category) {
-            const icons = {
-              leadership: "bi-trophy",
-              global: "bi-globe",
-              specialty: "bi-gear",
-              ai: "bi-cpu",
-              startup: "bi-lightbulb",
-              counseling: "bi-chat-heart",
-            };
-            return icons[category] || "bi-star";
-          }
+      modalApplyBtn.addEventListener("click", () => {
+           if (currentProgramId) handleApply(currentProgramId);
+      });
+      modalClose.addEventListener("click", closeModal);
+      modalCloseBtn.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modalOverlay.classList.contains("show")) closeModal(); });
 
-          // 프로그램 필터링 및 정렬
-          function filterAndSortPrograms() {
-            let filteredPrograms = programs.filter((program) => {
-              const categoryMatch =
-                currentCategory === "all" ||
-                program.category === currentCategory;
-              const statusMatch =
-                currentStatus === "all" || program.status === currentStatus;
-              const searchMatch =
-                searchInput.value === "" ||
-                program.title
-                  .toLowerCase()
-                  .includes(searchInput.value.toLowerCase()) ||
-                program.description
-                  .toLowerCase()
-                  .includes(searchInput.value.toLowerCase());
+      const hamburger = document.getElementById("hamburger");
+      hamburger.addEventListener("click", () => document.getElementById("sidebar").classList.toggle("show"));
 
-              return categoryMatch && statusMatch && searchMatch;
-            });
-
-            // 정렬
-            filteredPrograms.sort((a, b) => {
-              switch (currentSort) {
-                case "popular":
-                  return (
-                    b.participants.replace("명", "") -
-                    a.participants.replace("명", "")
-                  );
-                case "deadline":
-                  return (
-                    new Date(a.applicationDeadline) -
-                    new Date(b.applicationDeadline)
-                  );
-                case "recent":
-                default:
-                  return (
-                    new Date(b.applicationDeadline) -
-                    new Date(a.applicationDeadline)
-                  );
-              }
-            });
-
-            renderPrograms(filteredPrograms);
-          }
-
-          // 프로그램 렌더링
-          function renderPrograms(programsToRender) {
-            programGrid.innerHTML = programsToRender
-              .map(createProgramCard)
-              .join("");
-
-            // 상세보기 버튼에 이벤트 리스너 추가
-            document.querySelectorAll(".btn-detail").forEach((button) => {
-              button.addEventListener("click", (e) => {
-                const programCard = e.target.closest(".program-card");
-                const programId =
-                  programs.findIndex(
-                    (p) =>
-                      p.title ===
-                      programCard.querySelector(".program-title").textContent
-                  ) + 1; // id는 1부터 시작하므로 +1
-                openModal(programId);
-              });
-            });
-
-            // 신청하기 버튼에 이벤트 리스너 추가
-            document.querySelectorAll(".btn-apply").forEach((button) => {
-              button.addEventListener("click", (e) => {
-                if (button.disabled) return;
-
-                const programCard = e.target.closest(".program-card");
-                const programId =
-                  programs.findIndex(
-                    (p) =>
-                      p.title ===
-                      programCard.querySelector(".program-title").textContent
-                  ) + 1;
-                handleApply(programId);
-              });
-            });
-          }
-
-          // 이벤트 리스너들
-          filterTabs.forEach((tab) => {
-            tab.addEventListener("click", () => {
-              filterTabs.forEach((t) => t.classList.remove("active"));
-              tab.classList.add("active");
-              currentCategory = tab.dataset.category;
-              filterAndSortPrograms();
-            });
-          });
-
-          searchInput.addEventListener("input", filterAndSortPrograms);
-
-          sortSelect.addEventListener("change", (e) => {
-            currentSort = e.target.value;
-            filterAndSortPrograms();
-          });
-
-          statusSelect.addEventListener("change", (e) => {
-            currentStatus = e.target.value;
-            filterAndSortPrograms();
-          });
-
-          // 사이드바 토글
-          const sidebar = document.getElementById("sidebar");
-          const hamburger = document.getElementById("hamburger");
-          hamburger.addEventListener("click", () => {
-            sidebar.classList.toggle("show");
-          });
-
-          // 서브메뉴 토글
-          const menuLinks = document.querySelectorAll("[data-menu]");
-          menuLinks.forEach((menu) => {
-            menu.addEventListener("click", (e) => {
+      document.querySelectorAll("[data-menu]").forEach(menu => {
+          menu.addEventListener("click", (e) => {
               e.preventDefault();
-              const key = menu.getAttribute("data-menu");
-              const submenu = document.getElementById(`submenu-${key}`);
-
-              document.querySelectorAll(".submenu").forEach((sm) => {
-                if (sm !== submenu) sm.style.display = "none";
-              });
-
+              const submenu = document.getElementById(`submenu-${menu.dataset.menu}`);
               if (submenu) {
-                submenu.style.display =
-                  submenu.style.display === "block" ? "none" : "block";
+                  const isVisible = submenu.style.display === "block";
+                  document.querySelectorAll(".submenu").forEach(sm => sm.style.display = 'none');
+                  submenu.style.display = isVisible ? "none" : "block";
               }
-            });
           });
+      });
+    }
 
-          // 초기 렌더링
-          filterAndSortPrograms();
+    /**
+     * 신청 처리 함수
+     * @param {string} programId 
+     */
+     function handleApply(programId) {
+    	    if (!currentUser || !currentUser.stdId) { // stdId가 있는지 확인
+    	        alert("학생 정보가 올바르지 않습니다. 다시 로그인해주세요.");
+    	        return;
+    	    }
 
-          // 모달 관련 함수들
-          const modalOverlay = document.getElementById("modalOverlay");
-          const modalClose = document.getElementById("modalClose");
-          const modalCloseBtn = document.getElementById("modalCloseBtn");
-          const modalApplyBtn = document.getElementById("modalApplyBtn");
+    	    if (!confirm("프로그램을 신청하시겠습니까?")) {
+    	        return;
+    	    }
 
-          let currentProgram = null;
+    	    const payload = {
+    	        stdId: currentUser.stdId 
+    	    };
 
-          // 모달 열기
-          function openModal(programId) {
-            currentProgram = programs.find((p) => p.id === programId);
-            if (!currentProgram) return;
+    	    fetch(`/students/programs/${programId}/apply`, {
+    	        method: 'POST',
+    	        headers: {
+    	            'Content-Type': 'application/json',
+    	        },
+    	        credentials: 'same-origin',
+    	        body: JSON.stringify(payload) 
+    	    })
+         .then(response => response.json())
+         .then(data => {
+             alert(data.message);
+             if (data.success) {
+                 window.location.reload();
+             }
+         })
+         .catch(error => {
+             console.error('Apply Error:', error);
+             alert('신청 중 오류가 발생했습니다.');
+         });
+     }
 
-            // 모달 내용 업데이트
-            updateModalContent(currentProgram);
+    /**
+     * 모달 열기 함수
+     * @param {string} programId 
+     */
+    function openModal(programId) {
+        if (!programId) return;
+        currentProgramId = programId;
 
-            // 모달 표시
-            modalOverlay.classList.add("show");
-            document.body.style.overflow = "hidden";
-          }
+        fetch(`/students/programs/${programId}/json`)
+            .then(response => response.ok ? response.json() : Promise.reject('Network response was not ok'))
+            .then(program => {
+                updateModalContent(program);
+                modalOverlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(error => console.error('Error fetching program details:', error));
+    }
 
-          // 모달 닫기
-          function closeModal() {
-            modalOverlay.classList.remove("show");
-            document.body.style.overflow = "auto";
-            currentProgram = null;
-          }
-
-          // 모달 내용 업데이트
-          function updateModalContent(program) {
-            const dDay = calculateDDay(program.applicationDeadline);
-            const isApplicable =
-              program.status === "open" && dDay.class !== "closed";
-
-            // 모달 제목
-            document.getElementById("modalTitle").textContent = program.title;
-
-            // 헤더 정보
-            const modalDetailHeader =
-              document.getElementById("modalDetailHeader");
-            modalDetailHeader.innerHTML = `
-  <div class="program-detail-info">
-    <h3 class="program-detail-title">${program.title}</h3>
-    <span class="program-detail-category">${program.categoryName}</span>
-  </div>
-  <div class="d-day-badge ${dDay.class}">${dDay.text}</div>
-`;
-
-            // 기본 정보
-            const modalBasicInfo = document.getElementById("modalBasicInfo");
-            modalBasicInfo.innerHTML = `
+    /**
+     * 모달 내용 업데이트 함수
+     * @param {object} program 
+     */
+    function updateModalContent(program) {
+        document.getElementById('modalTitle').textContent = program.prgNm;
+        document.getElementById('modalDetailHeader').innerHTML = `
+          <div class="program-detail-info">
+            <h3 class="program-detail-title">${program.prgNm}</h3>
+            <span class="program-detail-category">${program.categoryName}</span>
+          </div>
+          <div class="d-day-badge ${program.status === 'ended' ? 'closed' : ''}">${program.statusText}</div>`;
+        document.getElementById('modalBasicInfo').innerHTML = `
           <div class="detail-card primary">
             <div class="detail-card-label">모집인원</div>
-            <div class="detail-card-value">${program.participants}</div>
-          </div>
-          <div class="detail-card success">
-            <div class="detail-card-label">활동장소</div>
-            <div class="detail-card-value">${program.location}</div>
+            <div class="detail-card-value">${program.maxCnt}명</div>
           </div>
           <div class="detail-card warning">
             <div class="detail-card-label">신청기간</div>
-            <div class="detail-card-value">${program.applicationPeriod}</div>
+            <div class="detail-card-value">${formatDate(program.aplyBgngYmd)} ~ ${formatDate(program.aplyEndYmd)}</div>
           </div>
           <div class="detail-card danger">
             <div class="detail-card-label">운영기간</div>
-            <div class="detail-card-value">${program.operationPeriod}</div>
-          </div>
-        `;
+            <div class="detail-card-value">${formatDate(program.prgStDt)} ~ ${formatDate(program.prgEndDt)}</div>
+          </div>`;
+        document.getElementById('modalDescription').textContent = program.prgDesc;
+        
+        const isApplicable = program.status === 'active';
+        modalApplyBtn.textContent = isApplicable ? '신청하기' : '신청마감';
+        modalApplyBtn.disabled = !isApplicable;
+    }
 
-            // 프로그램 설명
-            document.getElementById("modalDescription").textContent =
-              program.fullDescription;
+    /** 모달 닫기 함수 */
+    function closeModal() {
+        modalOverlay.classList.remove('show');
+        document.body.style.overflow = 'auto';
+        currentProgramId = null;
+    }
 
-            // 신청 요건
-            const modalRequirements =
-              document.getElementById("modalRequirements");
-            modalRequirements.innerHTML = program.requirements
-              .map(
-                (req) => `
-          <li class="requirement-item">
-            <i class="bi bi-check-circle requirement-icon"></i>
-            <span>${req}</span>
-          </li>
-        `
-              )
-              .join("");
+    /** 날짜 포맷팅 유틸리티 */
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`;
+    }
 
-            // 일정
-            const modalSchedule = document.getElementById("modalSchedule");
-            modalSchedule.innerHTML = program.schedule
-              .map(
-                (item) => `
-          <div class="timeline-item">
-            <div class="timeline-date">${item.date}</div>
-            <div class="timeline-content">${item.content}</div>
-          </div>
-        `
-              )
-              .join("");
+    // --- 페이지 초기화 실행 ---
+    initializePage();
 
-            // 신청 버튼 상태
-            modalApplyBtn.textContent = isApplicable ? "신청하기" : "신청마감";
-            modalApplyBtn.disabled = !isApplicable;
-          }
-
-          // 신청 처리
-          function handleApply(programId) {
-            const program = programs.find((p) => p.id === programId);
-            if (!program) return;
-
-            const dDay = calculateDDay(program.applicationDeadline);
-            const isApplicable =
-              program.status === "open" && dDay.class !== "closed";
-
-            if (isApplicable) {
-              alert(`${program.title} 프로그램에 신청하였습니다.`);
-            } else {
-              alert("신청기간이 마감되었습니다.");
-            }
-          }
-
-          // 모달 이벤트 리스너
-          modalClose.addEventListener("click", closeModal);
-          modalCloseBtn.addEventListener("click", closeModal);
-          modalApplyBtn.addEventListener("click", () => {
-            if (currentProgram) {
-              handleApply(currentProgram.id);
-              closeModal();
-            }
-          });
-
-          // 모달 오버레이 클릭 시 닫기
-          modalOverlay.addEventListener("click", (e) => {
-            if (e.target === modalOverlay) {
-              closeModal();
-            }
-          });
-
-          // ESC 키로 모달 닫기
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape" && modalOverlay.classList.contains("show")) {
-              closeModal();
-            }
-          });
-        </script>
-      </body>
-    </html>
-  </button>
-</div>
+  });
+</script>
+  </body>
+</html>

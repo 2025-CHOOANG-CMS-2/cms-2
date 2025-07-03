@@ -70,6 +70,31 @@
         .admin-header .hamburger { display: inline-block; margin-right: 1rem; }
         .admin-header .header-right { display: none; }
       }
+      
+       /* 기존 스타일 코드 아래에 추가 */
+      .notification {
+        position: fixed;
+        top: 80px; /* 헤더 높이(60px)보다 큰 값으로 설정하여 겹침 방지 */
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #28a745;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 5px;
+        z-index: 1050; /* 헤더(1040)보다 높은 z-index 설정 */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      
+      .notification.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .notification.error {
+        background-color: #dc3545; /* 에러 시 배경색 */
+      }
     </style>
 </head>
 <body>
@@ -109,9 +134,7 @@
         </div>
         <a class="nav-link has-submenu active" href="#" data-menu="상담">상담관리</a>
         <div class="submenu" id="submenu-상담" style="display: block">
-          <a class="nav-link" href="#">상담사일정등록</a>
           <a class="nav-link active" href="#">상담사/예약관리</a>
-          <a class="nav-link" href="#">상담결과관리</a>
         </div>
         <a class="nav-link has-submenu" href="#" data-menu="마일리지">마일리지관리</a>
         <div class="submenu" id="submenu-마일리지" style="display: none">
@@ -127,13 +150,6 @@
             <div class="breadcrumb">
                 <i class="fas fa-home"></i> 홈 &gt; 상담관리 &gt; 상담사 관리
             </div>
-        </div>
-
-        <div class="stats-overview">
-            <div class="stats-card"><div class="stats-icon"><i class="fas fa-users"></i></div><div class="stats-info"><h3>총 상담사</h3><p class="stats-number">12명</p></div></div>
-            <div class="stats-card"><div class="stats-icon"><i class="fas fa-user-check"></i></div><div class="stats-info"><h3>활성 상담사</h3><p class="stats-number">10명</p></div></div>
-            <div class="stats-card"><div class="stats-icon"><i class="fas fa-calendar-check"></i></div><div class="stats-info"><h3>이번 달 상담</h3><p class="stats-number">245건</p></div></div>
-            <div class="stats-card"><div class="stats-icon"><i class="fas fa-star"></i></div><div class="stats-info"><h3>평균 만족도</h3><p class="stats-number">4.7</p></div></div>
         </div>
 
         <div class="counselor-management-section">
