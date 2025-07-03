@@ -3,6 +3,8 @@ import kr.ac.dhuniv.ncs.dto.ProgramDto;
 import kr.ac.dhuniv.ncs.mapper.NcsPrgInfoMapper;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,13 +16,24 @@ public class NcsPrgInfoService {
         this.mapper = mapper;
     }
     
-    public List<ProgramDto> getList(Map<String, Object> params) {
+    public Map<String, Object> getList(Map<String, Object> params) {
         if (params.containsKey("page") && params.containsKey("size")) {
             int page = (Integer) params.get("page");
             int size = (Integer) params.get("size");
             params.put("offset", (page - 1) * size);
         }
-        return mapper.selectList(params);
+        
+        // 1. 데이터 목록 조회
+        List<ProgramDto> list = mapper.selectList(params);
+        // 2. 전체 개수 조회
+        int totalCount = mapper.selectListCount(params);
+        
+        // 3. 목록과 전체 개수를 Map에 담아 반환
+        Map<String, Object> result = new HashMap<>();
+        result.put("list", list);
+        result.put("totalCount", totalCount);
+        
+        return result;
     }
     
     public ProgramDto getOne(Long prgId) {

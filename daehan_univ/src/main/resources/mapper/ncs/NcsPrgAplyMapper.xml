@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.dhuniv.ncs.mapper.NcsPrgAplyMapper">
+
+<resultMap id="MyProgramResult" type="kr.ac.dhuniv.ncs.dto.MyProgramDto">
+        <result property="prgId" column="prg_id"/>
+        <result property="prgNm" column="prg_nm"/>
+        <result property="prgStDt" column="prg_st_dt"/>
+        <result property="prgEndDt" column="prg_end_dt"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="aplyId" column="aply_id"/>
+        <result property="aplyDt" column="aply_dt"/>
+        <result property="aplyStatCd" column="aply_stat_cd"/>
+        <result property="cmpStatCd" column="cmp_stat_cd"/>
+    </resultMap>
+
+    <select id="countByProgramId" resultType="int" parameterType="long">
+        SELECT COUNT(*)
+        FROM public.ncs_prg_aply
+        WHERE prg_id = #{prgId}
+    </select>
+
+    <select id="existsByProgramIdAndStudentId" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM public.ncs_prg_aply
+        WHERE prg_id = #{prgId} AND std_id = #{stdId}
+    </select>
+
+    <insert id="insert" parameterType="kr.ac.dhuniv.ncs.dto.NcsPrgAplyDto">
+        INSERT INTO public.ncs_prg_aply
+          (prg_id, std_id, aply_dt, aply_stat_cd, aply_code)
+        VALUES
+          (#{prgId}, #{stdId}, now(), #{aplyStatCd}, #{aplyCode})
+    </insert>
+    
+    <select id="findMyProgramsByStudentId" resultMap="MyProgramResult" parameterType="long">
+        SELECT
+            p.prg_id,
+            p.prg_nm,
+            p.prg_st_dt,
+            p.prg_end_dt,
+            ci.cci_nm AS category_name,
+            a.aply_id,
+            a.aply_dt,
+            a.aply_stat_cd,
+            c.cmp_stat_cd
+        FROM
+            public.ncs_prg_aply a
+        JOIN
+            public.ncs_prg_info p ON a.prg_id = p.prg_id
+        JOIN
+            public.core_cpt_info ci ON p.cci_id = ci.cci_id
+        LEFT JOIN
+            public.ncs_cmp_info c ON a.aply_id = c.aply_id
+        WHERE
+            a.std_id = 34
+        ORDER BY
+            a.aply_dt DESC
+    </select>
+
+</mapper>
