@@ -619,7 +619,7 @@
       <div class="header-right">
         <div class="user-box">
           <div class="user-info">
-            <div><strong>김교수</strong> (staff001)</div>
+            <div><strong>유상담</strong> (2025111001)</div>
             <div class="small">교무처</div>
           </div>
           <button class="user-btn" title="로그아웃">
@@ -802,7 +802,7 @@
                 </button>
 
                 <!-- 삭제는 그대로 POST 폼 -->
-                <form th:action="@{/employee/programs/{id}/delete(id=${program.prgId})}"
+                <form th:action="@{/employees/programs/{id}/delete(id=${program.prgId})}"
                       method="post" style="display:inline">
                   <button type="submit" class="btn-action btn-delete"
                           onclick="return confirm('정말 삭제하시겠습니까?')">
@@ -1103,7 +1103,7 @@ const getUserName = (userId) => {
 // --- 1) 상세보기 모달 열기 (AJAX로 DTO 가져오기) ---
 async function openDetailModal(prgId) {
   currentProgramId = prgId;
-  const res = await fetch(`/employee/programs/${prgId}/json`);
+  const res = await fetch(`/employees/programs/${prgId}/json`);
   if (!res.ok) {
     alert("상세 정보를 불러오던 중 오류가 발생했습니다.");
     return;
@@ -1224,7 +1224,7 @@ function openAddModal() {
 async function openEditModal(prgId) {
   document.getElementById("modalTitle").textContent = "프로그램 수정";
   
-  const res = await fetch(`/employee/programs/${prgId}/json`);
+  const res = await fetch(`/employees/programs/${prgId}/json`);
   if (!res.ok) {
     alert("수정할 정보를 불러오던 중 오류가 발생했습니다.");
     return;
@@ -1323,10 +1323,10 @@ async function saveProgram() {
   // URL 설정
   let url, method;
   if (isEdit) {
-    url = `/employee/programs/${currentProgramId}?action=update`;
+    url = `/employees/programs/${currentProgramId}?action=update`;
     method = 'POST';
   } else {
-    url = `/employee/programs`;
+    url = `/employees/programs`;
     method = 'POST';
   }
   
