@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.dhuniv.ncs.mapper.NcsPrgAplyMapper">
+
+    <resultMap id="MyProgramResult" type="kr.ac.dhuniv.ncs.dto.MyProgramDto">
+        <result property="prgId" column="prg_id"/>
+        <result property="prgNm" column="prg_nm"/>
+        <result property="prgStDt" column="prg_st_dt"/>
+        <result property="prgEndDt" column="prg_end_dt"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="aplyId" column="aply_id"/>
+        <result property="aplyDt" column="aply_dt"/>
+        <result property="aplyStatCd" column="aply_stat_cd"/>
+        <result property="cmpStatCd" column="cmp_stat_cd"/>
+    </resultMap>
+
+    <select id="countByProgramId" resultType="int" parameterType="long">
+        SELECT COUNT(*) FROM public.ncs_prg_aply WHERE prg_id = #{prgId}
+    </select>
+
+    <select id="existsByProgramIdAndStudentId" resultType="int" parameterType="map">
+        SELECT COUNT(*) FROM public.ncs_prg_aply WHERE prg_id = #{prgId} AND std_id = #{stdId}
+    </select>
+
+    <insert id="insert" parameterType="kr.ac.dhuniv.ncs.dto.NcsPrgAplyDto">
+        INSERT INTO public.ncs_prg_aply (prg_id, std_id, aply_dt, aply_stat_cd, aply_code)
+        VALUES (#{prgId}, #{stdId}, now(), #{aplyStatCd}, #{aplyCode})
+    </insert>
+    
+    <select id="findMyProgramsByStudentId" resultMap="MyProgramResult" parameterType="long">
+        SELECT p.prg_id, p.prg_nm, p.prg_st_dt, p.prg_end_dt, ci.cci_nm AS category_name,
+               a.aply_id, a.aply_dt, a.aply_stat_cd, c.cmp_stat_cd
+        FROM public.ncs_prg_aply a
+        JOIN public.ncs_prg_info p ON a.prg_id = p.prg_id
+        JOIN public.core_cpt_info ci ON p.cci_id = ci.cci_id
+        LEFT JOIN public.ncs_cmp_info c ON a.aply_id = c.aply_id
+        WHERE a.std_id = #{stdId}
+        ORDER BY a.aply_dt DESC
+    </select>
+    
+    <resultMap id="ApplicationResult" type="kr.ac.dhuniv.ncs.dto.NcsApplicationDto">
+        <id     property="aplyId"       column="aply_id"/>
+        <result property="aplyDt"       column="aply_dt"/>
+        <result property="aplyStatCd"   column="aply_stat_cd"/>
+        <result property="prgId"        column="prg_id"/>
+        <result property="prgNm"        column="prg_nm"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="maxCnt"       column="max_cnt"/>
+        <result property="stdId"        column="std_id"/>
+        <result property="stdNo"        column="std_no"/>
+        <result property="stdNm"        column="std_nm"/>
+        <result property="schYr"        column="sch_yr"/>
+    </resultMap>
+
+    <sql id="applicationWhere">
+        <where>
+            </where>
+    </sql>
+
+    <select id="findApplications" resultMap="ApplicationResult" parameterType="map">
+        SELECT a.aply_id, a.aply_dt, a.aply_stat_cd, p.prg_id, p.prg_nm, s.std_id, s.std_no, s.std_nm, s.sch_yr
+        FROM public.ncs_prg_aply a
+        JOIN public.std_info s ON a.std_id = s.std_id
+        JOIN public.ncs_prg_info p ON a.prg_id = p.prg_id
+        <include refid="applicationWhere"/>
+        ORDER BY a.aply_dt DESC
+        <if test="offset != null and size != null">
+            LIMIT #{size} OFFSET #{offset}
+        </if>
+    </select>
+
+    <select id="countApplications" resultType="int" parameterType="map">
+        SELECT count(*)
+        FROM public.ncs_prg_aply a
+        JOIN public.std_info s ON a.std_id = s.std_id
+        JOIN public.ncs_prg_info p ON a.prg_id = p.prg_id
+        <include refid="applicationWhere"/>
+    </select>
+    
+    <select id="findApplicationById" resultMap="ApplicationResult" parameterType="long">
+        SELECT
+            a.aply_id, a.aply_dt, a.aply_stat_cd,
+            p.prg_id, p.prg_nm, p.max_cnt,
+            s.std_id, s.std_no, s.std_nm, s.sch_yr,
+            ci.cci_nm AS category_name
+        FROM public.ncs_prg_aply a
+        JOIN public.std_info s ON a.std_id = s.std_id
+        JOIN public.ncs_prg_info p ON a.prg_id = p.prg_id
+        LEFT JOIN public.core_cpt_info ci ON p.cci_id = ci.cci_id
+        WHERE a.aply_id = #{aplyId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE public.ncs_prg_aply
+        SET aply_stat_cd = #{status}
+        WHERE aply_id = #{aplyId}
+    </update>
+
+</mapper>

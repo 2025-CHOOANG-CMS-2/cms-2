@@ -87,7 +87,7 @@ public class EmployeeMileageService {
     @Transactional
     public void saveMileagePayments(List<MileagePaymentReqDTO> requests) {
     	// mlg_code(마일리지 코드) 생성 : 일괄지급이던 개별지급이던 마일리지 코드 1개 생성 (unique 하지 않음)
-    	String mlgCode = generateCode("MLG");
+    	String mlgCode = generateMlgCode("MLG");
     	
         for (MileagePaymentReqDTO req : requests) {
             StdInfo student = stdInfoRepo.findByStdId(req.getStdId())
@@ -99,7 +99,7 @@ public class EmployeeMileageService {
 
             StdMileageTotal total = mileageTotalRepo.findByStudent(student)
                 .orElse(StdMileageTotal.builder()
-                		.totCode(generateCode("TOT"))       //tot_code(마일리총점 고유코드)
+                		.totCode(generateTotCode("TOT"))       //tot_code(마일리지총점 고유코드)
                         .student(student)                   //대상 학생 
                         .totalMileageScore(BigDecimal.ZERO) //마일리지 총점
                         .lastUpdated(LocalDateTime.now())   //마지막 갱신일자
@@ -189,11 +189,18 @@ public class EmployeeMileageService {
     
     // *** 공통 코드 ***
     
-    // 각 테이블 고유코드 생성기
-    private String generateCode(String prefix) {
+    // std_mileage_hist 테이블 고유코드 생성기
+    private String generateMlgCode(String prefix) {
     	Integer maxCode = mileageHistRepo.findMaxMlgCodeNumber();
     	int nextCode = (maxCode != null) ? maxCode + 1 : 1;
     	return String.format(prefix+"%03d", nextCode);   // 예: MLG001, MLG002 ...
+    }
+    
+    // std_mileage_total 테이블 고유코드 생성기
+    private String generateTotCode(String prefix) {
+    	Integer maxCode = mileageTotalRepo.findMaxTotCodeNumber();
+    	int nextCode = (maxCode != null) ? maxCode + 1 : 1;
+    	return String.format(prefix+"%03d", nextCode);   // 예: TOT001, TOT002 ...
     }
     
     // 학기 설정 (1학기 : 3월 ~ 8월, 2학기 : 9월 ~ 다음년 2월)

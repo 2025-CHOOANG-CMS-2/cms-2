@@ -1,1364 +1,687 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>대한대학교 CMS 관리자 - 프로그램 신청 관리</title>
-    <!-- Bootstrap & Icons -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <style>
-      /* 공통 스타일 */
-      body {
-        background-color: #f8f9fa;
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", sans-serif;
-      }
-
-      /* 헤더 영역 */
-      .header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 60px;
-        background-color: #1a2a45;
-        color: white;
-        z-index: 1040;
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
-
-      .header-left {
-        flex: 1;
-        font-weight: bold;
-        font-size: 1.1rem;
-      }
-
-      .header-center {
-        flex: 1;
-        text-align: center;
-        font-size: 1.2rem;
-      }
-
-      .header-right {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        font-size: 0.9rem;
-        gap: 1rem;
-      }
-
-      /* 사용자 정보 */
-      .user-box {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .user-info {
-        text-align: right;
-        line-height: 1.2;
-      }
-
-      .user-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        padding: 0.25rem 0.5rem;
-        cursor: pointer;
-      }
-
-      .user-btn:hover {
-        color: #ffc107;
-      }
-
-      /* 사이드바 */
-      .sidebar {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        width: 240px;
-        height: calc(100vh - 60px);
-        background-color: #1a2a45;
-        padding: 1rem 0;
-        color: white;
-        z-index: 1030;
-        overflow-y: auto;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-      }
-
-      /* 본문 */
-      .main-content {
-        margin-top: 60px;
-        margin-left: 240px;
-        padding: 1.5rem;
-        min-height: calc(100vh - 60px);
-      }
-
-      /* 메뉴 스타일 */
-      .nav-link {
-        color: #e0e8f0;
-        padding: 0.75rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background-color 0.2s, color 0.2s;
-        text-decoration: none;
-      }
-
-      .nav-link:hover {
-        background-color: #223a5e;
-        color: #ffffff;
-      }
-
-      .nav-link.active {
-        background-color: #2b4d77;
-        font-weight: bold;
-      }
-
-      /* 페이지 헤더 */
-      .page-header {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
-
-      .page-title {
-        color: #1a2a45;
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin: 0;
-      }
-
-      .page-subtitle {
-        color: #666;
-        font-size: 0.95rem;
-        margin-top: 0.5rem;
-      }
-
-      /* 통계 카드 */
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
-      }
-
-      .stat-card {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid transparent;
-        transition: transform 0.2s;
-      }
-
-      .stat-card:hover {
-        transform: translateY(-2px);
-      }
-
-      .stat-card.pending {
-        border-left-color: #f59e0b;
-      }
-
-      .stat-card.approved {
-        border-left-color: #10b981;
-      }
-
-      .stat-card.rejected {
-        border-left-color: #ef4444;
-      }
-
-      .stat-card.total {
-        border-left-color: #3b82f6;
-      }
-
-      .stat-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-      }
-
-      .stat-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.2rem;
-      }
-
-      .stat-icon.pending {
-        background: #f59e0b;
-      }
-
-      .stat-icon.approved {
-        background: #10b981;
-      }
-
-      .stat-icon.rejected {
-        background: #ef4444;
-      }
-
-      .stat-icon.total {
-        background: #3b82f6;
-      }
-
-      .stat-number {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #1a2a45;
-      }
-
-      .stat-label {
-        color: #6b7280;
-        font-size: 0.9rem;
-        font-weight: 500;
-      }
-
-      /* 검색 및 필터 */
-      .filter-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
-
-      .search-controls {
-        display: flex;
-        gap: 1rem;
-        align-items: center;
-        flex-wrap: wrap;
-      }
-
-      /* 테이블 */
-      .table-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-
-      .table {
-        margin: 0;
-      }
-
-      .table th {
-        background: #f8f9fa;
-        border: none;
-        font-weight: 600;
-        color: #374151;
-        padding: 1rem;
-      }
-
-      .table td {
-        border: none;
-        padding: 1rem;
-        vertical-align: middle;
-      }
-
-      .table tbody tr {
-        border-bottom: 1px solid #e5e7eb;
-      }
-
-      .table tbody tr:hover {
-        background: #f9fafb;
-      }
-
-      /* 상태 배지 */
-      .status-badge {
-        padding: 0.25rem 0.75rem;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        font-weight: 500;
-      }
-
-      .status-req {
-        background: #fef3c7;
-        color: #92400e;
-      }
-
-      .status-app {
-        background: #d1fae5;
-        color: #065f46;
-      }
-
-      .status-rej {
-        background: #fee2e2;
-        color: #991b1b;
-      }
-
-      .status-can {
-        background: #e5e7eb;
-        color: #374151;
-      }
-
-      /* 액션 버튼 */
-      .btn-action {
-        padding: 0.25rem 0.5rem;
-        border: 1px solid #d1d5db;
-        background: white;
-        color: #374151;
-        border-radius: 4px;
-        font-size: 0.8rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        margin: 0 0.2rem;
-      }
-
-      .btn-action:hover {
-        background: #f9fafb;
-        color: #374151;
-        text-decoration: none;
-      }
-
-      .btn-detail {
-        color: #3b82f6;
-        border-color: #3b82f6;
-      }
-
-      .btn-detail:hover {
-        background: #eff6ff;
-        color: #2563eb;
-      }
-
-      .btn-approve {
-        color: #10b981;
-        border-color: #10b981;
-      }
-
-      .btn-approve:hover {
-        background: #ecfdf5;
-        color: #059669;
-      }
-
-      .btn-reject {
-        color: #ef4444;
-        border-color: #ef4444;
-      }
-
-      .btn-reject:hover {
-        background: #fef2f2;
-        color: #dc2626;
-      }
-
-      /* 모달 스타일 */
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 2000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 1rem;
-        overflow-y: auto;
-      }
-
-      .modal-overlay.show {
-        display: flex;
-      }
-
-      .modal-content {
-        background: white;
-        border-radius: 12px;
-        max-width: 600px;
-        width: 100%;
-        max-height: calc(100vh - 2rem);
-        display: flex;
-        flex-direction: column;
-        position: relative;
-        animation: modalSlideIn 0.3s ease-out;
-        margin: auto;
-      }
-
-      @keyframes modalSlideIn {
-        from {
-          opacity: 0;
-          transform: translateY(-20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 1.5rem;
-        border-bottom: 1px solid #e5e7eb;
-        flex-shrink: 0;
-      }
-
-      .modal-title {
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #1a2a45;
-        margin: 0;
-      }
-
-      .modal-close {
-        background: none;
-        border: none;
-        font-size: 1.5rem;
-        color: #6b7280;
-        cursor: pointer;
-        padding: 0.25rem;
-        border-radius: 4px;
-        transition: background-color 0.2s;
-        flex-shrink: 0;
-      }
-
-      .modal-close:hover {
-        background: #f3f4f6;
-      }
-
-      .modal-body {
-        padding: 1.5rem;
-        overflow-y: auto;
-        flex: 1;
-      }
-
-      .detail-section {
-        margin-bottom: 2rem;
-      }
-
-      .detail-section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1a2a45;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-
-      .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin-bottom: 1rem;
-      }
-
-      .detail-item {
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 3px solid #e5e7eb;
-      }
-
-      .detail-item.primary {
-        border-left-color: #3b82f6;
-      }
-
-      .detail-item.success {
-        border-left-color: #10b981;
-      }
-
-      .detail-item.warning {
-        border-left-color: #f59e0b;
-      }
-
-      .detail-item.danger {
-        border-left-color: #ef4444;
-      }
-
-      .detail-label {
-        font-size: 0.85rem;
-        color: #6b7280;
-        margin-bottom: 0.25rem;
-        font-weight: 500;
-      }
-
-      .detail-value {
-        font-size: 1rem;
-        color: #1a2a45;
-        font-weight: 600;
-      }
-
-      .modal-actions {
-        display: flex;
-        gap: 1rem;
-        padding: 1.5rem;
-        border-top: 1px solid #e5e7eb;
-        background: #f9fafb;
-        flex-shrink: 0;
-      }
-
-      .btn-modal {
-        flex: 1;
-        padding: 0.75rem 1.5rem;
-        border: none;
-        border-radius: 8px;
-        font-size: 0.95rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .btn-modal-secondary {
-        background: white;
-        color: #374151;
-        border: 1px solid #d1d5db;
-      }
-
-      .btn-modal-secondary:hover {
-        background: #f9fafb;
-      }
-
-      .btn-modal-success {
-        background: #10b981;
-        color: white;
-      }
-
-      .btn-modal-success:hover {
-        background: #059669;
-      }
-
-      .btn-modal-danger {
-        background: #ef4444;
-        color: white;
-      }
-
-      .btn-modal-danger:hover {
-        background: #dc2626;
-      }
-
-      /* 추가된 스타일 */
-      .table th,
-      .table td {
-        padding: 1rem;
-        vertical-align: middle;
-      }
-
-      /* 상태와 관리 열의 너비 조정 */
-      .table th.status-col {
-        width: 120px;
-      }
-
-      .table th.action-col {
-        width: 180px;
-      }
-
-      /* 페이지네이션 스타일 */
-      .pagination-container {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-      }
-
-      .pagination {
-        justify-content: center;
-      }
-
-      .pagination .page-link {
-        color: #1a2a45;
-        padding: 0.5rem 1rem;
-      }
-
-      .pagination .page-item.active .page-link {
-        background-color: #1a2a45;
-        border-color: #1a2a45;
-      }
-
-      /* 반응형 */
-      @media (max-width: 768px) {
-        .sidebar {
-          left: -240px;
-          transition: left 0.3s ease;
-        }
-
-        .sidebar.show {
-          left: 0;
-        }
-
-        .main-content {
-          margin-left: 0;
-        }
-
-        .hamburger {
-          display: inline-block !important;
-        }
-
-        .header-right {
-          display: none;
-        }
-
-        .search-controls {
-          flex-direction: column;
-          align-items: stretch;
-        }
-
-        .table-container {
-          overflow-x: auto;
-        }
-
-        .detail-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .modal-content {
-          margin: 0;
-          max-height: 100vh;
-          border-radius: 0;
-          height: 100vh;
-        }
-
-        .stats-grid {
-          grid-template-columns: repeat(2, 1fr);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- 상단 헤더 -->
-    <header class="header">
-      <div class="header-left">
-        <span
-          class="hamburger"
-          id="hamburger"
-          style="
-            display: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-            margin-right: 1rem;
-          "
-          >&#9776;</span
-        >
-        CMS 관리자 포털
-      </div>
-      <div class="header-center">
-        <img
-          src="../../static/images/logo-white.png"
-          alt="logo"
-          height="30"
-          class="me-2"
-        />
-        대한대학교
-      </div>
-      <div class="header-right">
-        <div class="user-box">
-          <div class="user-info">
-            <div><strong>김교수</strong> (staff001)</div>
-            <div class="small">교무처</div>
-          </div>
-          <button class="user-btn" title="로그아웃">
-            <i class="bi bi-box-arrow-right"></i>
-          </button>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>대한대학교 CMS 관리자 - 프로그램 신청 관리</title>
+<!-- Bootstrap & Icons -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
+<style>
+/* 공통 스타일 */
+body {
+	background-color: #f8f9fa;
+	margin: 0;
+	padding: 0;
+	font-family: "Segoe UI", sans-serif;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* 헤더 영역 */
+.header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 60px;
+	background-color: #1a2a45;
+	color: white;
+	z-index: 1040;
+	display: flex;
+	align-items: center;
+	padding: 0 1rem;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header-left {
+	flex: 1;
+	font-weight: bold;
+	font-size: 1.1rem;
+}
+
+.header-center {
+	flex: 1;
+	text-align: center;
+	font-size: 1.2rem;
+}
+
+.header-right {
+	flex: 1;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: 0.9rem;
+	gap: 1rem;
+}
+
+/* 사용자 정보 */
+.user-box {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.user-info {
+	text-align: right;
+	line-height: 1.2;
+}
+
+.user-btn {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 1.2rem;
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
+
+.user-btn:hover {
+	color: #ffc107;
+}
+
+/* 사이드바 */
+.sidebar {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	width: 240px;
+	height: calc(100vh - 60px);
+	background-color: #1a2a45;
+	padding: 1rem 0;
+	color: white;
+	z-index: 1030;
+	overflow-y: auto;
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 본문 */
+.main-content {
+	margin-top: 60px;
+	margin-left: 240px;
+	padding: 1.5rem;
+	min-height: calc(100vh - 60px);
+}
+
+/* 메뉴 스타일 */
+.nav-link {
+	color: #e0e8f0;
+	padding: 0.75rem 1.5rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	transition: background-color 0.2s, color 0.2s;
+	text-decoration: none;
+}
+
+.nav-link:hover {
+	background-color: #223a5e;
+	color: #ffffff;
+}
+
+.nav-link.active {
+	background-color: #2b4d77;
+	font-weight: bold;
+}
+
+/* 페이지 헤더 */
+.page-header {
+	background: white;
+	padding: 1.5rem;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	margin-bottom: 2rem;
+}
+
+.page-title {
+	color: #1a2a45;
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin: 0;
+}
+
+.page-subtitle {
+	color: #666;
+	font-size: 0.95rem;
+	margin-top: 0.5rem;
+}
+
+/* 테이블 */
+.table-container {
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
+
+.table {
+	margin: 0;
+}
+
+.table th {
+	background: #f8f9fa;
+	border: none;
+	font-weight: 600;
+	color: #374151;
+	padding: 1rem;
+}
+
+.table td {
+	border: none;
+	padding: 1rem;
+	vertical-align: middle;
+}
+
+.table tbody tr {
+	border-bottom: 1px solid #e5e7eb;
+}
+
+.table tbody tr:hover {
+	background: #f9fafb;
+}
+
+/* 액션 버튼 */
+.btn-action {
+	padding: 0.25rem 0.75rem;
+	border: 1px solid #d1d5db;
+	background: white;
+	color: #374151;
+	border-radius: 4px;
+	font-size: 0.85rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	text-decoration: none;
+	margin: 0 0.2rem;
+}
+
+.btn-action:hover {
+	background: #f9fafb;
+	color: #374151;
+	text-decoration: none;
+}
+
+.btn-detail {
+	color: #3b82f6;
+	border-color: #3b82f6;
+}
+
+.btn-detail:hover {
+	background: #eff6ff;
+	color: #2563eb;
+}
+
+/* 상세 정보 스타일 */
+.detail-section {
+	margin-bottom: 2rem;
+}
+
+.detail-section-title {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #1a2a45;
+	margin-bottom: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.detail-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.detail-item {
+	background: #f9fafb;
+	padding: 1rem;
+	border-radius: 8px;
+	border-left: 3px solid #e5e7eb;
+}
+
+.detail-label {
+	font-size: 0.85rem;
+	color: #6b7280;
+	margin-bottom: 0.25rem;
+	font-weight: 500;
+}
+
+.detail-value {
+	font-size: 1rem;
+	color: #1a2a45;
+	font-weight: 600;
+}
+
+/* 반응형 */
+@media ( max-width : 768px) {
+	.sidebar {
+		left: -240px;
+		transition: left 0.3s ease;
+	}
+	.sidebar.show {
+		left: 0;
+	}
+	.main-content {
+		margin-left: 0;
+	}
+	.hamburger {
+		display: inline-block !important;
+	}
+	.header-right {
+		display: none;
+	}
+	.table-container {
+		overflow-x: auto;
+	}
+	.detail-grid {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+</head>
+<body>
+	<!-- 상단 헤더 -->
+	<header class="header">
+		<div class="header-left">
+			<span class="hamburger" id="hamburger"
+				style="display: none; cursor: pointer; font-size: 1.25rem; margin-right: 1rem;">&#9776;</span>
+			CMS 관리자 포털
+		</div>
+		<div class="header-center">
+			<img src="../../static/images/logo-white.png" alt="logo" height="30"
+				class="me-2" /> 대한대학교
+		</div>
+		<div class="header-right">
+			<div class="user-box">
+				<div class="user-info">
+					<div>
+						<strong>김교수</strong> (staff001)
+					</div>
+					<div class="small">교무처</div>
+				</div>
+				<button class="user-btn" title="로그아웃">
+					<i class="bi bi-box-arrow-right"></i>
+				</button>
+			</div>
+		</div>
+	</header>
+
+	<!-- 좌측 사이드바 -->
+	<aside class="sidebar" id="sidebar">
+		<nav class="nav flex-column">
+			<a class="nav-link" href="/admin/dashboard"> <i
+				class="bi bi-speedometer2 me-2"></i>대시보드
+			</a> <a class="nav-link" href="/admin/students"> <i
+				class="bi bi-people me-2"></i>학생 관리
+			</a> <a class="nav-link" href="/admin/programs"> <i
+				class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
+			</a> <a class="nav-link active" href="/admin/applications"> <i
+				class="bi bi-file-earmark-text me-2"></i>신청 관리
+			</a> <a class="nav-link" href="/admin/competency"> <i
+				class="bi bi-graph-up me-2"></i>역량 관리
+			</a> <a class="nav-link" href="/admin/counseling"> <i
+				class="bi bi-chat-dots me-2"></i>상담 관리
+			</a> <a class="nav-link" href="/admin/reports"> <i
+				class="bi bi-file-text me-2"></i>보고서
+			</a> <a class="nav-link" href="/admin/settings"> <i
+				class="bi bi-gear me-2"></i>시스템 설정
+			</a>
+		</nav>
+	</aside>
+
+	<!-- 본문 영역 -->
+	<main class="main-content">
+		<div class="page-header">
+			<div class="page-title-section">
+				<h1>프로그램 신청 관리</h1>
+				<p class="page-subtitle">학생들의 비교과 프로그램 신청을 검토하고 승인/반려할 수 있습니다.</p>
+			</div>
+		</div>
+
+		<div class="table-container">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>신청ID</th>
+						<th>프로그램명</th>
+						<th>학생정보</th>
+						<th>신청일시</th>
+						<th>상태</th>
+						<th style="width: 200px">관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.isEmpty(list)}">
+						<td colspan="6" class="text-center py-5">신청 내역이 없습니다.</td>
+					</tr>
+					<tr th:each="app : ${list}">
+						<td th:text="${app.aplyId}">1</td>
+						<td th:text="${app.prgNm}">프로그램명</td>
+						<td>
+							<div th:text="${app.stdNm} + ' (' + ${app.stdNo} + ')'"></div>
+						</td>
+						<td th:text="${#temporals.format(app.aplyDt, 'yyyy-MM-dd HH:mm')}"></td>
+						<td>
+						    <span th:if="${app.aplyStatCd == 'APPLIED'}" class="badge bg-warning text-dark">승인대기</span>
+						    <span th:if="${app.aplyStatCd == 'CONFIRM'}" class="badge bg-success">승인완료</span>
+						    <span th:if="${app.aplyStatCd == 'REJECT'}" class="badge bg-danger">반려</span>
+						</td>
+						<td>
+							<button type="button" class="btn-action btn-detail"
+								th:data-aply-id="${app.aplyId}">상세보기</button>
+								<th:block
+								th:if="${app.aplyStatCd == 'APPLIED'}">
+								<form
+									th:action="@{/employees/programs/applications/{id}/approve(id=${app.aplyId})}"
+									method="post" style="display: inline;"
+									onsubmit="return confirm('이 신청을 승인하시겠습니까?');">
+									<button type="submit" class="btn btn-sm btn-success">승인</button>
+								</form>
+								<form
+									th:action="@{/employees/programs/applications/{id}/reject(id=${app.aplyId})}"
+									method="post" style="display: inline;"
+									onsubmit="return confirm('이 신청을 반려하시겠습니까?');">
+									<button type="submit" class="btn btn-sm btn-danger">반려</button>
+								</form>
+							</th:block>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="pagination-container" th:if="${totalPages > 1}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${currentPage - 1})}">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${pageNumber == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${pageNumber})}"
+                           th:text="${pageNumber}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${currentPage + 1})}">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-      </div>
-    </header>
+	</main>
 
-    <!-- 좌측 사이드바 -->
-    <aside class="sidebar" id="sidebar">
-      <nav class="nav flex-column">
-        <a class="nav-link" href="/admin/dashboard">
-          <i class="bi bi-speedometer2 me-2"></i>대시보드
-        </a>
-        <a class="nav-link" href="/admin/students">
-          <i class="bi bi-people me-2"></i>학생 관리
-        </a>
-        <a class="nav-link" href="/admin/programs">
-          <i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
-        </a>
-        <a class="nav-link active" href="/admin/applications">
-          <i class="bi bi-file-earmark-text me-2"></i>신청 관리
-        </a>
-        <a class="nav-link" href="/admin/competency">
-          <i class="bi bi-graph-up me-2"></i>역량 관리
-        </a>
-        <a class="nav-link" href="/admin/counseling">
-          <i class="bi bi-chat-dots me-2"></i>상담 관리
-        </a>
-        <a class="nav-link" href="/admin/reports">
-          <i class="bi bi-file-text me-2"></i>보고서
-        </a>
-        <a class="nav-link" href="/admin/settings">
-          <i class="bi bi-gear me-2"></i>시스템 설정
-        </a>
-      </nav>
-    </aside>
+	<!-- 모달 -->
+	<div class="modal fade" id="detailModal" tabindex="-1"
+		aria-labelledby="detailModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailModalLabel">신청 상세 정보</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-person-circle"></i> 신청자 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">학번</div>
+								<div class="detail-value" id="modalStdNo">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">학생명</div>
+								<div class="detail-value" id="modalStdNm">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">학년</div>
+								<div class="detail-value" id="modalSchYr">-</div>
+							</div>
+						</div>
+					</div>
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-file-earmark-text"></i> 신청 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">신청ID</div>
+								<div class="detail-value" id="modalAplyId">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">신청일시</div>
+								<div class="detail-value" id="modalAplyDt">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">신청상태</div>
+								<div class="detail-value" id="modalAplyStatCd">-</div>
+							</div>
+						</div>
+					</div>
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-grid-3x3-gap"></i> 프로그램 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">프로그램ID</div>
+								<div class="detail-value" id="modalPrgId">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">프로그램명</div>
+								<div class="detail-value" id="modalPrgNm">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">카테고리</div>
+								<div class="detail-value" id="modalCategoryName">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">정원</div>
+								<div class="detail-value" id="modalMaxCnt">-</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+					<div id="modalActionButtons" style="display: none;">
+						<button type="button" class="btn btn-success" id="btnApprove">
+							<i class="bi bi-check-circle me-1"></i>승인
+						</button>
+						<button type="button" class="btn btn-danger" id="btnReject">
+							<i class="bi bi-x-circle me-1"></i>반려
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <!-- 본문 영역 -->
-    <main class="main-content">
-      <!-- 페이지 헤더 -->
-      <div class="page-header">
-        <h1 class="page-title">프로그램 신청 관리</h1>
-        <p class="page-subtitle">
-          학생들의 비교과 프로그램 신청을 검토하고 승인/반려할 수 있습니다.
-        </p>
-      </div>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
+    let detailModalInstance;
+    let currentAplyId = null; // 현재 모달에서 보고 있는 신청 ID
 
-      <!-- 통계 카드 -->
-      <div class="stats-grid">
-        <div class="stat-card total">
-          <div class="stat-header">
-            <div class="stat-icon total">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-            <div>
-              <div class="stat-number" id="totalCount">6</div>
-              <div class="stat-label">전체 신청</div>
-            </div>
-          </div>
-        </div>
+    async function openDetailModal(aplyId) {
+        try {
+            console.log('모달 열기 시도:', aplyId);
+            currentAplyId = aplyId; // 현재 신청 ID 저장
+            
+            // 서버에서 상세 정보 가져오기
+            const response = await fetch(`/employees/programs/applications/${aplyId}/json`);
+            if (!response.ok) {
+                throw new Error('데이터를 불러오는데 실패했습니다.');
+            }
+            const data = await response.json();
+            console.log('서버에서 받은 데이터:', data);
 
-        <div class="stat-card pending">
-          <div class="stat-header">
-            <div class="stat-icon pending">
-              <i class="bi bi-clock"></i>
-            </div>
-            <div>
-              <div class="stat-number" id="pendingCount">5</div>
-              <div class="stat-label">승인 대기</div>
-            </div>
-          </div>
-        </div>
+            // 모달에 데이터 설정
+            document.getElementById('modalStdNo').textContent = data.stdNo || '-';
+            document.getElementById('modalStdNm').textContent = data.stdNm || '-';
+            document.getElementById('modalSchYr').textContent = data.schYr ? `${data.schYr}학년` : '-';
+            
+            document.getElementById('modalAplyId').textContent = data.aplyId || '-';
+            document.getElementById('modalAplyDt').textContent = formatDateTime(data.aplyDt);
+            
+            // 상태 코드를 한글로 변환
+            let statusText = data.aplyStatCd;
+            switch(data.aplyStatCd) {
+                case 'APPLY': 
+                    statusText = '승인대기'; 
+                    break;
+                case 'CONFIRM': 
+                case 'APPROVED':  // 혹시 다른 코드를 사용하는 경우
+                    statusText = '승인완료'; 
+                    break;
+                case 'REJECT': 
+                case 'REJECTED':  // 혹시 다른 코드를 사용하는 경우
+                    statusText = '반려'; 
+                    break;
+                default:
+                    console.warn('알 수 없는 상태 코드:', data.aplyStatCd);
+                    statusText = data.aplyStatCd; // 원본 값 사용
+            }
+            document.getElementById('modalAplyStatCd').textContent = statusText;
+            
+            document.getElementById('modalPrgId').textContent = data.prgId || '-';
+            document.getElementById('modalPrgNm').textContent = data.prgNm || '-';
+            document.getElementById('modalCategoryName').textContent = data.categoryName || '-';
+            document.getElementById('modalMaxCnt').textContent = data.maxCnt ? `${data.maxCnt}명` : '-';
 
-        <div class="stat-card approved">
-          <div class="stat-header">
-            <div class="stat-icon approved">
-              <i class="bi bi-check-circle"></i>
-            </div>
-            <div>
-              <div class="stat-number" id="approvedCount">1</div>
-              <div class="stat-label">승인 완료</div>
-            </div>
-          </div>
-        </div>
+            // 승인대기 상태일 때만 액션 버튼 표시
+            const actionButtons = document.getElementById('modalActionButtons');
+            console.log('상태 코드:', data.aplyStatCd, '버튼 표시 여부:', data.aplyStatCd === 'APPLY');
+            
+            if (data.aplyStatCd === 'APPLY') {
+                actionButtons.style.display = 'inline-block';
+            } else {
+                actionButtons.style.display = 'none';
+            }
 
-        <div class="stat-card rejected">
-          <div class="stat-header">
-            <div class="stat-icon rejected">
-              <i class="bi bi-x-circle"></i>
-            </div>
-            <div>
-              <div class="stat-number" id="rejectedCount">0</div>
-              <div class="stat-label">반려</div>
-            </div>
-          </div>
-        </div>
-      </div>
+            // 모달 표시
+            if (detailModalInstance) {
+                detailModalInstance.show();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+    }
 
-      <!-- 검색 및 필터 -->
-      <div class="filter-section">
-        <div class="search-controls">
-          <div class="input-group" style="max-width: 300px">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="학번 또는 신청ID 검색"
-              id="searchInput"
-            />
-            <button class="btn btn-outline-secondary" type="button">
-              <i class="bi bi-search"></i>
-            </button>
-          </div>
-          <select
-            class="form-select"
-            style="max-width: 150px"
-            id="statusFilter"
-          >
-            <option value="">전체 상태</option>
-            <option value="REQ">승인 대기</option>
-            <option value="APP">승인 완료</option>
-            <option value="REJ">반려</option>
-            <option value="CAN">취소</option>
-          </select>
-          <select
-            class="form-select"
-            style="max-width: 150px"
-            id="programFilter"
-          >
-            <option value="">전체 프로그램</option>
-            <option value="COMM001">소통역량향상</option>
-            <option value="GLOB001">글로벌리더십</option>
-            <option value="GLOB002">국제문화교류</option>
-            <option value="CREA001">창의적사고</option>
-            <option value="PROB001">문제해결능력</option>
-            <option value="SELF001">자기주도학습</option>
-          </select>
-        </div>
-      </div>
+    // 승인 처리 함수
+    async function approveApplication() {
+        if (!currentAplyId) return;
+        
+        if (!confirm('이 신청을 승인하시겠습니까?')) {
+            return;
+        }
 
-      <!-- 신청 테이블 -->
-      <div class="table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th style="width: 60px">번호</th>
-              <th>신청ID</th>
-              <th>학번</th>
-              <th>학생명</th>
-              <th>프로그램</th>
-              <th style="width: 130px">신청일시</th>
-              <th style="width: 100px">상태</th>
-              <!-- 상태 열 추가 -->
-              <th style="width: 100px">상세</th>
-              <!-- 상세보기 버튼 열 -->
-              <th style="width: 180px">처리</th>
-              <!-- 승인/반려 버튼 열 -->
-            </tr>
-          </thead>
-          <tbody id="applicationTableBody">
-            <!-- 테이블 데이터가 여기에 동적으로 생성됩니다 -->
-          </tbody>
-        </table>
-      </div>
+        try {
+            const response = await fetch(`/employees/programs/applications/${currentAplyId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
 
-      <!-- 페이지네이션 -->
-      <div class="pagination-container">
-        <nav aria-label="Page navigation">
-          <ul class="pagination">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            <li class="page-item active" aria-current="page">
-              <a class="page-link" href="#">1</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#">2</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#">3</a>
-            </li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    </main>
+            if (response.ok) {
+                alert('승인이 완료되었습니다.');
+                detailModalInstance.hide();
+                location.reload(); // 페이지 새로고침으로 목록 업데이트
+            } else {
+                throw new Error('승인 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('승인 처리 중 오류가 발생했습니다.');
+        }
+    }
 
-    <!-- 신청 상세 모달 -->
-    <div class="modal-overlay" id="detailModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 class="modal-title">신청 상세 정보</h2>
-          <button class="modal-close" onclick="closeModal()">×</button>
-        </div>
+    // 반려 처리 함수
+    async function rejectApplication() {
+        if (!currentAplyId) return;
+        
+        if (!confirm('이 신청을 반려하시겠습니까?')) {
+            return;
+        }
 
-        <div class="modal-body">
-          <!-- 신청자 정보 -->
-          <div class="detail-section">
-            <h3 class="detail-section-title">
-              <i class="bi bi-person-circle"></i>
-              신청자 정보
-            </h3>
-            <div class="detail-grid">
-              <div class="detail-item primary">
-                <div class="detail-label">학번</div>
-                <div class="detail-value" id="modalStdNo">-</div>
-              </div>
-              <div class="detail-item primary">
-                <div class="detail-label">학생명</div>
-                <div class="detail-value" id="modalStdName">-</div>
-              </div>
-              <div class="detail-item primary">
-                <div class="detail-label">학과</div>
-                <div class="detail-value" id="modalDept">-</div>
-              </div>
-              <div class="detail-item primary">
-                <div class="detail-label">학년</div>
-                <div class="detail-value" id="modalGrade">-</div>
-              </div>
-            </div>
-          </div>
+        try {
+            const response = await fetch(`/employees/programs/applications/${currentAplyId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
 
-          <!-- 신청 정보 -->
-          <div class="detail-section">
-            <h3 class="detail-section-title">
-              <i class="bi bi-file-earmark-text"></i>
-              신청 정보
-            </h3>
-            <div class="detail-grid">
-              <div class="detail-item success">
-                <div class="detail-label">신청ID</div>
-                <div class="detail-value" id="modalAplyId">-</div>
-              </div>
-              <div class="detail-item success">
-                <div class="detail-label">신청일시</div>
-                <div class="detail-value" id="modalAplyDt">-</div>
-              </div>
-              <div class="detail-item warning">
-                <div class="detail-label">선택구분</div>
-                <div class="detail-value" id="modalAplySelCd">-</div>
-              </div>
-              <div class="detail-item warning">
-                <div class="detail-label">신청상태</div>
-                <div class="detail-value" id="modalAplyStatCd">-</div>
-              </div>
-            </div>
-          </div>
+            if (response.ok) {
+                alert('반려가 완료되었습니다.');
+                detailModalInstance.hide();
+                location.reload(); // 페이지 새로고침으로 목록 업데이트
+            } else {
+                throw new Error('반려 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('반려 처리 중 오류가 발생했습니다.');
+        }
+    }
 
-          <!-- 프로그램 정보 -->
-          <div class="detail-section">
-            <h3 class="detail-section-title">
-              <i class="bi bi-grid-3x3-gap"></i>
-              프로그램 정보
-            </h3>
-            <div class="detail-grid">
-              <div class="detail-item danger">
-                <div class="detail-label">프로그램ID</div>
-                <div class="detail-value" id="modalPrgId">-</div>
-              </div>
-              <div class="detail-item danger">
-                <div class="detail-label">프로그램명</div>
-                <div class="detail-value" id="modalPrgName">-</div>
-              </div>
-              <div class="detail-item danger">
-                <div class="detail-label">카테고리</div>
-                <div class="detail-value" id="modalCategory">-</div>
-              </div>
-              <div class="detail-item danger">
-                <div class="detail-label">정원</div>
-                <div class="detail-value" id="modalCapacity">-</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-actions" id="modalActions">
-          <button class="btn-modal btn-modal-secondary" onclick="closeModal()">
-            닫기
-          </button>
-          <button
-            class="btn-modal btn-modal-success"
-            id="approveBtn"
-            onclick="approveApplication()"
-          >
-            승인
-          </button>
-          <button
-            class="btn-modal btn-modal-danger"
-            id="rejectBtn"
-            onclick="rejectApplication()"
-          >
-            반려
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <script>
-      // 신청 데이터 (샘플 데이터 - 실제로는 API에서 가져옴)
-      const applications = [
-        {
-          id: 1,
-          aply_dt: "2025-06-03T23:03:26.160",
-          aply_sel_cd: "ALL",
-          aply_stat_cd: "APP",
-          aply_id: "APLY00001",
-          prg_id: "COMM001",
-          std_no: "20250300001",
-          // 추가 정보 (조인해서 가져온다고 가정)
-          std_name: "김학생",
-          dept: "컴퓨터공학과",
-          grade: "3학년",
-          prg_name: "소통역량향상 프로그램",
-          category: "전문역량",
-          capacity: "20명",
-        },
-        {
-          id: 3,
-          aply_dt: "2025-06-14T11:44:06.426",
-          aply_sel_cd: "SEL01",
-          aply_stat_cd: "REQ",
-          aply_id: "APL001",
-          prg_id: "GLOB001",
-          std_no: "20250300001",
-          std_name: "김학생",
-          dept: "컴퓨터공학과",
-          grade: "3학년",
-          prg_name: "글로벌 리더십 탐구",
-          category: "글로벌",
-          capacity: "15명",
-        },
-        {
-          id: 4,
-          aply_dt: "2025-06-14T11:44:06.426",
-          aply_sel_cd: "SEL01",
-          aply_stat_cd: "REQ",
-          aply_id: "APL002",
-          prg_id: "GLOB002",
-          std_no: "20250300002",
-          std_name: "이학생",
-          dept: "경영학과",
-          grade: "2학년",
-          prg_name: "국제문화교류 봉사",
-          category: "글로벌",
-          capacity: "25명",
-        },
-        {
-          id: 5,
-          aply_dt: "2025-06-14T11:44:06.426",
-          aply_sel_cd: "SEL01",
-          aply_stat_cd: "REQ",
-          aply_id: "APL003",
-          prg_id: "CREA001",
-          std_no: "20250300004",
-          std_name: "박학생",
-          dept: "디자인학과",
-          grade: "4학년",
-          prg_name: "창의적 사고력 향상",
-          category: "창의성",
-          capacity: "18명",
-        },
-        {
-          id: 6,
-          aply_dt: "2025-06-14T11:44:06.426",
-          aply_sel_cd: "SEL01",
-          aply_stat_cd: "REQ",
-          aply_id: "APL004",
-          prg_id: "PROB001",
-          std_no: "20250300005",
-          std_name: "최학생",
-          dept: "수학과",
-          grade: "1학년",
-          prg_name: "문제해결능력 개발",
-          category: "논리적사고",
-          capacity: "22명",
-        },
-        {
-          id: 7,
-          aply_dt: "2025-06-14T11:44:06.426",
-          aply_sel_cd: "SEL01",
-          aply_stat_cd: "REQ",
-          aply_id: "APL005",
-          prg_id: "SELF001",
-          std_no: "20250300003",
-          std_name: "정학생",
-          dept: "심리학과",
-          grade: "2학년",
-          prg_name: "자기주도학습 역량",
-          category: "학습역량",
-          capacity: "30명",
-        },
-      ];
-
-      // DOM 요소들
-      const applicationTableBody = document.getElementById(
-        "applicationTableBody"
-      );
-      const detailModal = document.getElementById("detailModal");
-      const searchInput = document.getElementById("searchInput");
-      const statusFilter = document.getElementById("statusFilter");
-      const programFilter = document.getElementById("programFilter");
-
-      let currentApplication = null;
-
-      // 상태 텍스트 매핑
-      const statusTexts = {
-        REQ: "승인 대기",
-        APP: "승인 완료",
-        REJ: "반려",
-        CAN: "취소",
-      };
-
-      // 선택구분 텍스트 매핑
-      const selectionTexts = {
-        ALL: "전체",
-        SEL01: "선택1",
-        SEL02: "선택2",
-        SEL03: "선택3",
-      };
-
-      // 날짜 포맷팅
-      function formatDateTime(dateString) {
+    function formatDateTime(dateString) {
+        if (!dateString) return '-';
         const date = new Date(dateString);
-        return date.toLocaleString("ko-KR", {
-          year: "numeric",
-          month: "2-digit",
-          day: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
+        return date.toLocaleString('ko-KR');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM 로딩 완료');
+        
+        // 모달 인스턴스 생성
+        const modalElement = document.getElementById('detailModal');
+        if(modalElement) {
+            detailModalInstance = new bootstrap.Modal(modalElement);
+            console.log('모달 인스턴스 생성됨');
+        }
+
+        // 상세보기 버튼 이벤트 등록
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-detail')) {
+                const aplyId = e.target.getAttribute('data-aply-id');
+                console.log('상세보기 버튼 클릭:', aplyId);
+                openDetailModal(aplyId);
+            }
         });
-      }
 
-      // 테이블 행 생성
-      function createTableRow(application, index) {
-        const statusClass = application.aply_stat_cd.toLowerCase();
-        const statusText =
-          statusTexts[application.aply_stat_cd] || application.aply_stat_cd;
-
-        // 승인/반려 버튼 표시 여부
-        const showActionButtons = application.aply_stat_cd === "REQ";
-
-        return `
-          <tr>
-            <td>${index + 1}</td>
-            <td>
-              <div style="font-weight: 600;">${application.aply_id}</div>
-              <div style="font-size: 0.85rem; color: #6b7280;">${
-                selectionTexts[application.aply_sel_cd]
-              }</div>
-            </td>
-            <td>${application.std_no}</td>
-            <td>
-              <div style="font-weight: 600;">${application.std_name}</div>
-              <div style="font-size: 0.85rem; color: #6b7280;">${
-                application.dept
-              } ${application.grade}</div>
-            </td>
-            <td>
-              <div style="font-weight: 600;">${application.prg_name}</div>
-              <div style="font-size: 0.85rem; color: #6b7280;">${
-                application.prg_id
-              }</div>
-            </td>
-            <td>
-              <div style="font-size: 0.85rem;">
-                ${formatDateTime(application.aply_dt)}
-              </div>
-            </td>
-            <td>
-              <span class="status-badge status-${statusClass}">${statusText}</span>
-            </td>
-            <td>
-              <button class="btn-action btn-detail" onclick="viewDetail(${
-                application.id
-              })">
-                상세보기
-              </button>
-            </td>
-            <td>
-              ${
-                showActionButtons
-                  ? `
-                <button class="btn-action btn-approve" onclick="quickApprove(${application.id})">승인</button>
-                <button class="btn-action btn-reject" onclick="quickReject(${application.id})">반려</button>
-              `
-                  : "-"
-              }
-            </td>
-          </tr>
-        `;
-      }
-
-      // 테이블 렌더링
-      function renderTable() {
-        const filteredApplications = filterApplications();
-        applicationTableBody.innerHTML = filteredApplications
-          .map((application, index) => createTableRow(application, index))
-          .join("");
-      }
-
-      // 신청 필터링
-      function filterApplications() {
-        return applications.filter((application) => {
-          const searchMatch =
-            searchInput.value === "" ||
-            application.std_no.includes(searchInput.value) ||
-            application.aply_id
-              .toLowerCase()
-              .includes(searchInput.value.toLowerCase());
-
-          const statusMatch =
-            statusFilter.value === "" ||
-            application.aply_stat_cd === statusFilter.value;
-
-          const programMatch =
-            programFilter.value === "" ||
-            application.prg_id === programFilter.value;
-
-          return searchMatch && statusMatch && programMatch;
-        });
-      }
-
-      // 통계 업데이트
-      function updateStats() {
-        const stats = {
-          total: applications.length,
-          pending: applications.filter((a) => a.aply_stat_cd === "REQ").length,
-          approved: applications.filter((a) => a.aply_stat_cd === "APP").length,
-          rejected: applications.filter((a) => a.aply_stat_cd === "REJ").length,
-        };
-
-        document.getElementById("totalCount").textContent = stats.total;
-        document.getElementById("pendingCount").textContent = stats.pending;
-        document.getElementById("approvedCount").textContent = stats.approved;
-        document.getElementById("rejectedCount").textContent = stats.rejected;
-      }
-
-      // 상세보기 모달 열기
-      function viewDetail(id) {
-        currentApplication = applications.find((a) => a.id === id);
-        if (!currentApplication) return;
-
-        // 모달에 데이터 채우기
-        document.getElementById("modalStdNo").textContent =
-          currentApplication.std_no;
-        document.getElementById("modalStdName").textContent =
-          currentApplication.std_name;
-        document.getElementById("modalDept").textContent =
-          currentApplication.dept;
-        document.getElementById("modalGrade").textContent =
-          currentApplication.grade;
-
-        document.getElementById("modalAplyId").textContent =
-          currentApplication.aply_id;
-        document.getElementById("modalAplyDt").textContent = formatDateTime(
-          currentApplication.aply_dt
-        );
-        document.getElementById("modalAplySelCd").textContent =
-          selectionTexts[currentApplication.aply_sel_cd];
-        document.getElementById("modalAplyStatCd").textContent =
-          statusTexts[currentApplication.aply_stat_cd];
-
-        document.getElementById("modalPrgId").textContent =
-          currentApplication.prg_id;
-        document.getElementById("modalPrgName").textContent =
-          currentApplication.prg_name;
-        document.getElementById("modalCategory").textContent =
-          currentApplication.category;
-        document.getElementById("modalCapacity").textContent =
-          currentApplication.capacity;
-
-        // 버튼 표시/숨김 처리
-        const approveBtn = document.getElementById("approveBtn");
-        const rejectBtn = document.getElementById("rejectBtn");
-
-        if (currentApplication.aply_stat_cd === "REQ") {
-          approveBtn.style.display = "block";
-          rejectBtn.style.display = "block";
-        } else {
-          approveBtn.style.display = "none";
-          rejectBtn.style.display = "none";
+        // 모달 내 승인/반려 버튼 이벤트 등록
+        const btnApprove = document.getElementById('btnApprove');
+        const btnReject = document.getElementById('btnReject');
+        
+        if (btnApprove) {
+            btnApprove.addEventListener('click', approveApplication);
+        }
+        
+        if (btnReject) {
+            btnReject.addEventListener('click', rejectApplication);
         }
 
-        detailModal.classList.add("show");
-        document.body.style.overflow = "hidden";
-      }
-
-      // 모달 닫기
-      function closeModal() {
-        detailModal.classList.remove("show");
-        document.body.style.overflow = "auto";
-        currentApplication = null;
-      }
-
-      // 빠른 승인
-      function quickApprove(id) {
-        if (confirm("이 신청을 승인하시겠습니까?")) {
-          const application = applications.find((a) => a.id === id);
-          application.aply_stat_cd = "APP";
-          alert("신청이 승인되었습니다.");
-          renderTable();
-          updateStats();
+        // 사이드바 토글
+        const sidebar = document.getElementById("sidebar");
+        const hamburger = document.getElementById("hamburger");
+        if(hamburger) {
+            hamburger.addEventListener("click", () => sidebar.classList.toggle("show"));
         }
-      }
-
-      // 빠른 반려
-      function quickReject(id) {
-        if (confirm("이 신청을 반려하시겠습니까?")) {
-          const application = applications.find((a) => a.id === id);
-          application.aply_stat_cd = "REJ";
-          alert("신청이 반려되었습니다.");
-          renderTable();
-          updateStats();
-        }
-      }
-
-      // 모달에서 승인
-      function approveApplication() {
-        if (currentApplication && confirm("이 신청을 승인하시겠습니까?")) {
-          currentApplication.aply_stat_cd = "APP";
-          alert("신청이 승인되었습니다.");
-          closeModal();
-          renderTable();
-          updateStats();
-        }
-      }
-
-      // 모달에서 반려
-      function rejectApplication() {
-        if (currentApplication && confirm("이 신청을 반려하시겠습니까?")) {
-          currentApplication.aply_stat_cd = "REJ";
-          alert("신청이 반려되었습니다.");
-          closeModal();
-          renderTable();
-          updateStats();
-        }
-      }
-
-      // 이벤트 리스너
-      searchInput.addEventListener("input", renderTable);
-      statusFilter.addEventListener("change", renderTable);
-      programFilter.addEventListener("change", renderTable);
-
-      // 모달 오버레이 클릭 시 닫기
-      detailModal.addEventListener("click", (e) => {
-        if (e.target === detailModal) {
-          closeModal();
-        }
-      });
-
-      // ESC 키로 모달 닫기
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && detailModal.classList.contains("show")) {
-          closeModal();
-        }
-      });
-
-      // 사이드바 토글 (모바일)
-      const hamburger = document.getElementById("hamburger");
-      const sidebar = document.getElementById("sidebar");
-
-      if (window.innerWidth <= 768) {
-        hamburger.style.display = "inline-block";
-        sidebar.style.left = "-240px";
-        document.querySelector(".main-content").style.marginLeft = "0";
-      }
-
-      hamburger.addEventListener("click", () => {
-        sidebar.classList.toggle("show");
-      });
-
-      // 윈도우 리사이즈 이벤트
-      window.addEventListener("resize", () => {
-        if (window.innerWidth <= 768) {
-          hamburger.style.display = "inline-block";
-          if (!sidebar.classList.contains("show")) {
-            sidebar.style.left = "-240px";
-            document.querySelector(".main-content").style.marginLeft = "0";
-          }
-        } else {
-          hamburger.style.display = "none";
-          sidebar.style.left = "0";
-          sidebar.classList.remove("show");
-          document.querySelector(".main-content").style.marginLeft = "240px";
-        }
-      });
-
-      // 초기 렌더링
-      renderTable();
-      updateStats();
+    });
     </script>
-  </body>
+</body>
 </html>

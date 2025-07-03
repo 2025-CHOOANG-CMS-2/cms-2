@@ -105,7 +105,7 @@ public class EmployeeMileageApiController {
     @GetMapping("/payment-history")
     public Page<PaymentHistoryDTO> getPaymentHistory(
         @RequestParam(name="page", defaultValue = "0") int page,
-        @RequestParam(name="size", defaultValue = "1") int size,
+        @RequestParam(name="size", defaultValue = "5") int size,
         @RequestParam(name="startDate", required = false) LocalDate startDate,
         @RequestParam(name="endDate", required = false) LocalDate endDate,
         @RequestParam(name="competencyId", required = false) Long competencyId,

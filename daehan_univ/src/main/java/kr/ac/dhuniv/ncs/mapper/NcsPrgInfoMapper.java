@@ -8,6 +8,9 @@ import kr.ac.dhuniv.ncs.dto.ProgramDto;
 @Mapper
 public interface NcsPrgInfoMapper {
     List<ProgramDto> selectList(Map<String,Object> params);
+    
+    int selectListCount(Map<String, Object> params);
+    
     ProgramDto selectOne(@Param("prgId") Long prgId);
     
     // 다음 프로그램 ID 조회

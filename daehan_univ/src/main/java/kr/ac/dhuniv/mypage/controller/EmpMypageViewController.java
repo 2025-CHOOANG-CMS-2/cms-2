@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/employee_mypage.do") // 클래스 레벨 URL 매핑
+@RequestMapping("/employees/mypage") // 클래스 레벨 URL 매핑
 public class EmpMypageViewController {
 
     private final EmpMypageService empMypageService;
@@ -35,10 +35,10 @@ public class EmpMypageViewController {
      * @param model Thymeleaf로 전달할 데이터를 담는 Model 객체
      * @return 템플릿 경로 ("mypage/employee-mypage.html")
      */
-    @GetMapping // GET /employee_mypage.do 또는 /employee_mypage.do?employeeId={교직원ID}
+    @GetMapping //   ex : /employees/mypage?employeeId=2025102001
     public String employeeMypage(
             @AuthenticationPrincipal User user,
-            @RequestParam(name = "employeeId", required = false) String employeeIdParam,
+            @RequestParam(name = "employeeId", required = true) String employeeIdParam,
             Model model) {
 
         String targetEmployeeId = null;
