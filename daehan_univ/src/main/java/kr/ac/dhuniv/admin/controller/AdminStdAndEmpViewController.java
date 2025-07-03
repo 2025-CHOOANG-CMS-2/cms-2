@@ -6,17 +6,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class AdminStdAndEmpViewController {
 	
-	@GetMapping("/admin_index.do")
+	/*
+	 * 
+	@GetMapping("/admin_index")
 	public String AdminIndexController() {
 		return "/admin/admin-index.html";
 	}
+	 */
 	
-	@GetMapping("/employee_management.do")
+	@GetMapping("/employees/employee-management")
 	public String EmployeeManagementController() {
 		return "/admin/management/employee-management.html";
 	}
 	
-	@GetMapping("/student_management.do")
+	@GetMapping("/students/student-management")
 	public String StudentManagementController() {
 		return "/admin/management/student-management.html";
 	}

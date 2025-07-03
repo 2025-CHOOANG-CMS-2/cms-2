@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Controller
-@RequestMapping("/student_mypage.do") // URL 매핑을 클래스 레벨로 변경
+@RequestMapping("/students/mypage") // URL 매핑을 클래스 레벨로 변경
 public class StdMypageViewController {
 
     private final StdMypageService stdMypageService;
@@ -31,13 +31,14 @@ public class StdMypageViewController {
      * URL 파라미터 'studentId'가 제공되면 해당 학번의 정보를 조회하고,
      * 그렇지 않으면 현재 로그인된 사용자의 학번을 사용합니다.
      *
+     *
      * @param user 현재 로그인된 사용자 객체 (Spring Security에 의해 자동 주입될 수 있음)
      * @param studentIdParam URL 쿼리 파라미터로 전달된 학생 학번 (선택 사항)
      * @param model Thymeleaf 템플릿으로 데이터를 전달하기 위한 Model 객체
      * @param redirectAttributes 리다이렉트 시 플래시 메시지를 전달하기 위한 객체
      * @return 마이페이지 템플릿 이름 ("/mypage/student-mypage.html") 또는 로그인 페이지로 리다이렉트
      */
-    @GetMapping // GET /student_mypage.do 또는 /student_mypage.do?studentId={학번}
+    @GetMapping //        ex : /students/mypage?studentId=2025004001
     public String showStudentMypage(
             @AuthenticationPrincipal User user, // 로그인된 사용자 (있을 수도 있고 없을 수도 있음)
             @RequestParam(name = "studentId", required = false) String studentIdParam, // URL 파라미터로 학번 받기
@@ -58,7 +59,7 @@ public class StdMypageViewController {
             // 3. 둘 다 없는 경우, 로그인 페이지로 리다이렉트
             System.out.println("❌ [Mypage Controller] 학생 정보를 조회할 학번을 찾을 수 없습니다. 로그인 페이지로 리다이렉트합니다.");
             redirectAttributes.addFlashAttribute("errorMessage", "로그인 정보가 유효하지 않거나, 조회할 학생 학번이 제공되지 않았습니다.");
-            return "redirect:/login"; // 실제 로그인 페이지 URL로 리다이렉트 (프로젝트에 맞게 수정 필요)
+            return "mypage/student-mypage"; // 실제 로그인 페이지 URL로 리다이렉트 (프로젝트에 맞게 수정 필요)
         }
 
         // 이제 targetStudentId를 사용하여 서비스 호출
