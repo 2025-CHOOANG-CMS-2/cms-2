@@ -1,5 +1,43 @@
 // /js/admin/student-management.js 파일 내용
 
+
+/**
+ * 로그인한 관리자(교직원) 정보를 서버에서 가져와 HTML에 표시합니다.
+ * API URL: /api/user/me/employee
+ */
+async function fetchAdminInfo() {
+    try {
+        const response = await fetch("/api/user/me/employee");
+        if (!response.ok) {
+            // 로그인되어 있지 않거나, 권한이 없는 경우 (401, 403 등)
+            console.warn("관리자 정보를 불러오지 못했습니다. 로그인 상태를 확인하세요.", response.status);
+            // 기본값 표시 (로그인 필요 또는 알 수 없음)
+            document.getElementById('headerAdminName').innerHTML = '<strong>알 수 없음</strong> (<span id="headerAdminId">N/A</span>)';
+            document.getElementById('headerAdminRole').textContent = '로그인 필요';
+            document.getElementById('sidebarAdminName').innerHTML = '<strong>알 수 없음</strong> (<span id="sidebarAdminId">N/A</span>)';
+            document.getElementById('sidebarAdminRole').textContent = '로그인 필요';
+            return;
+        }
+
+        const adminInfo = await response.json();
+        console.log("로그인한 관리자 정보:", adminInfo);
+
+        // 헤더에 관리자 정보 업데이트
+        document.getElementById('headerAdminName').innerHTML = `<strong>${adminInfo.emplNm}</strong> (<span id="headerAdminId">${adminInfo.userId}</span>)`;
+        document.getElementById('headerAdminRole').textContent = adminInfo.positionCd || '시스템관리자'; // DTO에 positionCd가 있다면 사용, 없으면 기본값
+
+        // 사이드바에 관리자 정보 업데이트
+        document.getElementById('sidebarAdminName').innerHTML = `<strong>${adminInfo.emplNm}</strong> (<span id="sidebarAdminId">${adminInfo.userId}</span>)`;
+        document.getElementById('sidebarAdminRole').textContent = adminInfo.positionCd || '시스템관리자'; // DTO에 positionCd가 있다면 사용, 없으면 기본값
+
+    } catch (error) {
+        console.error("관리자 정보를 불러오는 중 오류 발생:", error);
+        document.getElementById('headerAdminName').innerHTML = '<strong>오류</strong> (<span id="headerAdminId">ERROR</span>)';
+        document.getElementById('headerAdminRole').textContent = '정보 로드 실패';
+        document.getElementById('sidebarAdminName').innerHTML = '<strong>오류</strong> (<span id="sidebarAdminId">ERROR</span>)';
+        document.getElementById('sidebarAdminRole').textContent = '정보 로드 실패';
+    }
+}
 // ===============================================
 // DOMContentLoaded 이벤트 리스너: HTML 문서가 완전히 로드되고 파싱된 후 실행됩니다.
 // 모든 JavaScript 로직과 함수 정의를 이 블록 안에 포함시킵니다.
@@ -833,5 +871,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addStudent = addStudent;
     window.filterStudents = filterStudents;
     window.populateDeptDropdowns = populateDeptDropdowns; // 페이지 로드 시 호출될 수 있음
+	
+	fetchAdminInfo(); // ⭐ 이 줄을 추가합니다. ⭐
 
 }); // DOMContentLoaded 끝

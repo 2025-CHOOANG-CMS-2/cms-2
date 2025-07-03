@@ -24,12 +24,10 @@
 		</div>
 		<div class="header-right">
 			<div class="user-box">
-				<div class="user-info">
-					<div>
-						<strong>관리자</strong> (ADMIN001)
-					</div>
-					<div class="small">시스템관리자</div>
-				</div>
+				              <div class="user-info">
+                <div id="headerAdminName"><strong>관리자</strong> (<span id="headerAdminId">ADMIN001</span>)</div>
+                <div class="small" id="headerAdminRole">시스템관리자</div>
+              </div>
 				<button class="user-btn" title="로그아웃">
 					<i class="bi bi-box-arrow-right"></i>
 				</button>
@@ -37,17 +35,15 @@
 		</div>
 	</header>
 	<aside class="sidebar" id="sidebar">
-		<div class="sidebar-user-info">
-			<div>
-				<strong>관리자</strong> (ADMIN001)
-			</div>
-			<div>시스템관리자</div>
-			<div class="mt-2">
-				<button class="user-btn" title="로그아웃">
-					<i class="bi bi-box-arrow-right"></i> 로그아웃
-				</button>
-			</div>
-		</div>
+		          <div class="sidebar-user-info">
+            <div id="sidebarAdminName"><strong>관리자</strong> (<span id="sidebarAdminId">ADMIN001</span>)</div>
+            <div id="sidebarAdminRole">시스템관리자</div>
+            <div class="mt-2">
+              <button class="user-btn" title="로그아웃">
+                <i class="bi bi-box-arrow-right"></i> 로그아웃
+              </button>
+            </div>
+          </div>
 		<nav class="nav flex-column">
 			<a class="nav-link" href="/admin/student">학생관리</a> <a
 				class="nav-link" href="/admin/employee">교직원관리</a> <a

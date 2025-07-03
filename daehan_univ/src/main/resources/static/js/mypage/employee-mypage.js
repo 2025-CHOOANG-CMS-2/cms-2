@@ -143,6 +143,21 @@ document.addEventListener('DOMContentLoaded', () => {
     validatePasswordForm(); 
 });
 
+// ⭐여기에 DEPT_LIST와 departmentMap을 추가해주세요.⭐
+// 부서 목록 데이터 (고객님께서 제공해주신 버전)
+const DEPT_LIST = [
+    { code: "101", name: "교무처" }, { code: "102", name: "학생처" },
+    { code: "103", name: "입학처" }, { code: "104", name: "총무처" },
+    { code: "105", name: "기획처" }, { code: "106", name: "산학협력단" },
+    { code: "107", name: "도서관" }, { code: "108", name: "전산정보원" },
+    { code: "109", name: "국제교류처" }, { code: "110", name: "연구처" },
+    { code: "111", name: "진로취창업팀" }
+];
+
+// 매핑 맵 생성 (코드를 이름으로 빠르게 찾기 위함)
+const departmentMap = new Map(DEPT_LIST.map(item => [item.code, item.name]));
+
+
 // 개인정보 저장 (AJAX 호출)
 document.getElementById('personalInfoForm').addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -201,13 +216,9 @@ document.getElementById('personalInfoForm').addEventListener('submit', async fun
 
         // 프로필 영역 실시간 업데이트
         document.getElementById('profileName').textContent = formData.STAFF_NM;
-        // ⭐주의: position dropdown에서 value는 코드이고 text는 이름입니다.
-        // 여기서는 이름으로 표시되도록 EmpMypageService.getPositionCodeNameMap()을 사용하여 변환해야 정확합니다.
-        // 현재 JS에서는 map에 접근 불가하므로, HTML에서 미리 로드된 값을 사용하거나 백엔드에서 이름으로 반환받아야 합니다.
-        // 임시로 DTO의 POSITION_CD가 이름이라고 가정하거나, 백엔드에서 DEPT_NM, POSITION_NM을 DTO에 추가하는 것이 좋습니다.
-        // 지금은 DTO의 `POSITION_CD`가 이미 이름이라고 가정하고 사용합니다.
-        const departmentName = document.querySelector('#department option:checked')?.textContent || formData.DEPT_CD;
-        const positionName = document.querySelector('#position option:checked')?.textContent || formData.POSITION_CD;
+        // ⭐ 아래 두 줄의 departmentName을 departmentMap을 사용하여 변경합니다. ⭐
+        const departmentName = departmentMap.get(formData.DEPT_CD) || formData.DEPT_CD; // DEPT_CD를 이름으로 변환
+        const positionName = document.querySelector('#position option:checked')?.textContent || formData.POSITION_CD; // 이 부분은 그대로 둡니다.
 
         document.getElementById('profileInfo').textContent = `${departmentName} ${positionName} • ${formData.STAFF_NO}`;
         document.getElementById('headerUserName').textContent = formData.STAFF_NM;
@@ -234,7 +245,7 @@ function checkPasswordStrength() {
     if (password.length >= 8) {
         strength++;
     } else {
-        feedback.push('길이 8자 이상');
+        feedback.push('길이 8자 이상');       
     }
     if (/[a-z]/.test(password)) { 
         strength++;
