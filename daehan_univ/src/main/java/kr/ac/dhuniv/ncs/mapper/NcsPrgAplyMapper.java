@@ -1,6 +1,7 @@
 package kr.ac.dhuniv.ncs.mapper;
 
 import kr.ac.dhuniv.ncs.dto.MyProgramDto;
+import kr.ac.dhuniv.ncs.dto.NcsApplicationDto;
 import kr.ac.dhuniv.ncs.dto.NcsPrgAplyDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -21,4 +22,16 @@ public interface NcsPrgAplyMapper {
     int insert(NcsPrgAplyDto aplyDto);
     
     List<MyProgramDto> findMyProgramsByStudentId(@Param("stdId") Long stdId);
+    
+    /** 신청 목록 전체 조회 (JOIN) */
+    List<NcsApplicationDto> findApplications(Map<String, Object> params);
+    
+    /** 신청 목록 전체 개수 조회 */
+    int countApplications(Map<String, Object> params);
+
+    /** 신청 단건 상세 조회 (JOIN) */
+    NcsApplicationDto findApplicationById(@Param("aplyId") Long aplyId);
+
+    /** 신청 상태 업데이트 (승인/반려) */
+    int updateStatus(@Param("aplyId") Long aplyId, @Param("status") String status);
 }
