@@ -88,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profileAvatar?.dataset.profileImageUrl) {
         const url = profileAvatar.dataset.profileImageUrl;
         if (url.startsWith('/uploads/std_profile/')) {
-            profileAvatar.style.backgroundImage = `url(${url})`;
+            profileAvatar.style.backgroun
+
+            dImage = `url(${url})`;
             profileAvatar.style.backgroundSize = 'cover';
             profileAvatar.style.backgroundPosition = 'center';
             if (avatarIcon) avatarIcon.style.display = 'none';

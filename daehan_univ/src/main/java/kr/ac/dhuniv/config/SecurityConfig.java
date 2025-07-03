@@ -16,58 +16,81 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 
 
+/*
 
-
-/**
+*
  * ✅ Spring Security 설정 클래스
- * - 개발 단계: 모든 요청 허용
+ * - 인증/인가 정책 및 JWT 필터 설정
+*/
+
+ @Configuration
+ @RequiredArgsConstructor
+ public class SecurityConfig {
+
+ // ✅ JWT 인증 필터 주입 (JWT를 검사하고 SecurityContext에 인증 정보를 설정)
+ private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+/*
+*
+  * ✅ SecurityFilterChain 빈 등록
+  * - 보안 정책 (권한, 세션, 필터)을 구성
+*/
+
+ @Bean
+ public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+ http
+ // 🔹 CSRF 보호 비활성화 (쿠키 SameSite로 방어, REST API용)
+ .csrf(csrf -> csrf.disable())
+ .logout(logout -> logout.disable())  // Spring Security LogoutFilter 비활성화
+ // 🔹 세션 생성 금지 (JWT 기반이므로 상태 저장 불필요)
+ .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+ // 🔹 URL 별 접근 권한 설정
+
+ .authorizeHttpRequests(auth -> auth
+ // /api/auth/** → 로그인, 회원가입 등은 누구나 접근 허용
+ .requestMatchers("/","/login","/css/**","/js/**","/api/**", "/layout/**").permitAll()
+
+ // /api/admin/** → ADMIN 권한 사용자만 접근 허용
+ .requestMatchers("/admins/**","/admin/**").hasRole("ADMIN")
+
+ // /api/employees/** → STAFF, COUNSELOR, PROFESSOR, ADMIN 권한 접근 허용
+ .requestMatchers("/employees/**","/employee/**").hasAnyRole("EMPLOYEE", "COUNSELOR", "PROFESSOR", "ADMIN")
+
+ // /api/student/** → STUDENT 권한 접근 허용
+ .requestMatchers("/students/**","/student/**").hasAnyRole("STUDENT","ADMIN")
+
+ // 그 외 모든 요청은 인증 필요
+ .anyRequest().authenticated()
+ )
+
+
+ // JWT 필터 등록 (UsernamePasswordAuthenticationFilter 전에 실행)
+ .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+ return http.build();
+ }
+/*
+
+ *
+  * ✅ AuthenticationManager 빈 등록
+  * - Spring Security에서 로그인 시 인증에 사용
+*/
+
+ @Bean
+ public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+ return config.getAuthenticationManager();
+ }
+/*
+
  */
-@Configuration
-@RequiredArgsConstructor
-public class SecurityConfig {
+/**
+  * ✅ PasswordEncoder 빈 등록
+  * - 비밀번호 암호화/검증 시 사용
+*/
 
-    // ✅ JWT 인증 필터 주입
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-    /**
-     * ✅ SecurityFilterChain 빈 등록
-     * - 개발 단계: 모든 URL 접근 허용
-     */
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                // 🔹 CSRF 보호 비활성화 (개발 단계, REST API용)
-                .csrf(csrf -> csrf.disable())
-                // 🔹 로그아웃 비활성화 (필요시 활성화)
-                .logout(logout -> logout.disable())
-                // 🔹 세션 생성 금지 (JWT 기반)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 🔹 모든 요청 허용
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // ✅ 모든 요청 허용
-                )
-
-                // 🔹 JWT 필터 등록 (UsernamePasswordAuthenticationFilter 앞에)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    /**
-     * ✅ AuthenticationManager 빈 등록
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    /**
-     * ✅ PasswordEncoder 빈 등록
-     */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-}
-
+ @Bean
+ public PasswordEncoder passwordEncoder() {
+ return new BCryptPasswordEncoder();
+ }
+ }

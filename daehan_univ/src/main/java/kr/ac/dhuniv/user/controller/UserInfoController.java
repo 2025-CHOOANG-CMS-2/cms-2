@@ -36,8 +36,6 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
 
     User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
-
-
     // 학생 정보 조회 (nullable)
     StdInfo std = stdInfoRepository.findByUser_UserId(userId).orElse(null); // 학생이 아닐 수 있으므로 null 허용
 
@@ -48,8 +46,7 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
             "stdId", std.getStdId(),
             "stdNm", std != null ? std.getStdNm() : null,
             "scsbjtCd", std != null ? std.getScsbjtCd() : null,
-            "stdEmlAddr", std != null ? std.getStdEmlAddr() : null
-    ));
+            "stdEmlAddr", std != null ? std.getStdEmlAddr() : null));
 
 }
     /**

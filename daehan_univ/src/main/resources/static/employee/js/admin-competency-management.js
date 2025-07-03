@@ -2,15 +2,32 @@
 // 페이지가 완전히 로드되면 목록만 불러오도록 변경
 // 하위 역량별 코멘트/프로그램 추천 로직 제거
 
-document.addEventListener('DOMContentLoaded', () => {
+let CURRENT_USER_ID = null;
+
+
+
+document.addEventListener('DOMContentLoaded', async() => {
     console.log('역량 항목 관리 페이지 로드됨');
+    // ✅ 로그인 사용자 정보 먼저 가져오기
+    try {
+        await loadLoginUser();
+    } catch (err) {
+        alert('로그인이 필요합니다. 다시 로그인해주세요.');
+        location.href = '/login';
+        return;
+    }
     loadCompetencyList(); // 목록 로딩
 });
 
 // 전역 변수 선언
 let selectedCompetency = null;    // 선택된 상위 역량 코드
 let subModalParentId = null;      // 하위 역량 추가 모달용 상위 코드 저장
-
+async function loadLoginUser() {
+    const res = await fetch('/api/user/me/employee');
+    if (!res.ok) throw new Error('인증 실패');
+    const user = await res.json();
+    CURRENT_USER_ID = user.userId; // ← 여기에 실제 로그인한 사용자 ID가 들어감
+}
 /**
  * 상위 역량 목록 가져오기
  */
@@ -154,7 +171,7 @@ function addCompetency() {
         cciDesc: document.getElementById('competencyDescription').value,
         weight: parseInt(document.getElementById('competencyWeight').value, 10),
         colorHex: document.getElementById('competencyColor').value,
-        regUserId: 'admin01'
+        regUserId: CURRENT_USER_ID
     };
 
     fetch('/api/competencies/root', {
@@ -198,7 +215,7 @@ function addSubCompetency() {
         cciNm: document.getElementById('subCompetencyName').value,
         cciDesc: document.getElementById('subCompetencyDescription').value,
         weight: parseInt(document.getElementById('subCompetencyWeight').value, 10),
-        regUserId: 'admin01'
+        regUserId: CURRENT_USER_ID
     };
 
     fetch(`/api/competencies/child/${subModalParentId}`, {
@@ -471,7 +488,7 @@ function saveEditedCompetency() {
         cciDesc: document.getElementById('editCompetencyDescription').value,
         weight: parseInt(document.getElementById('editCompetencyWeight').value, 10),
         colorHex: document.getElementById('editCompetencyColor').value,
-        regUserId: 'admin01' // 수정자 ID
+        regUserId: CURRENT_USER_ID   // 수정자 ID
     };
 
     fetch(`/api/competencies/${editingCompetencyId}`, {
