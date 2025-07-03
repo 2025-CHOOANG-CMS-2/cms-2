@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.ac.dhuniv.ncs.mapper.NcsCmpInfoMapper">
+
+    <resultMap id="CompletionResult" type="kr.ac.dhuniv.ncs.dto.CompletionDto">
+        <id     property="cmpId"      column="cmp_id"/>
+        <result property="aplyId"     column="aply_id"/>
+        <result property="cmpDt"      column="cmp_dt"/>
+        <result property="cmpStatCd"  column="cmp_stat_cd"/>
+        <result property="prgNm"      column="prg_nm"/>
+        <result property="stdNo"      column="std_no"/>
+        <result property="stdNm"      column="std_nm"/>
+        <result property="deptNm"     column="dept_nm"/>
+        <result property="schYr"      column="sch_yr"/>
+    </resultMap>
+
+    <select id="findCompletionList" resultMap="CompletionResult" parameterType="map">
+        SELECT
+            c.cmp_id, c.aply_id, c.cmp_dt, c.cmp_stat_cd,
+            p.prg_nm,
+            s.std_no, s.std_nm, s.sch_yr
+        FROM
+            public.ncs_cmp_info c
+        JOIN
+            public.ncs_prg_info p ON c.prg_id = p.prg_id
+        JOIN
+            public.std_info s ON c.std_id = s.std_id
+        WHERE
+            c.cmp_stat_cd IN ('ING', 'CMP') -- 참여중, 이수완료 상태만 조회
+        ORDER BY
+            c.cmp_id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countCompletionList" resultType="int" parameterType="map">
+        SELECT count(*)
+        FROM public.ncs_cmp_info
+        WHERE cmp_stat_cd IN ('ING', 'CMP')
+    </select>
+    
+    <update id="updateStatusToComplete">
+        UPDATE public.ncs_cmp_info
+        SET
+            cmp_stat_cd = 'CMP',
+            cmp_dt = NOW()
+        WHERE
+            cmp_id = #{cmpId}
+    </update>
+</mapper>

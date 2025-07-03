@@ -630,29 +630,53 @@
     </header>
 
     <!-- 좌측 사이드바 -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" th:fragment="e_sidebar">
+      <div class="sidebar-user-info">
+        <div><strong>김교직</strong> (STAFF001)</div>
+        <div>학사운영팀</div>
+        <div class="mt-2">
+          <button class="user-btn" title="로그아웃">
+            <i class="bi bi-box-arrow-right"></i> 로그아웃
+          </button>
+        </div>
+      </div>
       <nav class="nav flex-column">
-        <a class="nav-link" href="/admin/dashboard"
-          ><i class="bi bi-speedometer2 me-2"></i>대시보드
-        </a>
-        <a class="nav-link" href="/admin/students"
-          ><i class="bi bi-people me-2"></i>학생 관리</a
+        <a class="nav-link" href="/employees/notice-management">공지사항관리</a>
+
+        <a class="nav-link has-submenu" href="#" data-menu="역량"
+          >핵심역량개발관리</a
         >
-        <a class="nav-link active" href="/admin/programs"
-          ><i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
-        </a>
-        <a class="nav-link" href="/admin/competency"
-          ><i class="bi bi-graph-up me-2"></i>역량 관리</a
+        <div class="submenu" id="submenu-역량" style="display: none">
+          <a class="nav-link" href="/competency/items">역량항목관리</a>
+          <a class="nav-link" href="/competency/questions">진단문항관리</a>
+          <a class="nav-link" href="/competency/diagnosis">진단검사현황</a>
+          <a class="nav-link" href="/competency/recommend">추천비교과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="비교과"
+          >비교과프로그램관리</a
         >
-        <a class="nav-link" href="/admin/counseling"
-          ><i class="bi bi-chat-dots me-2"></i>상담 관리</a
+        <div class="submenu" id="submenu-비교과" style="display: none">
+          <a class="nav-link" href="employees/programs">프로그램관리</a>
+          <a class="nav-link" href="employees/programs/application">프로그램신청관리</a>
+          <a class="nav-link" href="employees/programs/completion">프로그램활동관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+          <a class="nav-link" href="/counseling/schedule">상담사일정등록</a>
+          <a class="nav-link" href="/counseling/reservations">상담예약관리</a>
+          <a class="nav-link" href="/counseling/results">상담결과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지"
+          >마일리지관리</a
         >
-        <a class="nav-link" href="/admin/reports"
-          ><i class="bi bi-file-text me-2"></i>보고서</a
-        >
-        <a class="nav-link" href="/admin/settings"
-          ><i class="bi bi-gear me-2"></i>시스템 설정</a
-        >
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+          <a class="nav-link" href="/mileage/points">마일리지배점</a>
+          <a class="nav-link" href="/mileage/payments">마일리지지급관리</a>
+          <a class="nav-link" href="/mileage/status">마일리지현황</a>
+        </div>
       </nav>
     </aside>
 
