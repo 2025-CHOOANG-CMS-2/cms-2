@@ -1,495 +1,523 @@
 <!DOCTYPE html>
 <html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>대한대학교 CMS 관리자 - 프로그램 신청 관리</title>
-    <!-- Bootstrap & Icons -->
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
-      rel="stylesheet"
-    />
-    <style>
-      /* 공통 스타일 */
-      body {
-        background-color: #f8f9fa;
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", sans-serif;
-      }
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>대한대학교 CMS 관리자 - 프로그램 신청 관리</title>
+<!-- Bootstrap & Icons -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+	rel="stylesheet" />
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+	rel="stylesheet" />
+<style>
+/* 공통 스타일 */
+body {
+	background-color: #f8f9fa;
+	margin: 0;
+	padding: 0;
+	font-family: "Segoe UI", sans-serif;
+}
 
-      /* 헤더 영역 */
-      .header {
-        position: fixed;
-        top: 0;
-        width: 100%;
-        height: 60px;
-        background-color: #1a2a45;
-        color: white;
-        z-index: 1040;
-        display: flex;
-        align-items: center;
-        padding: 0 1rem;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      }
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
 
-      .header-left {
-        flex: 1;
-        font-weight: bold;
-        font-size: 1.1rem;
-      }
+/* 헤더 영역 */
+.header {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	height: 60px;
+	background-color: #1a2a45;
+	color: white;
+	z-index: 1040;
+	display: flex;
+	align-items: center;
+	padding: 0 1rem;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-      .header-center {
-        flex: 1;
-        text-align: center;
-        font-size: 1.2rem;
-      }
+.header-left {
+	flex: 1;
+	font-weight: bold;
+	font-size: 1.1rem;
+}
 
-      .header-right {
-        flex: 1;
-        display: flex;
-        justify-content: flex-end;
-        align-items: center;
-        font-size: 0.9rem;
-        gap: 1rem;
-      }
+.header-center {
+	flex: 1;
+	text-align: center;
+	font-size: 1.2rem;
+}
 
-      /* 사용자 정보 */
-      .user-box {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+.header-right {
+	flex: 1;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	font-size: 0.9rem;
+	gap: 1rem;
+}
 
-      .user-info {
-        text-align: right;
-        line-height: 1.2;
-      }
+/* 사용자 정보 */
+.user-box {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
 
-      .user-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        padding: 0.25rem 0.5rem;
-        cursor: pointer;
-      }
+.user-info {
+	text-align: right;
+	line-height: 1.2;
+}
 
-      .user-btn:hover {
-        color: #ffc107;
-      }
+.user-btn {
+	background: none;
+	border: none;
+	color: white;
+	font-size: 1.2rem;
+	padding: 0.25rem 0.5rem;
+	cursor: pointer;
+}
 
-      /* 사이드바 */
-      .sidebar {
-        position: fixed;
-        top: 60px;
-        left: 0;
-        width: 240px;
-        height: calc(100vh - 60px);
-        background-color: #1a2a45;
-        padding: 1rem 0;
-        color: white;
-        z-index: 1030;
-        overflow-y: auto;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-      }
+.user-btn:hover {
+	color: #ffc107;
+}
 
-      /* 본문 */
-      .main-content {
-        margin-top: 60px;
-        margin-left: 240px;
-        padding: 1.5rem;
-        min-height: calc(100vh - 60px);
-      }
+/* 사이드바 */
+.sidebar {
+	position: fixed;
+	top: 60px;
+	left: 0;
+	width: 240px;
+	height: calc(100vh - 60px);
+	background-color: #1a2a45;
+	padding: 1rem 0;
+	color: white;
+	z-index: 1030;
+	overflow-y: auto;
+	box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
 
-      /* 메뉴 스타일 */
-      .nav-link {
-        color: #e0e8f0;
-        padding: 0.75rem 1.5rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: background-color 0.2s, color 0.2s;
-        text-decoration: none;
-      }
+/* 본문 */
+.main-content {
+	margin-top: 60px;
+	margin-left: 240px;
+	padding: 1.5rem;
+	min-height: calc(100vh - 60px);
+}
 
-      .nav-link:hover {
-        background-color: #223a5e;
-        color: #ffffff;
-      }
+/* 메뉴 스타일 */
+.nav-link {
+	color: #e0e8f0;
+	padding: 0.75rem 1.5rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	transition: background-color 0.2s, color 0.2s;
+	text-decoration: none;
+}
 
-      .nav-link.active {
-        background-color: #2b4d77;
-        font-weight: bold;
-      }
+.nav-link:hover {
+	background-color: #223a5e;
+	color: #ffffff;
+}
 
-      /* 페이지 헤더 */
-      .page-header {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        margin-bottom: 2rem;
-      }
+.nav-link.active {
+	background-color: #2b4d77;
+	font-weight: bold;
+}
 
-      .page-title {
-        color: #1a2a45;
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin: 0;
-      }
+/* 페이지 헤더 */
+.page-header {
+	background: white;
+	padding: 1.5rem;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	margin-bottom: 2rem;
+}
 
-      .page-subtitle {
-        color: #666;
-        font-size: 0.95rem;
-        margin-top: 0.5rem;
-      }
+.page-title {
+	color: #1a2a45;
+	font-size: 1.8rem;
+	font-weight: bold;
+	margin: 0;
+}
 
-      /* 테이블 */
-      .table-container {
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
+.page-subtitle {
+	color: #666;
+	font-size: 0.95rem;
+	margin-top: 0.5rem;
+}
 
-      .table {
-        margin: 0;
-      }
+/* 테이블 */
+.table-container {
+	background: white;
+	border-radius: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	overflow: hidden;
+}
 
-      .table th {
-        background: #f8f9fa;
-        border: none;
-        font-weight: 600;
-        color: #374151;
-        padding: 1rem;
-      }
+.table {
+	margin: 0;
+}
 
-      .table td {
-        border: none;
-        padding: 1rem;
-        vertical-align: middle;
-      }
+.table th {
+	background: #f8f9fa;
+	border: none;
+	font-weight: 600;
+	color: #374151;
+	padding: 1rem;
+}
 
-      .table tbody tr {
-        border-bottom: 1px solid #e5e7eb;
-      }
+.table td {
+	border: none;
+	padding: 1rem;
+	vertical-align: middle;
+}
 
-      .table tbody tr:hover {
-        background: #f9fafb;
-      }
+.table tbody tr {
+	border-bottom: 1px solid #e5e7eb;
+}
 
-      /* 액션 버튼 */
-      .btn-action {
-        padding: 0.25rem 0.75rem;
-        border: 1px solid #d1d5db;
-        background: white;
-        color: #374151;
-        border-radius: 4px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s;
-        text-decoration: none;
-        margin: 0 0.2rem;
-      }
+.table tbody tr:hover {
+	background: #f9fafb;
+}
 
-      .btn-action:hover {
-        background: #f9fafb;
-        color: #374151;
-        text-decoration: none;
-      }
+/* 액션 버튼 */
+.btn-action {
+	padding: 0.25rem 0.75rem;
+	border: 1px solid #d1d5db;
+	background: white;
+	color: #374151;
+	border-radius: 4px;
+	font-size: 0.85rem;
+	cursor: pointer;
+	transition: all 0.2s;
+	text-decoration: none;
+	margin: 0 0.2rem;
+}
 
-      .btn-detail {
-        color: #3b82f6;
-        border-color: #3b82f6;
-      }
+.btn-action:hover {
+	background: #f9fafb;
+	color: #374151;
+	text-decoration: none;
+}
 
-      .btn-detail:hover {
-        background: #eff6ff;
-        color: #2563eb;
-      }
+.btn-detail {
+	color: #3b82f6;
+	border-color: #3b82f6;
+}
 
-      /* 상세 정보 스타일 */
-      .detail-section {
-        margin-bottom: 2rem;
-      }
+.btn-detail:hover {
+	background: #eff6ff;
+	color: #2563eb;
+}
 
-      .detail-section-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #1a2a45;
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+/* 상세 정보 스타일 */
+.detail-section {
+	margin-bottom: 2rem;
+}
 
-      .detail-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1rem;
-        margin-bottom: 1rem;
-      }
+.detail-section-title {
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #1a2a45;
+	margin-bottom: 1rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
 
-      .detail-item {
-        background: #f9fafb;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 3px solid #e5e7eb;
-      }
+.detail-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
 
-      .detail-label {
-        font-size: 0.85rem;
-        color: #6b7280;
-        margin-bottom: 0.25rem;
-        font-weight: 500;
-      }
+.detail-item {
+	background: #f9fafb;
+	padding: 1rem;
+	border-radius: 8px;
+	border-left: 3px solid #e5e7eb;
+}
 
-      .detail-value {
-        font-size: 1rem;
-        color: #1a2a45;
-        font-weight: 600;
-      }
+.detail-label {
+	font-size: 0.85rem;
+	color: #6b7280;
+	margin-bottom: 0.25rem;
+	font-weight: 500;
+}
 
-      /* 반응형 */
-      @media (max-width: 768px) {
-        .sidebar {
-          left: -240px;
-          transition: left 0.3s ease;
-        }
+.detail-value {
+	font-size: 1rem;
+	color: #1a2a45;
+	font-weight: 600;
+}
 
-        .sidebar.show {
-          left: 0;
-        }
+/* 반응형 */
+@media ( max-width : 768px) {
+	.sidebar {
+		left: -240px;
+		transition: left 0.3s ease;
+	}
+	.sidebar.show {
+		left: 0;
+	}
+	.main-content {
+		margin-left: 0;
+	}
+	.hamburger {
+		display: inline-block !important;
+	}
+	.header-right {
+		display: none;
+	}
+	.table-container {
+		overflow-x: auto;
+	}
+	.detail-grid {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+</head>
+<body>
+	<!-- 상단 헤더 -->
+	<header class="header">
+		<div class="header-left">
+			<span class="hamburger" id="hamburger"
+				style="display: none; cursor: pointer; font-size: 1.25rem; margin-right: 1rem;">&#9776;</span>
+			CMS 관리자 포털
+		</div>
+		<div class="header-center">
+			<img src="../../static/images/logo-white.png" alt="logo" height="30"
+				class="me-2" /> 대한대학교
+		</div>
+		<div class="header-right">
+			<div class="user-box">
+				<div class="user-info">
+					<div>
+						<strong>김교수</strong> (staff001)
+					</div>
+					<div class="small">교무처</div>
+				</div>
+				<button class="user-btn" title="로그아웃">
+					<i class="bi bi-box-arrow-right"></i>
+				</button>
+			</div>
+		</div>
+	</header>
 
-        .main-content {
-          margin-left: 0;
-        }
+	<!-- 좌측 사이드바 -->
+	<aside class="sidebar" id="sidebar">
+		<nav class="nav flex-column">
+			<a class="nav-link" href="/admin/dashboard"> <i
+				class="bi bi-speedometer2 me-2"></i>대시보드
+			</a> <a class="nav-link" href="/admin/students"> <i
+				class="bi bi-people me-2"></i>학생 관리
+			</a> <a class="nav-link" href="/admin/programs"> <i
+				class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
+			</a> <a class="nav-link active" href="/admin/applications"> <i
+				class="bi bi-file-earmark-text me-2"></i>신청 관리
+			</a> <a class="nav-link" href="/admin/competency"> <i
+				class="bi bi-graph-up me-2"></i>역량 관리
+			</a> <a class="nav-link" href="/admin/counseling"> <i
+				class="bi bi-chat-dots me-2"></i>상담 관리
+			</a> <a class="nav-link" href="/admin/reports"> <i
+				class="bi bi-file-text me-2"></i>보고서
+			</a> <a class="nav-link" href="/admin/settings"> <i
+				class="bi bi-gear me-2"></i>시스템 설정
+			</a>
+		</nav>
+	</aside>
 
-        .hamburger {
-          display: inline-block !important;
-        }
+	<!-- 본문 영역 -->
+	<main class="main-content">
+		<div class="page-header">
+			<div class="page-title-section">
+				<h1>프로그램 신청 관리</h1>
+				<p class="page-subtitle">학생들의 비교과 프로그램 신청을 검토하고 승인/반려할 수 있습니다.</p>
+			</div>
+		</div>
 
-        .header-right {
-          display: none;
-        }
-
-        .table-container {
-          overflow-x: auto;
-        }
-
-        .detail-grid {
-          grid-template-columns: 1fr;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- 상단 헤더 -->
-    <header class="header">
-      <div class="header-left">
-        <span
-          class="hamburger"
-          id="hamburger"
-          style="
-            display: none;
-            cursor: pointer;
-            font-size: 1.25rem;
-            margin-right: 1rem;
-          "
-          >&#9776;</span
-        >
-        CMS 관리자 포털
-      </div>
-      <div class="header-center">
-        <img
-          src="../../static/images/logo-white.png"
-          alt="logo"
-          height="30"
-          class="me-2"
-        />
-        대한대학교
-      </div>
-      <div class="header-right">
-        <div class="user-box">
-          <div class="user-info">
-            <div><strong>김교수</strong> (staff001)</div>
-            <div class="small">교무처</div>
-          </div>
-          <button class="user-btn" title="로그아웃">
-            <i class="bi bi-box-arrow-right"></i>
-          </button>
+		<div class="table-container">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>신청ID</th>
+						<th>프로그램명</th>
+						<th>학생정보</th>
+						<th>신청일시</th>
+						<th>상태</th>
+						<th style="width: 200px">관리</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:if="${#lists.isEmpty(list)}">
+						<td colspan="6" class="text-center py-5">신청 내역이 없습니다.</td>
+					</tr>
+					<tr th:each="app : ${list}">
+						<td th:text="${app.aplyId}">1</td>
+						<td th:text="${app.prgNm}">프로그램명</td>
+						<td>
+							<div th:text="${app.stdNm} + ' (' + ${app.stdNo} + ')'"></div>
+						</td>
+						<td th:text="${#temporals.format(app.aplyDt, 'yyyy-MM-dd HH:mm')}"></td>
+						<td>
+						    <span th:if="${app.aplyStatCd == 'APPLIED'}" class="badge bg-warning text-dark">승인대기</span>
+						    <span th:if="${app.aplyStatCd == 'CONFIRM'}" class="badge bg-success">승인완료</span>
+						    <span th:if="${app.aplyStatCd == 'REJECT'}" class="badge bg-danger">반려</span>
+						</td>
+						<td>
+							<button type="button" class="btn-action btn-detail"
+								th:data-aply-id="${app.aplyId}">상세보기</button>
+								<th:block
+								th:if="${app.aplyStatCd == 'APPLIED'}">
+								<form
+									th:action="@{/employees/programs/applications/{id}/approve(id=${app.aplyId})}"
+									method="post" style="display: inline;"
+									onsubmit="return confirm('이 신청을 승인하시겠습니까?');">
+									<button type="submit" class="btn btn-sm btn-success">승인</button>
+								</form>
+								<form
+									th:action="@{/employees/programs/applications/{id}/reject(id=${app.aplyId})}"
+									method="post" style="display: inline;"
+									onsubmit="return confirm('이 신청을 반려하시겠습니까?');">
+									<button type="submit" class="btn btn-sm btn-danger">반려</button>
+								</form>
+							</th:block>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="pagination-container" th:if="${totalPages > 1}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${currentPage - 1})}">
+                            <span>&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="pageNumber : ${#numbers.sequence(startPage, endPage)}"
+                        th:classappend="${pageNumber == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${pageNumber})}"
+                           th:text="${pageNumber}"></a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/employees/programs/applications(page=${currentPage + 1})}">
+                            <span>&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-      </div>
-    </header>
+	</main>
 
-    <!-- 좌측 사이드바 -->
-    <aside class="sidebar" id="sidebar">
-      <nav class="nav flex-column">
-        <a class="nav-link" href="/admin/dashboard">
-          <i class="bi bi-speedometer2 me-2"></i>대시보드
-        </a>
-        <a class="nav-link" href="/admin/students">
-          <i class="bi bi-people me-2"></i>학생 관리
-        </a>
-        <a class="nav-link" href="/admin/programs">
-          <i class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
-        </a>
-        <a class="nav-link active" href="/admin/applications">
-          <i class="bi bi-file-earmark-text me-2"></i>신청 관리
-        </a>
-        <a class="nav-link" href="/admin/competency">
-          <i class="bi bi-graph-up me-2"></i>역량 관리
-        </a>
-        <a class="nav-link" href="/admin/counseling">
-          <i class="bi bi-chat-dots me-2"></i>상담 관리
-        </a>
-        <a class="nav-link" href="/admin/reports">
-          <i class="bi bi-file-text me-2"></i>보고서
-        </a>
-        <a class="nav-link" href="/admin/settings">
-          <i class="bi bi-gear me-2"></i>시스템 설정
-        </a>
-      </nav>
-    </aside>
+	<!-- 모달 -->
+	<div class="modal fade" id="detailModal" tabindex="-1"
+		aria-labelledby="detailModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="detailModalLabel">신청 상세 정보</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-person-circle"></i> 신청자 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">학번</div>
+								<div class="detail-value" id="modalStdNo">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">학생명</div>
+								<div class="detail-value" id="modalStdNm">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">학년</div>
+								<div class="detail-value" id="modalSchYr">-</div>
+							</div>
+						</div>
+					</div>
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-file-earmark-text"></i> 신청 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">신청ID</div>
+								<div class="detail-value" id="modalAplyId">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">신청일시</div>
+								<div class="detail-value" id="modalAplyDt">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">신청상태</div>
+								<div class="detail-value" id="modalAplyStatCd">-</div>
+							</div>
+						</div>
+					</div>
+					<div class="detail-section">
+						<h6 class="detail-section-title">
+							<i class="bi bi-grid-3x3-gap"></i> 프로그램 정보
+						</h6>
+						<div class="detail-grid">
+							<div class="detail-item">
+								<div class="detail-label">프로그램ID</div>
+								<div class="detail-value" id="modalPrgId">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">프로그램명</div>
+								<div class="detail-value" id="modalPrgNm">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">카테고리</div>
+								<div class="detail-value" id="modalCategoryName">-</div>
+							</div>
+							<div class="detail-item">
+								<div class="detail-label">정원</div>
+								<div class="detail-value" id="modalMaxCnt">-</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">닫기</button>
+					<div id="modalActionButtons" style="display: none;">
+						<button type="button" class="btn btn-success" id="btnApprove">
+							<i class="bi bi-check-circle me-1"></i>승인
+						</button>
+						<button type="button" class="btn btn-danger" id="btnReject">
+							<i class="bi bi-x-circle me-1"></i>반려
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-    <!-- 본문 영역 -->
-    <main class="main-content">
-      <div class="page-header">
-        <div class="page-title-section">
-          <h1>프로그램 신청 관리</h1>
-          <p class="page-subtitle">학생들의 비교과 프로그램 신청을 검토하고 승인/반려할 수 있습니다.</p>
-        </div>
-      </div>
-
-      <div class="table-container">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>신청ID</th>
-              <th>프로그램명</th>
-              <th>학생정보</th>
-              <th>신청일시</th>
-              <th>상태</th>
-              <th style="width: 200px">관리</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:if="${#lists.isEmpty(list)}">
-                <td colspan="6" class="text-center py-5">신청 내역이 없습니다.</td>
-            </tr>
-            <tr th:each="app : ${list}">
-                <td th:text="${app.aplyId}">1</td>
-                <td th:text="${app.prgNm}">프로그램명</td>
-                <td>
-                    <div th:text="${app.stdNm} + ' (' + ${app.stdNo} + ')'"></div>
-                </td>
-                <td th:text="${#temporals.format(app.aplyDt, 'yyyy-MM-dd HH:mm')}"></td>
-                <td>
-                    <span th:if="${app.aplyStatCd == 'APPLY'}" class="badge bg-warning text-dark">승인대기</span>
-                    <span th:if="${app.aplyStatCd == 'CONFIRM'}" class="badge bg-success">승인완료</span>
-                    <span th:if="${app.aplyStatCd == 'REJECT'}" class="badge bg-danger">반려</span>
-                </td>
-                <td>
-                    <button type="button" class="btn-action btn-detail" th:data-aply-id="${app.aplyId}">상세보기</button>
-                    <th:block th:if="${app.aplyStatCd == 'APPLY'}">
-                        <form th:action="@{/employees/programs/applications/{id}/approve(id=${app.aplyId})}" method="post" style="display:inline;" onsubmit="return confirm('이 신청을 승인하시겠습니까?');">
-                            <button type="submit" class="btn btn-sm btn-success">승인</button>
-                        </form>
-                        <form th:action="@{/employees/programs/applications/{id}/reject(id=${app.aplyId})}" method="post" style="display:inline;" onsubmit="return confirm('이 신청을 반려하시겠습니까?');">
-                            <button type="submit" class="btn btn-sm btn-danger">반려</button>
-                        </form>
-                    </th:block>
-                </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
-
-    <!-- 모달 -->
-    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="detailModalLabel">신청 상세 정보</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="detail-section">
-                    <h6 class="detail-section-title"><i class="bi bi-person-circle"></i> 신청자 정보</h6>
-                    <div class="detail-grid">
-                        <div class="detail-item">
-                            <div class="detail-label">학번</div>
-                            <div class="detail-value" id="modalStdNo">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">학생명</div>
-                            <div class="detail-value" id="modalStdNm">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">학년</div>
-                            <div class="detail-value" id="modalSchYr">-</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="detail-section">
-                    <h6 class="detail-section-title"><i class="bi bi-file-earmark-text"></i> 신청 정보</h6>
-                    <div class="detail-grid">
-                        <div class="detail-item">
-                            <div class="detail-label">신청ID</div>
-                            <div class="detail-value" id="modalAplyId">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">신청일시</div>
-                            <div class="detail-value" id="modalAplyDt">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">신청상태</div>
-                            <div class="detail-value" id="modalAplyStatCd">-</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="detail-section">
-                    <h6 class="detail-section-title"><i class="bi bi-grid-3x3-gap"></i> 프로그램 정보</h6>
-                    <div class="detail-grid">
-                        <div class="detail-item">
-                            <div class="detail-label">프로그램ID</div>
-                            <div class="detail-value" id="modalPrgId">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">프로그램명</div>
-                            <div class="detail-value" id="modalPrgNm">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">카테고리</div>
-                            <div class="detail-value" id="modalCategoryName">-</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">정원</div>
-                            <div class="detail-value" id="modalMaxCnt">-</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
-            </div>
-        </div>
-      </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+	<script>
     let detailModalInstance;
+    let currentAplyId = null; // 현재 모달에서 보고 있는 신청 ID
 
     async function openDetailModal(aplyId) {
         try {
             console.log('모달 열기 시도:', aplyId);
+            currentAplyId = aplyId; // 현재 신청 ID 저장
             
             // 서버에서 상세 정보 가져오기
             const response = await fetch(`/employees/programs/applications/${aplyId}/json`);
@@ -510,9 +538,20 @@
             // 상태 코드를 한글로 변환
             let statusText = data.aplyStatCd;
             switch(data.aplyStatCd) {
-                case 'APPLY': statusText = '승인대기'; break;
-                case 'CONFIRM': statusText = '승인완료'; break;
-                case 'REJECT': statusText = '반려'; break;
+                case 'APPLY': 
+                    statusText = '승인대기'; 
+                    break;
+                case 'CONFIRM': 
+                case 'APPROVED':  // 혹시 다른 코드를 사용하는 경우
+                    statusText = '승인완료'; 
+                    break;
+                case 'REJECT': 
+                case 'REJECTED':  // 혹시 다른 코드를 사용하는 경우
+                    statusText = '반려'; 
+                    break;
+                default:
+                    console.warn('알 수 없는 상태 코드:', data.aplyStatCd);
+                    statusText = data.aplyStatCd; // 원본 값 사용
             }
             document.getElementById('modalAplyStatCd').textContent = statusText;
             
@@ -521,6 +560,16 @@
             document.getElementById('modalCategoryName').textContent = data.categoryName || '-';
             document.getElementById('modalMaxCnt').textContent = data.maxCnt ? `${data.maxCnt}명` : '-';
 
+            // 승인대기 상태일 때만 액션 버튼 표시
+            const actionButtons = document.getElementById('modalActionButtons');
+            console.log('상태 코드:', data.aplyStatCd, '버튼 표시 여부:', data.aplyStatCd === 'APPLY');
+            
+            if (data.aplyStatCd === 'APPLY') {
+                actionButtons.style.display = 'inline-block';
+            } else {
+                actionButtons.style.display = 'none';
+            }
+
             // 모달 표시
             if (detailModalInstance) {
                 detailModalInstance.show();
@@ -528,6 +577,64 @@
         } catch (error) {
             console.error('Error:', error);
             alert('상세 정보를 불러오는 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 승인 처리 함수
+    async function approveApplication() {
+        if (!currentAplyId) return;
+        
+        if (!confirm('이 신청을 승인하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/employees/programs/applications/${currentAplyId}/approve`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (response.ok) {
+                alert('승인이 완료되었습니다.');
+                detailModalInstance.hide();
+                location.reload(); // 페이지 새로고침으로 목록 업데이트
+            } else {
+                throw new Error('승인 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('승인 처리 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 반려 처리 함수
+    async function rejectApplication() {
+        if (!currentAplyId) return;
+        
+        if (!confirm('이 신청을 반려하시겠습니까?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/employees/programs/applications/${currentAplyId}/reject`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                }
+            });
+
+            if (response.ok) {
+                alert('반려가 완료되었습니다.');
+                detailModalInstance.hide();
+                location.reload(); // 페이지 새로고침으로 목록 업데이트
+            } else {
+                throw new Error('반려 처리에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('반려 처리 중 오류가 발생했습니다.');
         }
     }
 
@@ -556,6 +663,18 @@
             }
         });
 
+        // 모달 내 승인/반려 버튼 이벤트 등록
+        const btnApprove = document.getElementById('btnApprove');
+        const btnReject = document.getElementById('btnReject');
+        
+        if (btnApprove) {
+            btnApprove.addEventListener('click', approveApplication);
+        }
+        
+        if (btnReject) {
+            btnReject.addEventListener('click', rejectApplication);
+        }
+
         // 사이드바 토글
         const sidebar = document.getElementById("sidebar");
         const hamburger = document.getElementById("hamburger");
@@ -564,5 +683,5 @@
         }
     });
     </script>
-  </body>
+</body>
 </html>
