@@ -1,15 +1,23 @@
 package kr.ac.dhuniv.ncs.controller;
 
+import kr.ac.dhuniv.ncs.dto.MyProgramDto;
 import kr.ac.dhuniv.ncs.dto.ProgramDto;
 import kr.ac.dhuniv.ncs.service.NcsPrgAplyService;
 import kr.ac.dhuniv.ncs.service.NcsPrgInfoService;
+import kr.ac.dhuniv.user.User;
+import kr.ac.dhuniv.user.repository.UserRepository;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -18,10 +26,12 @@ public class StdNcsController {
 
     private final NcsPrgInfoService ncsPrgInfoService;
     private final NcsPrgAplyService ncsPrgAplyService;
+    private final UserRepository userRepository;
 
-    public StdNcsController(NcsPrgInfoService ncsPrgInfoService, NcsPrgAplyService ncsPrgAplyService) {
+    public StdNcsController(NcsPrgInfoService ncsPrgInfoService, NcsPrgAplyService ncsPrgAplyService, UserRepository userRepository) {
         this.ncsPrgInfoService = ncsPrgInfoService;
         this.ncsPrgAplyService = ncsPrgAplyService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -74,28 +84,29 @@ public class StdNcsController {
 
     /**
      * 프로그램 신청 처리 API
-     * @param prgId 신청할 프로그램 ID
-     * @param payload 프론트엔드에서 전송한 학생 ID가 담긴 데이터
-     * @return 처리 결과
      */
     @PostMapping("/{prgId}/apply")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> applyProgram(
             @PathVariable("prgId") Long prgId,
-            @RequestBody Map<String, Object> payload
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         Map<String, Object> response = new HashMap<>();
-        try {
-            // ▼▼▼ [핵심] userIdx 대신 stdId를 받도록 수정 ▼▼▼
-            Object stdIdObj = payload.get("stdId");
-            
-            if (stdIdObj == null) {
-                throw new IllegalArgumentException("학생 ID(stdId)가 전송되지 않았습니다.");
-            }
-            
-            Long studentId = Long.parseLong(stdIdObj.toString());
 
-            ncsPrgAplyService.applyForProgram(prgId, studentId);
+        if (userDetails == null) {
+            response.put("success", false);
+            response.put("message", "로그인이 필요합니다.");
+            return ResponseEntity.status(401).body(response);
+        }
+
+        try {
+            String username = userDetails.getUsername();
+            User user = userRepository.findByUserId(username)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자 정보를 찾을 수 없습니다."));
+            
+            Long studentPkId = user.getUserIdx();
+
+            ncsPrgAplyService.applyForProgram(prgId, studentPkId);
             
             response.put("success", true);
             response.put("message", "프로그램 신청이 완료되었습니다.");
@@ -106,5 +117,34 @@ public class StdNcsController {
             response.put("message", e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
+    }
+    
+    /**
+     * 내 프로그램 참여 현황 페이지
+     */
+    @GetMapping("/status")
+    public String myProgramStatus(Model model) {
+        try {
+            // 1. 학번을 하드코딩합니다.
+            String username = "2025005001"; 
+
+            // 2. 하드코딩된 학번으로 DB에서 사용자의 고유 ID(PK)를 조회합니다.
+            User user = userRepository.findByUserId(username)
+                    .orElseThrow(() -> new UsernameNotFoundException("테스트용 학생 정보(" + username + ")를 DB에서 찾을 수 없습니다."));
+            
+            Long studentPkId = user.getUserIdx();
+
+            // 3. 조회한 ID로 참여 현황을 가져옵니다.
+            List<MyProgramDto> myPrograms = ncsPrgAplyService.getMyApplicationStatus(studentPkId);
+            model.addAttribute("myPrograms", myPrograms);
+
+        } catch (Exception e) {
+            // 예외 발생 시 에러 메시지를 전달하고 빈 목록을 보여줍니다.
+            System.err.println("/status 에러: " + e.getMessage());
+            model.addAttribute("myPrograms", new ArrayList<>()); 
+            model.addAttribute("error", e.getMessage());
+        }
+
+        return "student/program/status";
     }
 }
