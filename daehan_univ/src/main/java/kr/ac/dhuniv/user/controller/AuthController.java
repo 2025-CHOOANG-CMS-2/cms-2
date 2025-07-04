@@ -73,15 +73,15 @@ public class AuthController {
 
         // 🔹 권한에 따라 클라이언트가 이동해야 할 페이지 URL 결정
         String redirectUrl;
-        if (roles.contains("ADMIN")) {
+        /*if (roles.contains("ADMIN")) {
             redirectUrl = "/admin/index";  // 관리자 메인 페이지
-        } else if (roles.stream().anyMatch(r ->
-                List.of("EMPLOYEE", "COUNSELOR", "PROFESSOR").contains(r))) {
+        } else*/ if (roles.stream().anyMatch(r ->
+                List.of("EMPLOYEE", "COUNSELOR", "PROFESSOR", "ADMIN").contains(r))) {
             System.out.println("roles = " + roles.toString());
-            redirectUrl = "/employees/index";  // 교직원용 메인 페이지
+            redirectUrl = "/employees/notice-management";  // 교직원용 메인 페이지
         } else {
             //System.out.println("roles = " + roles.toString());
-            redirectUrl = "/student/index";   // 학생용 메인 페이지
+            redirectUrl = "/students/notice";   // 학생용 메인 페이지
         }
 
         // 🔹 클라이언트에 JSON 응답 반환 (메시지 + 이동 URL)

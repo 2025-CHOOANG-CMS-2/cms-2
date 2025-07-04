@@ -10,6 +10,9 @@
 <link
 	href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css"
 	rel="stylesheet">
+	<link
+			href="/css/s_header.css"
+			rel="stylesheet">
 <style>
 :root {
 	--primary-color: #2c3e50;
@@ -25,7 +28,7 @@ body {
 	background-color: #f8f9fa;
 }
 
-/* Sidebar */
+/*!* Sidebar *!
 .sidebar {
 	position: fixed;
 	top: 0;
@@ -53,7 +56,7 @@ body {
 
 .sidebar-nav {
 	padding: 1rem 0;
-}
+}*/
 
 .nav-item {
 	margin-bottom: 0.25rem;
@@ -92,14 +95,14 @@ body {
 }
 
 /* Header */
-.header {
+/*.header {
 	background: white;
 	padding: 1rem 2rem;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 	display: flex;
 	justify-content: between;
 	align-items: center;
-}
+}*/
 
 .page-header {
 	background: linear-gradient(135deg, var(--primary-color),
@@ -478,7 +481,11 @@ body {
 </style>
 </head>
 <body>
-	<header th:replace="~{/student/header.html :: student-head}"></header>
+<!-- 헤더 -->
+<div th:replace="~{layout/s_header :: s_header}"></div>
+
+<!-- 사이드바 -->
+<div th:replace="~{layout/s_sidebar :: s_sidebar}"></div>
 
 	<!-- Main Content -->
 	<div class="main-content">

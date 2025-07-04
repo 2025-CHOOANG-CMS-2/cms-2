@@ -1,0 +1,82 @@
+<th:block th:fragment="s_header">
+    <header class="header d-flex">
+        <div class="header-left" onclick="goIndex()">
+            <span class="hamburger" id="hamburger">&#9776;</span> CMS 학생포털
+        </div>
+        <div class="header-center">
+            <img src="/images/logo-white.png" alt="logo" height="30" class="me-2" />
+            대한대학교
+        </div>
+        <div class="header-right" id="user-info">
+            <!-- ✅ 로그인 상태 -->
+            <div id="user-logged-in" class="user-box" style="display: none;">
+                <div class="user-info" id="std-info">
+                    <!-- JS로 로그인한 학생 정보 채움 -->
+                </div>
+                <button class="user-btn" title="로그아웃" onclick="logout()">
+                    <i class="bi bi-box-arrow-right">로그아웃</i>
+                </button>
+            </div>
+
+            <!-- ❌ 로그아웃 상태 -->
+            <div id="user-logged-out" class="user-box" style="display: none;">
+                <button class="user-btn" title="로그인" onclick="location.href='/login'">
+                    <i class="bi bi-box-arrow-in-right"></i> 로그인
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ✅ 학생 로그인 정보 로딩 JS -->
+    <script>
+        function goIndex(){
+            location.href="/student/index";
+        }
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const token = localStorage.getItem("accessToken");
+                const res = await fetch("/api/user/me/student", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) throw new Error("인증 실패");
+
+                const data = await res.json();
+
+                // 학생 정보 동적 출력
+                const infoBox = document.getElementById("std-info");
+                infoBox.innerHTML = `
+                    <div><strong>${data.stdNm}</strong> (${data.userId})</div>
+                    <div class="small">${data.scsbjtCd} 전공</div>
+                `;
+
+                document.getElementById("user-logged-in").style.display = "flex";
+                document.getElementById("user-logged-out").style.display = "none";
+
+            } catch (e) {
+                console.warn("로그인되지 않음 또는 에러:", e);
+                document.getElementById("user-logged-in").style.display = "none";
+                document.getElementById("user-logged-out").style.display = "flex";
+            }
+        });
+
+        function logout() {
+            fetch("/api/auth/logout", {
+                method: "POST"
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error("로그아웃 실패");
+                    return res.text();
+                })
+                .then(() => {
+                    location.href = "/login";
+                })
+                .catch(err => {
+                    console.error("Logout error:", err);
+                    alert("로그아웃 중 오류가 발생했습니다.");
+                });
+        }
+    </script>
+</th:block>

@@ -24,7 +24,7 @@ public class StudentMileageController {
 		List<CoreCptForMlgDTO> coreCompetencies = commonService.getAllCoreCompetencies();
 		m.addAttribute("coreCompetencies", coreCompetencies);  // 핵심역량 목록
 		
-    	return "/student/mileage/mileage.html";
+    	return "/student/mileage/mileage";
     }
     
     @GetMapping("/student")

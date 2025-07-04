@@ -16,11 +16,11 @@ public class AdminStdAndEmpViewController {
 	
 	@GetMapping("/employees/employee-management")
 	public String EmployeeManagementController() {
-		return "/admin/management/employee-management.html";
+		return "/admin/management/employee-management";
 	}
 	
 	@GetMapping("/students/student-management")
 	public String StudentManagementController() {
-		return "/admin/management/student-management.html";
+		return "/admin/management/student-management";
 	}
 }

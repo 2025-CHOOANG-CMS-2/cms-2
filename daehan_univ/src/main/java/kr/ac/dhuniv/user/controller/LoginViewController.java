@@ -64,10 +64,13 @@ public class LoginViewController {
             return "error/403";  // 403 에러 페이지 or 리다이렉트
         }
 
-        boolean hasAdminRole = authentication.getAuthorities().stream()
-                .anyMatch(auth -> auth.getAuthority().equals("ROLE_EMPLOYEE"));
+        boolean hasAuthorizedRole = authentication.getAuthorities().stream()
+                .anyMatch(auth ->
+                        auth.getAuthority().equals("ROLE_EMPLOYEE") ||
+                                auth.getAuthority().equals("ROLE_ADMIN")
+                );
 
-        if (!hasAdminRole) {
+        if (!hasAuthorizedRole) {
             System.out.println("❌ EMPLOYEE 권한 없음, 접근 거부");
             return "error/403";  // 403 에러 페이지 or 리다이렉트
         }

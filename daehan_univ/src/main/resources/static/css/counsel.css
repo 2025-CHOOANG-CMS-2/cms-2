@@ -16,7 +16,7 @@ body {
   min-height: 100vh;
 }
 
-/* 사이드바 */
+/*!* 사이드바 *!
 .sidebar {
   width: 250px;
   background: rgba(255, 255, 255, 0.95);
@@ -24,7 +24,7 @@ body {
   padding: 20px;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   border-right: 2px solid #e9ecef;
-}
+}*/
 
 .logo {
   text-align: center;
@@ -82,7 +82,7 @@ body {
   padding: 20px;
 }
 
-/* 헤더 */
+/*!* 헤더 *!
 .header {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -92,7 +92,7 @@ body {
 .header h1 {
   color: #333;
   margin-bottom: 10px;
-}
+}*/
 
 .breadcrumb {
   color: #666;

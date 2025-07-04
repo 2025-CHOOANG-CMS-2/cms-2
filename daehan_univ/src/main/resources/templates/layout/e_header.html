@@ -1,7 +1,14 @@
 <header class="header d-flex" th:fragment="e_header">
-    <div class="header-left">
-        <span class="hamburger" id="hamburger">&#9776;</span> CMS 교직원 포털
+    <div class="header-left" onclick="goIndex()">
+
+        <span class="hamburger" id="hamburger">&#9776;</span> 대한대학교 교직원 포털
+
     </div>
+    <script>
+        function goIndex(){
+            location.href="/employees/index";
+        }
+    </script>
     <div class="header-center">
         <img src="/images/logo-white.png" alt="logo" height="30" class="me-2" />
         대한대학교

@@ -9,15 +9,20 @@
     <link rel="stylesheet" href="/css/student-notice.css">
 </head>
 <body>
+<!-- 헤더 -->
+<div th:replace="~{layout/s_header :: s_header}"></div>
+
+<!-- 사이드바 -->
+<div th:replace="~{layout/s_sidebar :: s_sidebar}"></div>
     <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
+    <!--<nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <a href="#" class="sidebar-brand">
                 <i class="bi bi-mortarboard-fill me-2"></i>
                 교육 관리 시스템
             </a>
         </div>
-        <!-- ⭐ 추가: 사이드바 사용자 정보 영역 ⭐ -->
+        &lt;!&ndash; ⭐ 추가: 사이드바 사용자 정보 영역 ⭐ &ndash;&gt;
         
         
         <div class="sidebar-nav">
@@ -70,12 +75,12 @@
                 </a>
             </div>
         </div>
-    </nav>
+    </nav>-->
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header -->
-        <header class="header">
+        <!--<header class="header">
             <div class="d-flex align-items-center">
                 <button class="btn btn-link d-md-none me-3" id="toggleSidebarBtn">
                     <i class="bi bi-list"></i>
@@ -85,16 +90,16 @@
                     <span id="currentTime"></span>
                 </div>
             </div>
-            
+
             <div class="d-flex align-items-center gap-3">
                                 <div class="text-end">
-                  <!-- 
+                  &lt;!&ndash;
                     <div class="fw-medium" id="headerUserName">김학생</div>
                     <small class="text-muted" id="headerUserDept">컴퓨터공학과 3학년</small>
-                   --> 
+                   &ndash;&gt;
                 </div>
-    
-                
+
+
                 <div class="dropdown">
                     <button class="btn btn-link" data-bs-toggle="dropdown">
                         <i class="bi bi-three-dots-vertical"></i>
@@ -106,7 +111,7 @@
                     </ul>
                 </div>
             </div>
-        </header>
+        </header>-->
 
         <!-- Page Header -->
         <div class="page-header">
