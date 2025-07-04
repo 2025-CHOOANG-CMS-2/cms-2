@@ -19,7 +19,7 @@ public class EmployeeMileageController {
 	
 	@GetMapping("/employee/mileage/dashboard")
 	public String showMileageDashboard() {
-		return  "/employee/mileage/mileage-dashboard";
+		return  "employee/mileage/mileage-dashboard";
 	}
 
 	// 마일리지 지급 화면 (핵심역량목록, 비교과프로그램목록은 검색 옵션에 사용)
@@ -29,7 +29,7 @@ public class EmployeeMileageController {
 		List<NcsPrgForMlgDTO> ncsPrograms = commonService.getAllNcsPrograms();
 		m.addAttribute("coreCompetencies", coreCompetencies);  // 핵심역량 목록
 		m.addAttribute("ncsPrograms", ncsPrograms);            // 비교과 프로그램 목록
-		return  "/employee/mileage/mileage-payment";
+		return  "employee/mileage/mileage-payment";
 	}
 
 }

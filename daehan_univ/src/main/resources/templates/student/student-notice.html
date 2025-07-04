@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
 <head>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항 - 교육 관리 시스템</title>
@@ -10,10 +11,10 @@
 </head>
 <body>
 <!-- 헤더 -->
-<div th:replace="~{layout/s_header :: s_header}"></div>
+<div th:replace="layout/s_header :: s_header"></div>
 
 <!-- 사이드바 -->
-<div th:replace="~{layout/s_sidebar :: s_sidebar}"></div>
+<div th:replace="layout/s_sidebar :: s_sidebar"></div>
     <!-- Sidebar -->
     <!--<nav class="sidebar" id="sidebar">
         <div class="sidebar-header">

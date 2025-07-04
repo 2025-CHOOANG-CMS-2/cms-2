@@ -8,7 +8,7 @@ public class AdminNoticeViewController {
 
 	@GetMapping("/employees/notice-management")
 	public String AdminIndexController() {
-		return "/admin/management/admin-notice-management.html";
+		return "admin/management/admin-notice-management";
 	}
 	
 }
