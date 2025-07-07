@@ -79,6 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // 디버그용 로그 출력
             System.out.println("✅ 인증 정보 설정 완료: " + claims.getSubject());
+            System.out.println("authorities = " + authorities.toString());
         } else {
             // 토큰이 없거나 유효하지 않은 경우 (예: 서명 실패, 만료 등)
             System.out.println("❌ 유효하지 않은 토큰 또는 토큰 없음");

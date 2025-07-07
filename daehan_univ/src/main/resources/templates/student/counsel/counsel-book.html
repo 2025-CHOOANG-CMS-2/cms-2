@@ -9,14 +9,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+     <link th:href="@{/css/s_header.css}" rel="stylesheet" />
     <link th:href="@{/css/counsel.css}" rel="stylesheet" />
 
-  <th:block th:replace="s_header :: head"></th:block>
+  <!--<th:block th:replace="s_header :: head"></th:block>-->
   </head>
   
   <body>
-	<th:block th:replace="s_header :: header"></th:block>
-    <th:block th:replace="s_header :: sidebar"></th:block>
+  <!-- 헤더 -->
+  <div th:replace="~{layout/s_header :: s_header}"></div>
+
+  <!-- 사이드바 -->
+  <div th:replace="~{layout/s_sidebar :: s_sidebar}"></div>
     
     <main class="main-content">
         <div class="content-header">

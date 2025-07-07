@@ -2,6 +2,7 @@ package kr.ac.dhuniv.user.controller;
 
 import kr.ac.dhuniv.empl_info.domain.EmplInfo;
 import kr.ac.dhuniv.std_info.domain.StdInfo;
+import kr.ac.dhuniv.user.Role;
 import kr.ac.dhuniv.user.User;
 import kr.ac.dhuniv.user.repository.UserRepository;
 import kr.ac.dhuniv.user.repository.User_EmplInfoRepository;
@@ -13,7 +14,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
@@ -36,8 +40,6 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
 
     User user = userRepository.findByUserId(userId)
             .orElseThrow(() -> new RuntimeException("사용자 없음"));
-
-
     // 학생 정보 조회 (nullable)
     StdInfo std = stdInfoRepository.findByUser_UserId(userId).orElse(null); // 학생이 아닐 수 있으므로 null 허용
 
@@ -48,8 +50,7 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
             "stdId", std.getStdId(),
             "stdNm", std != null ? std.getStdNm() : null,
             "scsbjtCd", std != null ? std.getScsbjtCd() : null,
-            "stdEmlAddr", std != null ? std.getStdEmlAddr() : null
-    ));
+            "stdEmlAddr", std != null ? std.getStdEmlAddr() : null));
 
 }
     /**
@@ -62,18 +63,23 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
 
-        String userId = authentication.getName();  // JWT의 sub
+        String userId = authentication.getName();
 
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("사용자 없음"));
 
-        // 교직원 정보 조회 (nullable)
         EmplInfo empl = emplInfoRepository.findByUser_UserId(userId).orElse(null);
+
+        // 🔹 권한 목록 추출
+        List<String> roleNames = user.getRoles().stream()
+                .map(Role::getRoleName) // ex: "ROLE_ADMIN"
+                .collect(Collectors.toList());
 
         return ResponseEntity.ok(Map.of(
                 "userIdx", user.getUserIdx(),
                 "userId", user.getUserId(),
                 "userYn", user.getUserYn(),
+                "roles", roleNames, // 🔥 추가된 부분
                 "emplId", empl != null ? empl.getEmplId() : null,
                 "emplNm", empl != null ? empl.getEmplNm() : null,
                 "deptCd", empl != null ? empl.getDeptCd() : null,
@@ -81,5 +87,6 @@ public ResponseEntity<?> getLoginUser(Authentication authentication) {
                 "positionCd", empl != null ? empl.getPositionCd() : null
         ));
     }
+
 
 }

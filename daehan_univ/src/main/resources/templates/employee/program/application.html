@@ -287,54 +287,11 @@ body {
 </style>
 </head>
 <body>
-	<!-- 상단 헤더 -->
-	<header class="header">
-		<div class="header-left">
-			<span class="hamburger" id="hamburger"
-				style="display: none; cursor: pointer; font-size: 1.25rem; margin-right: 1rem;">&#9776;</span>
-			CMS 관리자 포털
-		</div>
-		<div class="header-center">
-			<img src="../../static/images/logo-white.png" alt="logo" height="30"
-				class="me-2" /> 대한대학교
-		</div>
-		<div class="header-right">
-			<div class="user-box">
-				<div class="user-info">
-					<div>
-						<strong>김교수</strong> (staff001)
-					</div>
-					<div class="small">교무처</div>
-				</div>
-				<button class="user-btn" title="로그아웃">
-					<i class="bi bi-box-arrow-right"></i>
-				</button>
-			</div>
-		</div>
-	</header>
+<!-- 헤더 -->
+<div th:replace="~{layout/e_header :: e_header}"></div>
 
-	<!-- 좌측 사이드바 -->
-	<aside class="sidebar" id="sidebar">
-		<nav class="nav flex-column">
-			<a class="nav-link" href="/admin/dashboard"> <i
-				class="bi bi-speedometer2 me-2"></i>대시보드
-			</a> <a class="nav-link" href="/admin/students"> <i
-				class="bi bi-people me-2"></i>학생 관리
-			</a> <a class="nav-link" href="/admin/programs"> <i
-				class="bi bi-grid-3x3-gap me-2"></i>비교과 프로그램
-			</a> <a class="nav-link active" href="/admin/applications"> <i
-				class="bi bi-file-earmark-text me-2"></i>신청 관리
-			</a> <a class="nav-link" href="/admin/competency"> <i
-				class="bi bi-graph-up me-2"></i>역량 관리
-			</a> <a class="nav-link" href="/admin/counseling"> <i
-				class="bi bi-chat-dots me-2"></i>상담 관리
-			</a> <a class="nav-link" href="/admin/reports"> <i
-				class="bi bi-file-text me-2"></i>보고서
-			</a> <a class="nav-link" href="/admin/settings"> <i
-				class="bi bi-gear me-2"></i>시스템 설정
-			</a>
-		</nav>
-	</aside>
+<!-- 사이드바 -->
+<div th:replace="~{layout/e_sidebar :: e_sidebar}"></div>
 
 	<!-- 본문 영역 -->
 	<main class="main-content">
@@ -683,5 +640,7 @@ body {
         }
     });
     </script>
+<script src="/js/layout/e_header.js"></script>
+<script src="/js/layout/e_sidebar.js"></script>
 </body>
 </html>

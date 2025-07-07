@@ -10,7 +10,7 @@ public class StudentNoticeViewController {
 	public String ViewStudentNotice() {
 		
 		
-		return "/student/student-notice.html";
+		return "student/student-notice";
 	}
 	
 }

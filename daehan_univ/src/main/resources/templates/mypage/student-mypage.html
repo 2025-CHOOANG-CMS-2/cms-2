@@ -9,71 +9,16 @@
     <link rel="stylesheet" href="/css/student-mypage.css">
 </head>
 <body>
-    <!-- Sidebar -->
-    <nav class="sidebar" id="sidebar">
-        <div class="sidebar-header">
-            <a th:href="@{/}" class="sidebar-brand"> 
-                <i class="bi bi-mortarboard-fill me-2"></i>
-                교육 관리 시스템
-            </a>
-        </div>
-        
-        <div class="sidebar-nav">
-            <div class="nav-item">
-                <a th:href="@{/}" class="nav-link">
-                    <i class="bi bi-house"></i>
-                    메인화면
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/student_mypage.do(studentId=${stdInfo.STD_NO})}" class="nav-link active">
-                    <i class="bi bi-person"></i>
-                    마이페이지
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/notice}" class="nav-link">
-                    <i class="bi bi-megaphone"></i>
-                    공지사항
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/competency-diagnosis}" class="nav-link">
-                    <i class="bi bi-clipboard-data"></i>
-                    학생역량진단
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/extracurricular-programs}" class="nav-link">
-                    <i class="bi bi-calendar-event"></i>
-                    비교과 프로그램
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/counseling}" class="nav-link">
-                    <i class="bi bi-chat-dots"></i>
-                    상담관리
-                </a>
-            </div>
-            
-            <div class="nav-item">
-                <a th:href="@{/mileage}" class="nav-link">
-                    <i class="bi bi-star"></i>
-                    마일리지 조회
-                </a>
-            </div>
-        </div>
-    </nav>
+<!-- 헤더 -->
+<div th:replace="~{layout/s_header :: s_header}"></div>
+
+<!-- 사이드바 -->
+<div th:replace="~{layout/s_sidebar :: s_sidebar}"></div>
 
     <!-- Main Content -->
     <div class="main-content">
         <!-- Header: 시간과 사용자 정보 간격 조정 및 정렬 -->
-        <header class="header d-flex justify-content-between align-items-center">
+        <!--<header class="header d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
                 <button class="btn btn-link d-md-none me-3" onclick="toggleSidebar()">
                     <i class="bi bi-list"></i>
@@ -86,10 +31,10 @@
             
             <div class="d-flex align-items-center gap-3">
                 <div class="text-end">
-                    <!-- 이름만 출력 -->
+                    &lt;!&ndash; 이름만 출력 &ndash;&gt;
                     <div class="fw-medium" id="headerUserName" th:text="${stdInfo.STD_NM}">김학생</div>
-                    <!-- 학과 학년 출력 (수정) 
-                    -->
+                    &lt;!&ndash; 학과 학년 출력 (수정)
+                    &ndash;&gt;
                     <small class="text-muted" id="headerUserDept" 
                            th:text="|${(stdInfo.SCSBJT_CD != null and departmentMap.containsKey(stdInfo.SCSBJT_CD)) ? departmentMap.get(stdInfo.SCSBJT_CD) : stdInfo.SCSBJT_CD} ${stdInfo.SCH_YR}학년|">
                         컴퓨터공학과 3학년
@@ -107,7 +52,7 @@
                     </ul>
                 </div>
             </div>
-        </header>
+        </header>-->
 
         <!-- Page Header -->
         <div class="page-header">

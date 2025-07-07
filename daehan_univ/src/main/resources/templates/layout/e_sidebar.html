@@ -1,0 +1,107 @@
+<aside class="sidebar" id="sidebar" th:fragment="e_sidebar">
+    <div class="sidebar-user-info">
+    <!--    <div><strong>김교직</strong> (STAFF001)</div>
+        <div>학사운영팀</div>-->
+      <!--  <div class="mt-2">
+            <button class="user-btn" title="로그아웃">
+                <i class="bi bi-box-arrow-right"></i> 로그아웃
+            </button>
+        </div>-->
+    </div>
+    <nav class="nav flex-column">
+        <a class="nav-link" href="/employees/notice-management">공지사항관리</a>
+
+
+
+        <a class="nav-link has-submenu" href="#" data-menu="역량"
+        >핵심역량개발관리</a
+        >
+        <div class="submenu" id="submenu-역량" style="display: none">
+            <a class="nav-link" href="/employees/core-diagnosis-cpt">핵심역량 대시보드</a>
+            <a class="nav-link" href="/employees/core-empl-cpt">역량항목관리</a>
+            <a class="nav-link" href="/employees/question-management">진단문항관리</a>
+            <a class="nav-link" href="/employees/core-diagnosis-result">진단결과열람</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="비교과"
+        >비교과프로그램관리</a
+        >
+        <div class="submenu" id="submenu-비교과" style="display: none">
+            <a class="nav-link" href="/employees/programs">프로그램관리</a>
+            <a class="nav-link" href="/employees/programs/applications">프로그램신청관리</a>
+            <a class="nav-link" href="/employees/programs/completions">프로그램활동관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="상담">상담관리</a>
+        <div class="submenu" id="submenu-상담" style="display: none">
+            <!--<a class="nav-link" href="">상담사일정등록</a>-->
+            <a class="nav-link" href="/employees/counselor-dashboard">상담예약관리</a>
+            <a class="nav-link" href="/employees/counselor-results">상담결과관리</a>
+        </div>
+
+        <a class="nav-link has-submenu" href="#" data-menu="마일리지"
+        >마일리지관리</a
+        >
+        <div class="submenu" id="submenu-마일리지" style="display: none">
+            <a class="nav-link" href="/employee/mileage/dashboard">마일리지 대시보드</a>
+            <a class="nav-link" href="/employee/mileage/payments">마일리지지급관리</a>
+            <!--<a class="nav-link" href="/mileage/status">마일리지현황</a>-->
+        </div>
+        <!-- ADMIN 전용 메뉴 - 기본은 숨김 -->
+        <a class="nav-link" href="/students/student-management" id="admin-student" style="display: none;">학생관리</a>
+        <a class="nav-link" href="/employees/employee-management" id="admin-employee" style="display: none;">교직원관리</a>
+
+    </nav>
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const res = await fetch("/api/user/me/employee", {
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+                    }
+                });
+
+                if (!res.ok) throw new Error("교직원 인증 실패");
+
+                const data = await res.json();
+
+                // ✅ 사용자 정보 출력
+                const box = document.getElementById("empl-info");
+                if (box) {
+                    box.innerHTML = `
+                    <div><strong>${data.emplNm}</strong> (${data.userId})</div>
+                    <div>${data.deptCd}</div>
+                    <div class="mt-2">
+                        <button class="user-btn" title="로그아웃" onclick="logout()">
+                            <i class="bi bi-box-arrow-right"></i> 로그아웃
+                        </button>
+                    </div>
+                `;
+                }
+
+                // ✅ ADMIN 권한이 있을 경우 관리자 메뉴 보이기
+                const roles = data.roles || [];
+
+                if (roles.includes("ADMIN")) {
+                    const studentMenu = document.getElementById("admin-student");
+                    const employeeMenu = document.getElementById("admin-employee");
+                    if (studentMenu) studentMenu.style.display = "block";
+                    if (employeeMenu) employeeMenu.style.display = "block";
+                }
+
+            } catch (err) {
+                console.warn("❌ 교직원 정보 가져오기 실패:", err);
+            }
+        });
+
+        // 로그아웃 버튼 처리
+        function logout() {
+            fetch("/api/auth/logout", { method: "POST" })
+                .then(() => location.href = "/login")
+                .catch(err => {
+                    alert("로그아웃 실패");
+                    console.error(err);
+                });
+        }
+    </script>
+</aside>

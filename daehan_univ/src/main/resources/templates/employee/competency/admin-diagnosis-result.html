@@ -1,29 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>진단 결과 열람 - 교육 관리 시스템</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>대한대학교 CMS 포털 - 교직원</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Bootstrap & Icons -->
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    />
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+            rel="stylesheet"
+    />
     <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,0.8);
-            padding: 0.75rem 1rem;
-            margin: 0.25rem 0;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover, .sidebar .nav-link.active {
-            color: white;
-            background-color: rgba(255,255,255,0.1);
-            transform: translateX(5px);
-        }
+
         .main-content {
             background-color: #f8f9fa;
             min-height: 100vh;
@@ -39,89 +33,119 @@
             transform: translateY(-5px);
         }
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2d4f3a;
             border: none;
             border-radius: 25px;
             padding: 0.5rem 1.5rem;
         }
         .table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #2d4f3a;
             color: white;
             border: none;
         }
-        .badge-status {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
+        .question-card {
+            border-left: 4px solid #3498db;
+            margin-bottom: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .search-box {
-            border-radius: 25px;
-            border: 2px solid #e9ecef;
-            padding: 0.75rem 1.5rem;
+        .question-options {
+            margin-top: 10px;
+            padding-left: 20px;
         }
-        .search-box:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        .option-item {
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #ddd;
         }
-        .competency-card {
-            border-left: 4px solid;
-            transition: all 0.3s ease;
+        .option-item.correct {
+            border-left-color: #28a745;
         }
-        .competency-card:hover {
-            transform: translateX(5px);
-        }
-        .competency-communication { border-left-color: #3498db; }
-        .competency-creativity { border-left-color: #9b59b6; }
-        .competency-leadership { border-left-color: #e74c3c; }
-        .competency-problem-solving { border-left-color: #f39c12; }
-        .competency-teamwork { border-left-color: #27ae60; }
-        
-        .chart-container {
-            height: 300px;
-            position: relative;
-        }
-        
         .filter-card {
             background-color: white;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
         }
-        
-        .student-profile {
+        .badge-competency {
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        .badge-communication { background-color: #3498db; color: white; }
+        .badge-creativity { background-color: #9b59b6; color: white; }
+        .badge-leadership { background-color: #e74c3c; color: white; }
+        .badge-problem-solving { background-color: #f39c12; color: white; }
+        .badge-teamwork { background-color: #27ae60; color: white; }
+    </style>
+    <style>
+        /* 공통 스타일 */
+        body {
+            background-color: #fafafa;
+            margin: 0;
+            padding: 0;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        /* 헤더 영역 (교직원용 포레스트 그린) */
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 60px;
+            background-color: #2d4f3a;
+            color: white;
+            z-index: 1040;
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        
-        .student-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 20px;
+        .header-left {
+            flex: 1;
+            font-weight: bold;
+            font-size: 1.1rem;
         }
-        
-        .student-info {
-            flex-grow: 1;
+        .header-center {
+            flex: 1;
+            text-align: center;
+            font-size: 1.2rem;
         }
-        
-        .radar-chart {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
-            height: 350px;
+        .header-right {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 0.9rem;
+            gap: 1rem;
+        }
+
+        /* 사용자 정보 및 버튼 */
+        .user-box {
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.5rem;
         }
-        
-        .result-summary {
-            background-color: white;
-            border-radius: 10px;
-            padding: 20px;
+        .user-info {
+            text-align: right;
+            line-height: 1.2;
         }
-        
+        .user-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
+        }
+        .user-btn:hover {
+            color: #ffc107;
+        }
         .recommendation-card {
             background-color: #f0f8ff;
             border-radius: 10px;
@@ -129,387 +153,380 @@
             margin-bottom: 15px;
             border-left: 4px solid #3498db;
         }
+        /* 사이드바 */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 240px;
+            height: 100%;
+            background-color: #2d4f3a;
+            padding: 1rem 0;
+            color: white;
+            z-index: 1030;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-user-info {
+            display: none;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-user-info div {
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        /* 본문 */
+        .main-content {
+            margin-top: 60px;
+            margin-left: 240px;
+            padding: 1.5rem;
+        }
+
+        /* 메뉴 스타일 */
+        .nav-link {
+            color: #e0e8f0;
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s, color 0.2s;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            background-color: #3b624d;
+            color: #ffffff;
+        }
+        .nav-link.active {
+            background-color: #46775c;
+            font-weight: bold;
+        }
+        .submenu {
+            background-color: #3b624d;
+        }
+        .submenu a {
+            padding-left: 2.5rem;
+            font-size: 0.95rem;
+        }
+        .has-submenu::after {
+            content: "\25BC";
+            font-size: 0.75rem;
+            margin-left: 0.5rem;
+        }
+
+        /* 햄버거 메뉴 (모바일) */
+        .hamburger {
+            display: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        /* 반응형 대응 */
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -240px;
+                transition: left 0.3s ease;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .hamburger {
+                display: inline-block;
+                margin-right: 1rem;
+            }
+            .header-right {
+                display: none;
+            }
+            .sidebar-user-info {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- 사이드바 -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4 class="text-white">
-                            <i class="fas fa-graduation-cap me-2"></i>
-                            관리자
-                        </h4>
-                    </div>
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-index.html">
-                                <i class="fas fa-tachometer-alt me-2"></i>
-                                대시보드
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" data-bs-toggle="collapse" data-bs-target="#userManagement">
-                                <i class="fas fa-users me-2"></i>
-                                사용자/조직 관리
-                                <i class="fas fa-chevron-down ms-auto"></i>
-                            </a>
-                            <div class="collapse" id="userManagement">
-                                <ul class="nav flex-column ms-3">
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-student-management.html">
-                                            <i class="fas fa-user-graduate me-2"></i>
-                                            학생 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-faculty-management.html">
-                                            <i class="fas fa-chalkboard-teacher me-2"></i>
-                                            교직원 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="../admin-department-management.html">
-                                            <i class="fas fa-building me-2"></i>
-                                            학과/부서 관리
-                                        </a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="admin-permission-management.html">
-                                            <i class="fas fa-key me-2"></i>
-                                            권한 관리
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link active" href="admin-diagnosis-management.html">
-                                <i class="fas fa-chart-line me-2"></i>
-                                역량진단 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-program-management.html">
-                                <i class="fas fa-calendar-alt me-2"></i>
-                                비교과 프로그램 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../admin-counseling-management.html">
-                                <i class="fas fa-comments me-2"></i>
-                                상담 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="admin-mileage-management.html">
-                                <i class="fas fa-coins me-2"></i>
-                                마일리지 관리
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="../admin-notice-management.html">
-                                <i class="fas fa-bullhorn me-2"></i>
-                                공지사항 관리
-                            </a>
-                        </li>
-                    </ul>
+<!-- 헤더 -->
+<div th:replace="~{layout/e_header :: e_header}"></div>
 
-                    <hr class="my-3" style="border-color: rgba(255,255,255,0.3);">
-                    
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" href="login.html">
-                                <i class="fas fa-sign-out-alt me-2"></i>
-                                로그아웃
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
-
-            <!-- 메인 콘텐츠 -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">
-                        <i class="fas fa-chart-bar me-2"></i>
-                        진단 결과 열람
-                    </h1>
-                    <div class="btn-toolbar mb-2 mb-md-0">
-                        <div class="btn-group me-2">
-<!--                            <button type="button" class="btn btn-outline-secondary" onclick="exportResults()">-->
-<!--                                <i class="fas fa-file-export me-2"></i>-->
-<!--                                결과 내보내기-->
-<!--                            </button>-->
-                            <a href="/employees/core-diagnosis-cpt" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                돌아가기
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 필터 및 검색 -->
-                <!-- 검색 필터 -->
-                <div class="filter-card">
-                    <div class="row">
-                        <div class="col-md-9 mb-3">
-                            <label for="searchStudent" class="form-label">검색</label>
-                            <input type="text" class="form-control" id="searchStudent" placeholder="학번 또는 이름으로 검색">
-                        </div>
-                        <div class="col-md-3 mb-3 d-flex align-items-end">
-                            <button class="btn btn-primary w-100" onclick="searchResults()">
-                                <i class="fas fa-search me-2"></i> 검색
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 학생별 진단 결과 목록 -->
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="fas fa-list me-2"></i>
-                            학생별 진단 결과
-                        </h5>
-<!--                        <span class="badge bg-primary">총 1,247건</span>Z-->
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>학번</th>
-                                        <th>이름</th>
-                                        <th>학과</th>
-                                        <th>학년</th>
-                                        <th>진단일시</th>
-                                        <th>종합점수</th>
-                                        <th>상세보기</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-
-                                </tbody>
-                            </table>
-                        </div>
-
-
-
-                    </div>
-                </div>
-
-                <!-- 학생 상세 결과 (초기에는 숨김) -->
-                <div id="studentDetailSection" class="mt-4" style="display: none;">
-                    <div class="card">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-user-graduate me-2"></i>
-                                학생 진단 상세 결과
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            <!-- 학생 프로필 -->
-                            <div class="student-profile">
-<!--                                <img src="https://via.placeholder.com/150" alt="학생 프로필" class="student-avatar">-->
-                                <div class="student-info">
-                                    <h4 id="studentName">김학생</h4>
-                                    <p class="mb-1">
-                                        <span id="studentId">20230001</span> | 
-                                        <span id="studentDepartment">컴퓨터공학과</span> | 
-                                        <span id="studentGrade">3학년</span>
-                                    </p>
-                                    <p class="text-muted mb-0">
-                                        <i class="fas fa-envelope me-2"></i>
-                                        <span id="studentEmail">student@example.com</span>
-                                    </p>
-                                </div>
-                                <div class="text-end">
-                                    <!--<h3 class="text-primary mb-0">85점</h3>
-                                    <p class="text-success mb-0">
-                                        <i class="fas fa-arrow-up me-1"></i>
-                                        전년 대비 +5점
-                                    </p>-->
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <!-- 왼쪽: 레이더 차트 -->
-                                <div class="col-md-6">
-                                    <div class="radar-chart" style="height: 350px;">
-                                        <canvas id="competencyRadarChart"></canvas>
-                                    </div>
-                                </div>
-
-                                <!-- 역량별 점수 -->
-                                <div class="col-md-6">
-                                    <div class="result-summary" id="resultSummary">
-                                        <h5 class="mb-3">역량별 점수</h5>
-                                        
-
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 추천 프로그램 -->
-                            <div class="mt-4">
-                                <h5 class="mb-3">추천 비교과 프로그램</h5>
-                                <div id="recommendationSection"></div>
-                               <!-- <div class="recommendation-card" >
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6 class="mb-1">창의적 문제해결 워크숍</h6>
-                                            <p class="mb-1 text-muted">창의역량 향상을 위한 워크숍 프로그램</p>
-                                            <p class="mb-0 small">
-                                                <span class="badge bg-info me-2">창의역량</span>
-                                                <span class="badge bg-secondary me-2">2023-07-15</span>
-                                                <span class="badge bg-success">마일리지 30점</span>
-                                            </p>
-                                        </div>
-                                        <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
-                                    </div>
-                                </div>
-                                
-                                <div class="recommendation-card">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h6 class="mb-1">효과적인 커뮤니케이션 특강</h6>
-                                            <p class="mb-1 text-muted">의사소통 능력 향상을 위한 특강</p>
-                                            <p class="mb-0 small">
-                                                <span class="badge bg-primary me-2">의사소통역량</span>
-                                                <span class="badge bg-secondary me-2">2023-07-20</span>
-                                                <span class="badge bg-success">마일리지 20점</span>
-                                            </p>
-                                        </div>
-                                        <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
-                                    </div>
-                                </div>-->
-                            </div>
-
-                            <!-- 진단 이력 -->
-
-
-                            <!-- 액션 버튼 -->
-                            <div class="text-center mt-4">
-                         <!--       <button class="btn btn-outline-primary me-2" onclick="printStudentReport()">
-                                    <i class="fas fa-print me-2"></i>
-                                    결과 출력
-                                </button>
-                                <button class="btn btn-outline-success me-2" onclick="sendResultEmail()">
-                                    <i class="fas fa-envelope me-2"></i>
-                                    결과 이메일 발송
-                                </button>-->
-                                <button class="btn btn-outline-secondary" onclick="hideStudentDetail()">
-                                    <i class="fas fa-times me-2"></i>
-                                    닫기
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+<!-- 사이드바 -->
+<div th:replace="~{layout/e_sidebar :: e_sidebar}"></div>
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-chart-bar me-2"></i>
+            진단 결과 열람
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <!--                            <button type="button" class="btn btn-outline-secondary" onclick="exportResults()">-->
+                <!--                                <i class="fas fa-file-export me-2"></i>-->
+                <!--                                결과 내보내기-->
+                <!--                            </button>-->
+                <a href="/employees/core-diagnosis-cpt" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>
+                    돌아가기
+                </a>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <!-- 필터 및 검색 -->
+    <!-- 검색 필터 -->
+    <div class="filter-card">
+        <div class="row">
+            <div class="col-md-9 mb-3">
+                <label for="searchStudent" class="form-label">검색</label>
+                <input type="text" class="form-control" id="searchStudent" placeholder="학번 또는 이름으로 검색">
+            </div>
+            <div class="col-md-3 mb-3 d-flex align-items-end">
+                <button class="btn btn-primary w-100" onclick="searchResults()">
+                    <i class="fas fa-search me-2"></i> 검색
+                </button>
+            </div>
+        </div>
+    </div>
 
-        let allDiagnosisData = [];  // ← 전체 학생 진단 결과 저장용
+    <!-- 학생별 진단 결과 목록 -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-list me-2"></i>
+                학생별 진단 결과
+            </h5>
+            <!--                        <span class="badge bg-primary">총 1,247건</span>Z-->
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>학번</th>
+                        <th>이름</th>
+                        <th>학과</th>
+                        <th>학년</th>
+                        <th>진단일시</th>
+                        <th>종합점수</th>
+                        <th>상세보기</th>
+                    </tr>
+                    </thead>
+                    <tbody>
 
-        // 결과 검색
-        function searchResults() {
-            const keyword = document.getElementById('searchStudent').value.trim();
-            const filtered = allDiagnosisData.filter(d =>
-                d.stdNo.includes(keyword) || d.stdNm.includes(keyword)
-            );
-            renderDiagnosisTable(filtered);  // 필터링된 데이터 렌더링
+                    </tbody>
+                </table>
+            </div>
+
+
+
+        </div>
+    </div>
+
+    <!-- 학생 상세 결과 (초기에는 숨김) -->
+    <div id="studentDetailSection" class="mt-4" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-user-graduate me-2"></i>
+                    학생 진단 상세 결과
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- 학생 프로필 -->
+                <div class="student-profile">
+                    <!--                                <img src="https://via.placeholder.com/150" alt="학생 프로필" class="student-avatar">-->
+                    <div class="student-info">
+                        <h4 id="studentName">김학생</h4>
+                        <p class="mb-1">
+                            <span id="studentId">20230001</span> |
+                            <span id="studentDepartment">컴퓨터공학과</span> |
+                            <span id="studentGrade">3학년</span>
+                        </p>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-envelope me-2"></i>
+                            <span id="studentEmail">student@example.com</span>
+                        </p>
+                    </div>
+                    <div class="text-end">
+                        <!--<h3 class="text-primary mb-0">85점</h3>
+                        <p class="text-success mb-0">
+                            <i class="fas fa-arrow-up me-1"></i>
+                            전년 대비 +5점
+                        </p>-->
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- 왼쪽: 레이더 차트 -->
+                    <div class="col-md-6">
+                        <div class="radar-chart" style="height: 350px;">
+                            <canvas id="competencyRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- 역량별 점수 -->
+                    <div class="col-md-6">
+                        <div class="result-summary" id="resultSummary">
+                            <h5 class="mb-3">역량별 점수</h5>
+
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 추천 프로그램 -->
+                <div class="mt-4">
+                    <h5 class="mb-3">추천 비교과 프로그램</h5>
+                    <div id="recommendationSection"></div>
+                    <!-- <div class="recommendation-card" >
+                         <div class="d-flex justify-content-between align-items-start">
+                             <div>
+                                 <h6 class="mb-1">창의적 문제해결 워크숍</h6>
+                                 <p class="mb-1 text-muted">창의역량 향상을 위한 워크숍 프로그램</p>
+                                 <p class="mb-0 small">
+                                     <span class="badge bg-info me-2">창의역량</span>
+                                     <span class="badge bg-secondary me-2">2023-07-15</span>
+                                     <span class="badge bg-success">마일리지 30점</span>
+                                 </p>
+                             </div>
+                             <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
+                         </div>
+                     </div>
+
+                     <div class="recommendation-card">
+                         <div class="d-flex justify-content-between align-items-start">
+                             <div>
+                                 <h6 class="mb-1">효과적인 커뮤니케이션 특강</h6>
+                                 <p class="mb-1 text-muted">의사소통 능력 향상을 위한 특강</p>
+                                 <p class="mb-0 small">
+                                     <span class="badge bg-primary me-2">의사소통역량</span>
+                                     <span class="badge bg-secondary me-2">2023-07-20</span>
+                                     <span class="badge bg-success">마일리지 20점</span>
+                                 </p>
+                             </div>
+                             <a href="#" class="btn btn-sm btn-outline-primary">상세보기</a>
+                         </div>
+                     </div>-->
+                </div>
+
+                <!-- 진단 이력 -->
+
+
+                <!-- 액션 버튼 -->
+                <div class="text-center mt-4">
+                    <!--       <button class="btn btn-outline-primary me-2" onclick="printStudentReport()">
+                               <i class="fas fa-print me-2"></i>
+                               결과 출력
+                           </button>
+                           <button class="btn btn-outline-success me-2" onclick="sendResultEmail()">
+                               <i class="fas fa-envelope me-2"></i>
+                               결과 이메일 발송
+                           </button>-->
+                    <button class="btn btn-outline-secondary" onclick="hideStudentDetail()">
+                        <i class="fas fa-times me-2"></i>
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<script>
+
+    let allDiagnosisData = [];  // ← 전체 학생 진단 결과 저장용
+
+    // 결과 검색
+    function searchResults() {
+        const keyword = document.getElementById('searchStudent').value.trim();
+        const filtered = allDiagnosisData.filter(d =>
+            d.stdNo.includes(keyword) || d.stdNm.includes(keyword)
+        );
+        renderDiagnosisTable(filtered);  // 필터링된 데이터 렌더링
+    }
+
+    // 학생 상세 정보 보기
+    function viewStudentDetail(stdNo) {
+        fetch(`/api/diagnosis/detail-with-color/${stdNo}`)
+            .then(res => res.json())
+            .then(data => {
+                // 이름, 학과 등도 서버에서 가져오는 경우라면 추가 API 필요
+                document.getElementById("studentId").textContent = data.stdNo;
+                document.getElementById("studentName").textContent = data.stdName;
+                document.getElementById("studentDepartment").textContent = data.departmentName;
+                document.getElementById("studentGrade").textContent = data.grade + "학년";
+                document.getElementById("studentEmail").textContent = `${data.stdNo}@dhuniv.ac.kr`;
+
+                renderDiagnosisDetail(data.diagnosisDetails);
+                renderRadarChart(data.diagnosisDetails);
+                renderRecommendedPrograms(data.stdNo);
+            });
+
+        document.getElementById('studentDetailSection').style.display = 'block';
+        document.getElementById('studentDetailSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // 학생 상세 정보 숨기기
+    function hideStudentDetail() {
+        document.getElementById('studentDetailSection').style.display = 'none';
+    }
+
+    // 결과 내보내기
+    function exportResults() {
+        alert('진단 결과를 엑셀 파일로 내보냅니다.');
+        // 실제 구현에서는 서버 API 호출하여 파일 다운로드
+    }
+
+    // 결과 출력
+    function printStudentReport() {
+        alert('학생 진단 결과를 출력합니다.');
+        // 실제 구현에서는 인쇄 기능 실행
+    }
+
+    // 결과 이메일 발송
+    function sendResultEmail() {
+        const studentId = document.getElementById('studentId').textContent;
+        const studentEmail = document.getElementById('studentEmail').textContent;
+
+        alert(`${studentId} 학생에게 진단 결과를 이메일(${studentEmail})로 발송합니다.`);
+        // 실제 구현에서는 서버 API 호출
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('진단 결과 열람 페이지가 로드되었습니다.');
+
+        // URL 파라미터에서 학생 ID 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const studentId = urlParams.get('student');
+
+        // 학생 ID가 있으면 상세 정보 표시
+        if (studentId) {
+            viewStudentDetail(studentId);
+        }
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/api/diagnosis/recent')
+            .then(res => res.json())
+            .then(
+                data => {
+                    allDiagnosisData = data;
+                    renderDiagnosisTable(data)});
+    });
+
+    function renderDiagnosisTable(data) {
+        const tbody = document.querySelector("tbody");
+        tbody.innerHTML = "";
+
+        if (data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">검색 결과가 없습니다.</td></tr>`;
+            return;
         }
 
-        // 학생 상세 정보 보기
-        function viewStudentDetail(stdNo) {
-            fetch(`/api/diagnosis/detail-with-color/${stdNo}`)
-                .then(res => res.json())
-                .then(data => {
-                    // 이름, 학과 등도 서버에서 가져오는 경우라면 추가 API 필요
-                    document.getElementById("studentId").textContent = data.stdNo;
-                    document.getElementById("studentName").textContent = data.stdName;
-                    document.getElementById("studentDepartment").textContent = data.departmentName;
-                    document.getElementById("studentGrade").textContent = data.grade + "학년";
-                    document.getElementById("studentEmail").textContent = `${data.stdNo}@dhuniv.ac.kr`;
-
-                    renderDiagnosisDetail(data.diagnosisDetails);
-                    renderRadarChart(data.diagnosisDetails);
-                    renderRecommendedPrograms(data.stdNo);
-                });
-
-            document.getElementById('studentDetailSection').style.display = 'block';
-            document.getElementById('studentDetailSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // 학생 상세 정보 숨기기
-        function hideStudentDetail() {
-            document.getElementById('studentDetailSection').style.display = 'none';
-        }
-
-        // 결과 내보내기
-        function exportResults() {
-            alert('진단 결과를 엑셀 파일로 내보냅니다.');
-            // 실제 구현에서는 서버 API 호출하여 파일 다운로드
-        }
-
-        // 결과 출력
-        function printStudentReport() {
-            alert('학생 진단 결과를 출력합니다.');
-            // 실제 구현에서는 인쇄 기능 실행
-        }
-
-        // 결과 이메일 발송
-        function sendResultEmail() {
-            const studentId = document.getElementById('studentId').textContent;
-            const studentEmail = document.getElementById('studentEmail').textContent;
-            
-            alert(`${studentId} 학생에게 진단 결과를 이메일(${studentEmail})로 발송합니다.`);
-            // 실제 구현에서는 서버 API 호출
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('진단 결과 열람 페이지가 로드되었습니다.');
-            
-            // URL 파라미터에서 학생 ID 가져오기
-            const urlParams = new URLSearchParams(window.location.search);
-            const studentId = urlParams.get('student');
-            
-            // 학생 ID가 있으면 상세 정보 표시
-            if (studentId) {
-                viewStudentDetail(studentId);
-            }
-        });
-
-
-        document.addEventListener("DOMContentLoaded", function () {
-            fetch('/api/diagnosis/recent')
-                .then(res => res.json())
-                .then(
-                    data => {
-                        allDiagnosisData = data;
-                        renderDiagnosisTable(data)});
-        });
-
-        function renderDiagnosisTable(data) {
-            const tbody = document.querySelector("tbody");
-            tbody.innerHTML = "";
-
-            if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">검색 결과가 없습니다.</td></tr>`;
-                return;
-            }
-
-            data.forEach(student => {
-                const color = getColorByScore(student.averageScore);
-                const row = `
+        data.forEach(student => {
+            const color = getColorByScore(student.averageScore);
+            const row = `
             <tr>
                 <td>${student.stdNo}</td>
                 <td>${student.stdNm}</td>
@@ -526,32 +543,32 @@
                 </td>
                 <td>
                     <button class="btn btn-sm btn-outline-primary" onclick="viewStudentDetail('${student.stdNo}')">
-                        <i class="fas fa-eye"></i>
+                        <i class="fas fa-eye">보기</i>
                     </button>
                 </td>
             </tr>
         `;
-                tbody.insertAdjacentHTML("beforeend", row);
-            });
+            tbody.insertAdjacentHTML("beforeend", row);
+        });
+    }
+
+
+    function getColorByScore(score) {
+        if (score >= 80) return '#198754';
+        if (score >= 60) return '#0d6efd';
+        if (score >= 40) return '#ffc107';
+        return '#dc3545';
+    }
+    function renderDiagnosisDetail(data) {
+        const container = document.getElementById("resultSummary");
+        if (!data || data.length === 0) {
+            container.innerHTML = "<p class='text-muted'>데이터 없음</p>";
+            return;
         }
 
-
-        function getColorByScore(score) {
-            if (score >= 80) return '#198754';
-            if (score >= 60) return '#0d6efd';
-            if (score >= 40) return '#ffc107';
-            return '#dc3545';
-        }
-        function renderDiagnosisDetail(data) {
-            const container = document.getElementById("resultSummary");
-            if (!data || data.length === 0) {
-                container.innerHTML = "<p class='text-muted'>데이터 없음</p>";
-                return;
-            }
-
-            container.innerHTML = `
+        container.innerHTML = `
         <h5 class="mb-3">역량별 점수</h5>` +
-                data.map(item => `
+            data.map(item => `
             <div class="mb-3">
                 <div class="d-flex justify-content-between">
                     <strong>${item.competencyName}</strong>
@@ -564,67 +581,67 @@
                 </div>
             </div>
         `).join('');
+    }
+
+    let radarChart = null;
+
+    function renderRadarChart(data) {
+        const ctx = document.getElementById('competencyRadarChart');
+        const labels = data.map(item => item.competencyName);
+        const scores = data.map(item => item.score);
+        const colors = data.map(item => item.colorHex);
+
+        if (radarChart !== null) {
+            radarChart.destroy();
         }
 
-        let radarChart = null;
-
-        function renderRadarChart(data) {
-            const ctx = document.getElementById('competencyRadarChart');
-            const labels = data.map(item => item.competencyName);
-            const scores = data.map(item => item.score);
-            const colors = data.map(item => item.colorHex);
-
-            if (radarChart !== null) {
-                radarChart.destroy();
-            }
-
-            radarChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: '역량 점수',
-                        data: scores,
-                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                        borderColor: '#9966ff',
-                        borderWidth: 2,
-                        pointBackgroundColor: colors,
-                        pointBorderColor: "#fff",
-                        pointHoverBackgroundColor: "#fff",
-                        pointHoverBorderColor: colors
-                    }]
+        radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '역량 점수',
+                    data: scores,
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: '#9966ff',
+                    borderWidth: 2,
+                    pointBackgroundColor: colors,
+                    pointBorderColor: "#fff",
+                    pointHoverBackgroundColor: "#fff",
+                    pointHoverBorderColor: colors
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: true, position: 'top' }
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: true, position: 'top' }
-                    },
-                    scales: {
-                        r: {
-                            min: 0,
-                            max: 250,
-                            ticks: {
-                                stepSize: 20
-                            },
-                            pointLabels: {
-                                font: { size: 14 }
-                            }
+                scales: {
+                    r: {
+                        min: 0,
+                        max: 250,
+                        ticks: {
+                            stepSize: 20
+                        },
+                        pointLabels: {
+                            font: { size: 14 }
                         }
                     }
                 }
-            });
-        }
-        function renderRecommendedPrograms(stdNo) {
-            fetch(`/api/diagnosis/recommend/${stdNo}`)
-                .then(res => res.json())
-                .then(programs => {
-                    const container = document.getElementById('recommendationSection');
-                    if (!programs || programs.length === 0) {
-                        container.innerHTML = '<p class="text-muted">추천할 비교과 프로그램이 없습니다.</p>';
-                        return;
-                    }
+            }
+        });
+    }
+    function renderRecommendedPrograms(stdNo) {
+        fetch(`/api/diagnosis/recommend/${stdNo}`)
+            .then(res => res.json())
+            .then(programs => {
+                const container = document.getElementById('recommendationSection');
+                if (!programs || programs.length === 0) {
+                    container.innerHTML = '<p class="text-muted">추천할 비교과 프로그램이 없습니다.</p>';
+                    return;
+                }
 
-                    container.innerHTML = programs.map(prg => `
+                container.innerHTML = programs.map(prg => `
                 <div class="recommendation-card">
                     <div class="d-flex justify-content-between align-items-start">
                         <div>
@@ -639,19 +656,541 @@
                     </div>
                 </div>
             `).join('');
-                })
-                .catch(err => {
-                    console.error("❌ 추천 프로그램 조회 실패:", err);
-                    document.getElementById('recommendationSection').innerHTML =
-                        '<p class="text-danger">추천 프로그램을 불러오지 못했습니다.</p>';
-                });
+            })
+            .catch(err => {
+                console.error("❌ 추천 프로그램 조회 실패:", err);
+                document.getElementById('recommendationSection').innerHTML =
+                    '<p class="text-danger">추천 프로그램을 불러오지 못했습니다.</p>';
+            });
+    }
+
+    // 날짜 포맷 YYYY-MM-DD
+    function formatDate(dateStr) {
+        const date = new Date(dateStr);
+        return date.toISOString().split('T')[0];
+    }
+</script>
+<!-- 스크립트 -->
+<script>
+    function openAddQuestionModal() {
+        document.getElementById('qstIdHidden').value = '';
+        document.getElementById('qstCodeHidden').value = '';
+        document.getElementById('qstCodeDisplay').innerText = '';
+        document.getElementById('questionText').value = '';
+        document.getElementById('competency').value = '';
+        clearSubCompetencyOptions();
+        loadLikertOptions();
+
+        new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
+    }
+
+    function handleSaveOrUpdate() {
+        const qstId = document.getElementById('qstIdHidden').value;
+        if (qstId) {
+            saveOrUpdateQuestion(true, qstId);  // 수정
+        } else {
+            saveOrUpdateQuestion(false, null);  // 등록
+        }
+    }
+    // ✅ 문항 저장 (문항 + 선택지)
+    function saveOrUpdateQuestion(isUpdate = false, qstId = null) {
+        const payload = {
+            qstCode: document.getElementById('qstCodeHidden').value,
+            questionText: document.getElementById('questionText').value,
+            qstOrd: 1,
+            coreCptInfoId: Number(document.getElementById('subCompetency').value),
+            regUserId: 'admin',
+            optionTemplateId: 1,
+            options: []
+        };
+
+        document.querySelectorAll('#optionsContainer .option-input').forEach((opt) => {
+            payload.options.push({
+                text: opt.querySelector('input[type=text]').value,
+                score: parseInt(opt.querySelector('input[type=number]').value),
+                isCorrect: false
+            });
+        });
+
+        const method = isUpdate ? 'PUT' : 'POST';
+        const url = isUpdate ? `/api/questions/${qstId}` : '/api/questions';
+
+        fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        }).then(res => {
+            if (res.ok) {
+                alert(isUpdate ? '문항이 수정되었습니다.' : '문항이 저장되었습니다.');
+                location.reload();
+            } else {
+                alert(isUpdate ? '문항 수정 실패' : '문항 저장 실패');
+            }
+        });
+    }
+
+
+    /**
+     * ✅ 선택된 하위 역량에 대한 문항 코드 생성 요청
+     */
+    function loadNextQstCode() {
+        const subCptId = document.getElementById('subCompetency').value;
+        if (!subCptId) {
+            alert('하위 역량을 선택해주세요.');
+            return;
         }
 
-        // 날짜 포맷 YYYY-MM-DD
-        function formatDate(dateStr) {
-            const date = new Date(dateStr);
-            return date.toISOString().split('T')[0];
+        fetch(`/api/questions/next-code?subCptId=${subCptId}`)
+            .then(res => res.text())
+            .then(code => {
+                console.log("생성된 코드: ", code);
+                document.getElementById('qstCodeDisplay').innerText = code; // 코드 표시용 요소
+                // 필요시 hidden input에 저장
+                document.getElementById('qstCodeHidden').value = code;
+            })
+            .catch(() => alert("문항 코드 생성 실패"));
+    }
+    /**
+     * ✅ 문항 삭제
+     * @param {number} qstId 삭제할 문항 ID
+     */
+    function deleteQuestion(qstId) {
+        if (!confirm("⚠️ 해당 문항을 삭제하면 이 문항에 답변한 학생들의 기록도 함께 삭제됩니다. 정말 삭제하시겠습니까?\"")) return;
+
+        fetch(`/api/questions/${qstId}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (res.ok) {
+                alert("삭제되었습니다.");
+                loadQuestions(); // 목록 새로고침
+            } else {
+                alert("삭제 실패");
+            }
+        });
+    }
+    /**
+     * ✅ 문항 수정 모달 열기 (기본은 fetch 로 데이터를 가져온 후 모달에 세팅)
+     * @param {number} qstId 수정할 문항 ID
+     */
+    function editQuestion(qstId) {
+        fetch(`/api/questions/${qstId}`)
+            .then(res => res.json())
+            .then(data => {
+                // 값 세팅
+                document.getElementById('qstIdHidden').value = data.qstId;  // ✅ qstId 저장
+                document.getElementById('competency').value = data.topCompetencyId;
+                loadSubCompetencies(data.topCompetencyId);
+
+                setTimeout(() => {
+                    document.getElementById('subCompetency').value = data.subCompetencyId;
+                }, 300);
+
+                document.getElementById('questionText').value = data.questionText;
+                document.getElementById('qstCodeDisplay').innerText = data.qstCode;
+                document.getElementById('qstCodeHidden').value = data.qstCode;
+
+                // 선택지 세팅 필요 시 작성
+            });
+
+        new bootstrap.Modal(document.getElementById('addQuestionModal')).show();
+    }
+
+
+    /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+     * */
+    // ✅ 문항 목록 조회 및 렌더링
+    function loadQuestions() {
+        fetch('/api/questions')
+            .then(res => res.json())
+            .then(data => {
+                renderQuestionList(data);
+            })
+            .catch(err => {
+                console.error('문항 목록 조회 실패:', err);
+                alert('문항 목록 조회에 실패했습니다.');
+            });
+    }
+    /**
+     * ✅ 문항 목록을 화면에 출력 (questionList 만 비웁니다)
+     * @param {Array} questions 서버에서 받은 문항 리스트
+     */
+    /**
+     * ✅ 문항 목록을 화면에 출력 (questionList 만 비웁니다)
+     * @param {Array} questions 서버에서 받은 문항 리스트
+
+     function renderQuestionList(questions) {
+     const listEl = document.getElementById('questionList');
+     listEl.innerHTML = '';  // pagination 영역과 분리하여 초기화
+
+     if (!questions || questions.length === 0) {
+     listEl.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+     return;
+     }
+
+     questions.forEach((q, idx) => {
+     listEl.innerHTML += `
+     <div class="question-card">
+     <div class="d-flex justify-content-between align-items-start mb-2">
+     <div>
+     <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color:#fff;">
+     ${q.cciNm}
+     </span>
+     <span class="badge bg-secondary me-2">${q.subCompetencyName}</span>
+     <span class="badge bg-info">${q.qstCode}</span>
+     </div>
+     <div>
+     <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})">
+     <i class="fas fa-edit"></i>
+     </button>
+     <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})">
+     <i class="fas fa-trash"></i>
+     </button>
+     </div>
+     </div>
+     <h6 class="mb-2">Q${idx+1}. ${q.questionText}</h6>
+     <div class="question-options">
+     ${renderOptions()}
+     </div>
+     <div class="mt-2 text-muted small">
+     <span class="me-3">문항 코드: ${q.qstCode}</span>
+     <span class="badge bg-success">활성</span>
+     </div>
+     </div>
+     `;
+     });
+     }
+     */
+    // ✅ 리커트 척도 옵션 HTML
+    function renderOptions() {
+        return `
+        <div class="option-item"><input type="radio" disabled> 전혀 그렇지 않다 (1점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇지 않다 (2점)</div>
+        <div class="option-item"><input type="radio" disabled> 보통이다 (3점)</div>
+        <div class="option-item"><input type="radio" disabled> 그렇다 (4점)</div>
+        <div class="option-item"><input type="radio" disabled> 매우 그렇다 (5점)</div>
+    `;
+    }
+    /**------------------------------------------- 1단계 — 진단 문항 목록 API 연동 → 화면에 DB 문항 출력------------------------
+     * */
+
+    /**
+     * 상/하위 역량 불러오는 js 파트
+     * */
+    /**
+     * ✅ 역량 영역 드롭다운 로딩 (상위 역량)
+     */
+    function loadTopCompetencies() {
+        fetch('/api/competencies/list')
+            .then(res => res.json())
+            .then(topList => {
+                console.log('상위 역량 목록:', topList);
+                renderTopCompetencyOptions(topList);
+            });
+    }
+
+    /**
+     * ✅ 상위 역량 옵션 렌더링
+     * @param topList 상위 역량 데이터 배열
+     */
+    function renderTopCompetencyOptions(topList) {
+        const topSelects = [
+            document.getElementById('competencyFilter'),
+            document.getElementById('competency')
+        ];
+
+        // 각 select 초기화
+        topSelects.forEach(sel => {
+            if (sel.id.includes('Filter')) {
+                sel.innerHTML = '<option value="">전체</option>';
+            } else {
+                sel.innerHTML = '<option value="">선택하세요</option>';
+            }
+        });
+
+        // 상위 역량 삽입
+        topList.forEach(top => {
+            topSelects.forEach(sel => {
+                sel.innerHTML += `<option value="${top.cciId}">${top.cciNm}</option>`;
+            });
+        });
+    }
+
+    /**
+     * ✅ 상위 역량 선택 시 하위 역량 로딩
+     * @param cciId 상위 역량 ID
+     */
+    function loadSubCompetencies(cciId) {
+        if (!cciId) {
+            clearSubCompetencyOptions();
+            return;
         }
-    </script>
+
+        fetch(`/api/competencies/${cciId}`)
+            .then(res => res.json())
+            .then(detail => {
+                console.log(`상위 역량 ${cciId} 상세:`, detail);
+                renderSubCompetencyOptions(detail.children);
+            });
+    }
+
+    /**
+     * ✅ 하위 역량 옵션 렌더링
+     * @param children 하위 역량 배열
+     */
+    function renderSubCompetencyOptions(children) {
+        const subSelects = [
+            document.getElementById('subCompetencyFilter'),
+            document.getElementById('subCompetency')
+        ];
+
+        subSelects.forEach(sel => {
+            if (sel.id.includes('Filter')) {
+                sel.innerHTML = '<option value="">전체</option>';
+            } else {
+                sel.innerHTML = '<option value="">선택하세요</option>';
+            }
+        });
+
+        children.forEach(sub => {
+            subSelects.forEach(sel => {
+                sel.innerHTML += `<option value="${sub.cciId}">${sub.cciNm}</option>`;
+            });
+        });
+    }
+
+    /**
+     * ✅ 하위 역량 select 초기화
+     */
+    function clearSubCompetencyOptions() {
+        const subSelects = [
+            document.getElementById('subCompetencyFilter'),
+            document.getElementById('subCompetency')
+        ];
+
+        subSelects.forEach(sel => {
+            if (sel.id.includes('Filter')) {
+                sel.innerHTML = '<option value="">전체</option>';
+            } else {
+                sel.innerHTML = '<option value="">선택하세요</option>';
+            }
+        });
+    }
+
+    /**
+     * ✅ 상위 역량 select change 이벤트 바인딩
+     */
+    function bindTopCompetencyChange() {
+        const topSelects = [
+            document.getElementById('competencyFilter'),
+            document.getElementById('competency')
+        ];
+
+        topSelects.forEach(sel => {
+            sel.addEventListener('change', (e) => {
+                const cciId = e.target.value;
+                loadSubCompetencies(cciId);
+            });
+        });
+    }
+
+    // ✅ 페이지 로드 시
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTopCompetencies();      // 상위 역량 불러오기
+        bindTopCompetencyChange();  // change 이벤트 연결
+        //loadQuestions(); // ✅ DOM 로드 시 목록 불러오기
+        searchQuestions(0);         // 페이지 0부터 조건 없이 페이징 목록 불러오기
+        document.getElementById('subCompetency').addEventListener('change', loadNextQstCode);
+    });
+    /**
+     * 상/하위 역량 불러오는 js 파트
+     * */
+
+    // 문항 추가 모달이 열릴 때 선택지 로드
+    document.getElementById('addQuestionModal').addEventListener('show.bs.modal', function () {
+        loadLikertOptions();
+    });
+
+    /**
+     * ✅ DB에서 리커트 척도 선택지를 로드하여 모달에 렌더링
+     */
+    function loadLikertOptions() {
+        fetch('/api/options/likert')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('optionsContainer');
+                container.innerHTML = ''; // 기존 내용 제거
+
+                data.forEach(opt => {
+                    container.innerHTML += `
+                    <div class="option-input mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text">${opt.ord}</span>
+                            <input type="text" class="form-control" value="${opt.optionText}" readonly>
+                            <span class="input-group-text">점수</span>
+                            <input type="number" class="form-control" value="${opt.score}" readonly style="width: 70px;">
+                        </div>
+                    </div>
+                `;
+                });
+            })
+            .catch(() => {
+                alert('리커트 척도 선택지 로드에 실패했습니다.');
+            });
+    }
+    /**
+     * 필터링 관련 js
+     * */
+
+    /**
+     * ✅ 문항 조회 + 렌더링
+     */
+    function searchQuestions(pageNo = 0) {
+        const topCptId = document.getElementById('competencyFilter').value;
+        const subCptId = document.getElementById('subCompetencyFilter').value;
+        const keyword = document.getElementById('searchQuestion').value;
+
+        const params = new URLSearchParams();
+        params.append('page', pageNo);
+        params.append('size', 10);
+        if (topCptId) params.append('topCptId', topCptId);
+        if (subCptId) params.append('subCptId', subCptId);
+        if (keyword) params.append('keyword', keyword);
+
+        fetch(`/api/questions/filter?${params.toString()}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                renderQuestionList(data.content);
+                renderPagination(data);
+            })
+            .catch(err => {
+                console.error('문항 조회 실패:', err);
+                alert('문항 조회 실패: ' + err.message);
+            });
+    }
+
+
+    // 초기 로드 시 바로 0페이지부터 조회
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTopCompetencies();
+        bindTopCompetencyChange();
+        searchQuestions(0);
+    });
+
+    /**
+     * ✅ 문항 목록 출력
+     */
+    function renderQuestionList(questions) {
+        const listEl = document.getElementById('questionList');
+        listEl.innerHTML = '';
+
+        if (!questions || questions.length === 0) {
+            listEl.innerHTML = '<p class="text-muted">등록된 문항이 없습니다.</p>';
+            return;
+        }
+
+        questions.forEach((q, idx) => {
+            listEl.innerHTML += `
+        <div class="question-card position-relative">
+            <!-- 우측 상단 수정/삭제 버튼 -->
+            <div class="position-absolute top-0 end-0 mt-2 me-2">
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="editQuestion(${q.qstId})" title="수정">
+                    <i class="fas fa-edit">수정</i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="deleteQuestion(${q.qstId})" title="삭제">
+                    <i class="fas fa-trash">삭제</i>
+                </button>
+            </div>
+
+            <!-- 문항 정보 -->
+            <span class="badge badge-competency me-2" style="background-color:${q.colorHex}; color:#fff;">
+                ${q.competencyName}
+            </span>
+            <span class="badge bg-secondary">${q.subCompetencyName}</span>
+            <span class="badge bg-info">${q.qstCode}</span>
+            <h6>Q${idx + 1}. ${q.questionText}</h6>
+        </div>
+        `;
+        });
+    }
+
+
+
+    /**
+     * 필터링 관련 js 끝
+     * */
+
+    /**
+     * 페이징 관련 js 시작
+     * */
+    /**
+     * ✅ 특정 페이지 로드
+     * @param {number} pageNo 페이지 번호
+     */
+    function loadPage(pageNo) {
+        fetch(`/api/questions?page=${pageNo}`)
+            .then(res => res.json())
+            .then(data => {
+                renderQuestionList(data.questions); // 목록 렌더링
+                renderPagination(data.pageInfo);    // 페이지네이션 렌더링
+            });
+    }
+
+    /**
+     * ✅ 페이징 렌더링
+     */
+    function renderPagination(page) {
+        const paginationEl = document.getElementById('pagination');
+        if (!paginationEl) {
+            console.warn('.pagination 요소를 찾을 수 없습니다.');
+            return;
+        }
+
+        paginationEl.innerHTML = '';
+        for (let i = 0; i < page.totalPages; i++) {
+            paginationEl.innerHTML += `
+          <li class="page-item ${page.number === i ? 'active' : ''}">
+            <a class="page-link" href="#" onclick="searchQuestions(${i})">${i + 1}</a>
+          </li>
+        `;
+        }
+    }
+
+
+
+    /**
+     * 페이징 관련 js 끝
+     * */
+
+</script>
+</script>
+<script>
+    const sidebar = document.getElementById("sidebar");
+    const hamburger = document.getElementById("hamburger");
+    hamburger.addEventListener("click", () => {
+        sidebar.classList.toggle("show");
+    });
+
+    const menuLinks = document.querySelectorAll("[data-menu]");
+    menuLinks.forEach((menu) => {
+        menu.addEventListener("click", (e) => {
+            e.preventDefault();
+            const key = menu.getAttribute("data-menu");
+            const submenu = document.getElementById(`submenu-${key}`);
+
+            document.querySelectorAll(".submenu").forEach((sm) => {
+                if (sm !== submenu) sm.style.display = "none";
+            });
+
+            if (submenu) {
+                submenu.style.display =
+                    submenu.style.display === "block" ? "none" : "block";
+            }
+        });
+    });
+</script>
+<script src="/js/layout/e_header.js"></script>
 </body>
 </html>

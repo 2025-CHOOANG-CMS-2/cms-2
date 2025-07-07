@@ -1,0 +1,72 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/extras/spring-security">
+<th:block th:fragment="s_sidebar">
+    <aside class="sidebar" id="sidebar" >
+        <!-- 모바일에서 사용자 정보 표시 -->
+        <!--<div class="sidebar-user-info">
+            <div><strong>홍길동</strong> (20231234)</div>
+            <div>컴퓨터공학과 3학년</div>
+            <div class="mt-2">
+                <button class="user-btn" title="로그아웃">
+                    <i class="bi bi-box-arrow-right"></i> 로그아웃
+                </button>
+            </div>
+        </div>-->
+        <!-- 메뉴 항목 -->
+        <nav class="nav flex-column">
+            <a class="nav-link" href="/students/notice">공지사항</a>
+            <a class="nav-link has-submenu" href="/students/competency-diagnosis" data-menu="역량"
+            >핵심역량관리</a
+            >
+            <!--<div class="submenu" id="submenu-역량" style="display: none">
+                <a class="nav-link" href="/competency/test">진단검사</a>
+                <a class="nav-link" href="/competency/history">진단결과이력</a>
+            </div>-->
+            <a class="nav-link has-submenu" href="/students/programs" data-menu="비교과">비교과프로그램</a>
+            <div class="submenu" id="submenu-비교과" style="display: none">
+                <a class="nav-link" href="/students/programs">프로그램 목록</a>
+                <a class="nav-link" href="/students/programs/status">프로그램 참여 현황</a>
+            </div>
+            <a class="nav-link has-submenu" href="/students/counsel-book" data-menu="상담" >상담센터</a>
+            <div class="submenu" id="submenu-상담" style="display: none">
+                <a class="nav-link" href="/students/counsel-book">상담 예약</a>
+                <a class="nav-link" href="/students/counsel-history">상담 신청 내역</a>
+                <!--<a class="nav-link" href="/counseling/results">상담결과</a>-->
+            </div>
+            <a class="nav-link" href="/student/mileage">마일리지</a>
+            <a id="mypage-link" href="#" class="nav-link">
+               마이페이지
+            </a>
+
+        </nav>
+    </aside>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const token = localStorage.getItem("accessToken");
+            //if (!token) return;
+
+            try {
+                const res = await fetch("/api/user/me/student", {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) throw new Error("학생 인증 실패");
+
+                const data = await res.json();
+               // console.log("sidebar data 확인 "+data.userId);
+                // ✅ 마이페이지 링크에 클릭 이벤트 추가
+                const link = document.getElementById("mypage-link");
+                if (link) {
+                    link.addEventListener("click", function (e) {
+                        e.preventDefault(); // 기존 a 태그 동작 막기
+                        window.location.href = `/students/mypage?studentId=${data.userId}`; // 직접 이동
+                    });
+                }
+            } catch (err) {
+                console.warn("학생 정보 가져오기 실패", err);
+            }
+        });
+    </script>
+</th:block>

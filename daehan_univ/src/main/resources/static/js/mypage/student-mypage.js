@@ -88,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (profileAvatar?.dataset.profileImageUrl) {
         const url = profileAvatar.dataset.profileImageUrl;
         if (url.startsWith('/uploads/std_profile/')) {
-            profileAvatar.style.backgroundImage = `url(${url})`;
+            profileAvatar.style.backgroun
+
+            dImage = `url(${url})`;
             profileAvatar.style.backgroundSize = 'cover';
             profileAvatar.style.backgroundPosition = 'center';
             if (avatarIcon) avatarIcon.style.display = 'none';
@@ -223,12 +225,12 @@ function resetPersonalInfo() {
     }
 }
 
-// 로그아웃
+/*// 로그아웃
 function logout() {
     if (confirm('로그아웃 하시겠습니까?')) {
         window.location.href = '/logout';
     }
-}
+}*/
 
 // 비밀번호 변경 폼 제출 이벤트 리스너 (버튼 항상 활성화 상태 유지)
 document.getElementById('passwordForm')?.addEventListener('submit', async function (e) {

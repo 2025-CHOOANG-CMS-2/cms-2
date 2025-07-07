@@ -1,0 +1,37 @@
+<header class="header d-flex" th:fragment="e_header">
+    <div class="header-left" onclick="goIndex()">
+
+        <span class="hamburger" id="hamburger">&#9776;</span> 대한대학교 교직원 포털
+
+    </div>
+    <script>
+        function goIndex(){
+            location.href="/employees/index";
+        }
+    </script>
+    <div class="header-center">
+        <img src="/images/logo-white.png" alt="logo" height="30" class="me-2" />
+        대한대학교
+    </div>
+    <div class="header-right" id="user-info">
+        <!-- ✅ 로그인된 경우 -->
+        <div id="user-logged-in" class="user-box" style="display: none;">
+            <div class="user-info" id="empl-info">
+                <!-- JS로 동적 채움 -->
+            </div>
+            <button class="user-btn" title="로그아웃" onclick="logout()">
+                <i class="bi bi-box-arrow-right">로그아웃</i>
+            </button>
+        </div>
+
+        <!-- ❌ 로그아웃 상태 -->
+        <div id="user-logged-out" class="user-box" style="display: none;">
+            <button class="user-btn" title="로그인" onclick="location.href='/login'">
+                <i class="bi bi-box-arrow-in-right"></i> 로그인
+            </button>
+        </div>
+    </div>
+</header>
+
+
+
